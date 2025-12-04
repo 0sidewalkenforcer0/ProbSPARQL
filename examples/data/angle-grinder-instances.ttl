@@ -1,0 +1,889 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <http://example.org/ontology/core#> .
+@prefix ag: <http://example.org/ontology/anglegrinder#> .
+@prefix cfm: <http://example.org/ontology/cfm#> .
+@prefix om: <http://example.org/ontology/om#> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+@prefix ex: <http://example.org/data/> .
+
+# ============================================
+# Units of Measurement - Instance Data
+# ============================================
+
+om:millimetre a om:LengthUnit ;
+    rdfs:label "millimetre"@en ;
+    rdfs:comment "SI unit of length: 1/1000 of a metre"@en .
+
+om:metre a om:LengthUnit ;
+    rdfs:label "metre"@en ;
+    rdfs:comment "SI base unit of length"@en .
+
+om:centimetre a om:LengthUnit ;
+    rdfs:label "centimetre"@en ;
+    rdfs:comment "1/100 of a metre"@en .
+
+om:inch a om:LengthUnit ;
+    rdfs:label "inch"@en ;
+    rdfs:comment "Imperial unit of length: 25.4 mm"@en .
+
+om:micrometre a om:LengthUnit ;
+    rdfs:label "micrometre"@en ;
+    rdfs:comment "1/1000000 of a metre (micron)"@en .
+
+# ============================================
+# Angle Grinder Product Instances
+# ============================================
+
+ex:anglegrinder_001 a ag:AngleGrinder ;
+    rdfs:label "AG-2000 Professional Angle Grinder"@en ;
+    rdfs:comment "High-end professional model with advanced features"@en ;
+    ag:hasPart ex:crowngear_001, ex:crowngear_002 .
+
+ex:anglegrinder_002 a ag:AngleGrinder ;
+    rdfs:label "AG-1500 Standard Angle Grinder"@en ;
+    rdfs:comment "Standard consumer model"@en ;
+    ag:hasPart ex:crowngear_003 .
+
+# ============================================
+# Measurable Characteristics
+# ============================================
+
+ex:toothlength_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #001)"@en ;
+    rdfs:comment "Geometric characteristic being measured"@en .
+
+ex:toothlength_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #002)"@en ;
+    rdfs:comment "Geometric characteristic being measured"@en .
+
+ex:toothlength_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #003)"@en ;
+    rdfs:comment "Geometric characteristic being measured"@en .
+
+# ============================================
+# Crown Gear Part Instances
+# ============================================
+
+ex:crowngear_001 a ag:CrownGear ;
+    rdfs:label "Crown Gear #001"@en ;
+    rdfs:comment "Manually inspected, high quality part"@en ;
+    cfm:hasScan ex:pointcloud_001 ;
+    cfm:hasCharacteristic ex:toothlength_char_001 .  
+
+ex:crowngear_002 a ag:CrownGear ;
+    rdfs:label "Crown Gear #002"@en ;
+    rdfs:comment "Automated vision inspection"@en ;
+    cfm:hasScan ex:pointcloud_002 ;
+    cfm:hasCharacteristic ex:toothlength_char_002 .  
+
+ex:crowngear_003 a ag:CrownGear ;
+    rdfs:label "Crown Gear #003"@en ;
+    rdfs:comment "Partially occluded during scan"@en ;
+    cfm:hasScan ex:pointcloud_003 ;
+    cfm:hasCharacteristic ex:toothlength_char_003 .  
+
+# ============================================
+# Point Cloud Scan Data
+# ============================================
+
+ex:pointcloud_001 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #001"@en ;
+    rdfs:comment "High-resolution scan from premium scanner"@en .
+
+ex:pointcloud_002 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #002"@en ;
+    rdfs:comment "Standard resolution scan"@en .
+
+ex:pointcloud_003 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #003"@en ;
+    rdfs:comment "Partial scan with occlusions"@en .
+
+# ============================================
+# Random Variables - REMOVED (See U2 section for CT/SL measurements)
+# ============================================
+# Old single-sensor measurements removed to avoid conflicts
+# U1 now uses SL measurements (ex:rv_sl_001-008)
+# U2 uses both CT (ex:rv_ct_001-008) and SL (ex:rv_sl_001-008)
+
+# ============================================
+# Additional Gears for Wear Detection Testing
+# ============================================
+
+ex:anglegrinder_003 a ag:AngleGrinder ;
+
+
+    rdfs:label "AG-1200 Repair Workshop Batch"@en ;
+    rdfs:comment "Batch of gears submitted for wear inspection"@en ;
+    ag:hasPart ex:crowngear_004, ex:crowngear_005, ex:crowngear_006, 
+               ex:crowngear_007, ex:crowngear_008 .
+
+# ============================================
+# Additional Measurable Characteristics
+# ============================================
+
+ex:toothlength_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #004)"@en .
+
+ex:toothlength_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #005)"@en .
+
+ex:toothlength_char_006 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #006)"@en .
+
+ex:toothlength_char_007 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #007)"@en .
+
+ex:toothlength_char_008 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth Length Characteristic (Gear #008)"@en .
+
+# ============================================
+# Additional Crown Gear Instances
+# ============================================
+
+ex:crowngear_004 a ag:CrownGear ;
+    rdfs:label "Crown Gear #004"@en ;
+    rdfs:comment "Critical wear detected - requires immediate replacement"@en ;
+    cfm:hasScan ex:pointcloud_004 ;
+    cfm:hasCharacteristic ex:toothlength_char_004 .
+
+ex:crowngear_005 a ag:CrownGear ;
+    rdfs:label "Crown Gear #005"@en ;
+    rdfs:comment "Severe wear - approaching end of service life"@en ;
+    cfm:hasScan ex:pointcloud_005 ;
+    cfm:hasCharacteristic ex:toothlength_char_005 .
+
+ex:crowngear_006 a ag:CrownGear ;
+    rdfs:label "Crown Gear #006"@en ;
+    rdfs:comment "Borderline case - requires monitoring"@en ;
+    cfm:hasScan ex:pointcloud_006 ;
+    cfm:hasCharacteristic ex:toothlength_char_006 .
+
+ex:crowngear_007 a ag:CrownGear ;
+    rdfs:label "Crown Gear #007"@en ;
+    rdfs:comment "Normal wear - within specification"@en ;
+    cfm:hasScan ex:pointcloud_007 ;
+    cfm:hasCharacteristic ex:toothlength_char_007 .
+
+ex:crowngear_008 a ag:CrownGear ;
+    rdfs:label "Crown Gear #008"@en ;
+    rdfs:comment "Minimal wear - like new condition"@en ;
+    cfm:hasScan ex:pointcloud_008 ;
+    cfm:hasCharacteristic ex:toothlength_char_008 .
+
+# ============================================
+# Additional Point Cloud Scans
+# ============================================
+
+ex:pointcloud_004 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #004"@en ;
+    rdfs:comment "High-resolution scan showing wear patterns"@en .
+
+ex:pointcloud_005 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #005"@en ;
+    rdfs:comment "Standard resolution scan"@en .
+
+ex:pointcloud_006 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #006"@en ;
+    rdfs:comment "Scan with moderate uncertainty"@en .
+
+ex:pointcloud_007 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #007"@en ;
+    rdfs:comment "Clean scan from optimal angle"@en .
+
+ex:pointcloud_008 a cfm:PointCloud ;
+    rdfs:label "Point Cloud Scan #008"@en ;
+    rdfs:comment "High-confidence measurement"@en .
+
+# ============================================
+# CT Voxel Grid Data (from CT Scanner)
+# ============================================
+
+ex:voxelgrid_001 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #001"@en ;
+    rdfs:comment "High-resolution CT scan of Gear #001"@en .
+
+ex:voxelgrid_002 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #002"@en ;
+    rdfs:comment "CT scan of Gear #002"@en .
+
+ex:voxelgrid_003 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #003"@en ;
+    rdfs:comment "CT scan of Gear #003"@en .
+
+ex:voxelgrid_004 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #004"@en ;
+    rdfs:comment "CT scan of Gear #004"@en .
+
+ex:voxelgrid_005 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #005"@en ;
+    rdfs:comment "CT scan of Gear #005"@en .
+
+ex:voxelgrid_006 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #006"@en ;
+    rdfs:comment "CT scan of Gear #006"@en .
+
+ex:voxelgrid_007 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #007"@en ;
+    rdfs:comment "CT scan of Gear #007 - ABNORMAL: systematic bias detected"@en .
+
+ex:voxelgrid_008 a cfm:VoxelGrid ;
+    rdfs:label "CT Voxel Grid #008"@en ;
+    rdfs:comment "CT scan of Gear #008 - ABNORMAL: calibration issue suspected"@en .
+
+# ============================================
+# CT Scanner Measurements with Uncertainty
+# ============================================
+
+ex:measurement_ct_001 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #001)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_001 ;
+    cfm:measuresCharacteristic ex:toothlength_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_ct_001 ;
+    om:hasValue "9.15"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 9.15mm (close to SL 9.2mm, small divergence)"@en .
+
+ex:measurement_ct_002 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #002)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_002 ;
+    cfm:measuresCharacteristic ex:toothlength_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_ct_002 ;
+    om:hasValue "9.8"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 9.8mm (good agreement with SL)"@en .
+
+ex:measurement_ct_003 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #003)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_003 ;
+    cfm:measuresCharacteristic ex:toothlength_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_ct_003 ;
+    om:hasValue "10.2"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 10.2mm (good agreement with SL)"@en .
+
+ex:measurement_ct_004 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #004)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_004 ;
+    cfm:measuresCharacteristic ex:toothlength_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_ct_004 ;
+    om:hasValue "9.05"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 9.05mm (close to SL 9.1mm, small divergence)"@en .
+
+ex:measurement_ct_005 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #005)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_005 ;
+    cfm:measuresCharacteristic ex:toothlength_char_005 ;
+    cfm:hasProbabilisticValue ex:rv_ct_005 ;
+    om:hasValue "9.25"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 9.25mm (close to SL 9.3mm, small divergence)"@en .
+
+ex:measurement_ct_006 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #006)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_006 ;
+    cfm:measuresCharacteristic ex:toothlength_char_006 ;
+    cfm:hasProbabilisticValue ex:rv_ct_006 ;
+    om:hasValue "9.45"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 9.45mm (close to SL 9.5mm, small divergence)"@en .
+
+ex:measurement_ct_007 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #007)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_007 ;
+    cfm:measuresCharacteristic ex:toothlength_char_007 ;
+    cfm:hasProbabilisticValue ex:rv_ct_007 ;
+    om:hasValue "10.0"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 10.0mm ⚠️ ABNORMAL: large divergence from SL (10.8mm)"@en .
+
+ex:measurement_ct_008 a om:Measure ;
+    rdfs:label "CT Tooth Length Measurement (Gear #008)"@en ;
+    cfm:hasInputVoxelGrid ex:voxelgrid_008 ;
+    cfm:measuresCharacteristic ex:toothlength_char_008 ;
+    cfm:hasProbabilisticValue ex:rv_ct_008 ;
+    om:hasValue "10.2"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "CT measurement: 10.2mm ⚠️ ABNORMAL: large divergence from SL (10.8mm)"@en .
+
+# ============================================
+# Structured-Light Measurements with Uncertainty
+# ============================================
+
+ex:measurement_sl_001 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #001)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_001 ;
+    cfm:measuresCharacteristic ex:toothlength_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_sl_001 ;
+    om:hasValue "9.2"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 9.2mm - SEVERE WEAR for U1, slight divergence from CT for U2"@en .
+
+ex:measurement_sl_002 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #002)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_002 ;
+    cfm:measuresCharacteristic ex:toothlength_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_sl_002 ;
+    om:hasValue "9.6"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 9.6mm - MODERATE WEAR for U1, good agreement with CT for U2"@en .
+
+ex:measurement_sl_003 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #003)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_003 ;
+    cfm:measuresCharacteristic ex:toothlength_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_sl_003 ;
+    om:hasValue "10.5"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 10.5mm - NORMAL for U1, good agreement with CT for U2"@en .
+
+ex:measurement_sl_004 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #004)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_004 ;
+    cfm:measuresCharacteristic ex:toothlength_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_sl_004 ;
+    om:hasValue "9.1"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 9.1mm - CRITICAL WEAR for U1, normal agreement with CT for U2"@en .
+
+ex:measurement_sl_005 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #005)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_005 ;
+    cfm:measuresCharacteristic ex:toothlength_char_005 ;
+    cfm:hasProbabilisticValue ex:rv_sl_005 ;
+    om:hasValue "9.3"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 9.3mm - SEVERE WEAR for U1, acceptable agreement with CT for U2"@en .
+
+ex:measurement_sl_006 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #006)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_006 ;
+    cfm:measuresCharacteristic ex:toothlength_char_006 ;
+    cfm:hasProbabilisticValue ex:rv_sl_006 ;
+    om:hasValue "9.5"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 9.5mm - BORDERLINE WEAR for U1, normal agreement with CT for U2"@en .
+
+ex:measurement_sl_007 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #007)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_007 ;
+    cfm:measuresCharacteristic ex:toothlength_char_007 ;
+    cfm:hasProbabilisticValue ex:rv_sl_007 ;
+    om:hasValue "10.8"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 10.8mm - NORMAL for U1, ⚠️ ABNORMAL divergence from CT (10.0mm) for U2"@en .
+
+ex:measurement_sl_008 a om:Measure ;
+    rdfs:label "Structured-Light Tooth Length Measurement (Gear #008)"@en ;
+    cfm:hasInputPointCloud ex:pointcloud_008 ;
+    cfm:measuresCharacteristic ex:toothlength_char_008 ;
+    cfm:hasProbabilisticValue ex:rv_sl_008 ;
+    om:hasValue "10.8"^^xsd:double ;
+    om:hasUnit om:millimetre ;
+    rdfs:comment "Structured-light: 10.8mm - NORMAL for U1, ⚠️ ABNORMAL divergence from CT (9.5mm) for U2"@en .
+
+# ============================================
+# CT Scanner Random Variables (GMM Distributions)
+# ============================================
+
+ex:rv_ct_001 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #001)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.15],[9.05]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT bimodal: 75% gear body N(9.15,σ=0.2) + 25% edge artifact N(9.05,σ=0.3)"@en .
+
+ex:rv_ct_002 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #002)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.8],[9.75],[9.9]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT trimodal: material density variation across tooth (60% mid + 30% base + 10% tip)"@en .
+
+ex:rv_ct_003 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #003)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.2],[10.1]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT bimodal: 70% primary measurement + 30% partial volume effect"@en .
+
+ex:rv_ct_004 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #004)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.05],[8.95]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT bimodal: 65% main + 35% wear-induced scatter (worn gear)"@en .
+
+ex:rv_ct_005 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #005)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[9.25],[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT trimodal: severe wear creates heterogeneous density (50% + 30% + 20%)"@en .
+
+ex:rv_ct_006 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #006)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.45],[9.35]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT bimodal: 80% primary + 20% beam hardening artifact"@en .
+
+ex:rv_ct_007 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #007)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.0],[9.85]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT bimodal with systematic bias: 70% N(10.0) + 30% N(9.85) ⚠️ ABNORMAL divergence from SL"@en .
+
+ex:rv_ct_008 a uq:RandomVariable ;
+    rdfs:label "CT Tooth Length Uncertainty (Gear #008)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[10.2],[10.1],[10.35]],\"covariances\":[[[0.06]],[[0.09]],[[0.12]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "CT trimodal calibration drift: 50% + 30% + 20% ⚠️ ABNORMAL divergence from SL"@en .
+
+# ============================================
+# Structured-Light Random Variables (GMM Distributions)
+# ============================================
+
+ex:rv_sl_001 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #001)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 80% clear scan N(9.2) + 20% reflection noise N(9.35) → U1: WORN"@en .
+
+ex:rv_sl_002 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #002)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.6],[9.75]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 75% primary + 25% partial occlusion → U1: MODERATE wear"@en .
+
+ex:rv_sl_003 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #003)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.5],[10.3]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 70% good scan + 30% shadow artifact → U1: NORMAL"@en .
+
+ex:rv_sl_004 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #004)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.85,0.15],\"means\":[[9.1],[9.25]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 85% primary + 15% surface roughness → U1: CRITICAL WEAR"@en .
+
+ex:rv_sl_005 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #005)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.9,0.1],\"means\":[[9.3],[9.45]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 90% clear + 10% glare artifact → U1: SEVERE WEAR"@en .
+
+ex:rv_sl_006 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #006)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.5],[9.65]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 75% main + 25% environmental noise → U1: BORDERLINE"@en .
+
+ex:rv_sl_007 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #007)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.16]],[[0.30]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 65% + 35% high variance → U1: NORMAL, U2: ⚠️ ABNORMAL vs CT"@en .
+
+ex:rv_sl_008 a uq:RandomVariable ;
+    rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #008)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.20]],[[0.30]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "SL bimodal: 60% + 40% mixed modes → U1: NORMAL, U2: ⚠️ ABNORMAL vs CT"@en .
+
+# ============================================
+# U3: MOTOR PERFORMANCE INFERENCE USE CASE
+# Distribution Transformation and Propagation
+# ============================================
+# Client: Functional testers
+# Scenario: Motor power calculation with uncertainty
+# Formula: P (watts) = ω (rad/s) × τ (Nm)
+# ============================================
+
+# ============================================
+# U3: Motor Performance Unit Instances
+# ============================================
+
+om:revolutionsPerMinute a om:AngularVelocityUnit ;
+    rdfs:label "revolutions per minute"@en ;
+    rdfs:comment "RPM: rotational speed unit (1 RPM = 2π/60 rad/s)"@en .
+
+om:newtonMetre a om:TorqueUnit ;
+    rdfs:label "newton metre"@en ;
+    rdfs:comment "Nm: SI unit of torque"@en .
+
+om:watt a om:PowerUnit ;
+    rdfs:label "watt"@en ;
+    rdfs:comment "W: SI unit of power (1 W = 1 J/s = 1 Nm·rad/s)"@en .
+
+# ============================================
+# U3: Motor Instances (linked to existing angle grinders)
+# ============================================
+
+ex:motor_001 a ag:Motor ;
+    rdfs:label "Motor #001 (AG-2000 High-Performance)"@en ;
+    rdfs:comment "High-performance motor under load test, nominal 11000 RPM, target 1.5 Nm"@en ;
+    ag:hasSpeedCharacteristic ex:speed_char_001 ;
+    ag:hasTorqueCharacteristic ex:torque_char_001 .
+
+ex:anglegrinder_001 ag:hasMotor ex:motor_001 .
+
+ex:motor_002 a ag:Motor ;
+    rdfs:label "Motor #002 (AG-1500 Standard)"@en ;
+    rdfs:comment "Standard motor under nominal load, target 10000 RPM, 1.2 Nm"@en ;
+    ag:hasSpeedCharacteristic ex:speed_char_002 ;
+    ag:hasTorqueCharacteristic ex:torque_char_002 .
+
+ex:anglegrinder_002 ag:hasMotor ex:motor_002 .
+
+ex:motor_003 a ag:Motor ;
+    rdfs:label "Motor #003 (AG-1200 Workshop)"@en ;
+    rdfs:comment "Workshop motor with aging bearings, increased friction uncertainty"@en ;
+    ag:hasSpeedCharacteristic ex:speed_char_003 ;
+    ag:hasTorqueCharacteristic ex:torque_char_003 .
+
+ex:anglegrinder_003 ag:hasMotor ex:motor_003 .
+
+# ============================================
+# U3: Motor Performance Characteristics
+# ============================================
+
+ex:speed_char_001 a ag:RotationalSpeed ;
+    rdfs:label "Rotational Speed (Motor #001)"@en ;
+    rdfs:comment "Speed under load test conditions"@en .
+
+ex:torque_char_001 a ag:Torque ;
+    rdfs:label "Output Torque (Motor #001)"@en ;
+    rdfs:comment "Torque measured during load test"@en .
+
+ex:speed_char_002 a ag:RotationalSpeed ;
+    rdfs:label "Rotational Speed (Motor #002)"@en ;
+    rdfs:comment "Speed under nominal operating conditions"@en .
+
+ex:torque_char_002 a ag:Torque ;
+    rdfs:label "Output Torque (Motor #002)"@en ;
+    rdfs:comment "Torque under nominal load"@en .
+
+ex:speed_char_003 a ag:RotationalSpeed ;
+    rdfs:label "Rotational Speed (Motor #003)"@en ;
+    rdfs:comment "Speed with increased uncertainty from bearing wear"@en .
+
+ex:torque_char_003 a ag:Torque ;
+    rdfs:label "Output Torque (Motor #003)"@en ;
+    rdfs:comment "Torque with friction variability"@en .
+
+# ============================================
+# U3: Speed Measurements (with sensor noise)
+# ============================================
+
+ex:measurement_speed_001 a om:Measure ;
+    rdfs:label "Speed Measurement (Motor #001)"@en ;
+    cfm:measuresCharacteristic ex:speed_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_speed_001 ;
+    om:hasValue "1151.9"^^xsd:double ;
+    om:hasUnit om:revolutionsPerMinute ;
+    rdfs:comment "Optical encoder: 11000 RPM → 1151.9 rad/s, ±5.24 rad/s noise"@en .
+
+ex:measurement_speed_002 a om:Measure ;
+    rdfs:label "Speed Measurement (Motor #002)"@en ;
+    cfm:measuresCharacteristic ex:speed_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_speed_002 ;
+    om:hasValue "1047.2"^^xsd:double ;
+    om:hasUnit om:revolutionsPerMinute ;
+    rdfs:comment "Standard encoder: 10000 RPM → 1047.2 rad/s, ±6.28 rad/s noise"@en .
+
+ex:measurement_speed_003 a om:Measure ;
+    rdfs:label "Speed Measurement (Motor #003)"@en ;
+    cfm:measuresCharacteristic ex:speed_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_speed_003 ;
+    om:hasValue "995.0"^^xsd:double ;
+    om:hasUnit om:revolutionsPerMinute ;
+    rdfs:comment "Bearing wear: 9500 RPM → 995.0 rad/s, ±8.38 rad/s uncertainty"@en .
+
+# ============================================
+# U3: Torque Measurements (with load cell noise)
+# ============================================
+
+ex:measurement_torque_001 a om:Measure ;
+    rdfs:label "Torque Measurement (Motor #001)"@en ;
+    cfm:measuresCharacteristic ex:torque_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_torque_001 ;
+    om:hasValue "1.5"^^xsd:double ;
+    om:hasUnit om:newtonMetre ;
+    rdfs:comment "Strain gauge load cell: 1.5 Nm, ±0.05 Nm noise"@en .
+
+ex:measurement_torque_002 a om:Measure ;
+    rdfs:label "Torque Measurement (Motor #002)"@en ;
+    cfm:measuresCharacteristic ex:torque_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_torque_002 ;
+    om:hasValue "1.2"^^xsd:double ;
+    om:hasUnit om:newtonMetre ;
+    rdfs:comment "Standard load cell: 1.2 Nm, ±0.04 Nm uncertainty"@en .
+
+ex:measurement_torque_003 a om:Measure ;
+    rdfs:label "Torque Measurement (Motor #003)"@en ;
+    cfm:measuresCharacteristic ex:torque_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_torque_003 ;
+    om:hasValue "1.1"^^xsd:double ;
+    om:hasUnit om:newtonMetre ;
+    rdfs:comment "Increased friction variability: 1.1 Nm, ±0.06 Nm"@en .
+
+# ============================================
+# U3: Random Variables (GMM Distributions)
+# Speed stored in rad/s for power calculation
+# ============================================
+
+# Speed distributions
+# Motor 001: 11000 RPM → 1151.9 rad/s, σ = 50 RPM → 5.24 rad/s
+ex:rv_speed_001 a uq:RandomVariable ;
+    rdfs:label "Speed Distribution (Motor #001)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[1151.9],[1145.0]],\"covariances\":[[[27.5]],[[50.0]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Speed bimodal: 80% steady N(1151.9,σ=5.24) + 20% vibration mode N(1145.0,σ=7.07)"@en .
+
+# Motor 002: 10000 RPM → 1047.2 rad/s, σ = 60 RPM → 6.28 rad/s
+ex:rv_speed_002 a uq:RandomVariable ;
+    rdfs:label "Speed Distribution (Motor #002)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1047.2],[1040.0]],\"covariances\":[[[39.5]],[[60.0]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Speed bimodal: 75% normal N(1047.2,σ=6.28) + 25% load fluctuation N(1040.0,σ=7.75)"@en .
+
+# Motor 003: 9500 RPM → 995.0 rad/s, σ = 80 RPM → 8.38 rad/s
+ex:rv_speed_003 a uq:RandomVariable ;
+    rdfs:label "Speed Distribution (Motor #003)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[995.0],[985.0]],\"covariances\":[[[70.4]],[[100.0]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Speed bimodal: 70% N(995.0,σ=8.38) + 30% bearing wear mode N(985.0,σ=10.0)"@en .
+
+# Torque distributions
+ex:rv_torque_001 a uq:RandomVariable ;
+    rdfs:label "Torque Distribution (Motor #001)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[1.5],[1.48],[1.55]],\"covariances\":[[[0.0025]],[[0.0036]],[[0.0049]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Torque trimodal: 60% steady load + 30% light + 10% heavy (precision load cell)"@en .
+
+ex:rv_torque_002 a uq:RandomVariable ;
+    rdfs:label "Torque Distribution (Motor #002)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1.2],[1.15]],\"covariances\":[[[0.0016]],[[0.0036]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Torque bimodal: 75% nominal N(1.2,σ=0.04) + 25% load variation N(1.15,σ=0.06)"@en .
+
+ex:rv_torque_003 a uq:RandomVariable ;
+    rdfs:label "Torque Distribution (Motor #003)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[1.1],[1.05],[1.15]],\"covariances\":[[[0.0036]],[[0.0049]],[[0.0064]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Torque trimodal: 50% + 30% + 20% - high friction variability modes"@en .
+
+# ============================================
+# U4: Spindle Instances and Diameter Measurements
+# ============================================
+
+# Spindle characteristics
+ex:diameter_char_001 a ag:Diameter ;
+    rdfs:label "Diameter Characteristic (Spindle #001)"@en ;
+    rdfs:comment "Critical dimension for press-fit assembly"@en .
+
+ex:diameter_char_002 a ag:Diameter ;
+    rdfs:label "Diameter Characteristic (Spindle #002)"@en ;
+    rdfs:comment "Critical dimension for press-fit assembly"@en .
+
+ex:diameter_char_003 a ag:Diameter ;
+    rdfs:label "Diameter Characteristic (Spindle #003)"@en ;
+    rdfs:comment "Critical dimension for press-fit assembly"@en .
+
+# Spindle instances
+ex:spindle_001 a ag:Spindle ;
+    rdfs:label "Spindle #001 (High-Performance)"@en ;
+    rdfs:comment "Precision ground spindle for AG-2000 model"@en ;
+    ag:hasDiameterCharacteristic ex:diameter_char_001 .
+
+ex:spindle_002 a ag:Spindle ;
+    rdfs:label "Spindle #002 (Standard)"@en ;
+    rdfs:comment "Standard tolerance spindle for AG-1500 model"@en ;
+    ag:hasDiameterCharacteristic ex:diameter_char_002 .
+
+ex:spindle_003 a ag:Spindle ;
+    rdfs:label "Spindle #003 (Workshop)"@en ;
+    rdfs:comment "General purpose spindle for AG-1200 model"@en ;
+    ag:hasDiameterCharacteristic ex:diameter_char_003 .
+
+# Link spindles to angle grinders
+ex:anglegrinder_001 ag:hasSpindle ex:spindle_001 .
+ex:anglegrinder_002 ag:hasSpindle ex:spindle_002 .
+ex:anglegrinder_003 ag:hasSpindle ex:spindle_003 .
+
+# ============================================
+# U4: Multi-modal Diameter Measurements
+# Spindle #001 - Two sensors with bimodal/trimodal distributions
+# ============================================
+
+# Caliper measurement (K=2 bimodal: normal reading + parallax error mode)
+ex:measurement_diameter_caliper_001 a om:Measure ;
+    rdfs:label "Caliper Measurement (Spindle #001)"@en ;
+    rdfs:comment "Digital caliper - bimodal due to operator parallax error"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_caliper_001 ;
+    om:hasValue "12.02"^^xsd:double ;  # Nominal diameter
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_caliper_001 a uq:RandomVariable ;
+    rdfs:label "Caliper Distribution (Spindle #001)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[12.02],[12.08]],\"covariances\":[[[0.0001]],[[0.000225]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Bimodal: 70% normal reading N(12.02mm, σ=0.01mm) + 30% parallax error N(12.08mm, σ=0.015mm)"@en .
+
+# Laser micrometer measurement (K=3 trimodal: representing elliptical cross-section)
+ex:measurement_diameter_laser_001 a om:Measure ;
+    rdfs:label "Laser Micrometer Measurement (Spindle #001)"@en ;
+    rdfs:comment "Non-contact laser measurement - trimodal capturing ellipticity"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_laser_001 ;
+    om:hasValue "12.01"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_laser_001 a uq:RandomVariable ;
+    rdfs:label "Laser Distribution (Spindle #001)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[12.01],[12.015],[12.005]],\"covariances\":[[[0.000025]],[[0.000036]],[[0.000049]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Trimodal ellipticity: 50% N(12.01mm,σ=0.005mm) + 30% N(12.015mm,σ=0.006mm) + 20% N(12.005mm,σ=0.007mm)"@en .
+
+# ============================================
+# Spindle #002 measurements
+# ============================================
+
+ex:measurement_diameter_caliper_002 a om:Measure ;
+    rdfs:label "Caliper Measurement (Spindle #002)"@en ;
+    rdfs:comment "Digital caliper - bimodal measurement pattern"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_caliper_002 ;
+    om:hasValue "11.98"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_caliper_002 a uq:RandomVariable ;
+    rdfs:label "Caliper Distribution (Spindle #002)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[11.98],[12.04]],\"covariances\":[[[0.000144]],[[0.0004]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Bimodal: 65% N(11.98mm, σ=0.012mm) + 35% N(12.04mm, σ=0.02mm) - higher parallax variance"@en .
+
+ex:measurement_diameter_laser_002 a om:Measure ;
+    rdfs:label "Laser Micrometer Measurement (Spindle #002)"@en ;
+    rdfs:comment "Laser measurement showing material variation"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_laser_002 ;
+    om:hasValue "12.00"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_laser_002 a uq:RandomVariable ;
+    rdfs:label "Laser Distribution (Spindle #002)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.25,0.15],\"means\":[[12.00],[12.01],[11.99]],\"covariances\":[[[0.000064]],[[0.0001]],[[0.000081]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Trimodal: 60% N(12.00mm,σ=0.008mm) + 25% N(12.01mm,σ=0.01mm) + 15% N(11.99mm,σ=0.009mm)"@en .
+
+# ============================================
+# Spindle #003 measurements
+# ============================================
+
+ex:measurement_diameter_caliper_003 a om:Measure ;
+    rdfs:label "Caliper Measurement (Spindle #003)"@en ;
+    rdfs:comment "Digital caliper with significant operator variance"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_caliper_003 ;
+    om:hasValue "12.05"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_caliper_003 a uq:RandomVariable ;
+    rdfs:label "Caliper Distribution (Spindle #003)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[12.05],[12.12]],\"covariances\":[[[0.000196]],[[0.000625]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Bimodal: 60% N(12.05mm, σ=0.014mm) + 40% N(12.12mm, σ=0.025mm) - workshop conditions"@en .
+
+ex:measurement_diameter_laser_003 a om:Measure ;
+    rdfs:label "Laser Micrometer Measurement (Spindle #003)"@en ;
+    rdfs:comment "Laser measurement with surface roughness effects"@en ;
+    cfm:measuresCharacteristic ex:diameter_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_diameter_laser_003 ;
+    om:hasValue "12.03"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:rv_diameter_laser_003 a uq:RandomVariable ;
+    rdfs:label "Laser Distribution (Spindle #003)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.45,0.35,0.2],\"means\":[[12.03],[12.04],[12.01]],\"covariances\":[[[0.0001]],[[0.000144]],[[0.000121]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Trimodal: 45% N(12.03mm,σ=0.01mm) + 35% N(12.04mm,σ=0.012mm) + 20% N(12.01mm,σ=0.011mm)"@en .
+
+# ============================================
+# U5: HISTORICAL GEAR CASES FOR SIMILARITY SEARCH
+# ============================================
+# Client: Repair technicians
+# Use case: Similar-wear case retrieval
+# Historical CT tooth-length distributions for comparison
+# ============================================
+
+# Historical Gear Case #1: Normal Wear Pattern
+ex:historical_gear_001 a ag:HistoricalGear ;
+    rdfs:label "Historical Case #1 - Normal Wear"@en ;
+    rdfs:comment "Past repair case: typical wear pattern after 500h operation"@en ;
+    cfm:hasCharacteristic ex:historical_tooth_char_001 .
+
+ex:historical_tooth_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Historical Tooth Length (Case #001)"@en .
+
+ex:historical_measurement_001 a om:Measure ;
+    rdfs:label "CT Measurement (Historical Case #001)"@en ;
+    cfm:hasInputVoxelGrid ex:historical_voxel_001 ;
+    cfm:measuresCharacteristic ex:historical_tooth_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_historical_001 ;
+    om:hasValue "10.1"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:historical_voxel_001 a cfm:VoxelGrid ;
+    rdfs:label "Historical CT Voxel Grid #001"@en .
+
+ex:rv_historical_001 a uq:RandomVariable ;
+    rdfs:label "Historical CT Distribution (Case #001)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.1],[10.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Normal wear pattern - similar to crowngear_003 CT distribution"@en .
+
+# Historical Gear Case #2: Severe Wear Pattern
+ex:historical_gear_002 a ag:HistoricalGear ;
+    rdfs:label "Historical Case #2 - Severe Wear"@en ;
+    rdfs:comment "Past repair case: excessive wear requiring replacement"@en ;
+    cfm:hasCharacteristic ex:historical_tooth_char_002 .
+
+ex:historical_tooth_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Historical Tooth Length (Case #002)"@en .
+
+ex:historical_measurement_002 a om:Measure ;
+    rdfs:label "CT Measurement (Historical Case #002)"@en ;
+    cfm:hasInputVoxelGrid ex:historical_voxel_002 ;
+    cfm:measuresCharacteristic ex:historical_tooth_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_historical_002 ;
+    om:hasValue "9.1"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:historical_voxel_002 a cfm:VoxelGrid ;
+    rdfs:label "Historical CT Voxel Grid #002"@en .
+
+ex:rv_historical_002 a uq:RandomVariable ;
+    rdfs:label "Historical CT Distribution (Case #002)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.1],[9.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Severe wear pattern - similar to crowngear_004 CT distribution"@en .
+
+# Historical Gear Case #3: Moderate Wear Pattern
+ex:historical_gear_003 a ag:HistoricalGear ;
+    rdfs:label "Historical Case #3 - Moderate Wear"@en ;
+    rdfs:comment "Past repair case: moderate wear, borderline replacement"@en ;
+    cfm:hasCharacteristic ex:historical_tooth_char_003 .
+
+ex:historical_tooth_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Historical Tooth Length (Case #003)"@en .
+
+ex:historical_measurement_003 a om:Measure ;
+    rdfs:label "CT Measurement (Historical Case #003)"@en ;
+    cfm:hasInputVoxelGrid ex:historical_voxel_003 ;
+    cfm:measuresCharacteristic ex:historical_tooth_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_historical_003 ;
+    om:hasValue "9.5"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:historical_voxel_003 a cfm:VoxelGrid ;
+    rdfs:label "Historical CT Voxel Grid #003"@en .
+
+ex:rv_historical_003 a uq:RandomVariable ;
+    rdfs:label "Historical CT Distribution (Case #003)"@en ;
+    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.5],[9.4]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Moderate wear pattern - similar to crowngear_006 CT distribution"@en .
+
+# Historical Gear Case #4: Light Wear Pattern  
+ex:historical_gear_004 a ag:HistoricalGear ;
+    rdfs:label "Historical Case #4 - Light Wear"@en ;
+    rdfs:comment "Past repair case: minimal wear, good condition"@en ;
+    cfm:hasCharacteristic ex:historical_tooth_char_004 .
+
+ex:historical_tooth_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Historical Tooth Length (Case #004)"@en .
+
+ex:historical_measurement_004 a om:Measure ;
+    rdfs:label "CT Measurement (Historical Case #004)"@en ;
+    cfm:hasInputVoxelGrid ex:historical_voxel_004 ;
+    cfm:measuresCharacteristic ex:historical_tooth_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_historical_004 ;
+    om:hasValue "9.9"^^xsd:double ;
+    om:hasUnit om:millimetre .
+
+ex:historical_voxel_004 a cfm:VoxelGrid ;
+    rdfs:label "Historical CT Voxel Grid #004"@en .
+
+ex:rv_historical_004 a uq:RandomVariable ;
+    rdfs:label "Historical CT Distribution (Case #004)"@en ;
+    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.9],[9.85],[10.0]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    rdfs:comment "Light wear pattern - similar to crowngear_002 CT distribution"@en .

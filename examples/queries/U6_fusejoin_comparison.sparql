@@ -1,0 +1,32 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+# Comparison: FUSEJOIN vs SIMILARITYJOIN
+# FUSEJOIN creates a fused distribution when JS divergence <= tolerance
+# SIMILARITYJOIN keeps original distributions when JS divergence <= tolerance
+
+SELECT ?spindle ?caliperDist ?laserDist ?fusedDist
+WHERE {
+  ?spindle a ag:Spindle ; 
+           ag:hasDiameterCharacteristic ?diameterChar .
+  
+  ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ; 
+                  cfm:hasProbabilisticValue ?rvCaliper .
+  
+  ?rvCaliper uq:hasDistribution ?caliperDist .
+  
+  ?laserMeasure cfm:measuresCharacteristic ?diameterChar ; 
+                cfm:hasProbabilisticValue ?rvLaser .
+  
+  ?rvLaser uq:hasDistribution ?laserDist .
+  
+  # FUSEJOIN: Creates ?fusedDist from ?caliperDist and ?laserDist
+  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist) { }
+}

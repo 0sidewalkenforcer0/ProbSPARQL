@@ -1,0 +1,80 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cfm: <http://example.org/ontology/cfm#> .
+@prefix core: <http://example.org/ontology/core#> .
+@prefix om: <http://example.org/ontology/om#> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+
+
+# Circular Factory Measure Ontology
+
+<http://example.org/ontology/cfm> a owl:Ontology ;
+    rdfs:label "Circular Factory Measure Ontology"@en ;
+    rdfs:comment "Ontology for geometric and measurable characteristics of manufactured parts"@en .
+
+# Classes
+
+cfm:GeometricData a owl:Class ;
+    rdfs:label "Geometric Data"@en ;
+    rdfs:comment "Geometric information about a part"@en .
+
+cfm:MeasurableCharacteristics a owl:Class ;
+    rdfs:label "Measurable Characteristics"@en ;
+    rdfs:comment "Characteristics that can be measured"@en .
+
+cfm:3DData a owl:Class ;
+    rdfs:subClassOf cfm:GeometricData ;
+    rdfs:label "3D Data"@en ;
+    rdfs:comment "Three-dimensional geometric data"@en .
+
+cfm:PointCloud a owl:Class ;
+    rdfs:subClassOf cfm:3DData ;
+    rdfs:label "Point Cloud"@en ;
+    rdfs:comment "Point cloud representation of 3D geometry"@en .
+
+cfm:VoxelGrid a owl:Class ;
+    rdfs:subClassOf cfm:3DData ;
+    rdfs:label "CT voxel grid"@en ;
+    rdfs:comment "Three-dimensional voxel grid obtained from CT scanning."@en .
+
+# ============================================
+# Object Properties
+# ============================================
+
+cfm:hasScan a owl:ObjectProperty ;
+    rdfs:label "has scan"@en ;
+    rdfs:domain core:Component;  
+    rdfs:range cfm:PointCloud ;
+    rdfs:comment "Links a part to its scan data"@en .
+
+cfm:hasCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has characteristic"@en ;
+    rdfs:domain core:Part ;
+    rdfs:range cfm:MeasurableCharacteristics ;
+    rdfs:comment "Links a part to its measurable characteristics"@en .
+
+cfm:hasInputPointCloud a owl:ObjectProperty ;
+    rdfs:label "has input point cloud"@en ;
+    rdfs:domain om:Measure ; 
+    rdfs:range cfm:PointCloud ;
+    rdfs:comment "Links a measurement to its input point cloud"@en .
+
+cfm:hasInputVoxelGrid a owl:ObjectProperty ;
+    rdfs:label "has input voxel grid"@en ;
+    rdfs:domain om:Measure ;
+    rdfs:range  cfm:VoxelGrid ;
+    rdfs:comment "Links a measurement to its CT voxel-grid input."@en .
+
+cfm:measuresCharacteristic a owl:ObjectProperty ;
+    rdfs:label "measures characteristic"@en ;
+    rdfs:domain om:Measure ;
+    rdfs:range cfm:MeasurableCharacteristics ;
+    rdfs:comment "Links a measurement to the characteristic being measured"@en .
+
+cfm:hasProbabilisticValue a owl:ObjectProperty ;
+    rdfs:label "has probabilistic value"@en ;
+    rdfs:domain om:Measure ;
+    rdfs:range uq:RandomVariable ;
+    rdfs:comment "Links a measurement to its uncertainty representation as a random variable"@en .

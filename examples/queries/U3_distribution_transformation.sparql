@@ -1,0 +1,37 @@
+# U3: Distribution Transformation and Propagation
+# "Retrieve all motors with their speed, torque, and computed power (with uncertainty propagation)."
+# Formula: P (watts) = ω (rad/s) × τ (Nm)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?motor ?gmmSpeed ?gmmTorque ?powerDist
+WHERE {
+  # Motors with performance characteristics
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  # Speed measurement (rad/s)
+  ?speedMeasure cfm:measuresCharacteristic ?speedChar ;
+                cfm:hasProbabilisticValue ?rvSpeed ;
+                om:hasValue ?speedRadPerSec .
+  ?rvSpeed uq:hasDistribution ?gmmSpeed .
+  
+  # Torque measurement (Nm)
+  ?torqueMeasure cfm:measuresCharacteristic ?torqueChar ;
+                 cfm:hasProbabilisticValue ?rvTorque ;
+                 om:hasValue ?torqueNm .
+  ?rvTorque uq:hasDistribution ?gmmTorque .
+  
+  # Power distribution: P = ω × τ
+  BIND(prob:multiply(?gmmSpeed, ?gmmTorque) AS ?powerDist)
+}
+ORDER BY DESC(?speedRadPerSec)

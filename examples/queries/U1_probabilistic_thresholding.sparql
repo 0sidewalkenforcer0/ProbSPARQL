@@ -1,0 +1,34 @@
+# U1: Probabilistic Thresholding
+# "Give me all gears whose tooth length is below 9.8mm with probability at least 0.9."
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?pointEstimate ?probability
+WHERE {
+  # Crown gears with tooth length measurement
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?characteristic .
+  
+  ?measurement cfm:measuresCharacteristic ?characteristic ;
+               cfm:hasInputPointCloud ?pointCloud ;
+               cfm:hasProbabilisticValue ?rv ;
+               om:hasValue ?pointEstimate .
+  
+  ?rv uq:hasDistribution ?distribution .
+  
+  # CDF(9.8) = P(X <= 9.8)
+  BIND(prob:cdf(?distribution, 9.8) AS ?probability)
+  
+  # Filter: P(X < 9.8mm) >= 0.9
+  FILTER(?probability >= 0.9)
+}
+ORDER BY DESC(?probability)

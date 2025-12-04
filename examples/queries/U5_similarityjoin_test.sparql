@@ -1,0 +1,39 @@
+# U5: Probabilistic Similarity Search (New Relational SIMILARITYJOIN Syntax)
+# "For the current gear, retrieve all historical gears whose CT tooth-length distributions are similar."
+#
+# New Syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance) { rightPattern }
+# - Left table: Current gears with CT measurements
+# - Right table: Historical gears with CT measurements
+# - Join condition: JS(?currentDist, ?historicalDist) <= 0.3
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX ex: <http://example.org/data/>
+PREFIX prob: <http://example.org/function/prob#>
+
+SELECT ?currentGear ?historicalGear ?currentDist ?historicalDist
+WHERE {
+  # Left table: Current gears with CT measurements
+  {
+    ?currentGear a ag:CrownGear ;
+                 cfm:hasCharacteristic ?currentChar .
+    ?currentMeasure cfm:hasInputVoxelGrid ?vg ;
+                    cfm:measuresCharacteristic ?currentChar ;
+                    cfm:hasProbabilisticValue ?rvCurrent .
+    ?rvCurrent uq:hasDistribution ?currentDist .
+  }
+  # SIMILARITYJOIN: Find similar historical cases (JS divergence <= 0.3)
+  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3)
+  {
+    # Right table: Historical gears with CT measurements
+    ?historicalGear a ag:HistoricalGear ;
+                    cfm:hasCharacteristic ?histChar .
+    ?histMeasure cfm:hasInputVoxelGrid ?hvg ;
+                 cfm:measuresCharacteristic ?histChar ;
+                 cfm:hasProbabilisticValue ?rvHist .
+    ?rvHist uq:hasDistribution ?historicalDist .
+  }
+}

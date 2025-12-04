@@ -1,0 +1,59 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix om: <http://example.org/ontology/om#> .
+
+# Units of Measurement Ontology
+
+<http://example.org/ontology/om> a owl:Ontology ;
+    rdfs:label "Units of Measurement Ontology"@en ;
+    rdfs:comment "Ontology for units of measurement"@en .
+
+# Classes
+
+om:Measure a owl:Class ;
+    rdfs:label "Measure"@en ;
+    rdfs:comment "A measurement with a value and unit"@en .
+
+om:Unit a owl:Class ;
+    rdfs:label "Unit"@en ;
+    rdfs:comment "A unit of measurement"@en .
+
+om:LengthUnit a owl:Class ;
+    rdfs:subClassOf om:Unit ;
+    rdfs:label "Length Unit"@en ;
+    rdfs:comment "A unit for measuring length"@en .
+
+# Properties
+
+om:hasValue a owl:DatatypeProperty ;
+    rdfs:label "has value"@en ;
+    rdfs:domain om:Measure ;
+    rdfs:range xsd:double ;
+    rdfs:comment "The numerical value of a measurement"@en .
+
+om:hasUnit a owl:ObjectProperty ;
+    rdfs:label "has unit"@en ;
+    rdfs:domain om:Measure ;
+    rdfs:range om:Unit ;
+    rdfs:comment "The unit of a measurement"@en .
+
+# ============================================
+# U3: Motor Performance Units
+# ============================================
+
+om:AngularVelocityUnit a owl:Class ;
+    rdfs:subClassOf om:Unit ;
+    rdfs:label "Angular Velocity Unit"@en ;
+    rdfs:comment "Unit for rotational speed (e.g., RPM, rad/s)"@en .
+
+om:TorqueUnit a owl:Class ;
+    rdfs:subClassOf om:Unit ;
+    rdfs:label "Torque Unit"@en ;
+    rdfs:comment "Unit for torque (e.g., Nm, lbf·ft)"@en .
+
+om:PowerUnit a owl:Class ;
+    rdfs:subClassOf om:Unit ;
+    rdfs:label "Power Unit"@en ;
+    rdfs:comment "Unit for mechanical power (e.g., W, kW, hp)"@en .

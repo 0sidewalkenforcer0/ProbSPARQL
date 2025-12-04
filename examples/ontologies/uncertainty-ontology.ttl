@@ -1,0 +1,41 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+
+# Uncertainty Quantification Ontology
+
+<http://example.org/ontology/uncertainty> a owl:Ontology ;
+    rdfs:label "Uncertainty Quantification Ontology"@en ;
+    rdfs:comment "Ontology for representing uncertainty in RDF data using custom datatypes"@en .
+
+# ============================================
+# Classes
+# ============================================
+
+uq:RandomVariable a owl:Class ;
+    rdfs:label "Random Variable"@en ;
+    rdfs:comment "A variable whose value is subject to variations due to uncertainty"@en .
+
+# ============================================
+# Custom Datatype
+# ============================================
+
+uq:gmmLiteral a rdfs:Datatype ;
+    rdfs:label "Gaussian Mixture Model Literal"@en ;
+    rdfs:comment "A custom datatype representing a Gaussian Mixture Model (GMM) with components, weights, means, and covariances"@en ;
+    rdfs:subClassOf rdfs:Literal .
+
+# Example format for uq:gmmLiteral:
+# "{\"k\": 2, \"d\": 1, \"weights\": [0.4, 0.6], \"means\": [[5.01], [8.01]], \"covariances\": [[[4.01]], [[3.21]]]}"^^uq:gmmLiteral
+
+# ============================================
+# Datatype Properties
+# ============================================
+
+uq:hasDistribution a owl:DatatypeProperty ;
+    rdfs:label "has distribution"@en ;
+    rdfs:domain uq:RandomVariable ;
+    rdfs:range uq:gmmLiteral ;
+    rdfs:comment "Associates a random variable with its probability distribution represented as a Gaussian Mixture Model"@en .

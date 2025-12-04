@@ -1,0 +1,239 @@
+package org.apache.jena.probsparql;
+
+import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.probsparql.datatypes.GMMDatatype;
+import org.apache.jena.probsparql.functions.thresholding.PDF;
+import org.apache.jena.probsparql.functions.thresholding.CDF;
+import org.apache.jena.probsparql.functions.thresholding.LogPDF;
+import org.apache.jena.probsparql.functions.thresholding.LogCDF;
+import org.apache.jena.probsparql.functions.comparison.KLDivergence;
+import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.functions.transformation.Scale;
+import org.apache.jena.probsparql.functions.transformation.Shift;
+import org.apache.jena.probsparql.functions.transformation.LinearTransform;
+import org.apache.jena.probsparql.functions.transformation.Marginal;
+import org.apache.jena.probsparql.functions.transformation.Joint;
+import org.apache.jena.probsparql.functions.transformation.Convolve;
+import org.apache.jena.probsparql.functions.transformation.Multiply;
+import org.apache.jena.probsparql.functions.manipulation.Mean;
+import org.apache.jena.probsparql.functions.manipulation.Std;
+import org.apache.jena.probsparql.functions.manipulation.Map;
+import org.apache.jena.probsparql.functions.manipulation.ModeCount;
+import org.apache.jena.probsparql.functions.manipulation.Mix;
+import org.apache.jena.probsparql.functions.manipulation.Fuse;
+import org.apache.jena.probsparql.functions.manipulation.Quantile;
+import org.apache.jena.probsparql.propertyfunctions.ExactJoinPF;
+import org.apache.jena.probsparql.propertyfunctions.FuzzyJoinPF;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.AlgebraGeneratorProbabilistic;
+import org.apache.jena.sparql.engine.QueryEngineProbabilistic;
+import org.apache.jena.sparql.engine.QueryEngineRegistry;
+import org.apache.jena.sparql.engine.join.ProbabilisticJoins;
+import org.apache.jena.sparql.engine.main.OpExecutorProbabilistic;
+import org.apache.jena.sparql.engine.main.QC;
+import org.apache.jena.sparql.function.FunctionRegistry;
+import org.apache.jena.sparql.pfunction.PropertyFunctionRegistry;
+import org.apache.jena.sparql.util.Symbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Main entry point for ProbSPARQL - Probabilistic SPARQL with 
+ * attribute-level uncertainty support.
+ * 
+ * This class provides initialization and configuration for the
+ * probabilistic SPARQL extension to Apache Jena.
+ * 
+ * @author ProbSPARQL Team
+ * @version 1.0.0-SNAPSHOT
+ */
+public class ProbSPARQL {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ProbSPARQL.class);
+    
+    public static final String VERSION = "1.0.0-SNAPSHOT";
+    public static final String NAME = "ProbSPARQL";
+    
+    // Context symbols for FUSEJOIN metadata
+    public static final Symbol FUSEJOIN_LEFT_VAR = Symbol.create("http://probsparql.org/fusejoin#leftVar");
+    public static final Symbol FUSEJOIN_RIGHT_VAR = Symbol.create("http://probsparql.org/fusejoin#rightVar");
+    public static final Symbol FUSEJOIN_TOLERANCE = Symbol.create("http://probsparql.org/fusejoin#tolerance");
+    public static final Symbol FUSEJOIN_RESULT_VAR = Symbol.create("http://probsparql.org/fusejoin#resultVar");
+    // New: Pattern information for relational semantics
+    public static final Symbol FUSEJOIN_LEFT_PATTERN = Symbol.create("http://probsparql.org/fusejoin#leftPattern");
+    public static final Symbol FUSEJOIN_RIGHT_PATTERN = Symbol.create("http://probsparql.org/fusejoin#rightPattern");
+    
+    // Context symbols for SIMILARITYJOIN metadata
+    public static final Symbol SIMILARITYJOIN_LEFT_VAR = Symbol.create("http://probsparql.org/similarityjoin#leftVar");
+    public static final Symbol SIMILARITYJOIN_RIGHT_VAR = Symbol.create("http://probsparql.org/similarityjoin#rightVar");
+    public static final Symbol SIMILARITYJOIN_TOLERANCE = Symbol.create("http://probsparql.org/similarityjoin#tolerance");
+    // New: Pattern information for relational semantics
+    public static final Symbol SIMILARITYJOIN_LEFT_PATTERN = Symbol.create("http://probsparql.org/similarityjoin#leftPattern");
+    public static final Symbol SIMILARITYJOIN_RIGHT_PATTERN = Symbol.create("http://probsparql.org/similarityjoin#rightPattern");
+    
+    private static boolean initialized = false;
+    
+    /**
+     * Initialize the ProbSPARQL system.
+     * This method should be called before using any ProbSPARQL functionality.
+     * It is safe to call this method multiple times - subsequent calls will be ignored.
+     */
+    public static synchronized void init() {
+        if (initialized) {
+            logger.debug("ProbSPARQL already initialized");
+            return;
+        }
+        
+        logger.info("Initializing {} {}", NAME, VERSION);
+        
+        // Ensure Jena system is initialized
+        org.apache.jena.sys.JenaSystem.init();
+        
+        // Register custom GMM datatype
+        TypeMapper.getInstance().registerDatatype(GMMDatatype.INSTANCE);
+        logger.info("Registered custom datatype: {}", GMMDatatype.URI);
+        
+        // Register custom SPARQL functions for probabilistic operators
+        FunctionRegistry functionRegistry = FunctionRegistry.get();
+        
+        // Category 1: Probabilistic Thresholding Operators
+        functionRegistry.put(PDF.URI, PDF.class);
+        functionRegistry.put(CDF.URI, CDF.class);
+        functionRegistry.put(LogPDF.URI, LogPDF.class);
+        functionRegistry.put(LogCDF.URI, LogCDF.class);
+        logger.info("Registered {} thresholding functions", 4);
+        
+        // Category 2: Probabilistic Comparison Operators
+        functionRegistry.put(KLDivergence.URI, KLDivergence.class);
+        functionRegistry.put(JSDivergence.URI, JSDivergence.class);
+        logger.info("Registered {} comparison functions", 2);
+        
+        // Category 3: Probabilistic Transformation Operators
+        functionRegistry.put(Scale.URI, Scale.class);
+        functionRegistry.put(Shift.URI, Shift.class);
+        functionRegistry.put(LinearTransform.URI, LinearTransform.class);
+        functionRegistry.put(Marginal.URI, Marginal.class);
+        functionRegistry.put(Joint.URI, Joint.class);
+        functionRegistry.put(Convolve.URI, Convolve.class);
+        functionRegistry.put(Multiply.URI, Multiply.class);
+        logger.info("Registered {} transformation functions", 7);
+        
+        // Category 4: Distribution Manipulation Operators
+        functionRegistry.put(Mean.URI, Mean.class);
+        functionRegistry.put(Std.URI, Std.class);
+        functionRegistry.put(Map.URI, Map.class);
+        functionRegistry.put(ModeCount.URI, ModeCount.class);
+        functionRegistry.put(Mix.URI, Mix.class);
+        functionRegistry.put(Fuse.URI, Fuse.class);
+        functionRegistry.put(Quantile.URI, Quantile.class);
+        logger.info("Registered {} manipulation functions", 7);
+        
+        // Category 5: Probabilistic Property Functions (JOIN operations)
+        PropertyFunctionRegistry pfRegistry = PropertyFunctionRegistry.get();
+        pfRegistry.put(ExactJoinPF.URI, ExactJoinPF.class);
+        pfRegistry.put(FuzzyJoinPF.URI, FuzzyJoinPF.class);
+        logger.info("Registered {} property functions for probabilistic joins", 2);
+        
+        // Category 6: Engine-level Probabilistic Join Framework
+        // Initialize the registry-based join framework (similar to Distances.java)
+        // This provides algebra-level join operators with extensible strategies
+        logger.info("Initialized probabilistic join framework:");
+        logger.info("  - Available strategies: {}", ProbabilisticJoins.getRegisteredStrategies());
+        for (String strategyURI : ProbabilisticJoins.getRegisteredStrategies()) {
+            ProbabilisticJoins.ProbJoinFunc func = ProbabilisticJoins.getJoinStrategy(strategyURI);
+            logger.info("    {} : {}", strategyURI, func.getDescription());
+        }
+        
+        // Category 7: Register QueryEngineProbabilistic for FUSEJOIN support
+        // This engine uses AlgebraGeneratorProbabilistic to handle ElementFuseJoin
+        QueryEngineRegistry.addFactory(new QueryEngineProbabilistic.Factory());
+        logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and SIMILARITYJOIN syntax support");
+        
+        initialized = true;
+        logger.info("{} initialization complete (22 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
+    }
+    
+    /**
+     * Check if ProbSPARQL has been initialized.
+     * 
+     * @return true if initialized, false otherwise
+     */
+    public static boolean isInitialized() {
+        return initialized;
+    }
+    
+    /**
+     * Get the ProbSPARQL version string.
+     * 
+     * @return version string
+     */
+    public static String getVersion() {
+        return VERSION;
+    }
+    
+    /**
+     * Helper method: Calculate JS divergence between two GMM distributions.
+     * Used by QueryIterSimilarityJoin and QueryIterFuseJoin.
+     * 
+     * @param leftNode  First GMM distribution node
+     * @param rightNode Second GMM distribution node
+     * @return JS divergence value
+     */
+    public static double JSDivergence(org.apache.jena.graph.Node leftNode, org.apache.jena.graph.Node rightNode) {
+        org.apache.jena.probsparql.functions.comparison.JSDivergence jsFunc = 
+            new org.apache.jena.probsparql.functions.comparison.JSDivergence();
+        org.apache.jena.sparql.expr.NodeValue result = jsFunc.exec(
+            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
+            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
+        );
+        return result.getDouble();
+    }
+    
+    /**
+     * Helper method: Fuse two GMM distributions using Bayesian fusion.
+     * Used by QueryIterFuseJoin.
+     * 
+     * @param leftNode  First GMM distribution node
+     * @param rightNode Second GMM distribution node
+     * @return Fused GMM distribution node
+     */
+    public static org.apache.jena.graph.Node Fuse(org.apache.jena.graph.Node leftNode, org.apache.jena.graph.Node rightNode) {
+        org.apache.jena.probsparql.functions.manipulation.Fuse fuseFunc = 
+            new org.apache.jena.probsparql.functions.manipulation.Fuse();
+        org.apache.jena.sparql.expr.NodeValue result = fuseFunc.exec(
+            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
+            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
+        );
+        return result.asNode();
+    }
+    
+    /**
+     * Main method for command-line execution.
+     * 
+     * @param args command-line arguments
+     */
+    public static void main(String[] args) {
+        System.out.println(NAME + " " + VERSION);
+        System.out.println("Probabilistic SPARQL with Attribute-level Uncertainty Support");
+        System.out.println("Based on Apache Jena ARQ");
+        System.out.println();
+        
+        init();
+        
+        if (args.length == 0) {
+            printUsage();
+        } else {
+            System.out.println("Command-line interface not yet implemented");
+        }
+    }
+    
+    private static void printUsage() {
+        System.out.println("Usage: java -jar jena-probsparql.jar [options]");
+        System.out.println();
+        System.out.println("Options:");
+        System.out.println("  --query <file>     Execute SPARQL query from file");
+        System.out.println("  --data <file>      Load RDF data with probabilities");
+        System.out.println("  --help             Show this help message");
+        System.out.println("  --version          Show version information");
+    }
+}

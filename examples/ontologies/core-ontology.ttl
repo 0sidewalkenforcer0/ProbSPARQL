@@ -1,0 +1,30 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <http://example.org/ontology/core#> .
+
+# Core Ontology - Base Classes
+
+<http://example.org/ontology/core> a owl:Ontology ;
+    rdfs:label "Core Manufacturing Ontology"@en ;
+    rdfs:comment "Core ontology defining basic product and component structure"@en .
+
+# Classes
+
+core:Component a owl:Class ;
+    rdfs:label "Component"@en ;
+    rdfs:comment "A component in the manufacturing domain"@en .
+
+core:Product a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Product"@en ;
+    rdfs:comment "A manufactured product"@en .
+
+core:Part a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Part"@en ;
+    rdfs:comment "A part that is a type of component"@en .
+
+
+

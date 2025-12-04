@@ -1,0 +1,33 @@
+# Compiled class files
+*.class
+target/
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test-output/
+
+# Jena TDB databases
+TDB/
+TDB2/

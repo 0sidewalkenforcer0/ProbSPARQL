@@ -1,0 +1,41 @@
+# U2: Probabilistic Comparison and Matching
+# "Find all gears where the JS divergence between CT and SL tooth-length distributions exceeds 0.2."
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX core: <http://example.org/ontology/core#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?gearLabel ?ct_mean ?sl_mean ?jsDivergence
+WHERE {
+  # Crown gears with measurements
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?characteristic .
+  
+  # CT Scanner measurement
+  ?measurement_ct cfm:measuresCharacteristic ?characteristic ;
+                  cfm:hasInputVoxelGrid ?voxelGrid ;
+                  cfm:hasProbabilisticValue ?rv_ct ;
+                  om:hasValue ?ct_mean .
+  ?rv_ct uq:hasDistribution ?gmm_ct .
+  
+  # Structured-Light measurement
+  ?measurement_sl cfm:measuresCharacteristic ?characteristic ;
+                  cfm:hasInputPointCloud ?pointCloud ;
+                  cfm:hasProbabilisticValue ?rv_sl ;
+                  om:hasValue ?sl_mean .
+  ?rv_sl uq:hasDistribution ?gmm_sl .
+  
+  # Jensen-Shannon divergence
+  BIND(prob:jsdivergence(?gmm_ct, ?gmm_sl) AS ?jsDivergence)
+  
+  # Filter: JS divergence > 0.2
+  FILTER(?jsDivergence > 0.2)
+}
+ORDER BY DESC(?jsDivergence)

@@ -1,0 +1,109 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <http://example.org/ontology/core#> .
+@prefix ag: <http://example.org/ontology/anglegrinder#> .
+
+# Angle Grinder Ontology
+
+<http://example.org/ontology/anglegrinder> a owl:Ontology ;
+    rdfs:label "Angle Grinder Ontology"@en ;
+    rdfs:comment "Ontology for angle grinder products and components"@en ;
+    owl:imports <http://example.org/ontology/core> .
+
+# Classes
+
+ag:AngleGrinder a owl:Class ;
+    rdfs:subClassOf core:Product ;
+    rdfs:label "Angle Grinder"@en ;
+    rdfs:comment "An angle grinder product"@en .
+
+ag:CrownGear a owl:Class ;
+    rdfs:subClassOf core:Part ;
+    rdfs:label "Crown Gear"@en ;
+    rdfs:comment "A crown gear component"@en .
+
+# ============================================
+# Object Properties
+# ============================================
+
+ag:hasPart a owl:ObjectProperty ;
+    rdfs:label "has part"@en ;
+    rdfs:domain core:Product ;
+    rdfs:range core:Part ;
+    rdfs:comment "Relates an angle grinder product to its parts"@en .
+
+# ============================================
+# U3: Motor-related Classes
+# ============================================
+
+ag:Motor a owl:Class ;
+    rdfs:subClassOf core:Part ;
+    rdfs:label "Electric Motor"@en ;
+    rdfs:comment "Electric motor component used in angle grinders"@en .
+
+ag:RotationalSpeed a owl:Class ;
+    rdfs:label "Rotational Speed"@en ;
+    rdfs:comment "Motor rotational speed characteristic (measured in RPM or rad/s)"@en .
+
+ag:Torque a owl:Class ;
+    rdfs:label "Torque"@en ;
+    rdfs:comment "Motor output torque characteristic (measured in Nm)"@en .
+
+ag:MechanicalPower a owl:Class ;
+    rdfs:label "Mechanical Power"@en ;
+    rdfs:comment "Motor mechanical power output (computed as speed × torque)"@en .
+
+# ============================================
+# U3: Motor-related Object Properties
+# ============================================
+
+ag:hasMotor a owl:ObjectProperty ;
+    rdfs:label "has motor"@en ;
+    rdfs:domain ag:AngleGrinder ;
+    rdfs:range ag:Motor ;
+    rdfs:subPropertyOf ag:hasPart ;
+    rdfs:comment "Relates an angle grinder to its electric motor"@en .
+
+ag:hasSpeedCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has speed characteristic"@en ;
+    rdfs:domain ag:Motor ;
+    rdfs:range ag:RotationalSpeed ;
+    rdfs:comment "Links a motor to its rotational speed characteristic"@en .
+
+ag:hasTorqueCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has torque characteristic"@en ;
+    rdfs:domain ag:Motor ;
+    rdfs:range ag:Torque ;
+    rdfs:comment "Links a motor to its torque characteristic"@en .
+
+# ============================================
+# U4: Spindle-related Classes
+# ============================================
+
+ag:Spindle a owl:Class ;
+    rdfs:subClassOf core:Part ;
+    rdfs:label "Spindle"@en ;
+    rdfs:comment "Rotating spindle component that holds the grinding disc or tool"@en .
+
+ag:Diameter a owl:Class ;
+    rdfs:label "Diameter"@en ;
+    rdfs:comment "Spindle diameter characteristic (measured in mm). Critical for press-fit assembly."@en .
+
+# ============================================
+# U4: Spindle-related Object Properties
+# ============================================
+
+ag:hasSpindle a owl:ObjectProperty ;
+    rdfs:label "has spindle"@en ;
+    rdfs:domain ag:AngleGrinder ;
+    rdfs:range ag:Spindle ;
+    rdfs:subPropertyOf ag:hasPart ;
+    rdfs:comment "Relates an angle grinder to its spindle component"@en .
+
+ag:hasDiameterCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has diameter characteristic"@en ;
+    rdfs:domain ag:Spindle ;
+    rdfs:range ag:Diameter ;
+    rdfs:comment "Links a spindle to its diameter characteristic for press-fit configuration"@en .

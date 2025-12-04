@@ -1,0 +1,54 @@
+# U4: Distribution Manipulation (New Relational FUSEJOIN Syntax)
+# "For spindles, fuse caliper and laser measurements, then extract MAP diameter for robot control."
+#
+# New Syntax: { leftPattern } FUSEJOIN(?left, ?right, tolerance, ?result) { rightPattern }
+# - Left table: Caliper measurements
+# - Right table: Laser measurements  
+# - Join condition: same ?diameterChar + JS(?caliperDist, ?laserDist) <= 0.3
+# - Result: Bayesian fusion of distributions
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?spindle ?spindleLabel ?fusedDist ?mapDiameter ?meanDiameter ?stdDev
+WHERE {
+  # Left table: Spindles with Caliper measurements (K=2 bimodal)
+  {
+    ?spindle a ag:Spindle ;
+             rdfs:label ?spindleLabel ;
+             ag:hasDiameterCharacteristic ?diameterChar .
+    ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ;
+                    rdfs:label ?caliperLabel ;
+                    cfm:hasProbabilisticValue ?rvCaliper .
+    FILTER(CONTAINS(?caliperLabel, "Caliper"))
+    ?rvCaliper uq:hasDistribution ?caliperDist .
+  }
+  # FUSEJOIN: Join on ?diameterChar, check JS divergence, perform Bayesian fusion
+  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist) 
+  {
+    # Right table: Laser measurements (K=3 trimodal) for the same characteristic
+    ?laserMeasure cfm:measuresCharacteristic ?diameterChar ;
+                  rdfs:label ?laserLabel ;
+                  cfm:hasProbabilisticValue ?rvLaser .
+    FILTER(CONTAINS(?laserLabel, "Laser"))
+    ?rvLaser uq:hasDistribution ?laserDist .
+  }
+  
+  # Extract statistics from fused distribution
+  BIND(prob:map(?fusedDist) AS ?mapJson)
+  BIND(prob:mean(?fusedDist) AS ?meanJson)
+  BIND(prob:std(?fusedDist) AS ?stdJson)
+  
+  # Parse JSON to double
+  BIND(xsd:double(REPLACE(?mapJson, "[\\[\\]]", "")) AS ?mapDiameter)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?meanDiameter)
+  BIND(xsd:double(REPLACE(?stdJson, "[\\[\\]]", "")) AS ?stdDev)
+}
+ORDER BY ?spindleLabel
