@@ -50,7 +50,7 @@ public class U2_ProbabilisticComparison {
             logger.info("=".repeat(80) + "\n");
             
             String queryString = new String(Files.readAllBytes(
-                Paths.get("examples/queries/U2_probabilistic_comparison.sparql")));
+                Paths.get("examples/queries/probabilistic_comparison.sparql")));
             
             Query query = QueryFactory.create(queryString);
             

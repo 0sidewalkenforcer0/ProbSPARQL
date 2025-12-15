@@ -1,0 +1,232 @@
+/**
+ * ProbSPARQL JavaCC Grammar Extensions
+ * 
+ * This file contains the grammar rules for SIMILARITYJOIN and FUSEJOIN operators
+ * that should be merged into Jena's sparql_11.jj grammar file.
+ * 
+ * These extensions add support for probabilistic similarity joins based on
+ * Jensen-Shannon (JS) divergence between Gaussian Mixture Model (GMM) distributions.
+ */
+
+// =============================================================================
+// TOKEN DEFINITIONS
+// =============================================================================
+// Add these to the TOKEN section of sparql_11.jj
+
+TOKEN [IGNORE_CASE] :
+{
+    // ProbSPARQL Extension Keywords
+    < SIMILARITYJOIN : "SIMILARITYJOIN" >
+|   < FUSEJOIN : "FUSEJOIN" >
+}
+
+// =============================================================================
+// GRAMMAR RULES
+// =============================================================================
+
+/**
+ * Modify GraphPatternNotTriples to include our new patterns.
+ * 
+ * In sparql_11.jj, find GraphPatternNotTriples() and add:
+ *   | el = SimilarityJoinGraphPattern() { return el ; }
+ *   | el = FuseJoinGraphPattern() { return el ; }
+ */
+
+// -----------------------------------------------------------------------------
+// SIMILARITYJOIN Rule
+// -----------------------------------------------------------------------------
+/**
+ * SimilarityJoinGraphPattern: Parses SIMILARITYJOIN syntax
+ * 
+ * Syntax options:
+ * 1. New relational semantics (binary join):
+ *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * 
+ * 2. Legacy filter semantics (unary filter):
+ *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
+ * 
+ * The join condition is: JS(?leftVar, ?rightVar) <= tolerance
+ * where JS is the Jensen-Shannon divergence.
+ */
+Element SimilarityJoinGraphPattern() :
+{
+    Element leftPattern = null;
+    Element rightPattern = null;
+    Token leftVarToken;
+    Token rightVarToken;
+    Node toleranceNode;
+    double tolerance;
+    String leftVarName;
+    String rightVarName;
+}
+{
+    // Optional left pattern for new relational semantics
+    // If present, this is a binary join operator
+    [ 
+        LOOKAHEAD( GroupGraphPattern() <SIMILARITYJOIN> )
+        leftPattern = GroupGraphPattern() 
+    ]
+    
+    <SIMILARITYJOIN> 
+    <LPAREN>
+    
+    // Left variable (the GMM distribution variable from left pattern)
+    leftVarToken = <VAR1>
+    { leftVarName = leftVarToken.image.substring(1); }
+    
+    <COMMA>
+    
+    // Right variable (the GMM distribution variable from right pattern)
+    rightVarToken = <VAR1>
+    { rightVarName = rightVarToken.image.substring(1); }
+    
+    <COMMA>
+    
+    // Tolerance (JS divergence threshold)
+    toleranceNode = NumericLiteral()
+    {
+        Object value = toleranceNode.getLiteralValue();
+        if (value instanceof Number) {
+            tolerance = ((Number) value).doubleValue();
+        } else {
+            throw new ParseException("Tolerance must be a numeric value");
+        }
+    }
+    
+    <RPAREN>
+    
+    // Right pattern (required)
+    rightPattern = GroupGraphPattern()
+    
+    {
+        // Create the ElementSimilarityJoin with appropriate constructor
+        if (leftPattern != null) {
+            // New relational semantics: binary join
+            return new ElementSimilarityJoin(leftPattern, rightPattern, 
+                                              leftVarName, rightVarName, tolerance);
+        } else {
+            // Legacy filter semantics: unary filter
+            return new ElementSimilarityJoin(rightPattern, leftVarName, rightVarName, tolerance);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------------
+// FUSEJOIN Rule
+// -----------------------------------------------------------------------------
+/**
+ * FuseJoinGraphPattern: Parses FUSEJOIN syntax
+ * 
+ * Syntax options:
+ * 1. New relational semantics (binary join with fusion):
+ *    { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
+ * 
+ * 2. Legacy filter semantics (unary filter with fusion):
+ *    FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { pattern }
+ * 
+ * The join condition is: JS(?leftVar, ?rightVar) <= tolerance
+ * If the condition is met, Bayesian fusion is performed and the result is bound to ?resultVar.
+ */
+Element FuseJoinGraphPattern() :
+{
+    Element leftPattern = null;
+    Element rightPattern = null;
+    Token leftVarToken;
+    Token rightVarToken;
+    Token resultVarToken;
+    Node toleranceNode;
+    double tolerance;
+    String leftVarName;
+    String rightVarName;
+    String resultVarName;
+}
+{
+    // Optional left pattern for new relational semantics
+    // If present, this is a binary join operator
+    [ 
+        LOOKAHEAD( GroupGraphPattern() <FUSEJOIN> )
+        leftPattern = GroupGraphPattern() 
+    ]
+    
+    <FUSEJOIN> 
+    <LPAREN>
+    
+    // Left variable (the GMM distribution variable from left pattern)
+    leftVarToken = <VAR1>
+    { leftVarName = leftVarToken.image.substring(1); }
+    
+    <COMMA>
+    
+    // Right variable (the GMM distribution variable from right pattern)
+    rightVarToken = <VAR1>
+    { rightVarName = rightVarToken.image.substring(1); }
+    
+    <COMMA>
+    
+    // Tolerance (JS divergence threshold)
+    toleranceNode = NumericLiteral()
+    {
+        Object value = toleranceNode.getLiteralValue();
+        if (value instanceof Number) {
+            tolerance = ((Number) value).doubleValue();
+        } else {
+            throw new ParseException("Tolerance must be a numeric value");
+        }
+    }
+    
+    <COMMA>
+    
+    // Result variable (the fused GMM distribution will be bound here)
+    resultVarToken = <VAR1>
+    { resultVarName = resultVarToken.image.substring(1); }
+    
+    <RPAREN>
+    
+    // Right pattern (required)
+    rightPattern = GroupGraphPattern()
+    
+    {
+        // Create the ElementFuseJoin with appropriate constructor
+        if (leftPattern != null) {
+            // New relational semantics: binary join with fusion
+            return new ElementFuseJoin(leftPattern, rightPattern, 
+                                        leftVarName, rightVarName, 
+                                        tolerance, resultVarName);
+        } else {
+            // Legacy filter semantics: unary filter with fusion
+            return new ElementFuseJoin(rightPattern, leftVarName, rightVarName, 
+                                        tolerance, resultVarName);
+        }
+    }
+}
+
+// =============================================================================
+// IMPORT STATEMENTS
+// =============================================================================
+// Add these imports to the PARSER_BEGIN section of sparql_11.jj:
+//
+// import org.apache.jena.sparql.syntax.ElementSimilarityJoin;
+// import org.apache.jena.sparql.syntax.ElementFuseJoin;
+//
+
+// =============================================================================
+// INTEGRATION INSTRUCTIONS
+// =============================================================================
+/**
+ * To integrate these rules into Jena's sparql_11.jj:
+ * 
+ * 1. Add the TOKEN definitions to the TOKEN section
+ * 
+ * 2. Add the import statements to PARSER_BEGIN
+ * 
+ * 3. Modify GraphPatternNotTriples() to include:
+ *    | el = SimilarityJoinGraphPattern() { return el ; }
+ *    | el = FuseJoinGraphPattern() { return el ; }
+ * 
+ * 4. Add the SimilarityJoinGraphPattern() and FuseJoinGraphPattern() rules
+ * 
+ * 5. Regenerate the parser with: javacc sparql_11.jj
+ * 
+ * 6. Rebuild jena-arq: mvn install -DskipTests
+ */
+

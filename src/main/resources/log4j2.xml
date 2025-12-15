@@ -6,10 +6,19 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Root level="info">
+        <Root level="debug">
             <AppenderRef ref="Console"/>
         </Root>
         <Logger name="org.apache.jena.probsparql" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.apache.jena.sparql" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.apache.jena.sparql.engine" level="debug" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="org.apache.jena.sparql.algebra" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
     </Loggers>

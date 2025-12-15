@@ -48,13 +48,18 @@ public class ElementSimilarityJoin extends Element {
 
     @Override
     public void visit(ElementVisitor v) {
-        // ElementVisitor does not have visit(ElementSimilarityJoin) by default
-        // Visit both patterns
-        if (leftPattern != null) {
-            leftPattern.visit(v);
-        }
-        if (rightPattern != null) {
-            rightPattern.visit(v);
+        // Check if visitor implements our extended interface
+        if (v instanceof ElementVisitorProbabilistic) {
+            ((ElementVisitorProbabilistic) v).visit(this);
+        } else {
+            // Fallback: visit both patterns for standard visitors
+            // This allows standard Jena visitors to still traverse the tree
+            if (leftPattern != null) {
+                leftPattern.visit(v);
+            }
+            if (rightPattern != null) {
+                rightPattern.visit(v);
+            }
         }
     }
 

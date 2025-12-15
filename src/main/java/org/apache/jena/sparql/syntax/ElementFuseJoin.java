@@ -52,14 +52,18 @@ public class ElementFuseJoin extends Element {
 
     @Override
     public void visit(ElementVisitor v) {
-        // ElementVisitor does not have visit(ElementFuseJoin) by default
-        // This will need to be added to a custom visitor or handled generically
-        // Visit both patterns
-        if (leftPattern != null) {
-            leftPattern.visit(v);
-        }
-        if (rightPattern != null) {
-            rightPattern.visit(v);
+        // Check if visitor implements our extended interface
+        if (v instanceof ElementVisitorProbabilistic) {
+            ((ElementVisitorProbabilistic) v).visit(this);
+        } else {
+            // Fallback: visit both patterns for standard visitors
+            // This allows standard Jena visitors to still traverse the tree
+            if (leftPattern != null) {
+                leftPattern.visit(v);
+            }
+            if (rightPattern != null) {
+                rightPattern.visit(v);
+            }
         }
     }
 

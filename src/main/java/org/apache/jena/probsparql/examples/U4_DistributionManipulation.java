@@ -60,7 +60,7 @@ public class U4_DistributionManipulation {
             logger.info("=".repeat(120) + "\n");
             
             String queryString = new String(Files.readAllBytes(
-                Paths.get("examples/queries/U4_distribution_manipulation.sparql")));
+                Paths.get("examples/queries/distribution_manipulation.sparql")));
             
             Query query = QueryFactory.create(queryString);
             

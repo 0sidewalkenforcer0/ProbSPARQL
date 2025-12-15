@@ -49,7 +49,7 @@ public class U1_ProbabilisticThresholding {
             logger.info("=".repeat(80) + "\n");
             
             String queryString = new String(Files.readAllBytes(
-                Paths.get("examples/queries/U1_probabilistic_thresholding.sparql")));
+                Paths.get("examples/queries/probabilistic_thresholding.sparql")));
             
             Query query = QueryFactory.create(queryString);
             

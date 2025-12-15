@@ -55,7 +55,7 @@ public class U3_DistributionTransformation {
             logger.info("=".repeat(80) + "\n");
             
             String queryString = new String(Files.readAllBytes(
-                Paths.get("examples/queries/U3_distribution_transformation.sparql")));
+                Paths.get("examples/queries/distribution_transformation.sparql")));
             
             Query query = QueryFactory.create(queryString);
             

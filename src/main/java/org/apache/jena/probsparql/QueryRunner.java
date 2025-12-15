@@ -5,25 +5,48 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Scanner;
+// Regex imports - no longer used since we use JavaCC extension
+// import java.util.regex.Matcher;
+// import java.util.regex.Pattern;
 import org.apache.jena.sparql.engine.QueryIterator;
-import org.apache.jena.sparql.engine.ExecutionContext;
+// import org.apache.jena.sparql.engine.ExecutionContext;  // No longer used
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.sparql.algebra.Algebra;
-import org.apache.jena.sparql.algebra.Op;
-import org.apache.jena.sparql.engine.main.QC;
+// import org.apache.jena.sparql.algebra.Algebra;  // No longer used
+// import org.apache.jena.sparql.algebra.Op;  // No longer used
+// import org.apache.jena.sparql.engine.main.QC;  // No longer used
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.graph.Node;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
+// import org.apache.jena.sparql.core.DatasetGraphFactory;  // No longer used
 
 public class QueryRunner {
+    
+    private static Scanner scanner = new Scanner(System.in);
+    private static boolean interactiveMode = false;
+    
+    /**
+     * Wait for user to press Enter to continue (interactive debug mode).
+     */
+    private static void waitForStep(String stepName) {
+        if (interactiveMode) {
+            System.out.println("\n[DEBUG] >>> Press Enter to continue to: " + stepName + "...");
+            try {
+                scanner.nextLine();
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+    }
     
     /**
      * Holds FUSEJOIN metadata extracted from query.
      * New relational semantics: { leftPattern } FUSEJOIN(...) { rightPattern }
+     * 
+     * @deprecated This class is no longer used since we now use formal JavaCC extension.
+     *             The JavaCC parser directly creates ElementFuseJoin objects.
      */
+    /*
     static class FuseJoinInfo {
         String leftPattern;   // Left table pattern (SPARQL triple patterns)
         String rightPattern;  // Right table pattern (SPARQL triple patterns)
@@ -44,11 +67,16 @@ public class QueryRunner {
             this.modifiedQuery = modQuery;
         }
     }
+    */
     
     /**
      * Holds SIMILARITYJOIN metadata extracted from query.
      * New relational semantics: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
+     * 
+     * @deprecated This class is no longer used since we now use formal JavaCC extension.
+     *             The JavaCC parser directly creates ElementSimilarityJoin objects.
      */
+    /*
     static class SimilarityJoinInfo {
         String leftPattern;   // Left table pattern
         String rightPattern;  // Right table pattern
@@ -67,11 +95,15 @@ public class QueryRunner {
             this.modifiedQuery = modQuery;
         }
     }
+    */
     
     /**
      * Find the matching closing brace for an opening brace at the given position.
      * Handles nested braces correctly.
+     * 
+     * @deprecated No longer used - JavaCC parser handles syntax parsing directly.
      */
+    /*
     private static int findMatchingBrace(String text, int openPos) {
         if (openPos < 0 || openPos >= text.length() || text.charAt(openPos) != '{') {
             return -1;
@@ -90,12 +122,16 @@ public class QueryRunner {
         }
         return -1;  // No matching brace found
     }
+    */
     
     /**
      * Find the opening brace that precedes the given position.
      * Walks backwards to find the block before FUSEJOIN/SIMILARITYJOIN.
      * Skips whitespace and comment lines (starting with #).
+     * 
+     * @deprecated No longer used - JavaCC parser handles syntax parsing directly.
      */
+    /*
     private static int findPrecedingBlockStart(String text, int beforePos) {
         // Walk backwards to find the closing brace of the preceding block
         // We need to skip whitespace and comments
@@ -144,11 +180,15 @@ public class QueryRunner {
         }
         return -1;
     }
+    */
     
     /**
      * Check if the given position is within a comment line.
      * A comment line starts with # (after any leading whitespace).
+     * 
+     * @deprecated No longer used - JavaCC parser handles syntax parsing directly.
      */
+    /*
     private static boolean isInCommentLine(String text, int pos) {
         // Find the start of the current line
         int lineStart = pos;
@@ -168,6 +208,7 @@ public class QueryRunner {
         }
         return false;
     }
+    */
     
     /**
      * Detect and parse FUSEJOIN with new relational semantics.
@@ -176,7 +217,11 @@ public class QueryRunner {
      * Also supports old pattern: FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { }
      * 
      * @return FuseJoinInfo if FUSEJOIN detected, null otherwise
+     * 
+     * @deprecated This method is no longer used. The JavaCC parser now directly parses
+     *             FUSEJOIN syntax and creates ElementFuseJoin objects. No preprocessing needed.
      */
+    /*
     private static FuseJoinInfo preprocessFuseJoin(String queryString) {
         // Match the FUSEJOIN operator with arguments
         Pattern pattern = Pattern.compile(
@@ -252,6 +297,7 @@ public class QueryRunner {
         
         return null;
     }
+    */
     
     /**
      * Detect and parse SIMILARITYJOIN with new relational semantics.
@@ -260,7 +306,11 @@ public class QueryRunner {
      * Also supports old pattern: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { }
      * 
      * @return SimilarityJoinInfo if SIMILARITYJOIN detected, null otherwise
+     * 
+     * @deprecated This method is no longer used. The JavaCC parser now directly parses
+     *             SIMILARITYJOIN syntax and creates ElementSimilarityJoin objects. No preprocessing needed.
      */
+    /*
     private static SimilarityJoinInfo preprocessSimilarityJoin(String queryString) {
         // Match the SIMILARITYJOIN operator with arguments
         Pattern pattern = Pattern.compile(
@@ -331,12 +381,27 @@ public class QueryRunner {
         
         return null;
     }
+    */
     
     public static void main(String[] args) {
+        // Check for interactive mode flag
+        if (args.length > 0 && args[0].equals("--interactive")) {
+            interactiveMode = true;
+            System.out.println("\n[DEBUG] ========================================");
+            System.out.println("[DEBUG] INTERACTIVE DEBUG MODE ENABLED");
+            System.out.println("[DEBUG] Press Enter at each step to continue");
+            System.out.println("[DEBUG] ========================================\n");
+            // Shift arguments
+            String[] newArgs = new String[args.length - 1];
+            System.arraycopy(args, 1, newArgs, 0, args.length - 1);
+            args = newArgs;
+        }
+        
         // Initialize ProbSPARQL functions and datatypes
         ProbSPARQL.init();
         if (args.length < 2) {
-            System.err.println("Usage: QueryRunner <data-file> <query-file>");
+            System.err.println("Usage: QueryRunner [--interactive] <data-file> <query-file>");
+            System.err.println("  --interactive: Enable step-by-step debugging mode");
             System.exit(1);
         }
         
@@ -345,13 +410,17 @@ public class QueryRunner {
         
         // Load RDF data
         System.out.println("Loading data from: " + dataFile);
+        waitForStep("Load RDF data");
         Model model = RDFDataMgr.loadModel(dataFile);
+        System.out.println("[DEBUG] ✓ Data loaded: " + model.size() + " triples");
         
         // Read query
-        System.out.println("Loading query from: " + queryFile);
+        System.out.println("\nLoading query from: " + queryFile);
+        waitForStep("Read query file");
         String queryString;
         try {
             queryString = new String(Files.readAllBytes(Paths.get(queryFile)));
+            System.out.println("[DEBUG] ✓ Query file read: " + queryString.length() + " characters");
         } catch (Exception e) {
             System.err.println("Error reading query file: " + e.getMessage());
             return;
@@ -359,79 +428,152 @@ public class QueryRunner {
         
         // Print query content
         printQuery(queryString);
+        waitForStep("View original query");
         
+        // ========================================================================
+        // OLD REGEX-BASED PREPROCESSING (DEPRECATED - NOW USING JAVACC EXTENSION)
+        // ========================================================================
+        // The JavaCC parser now directly handles FUSEJOIN and SIMILARITYJOIN syntax,
+        // creating ElementFuseJoin and ElementSimilarityJoin objects automatically.
+        // No preprocessing is needed anymore.
+        /*
         // Preprocess FUSEJOIN syntax
+        System.out.println("\n[DEBUG] ========================================");
+        System.out.println("[DEBUG] Step 1: Preprocessing query syntax");
+        System.out.println("[DEBUG] ========================================");
+        waitForStep("Preprocess query syntax");
         FuseJoinInfo fuseJoinInfo = preprocessFuseJoin(queryString);
         SimilarityJoinInfo similarityJoinInfo = null;
         
         if (fuseJoinInfo != null) {
             queryString = fuseJoinInfo.modifiedQuery;
-            System.out.println("[INFO] Detected FUSEJOIN:");
-            System.out.println("  Left pattern: " + (fuseJoinInfo.leftPattern.isEmpty() ? "(none)" : "present"));
-            System.out.println("  Right pattern: " + (fuseJoinInfo.rightPattern.isEmpty() ? "(none)" : "present"));
-            System.out.println("  Variables: ?" + fuseJoinInfo.leftVar + ", ?" + fuseJoinInfo.rightVar + 
+            System.out.println("[DEBUG] ✓ FUSEJOIN detected!");
+            System.out.println("[DEBUG]   Original query length: " + queryString.length() + " chars");
+            System.out.println("[DEBUG]   Left pattern: " + (fuseJoinInfo.leftPattern.isEmpty() ? "(none)" : fuseJoinInfo.leftPattern));
+            System.out.println("[DEBUG]   Right pattern: " + (fuseJoinInfo.rightPattern.isEmpty() ? "(none)" : fuseJoinInfo.rightPattern));
+            System.out.println("[DEBUG]   Variables: ?" + fuseJoinInfo.leftVar + ", ?" + fuseJoinInfo.rightVar + 
                              " -> ?" + fuseJoinInfo.resultVar);
-            System.out.println("  Tolerance: " + fuseJoinInfo.tolerance);
+            System.out.println("[DEBUG]   Tolerance: " + fuseJoinInfo.tolerance);
+            System.out.println("[DEBUG]   Modified query:\n" + fuseJoinInfo.modifiedQuery);
         } else {
             // Check for SIMILARITYJOIN if no FUSEJOIN found
             similarityJoinInfo = preprocessSimilarityJoin(queryString);
             if (similarityJoinInfo != null) {
                 queryString = similarityJoinInfo.modifiedQuery;
-                System.out.println("[INFO] Detected SIMILARITYJOIN:");
-                System.out.println("  Left pattern: " + (similarityJoinInfo.leftPattern.isEmpty() ? "(none)" : "present"));
-                System.out.println("  Right pattern: " + (similarityJoinInfo.rightPattern.isEmpty() ? "(none)" : "present"));
-                System.out.println("  Variables: ?" + similarityJoinInfo.leftVar + ", ?" + similarityJoinInfo.rightVar);
-                System.out.println("  Tolerance: " + similarityJoinInfo.tolerance);
+                System.out.println("[DEBUG] ✓ SIMILARITYJOIN detected!");
+                System.out.println("[DEBUG]   Left pattern: " + (similarityJoinInfo.leftPattern.isEmpty() ? "(none)" : similarityJoinInfo.leftPattern));
+                System.out.println("[DEBUG]   Right pattern: " + (similarityJoinInfo.rightPattern.isEmpty() ? "(none)" : similarityJoinInfo.rightPattern));
+                System.out.println("[DEBUG]   Variables: ?" + similarityJoinInfo.leftVar + ", ?" + similarityJoinInfo.rightVar);
+                System.out.println("[DEBUG]   Tolerance: " + similarityJoinInfo.tolerance);
+                System.out.println("[DEBUG]   Modified query:\n" + similarityJoinInfo.modifiedQuery);
+            } else {
+                System.out.println("[DEBUG] No FUSEJOIN or SIMILARITYJOIN detected - standard SPARQL query");
             }
         }
         
         // Execute query
         String queryType = fuseJoinInfo != null ? "FUSEJOIN" : 
                           (similarityJoinInfo != null ? "SIMILARITYJOIN" : "Standard");
-        System.out.println("\nExecuting " + queryType + " query...\n");
-        Query query = QueryFactory.create(queryString);
+        */
         
+        // NEW APPROACH: Direct parsing with JavaCC - no preprocessing needed
+        String queryType = "Standard";  // Will be detected automatically by parser
+        System.out.println("\n[DEBUG] ========================================");
+        System.out.println("[DEBUG] Step 2: Parsing query");
+        System.out.println("[DEBUG] ========================================");
+        waitForStep("Parse query");
+        System.out.println("[DEBUG] Query type: " + queryType);
+        Query query = QueryFactory.create(queryString);
+        System.out.println("[DEBUG] ✓ Query parsed successfully");
+        System.out.println("[DEBUG]   Result variables: " + query.getResultVars());
+        
+        System.out.println("\n[DEBUG] ========================================");
+        System.out.println("[DEBUG] Step 3: Setting up execution context");
+        System.out.println("[DEBUG] ========================================");
+        waitForStep("Setup execution context");
         try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            // ========================================================================
+            // OLD CONTEXT-BASED APPROACH (DEPRECATED)
+            // ========================================================================
+            // With JavaCC extension, FUSEJOIN and SIMILARITYJOIN are parsed directly
+            // into ElementFuseJoin and ElementSimilarityJoin objects, which are then
+            // compiled into OpFuseJoin and OpSimilarityJoin by AlgebraGenerator.
+            // No context variables are needed - the information is in the algebra tree.
+            /*
             // Pass FUSEJOIN metadata to execution context
             if (fuseJoinInfo != null) {
+                System.out.println("[DEBUG] Setting FUSEJOIN context variables:");
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_LEFT_VAR, fuseJoinInfo.leftVar);
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_RIGHT_VAR, fuseJoinInfo.rightVar);
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_TOLERANCE, fuseJoinInfo.tolerance);
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_RESULT_VAR, fuseJoinInfo.resultVar);
+                System.out.println("[DEBUG]   ?" + fuseJoinInfo.leftVar + " -> ?" + fuseJoinInfo.rightVar + 
+                                 " (tolerance: " + fuseJoinInfo.tolerance + ") -> ?" + fuseJoinInfo.resultVar);
                 // Store pattern information for potential nested loop join implementation
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_LEFT_PATTERN, fuseJoinInfo.leftPattern);
                 qexec.getContext().set(ProbSPARQL.FUSEJOIN_RIGHT_PATTERN, fuseJoinInfo.rightPattern);
+                System.out.println("[DEBUG]   Left pattern stored: " + (!fuseJoinInfo.leftPattern.isEmpty()));
+                System.out.println("[DEBUG]   Right pattern stored: " + (!fuseJoinInfo.rightPattern.isEmpty()));
             }
             
             // Pass SIMILARITYJOIN metadata to execution context
             if (similarityJoinInfo != null) {
+                System.out.println("[DEBUG] Setting SIMILARITYJOIN context variables:");
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_LEFT_VAR, similarityJoinInfo.leftVar);
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_RIGHT_VAR, similarityJoinInfo.rightVar);
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_TOLERANCE, similarityJoinInfo.tolerance);
+                System.out.println("[DEBUG]   ?" + similarityJoinInfo.leftVar + " -> ?" + similarityJoinInfo.rightVar + 
+                                 " (tolerance: " + similarityJoinInfo.tolerance + ")");
                 // Store pattern information for potential nested loop join implementation
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_LEFT_PATTERN, similarityJoinInfo.leftPattern);
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_RIGHT_PATTERN, similarityJoinInfo.rightPattern);
+                System.out.println("[DEBUG]   Left pattern stored: " + (!similarityJoinInfo.leftPattern.isEmpty()));
+                System.out.println("[DEBUG]   Right pattern stored: " + (!similarityJoinInfo.rightPattern.isEmpty()));
             }
+            */
             
+            System.out.println("[DEBUG] ✓ Execution context ready");
+            System.out.println("[DEBUG]   Using JavaCC-based parser - no context variables needed");
+            
+            System.out.println("\n[DEBUG] ========================================");
+            System.out.println("[DEBUG] Step 4: Executing query");
+            System.out.println("[DEBUG] ========================================");
+            waitForStep("Execute query");
             // Execute query directly using QueryIterator
             QueryIterator queryIterator = executeQueryDirectly(qexec, query, model);
+            System.out.println("[DEBUG] ✓ Query iterator created");
+            waitForStep("Query iterator created");
             
             // Collect all bindings
             int rowCount = 0;
             java.util.List<Binding> allBindings = new java.util.ArrayList<>();
             
+            System.out.println("[DEBUG] Iterating through results...");
+            waitForStep("Start iterating results");
             while (queryIterator.hasNext()) {
                 Binding binding = queryIterator.nextBinding();
                 allBindings.add(binding);
                 rowCount++;
+                if (rowCount <= 3 || interactiveMode) {
+                    System.out.println("[DEBUG]   Row " + rowCount + ": " + binding);
+                    if (interactiveMode && rowCount <= 10) {
+                        waitForStep("Next result row");
+                    }
+                }
             }
             queryIterator.close();
+            System.out.println("[DEBUG] ✓ Collected " + rowCount + " result bindings");
             
+            System.out.println("\n[DEBUG] ========================================");
+            System.out.println("[DEBUG] Step 5: Outputting results");
+            System.out.println("[DEBUG] ========================================");
+            waitForStep("Output results");
             // Output results
             outputResults(query, allBindings);
-            System.out.println("\nTotal rows: " + rowCount);
+            System.out.println("\n[DEBUG] Total rows: " + rowCount);
         } catch (Exception e) {
-            System.err.println("Query execution error: " + e.getMessage());
+            System.err.println("\n[ERROR] Query execution error: " + e.getMessage());
+            System.err.println("[ERROR] Stack trace:");
             e.printStackTrace();
         }
     }
@@ -443,17 +585,29 @@ public class QueryRunner {
             QueryExecution qexec, Query query, Model model) {
         
         try {
+            System.out.println("[DEBUG] Creating DatasetGraph from model...");
+            waitForStep("Create DatasetGraph");
             org.apache.jena.sparql.core.DatasetGraph dsg = 
                 org.apache.jena.sparql.core.DatasetGraphFactory.wrap(model.getGraph());
+            System.out.println("[DEBUG] ✓ DatasetGraph created");
             
             Binding initialBinding = BindingFactory.binding();
+            System.out.println("[DEBUG] Creating QueryEngineProbabilistic...");
+            waitForStep("Create QueryEngineProbabilistic");
             org.apache.jena.sparql.engine.QueryEngineProbabilistic engine = 
                 new org.apache.jena.sparql.engine.QueryEngineProbabilistic(
                     query, dsg, initialBinding, qexec.getContext()
                 );
+            System.out.println("[DEBUG] ✓ QueryEngineProbabilistic created");
             
-            return engine.getPlan().iterator();
+            System.out.println("[DEBUG] Getting query plan iterator...");
+            waitForStep("Get query plan iterator");
+            QueryIterator iterator = engine.getPlan().iterator();
+            System.out.println("[DEBUG] ✓ Query iterator obtained");
+            
+            return iterator;
         } catch (Exception e) {
+            System.err.println("[ERROR] Failed to execute query directly: " + e.getMessage());
             throw new RuntimeException("Failed to execute query directly: " + e.getMessage(), e);
         }
     }
