@@ -1,0 +1,29 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+name: Apache Jena CI (MacOS)
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - name: Set up JDK
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '21'
+
+    - name: Build with Maven
+      run: mvn -B --file pom.xml -Dmaven.javadoc.skip=true install

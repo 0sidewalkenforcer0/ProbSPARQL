@@ -1,0 +1,36 @@
+#!/bin/bash
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+## if [ "$#" != 1 ]
+## then
+##     echo "Usage: $(basename $0) FILE" 2>&1
+##     exit 1
+## fi
+
+# Find the namespace
+PKG=../../src/main/java/org/apache/jena/riot/thrift/wire
+rm -f "$PKG"/*.java
+
+## Avoid needing a dependency javax.annotations
+## generated_annotations=[undated|suppress]:
+##                      undated: suppress the date at @Generated annotations
+##                      suppress: suppress @Generated annotations entirely
+
+THRIFT="${1:-BinaryRDF.thrift}"
+
+thrift -r -out ../../src/main/java -gen 'java:generated_annotations=suppress' "$THRIFT"
+
+for f in "$PKG"/*.java
+do
+    perl -i.bak -p -e 's/^\@SuppressWarnings.*$/\@SuppressWarnings("all")/' $f
+    rm -f $f.bak
+done
+
+## trift 0.19.0 - not needed
+## ## PatchTxn.java
+## F="$PKG/PatchTxn.java"
+## if [ -e "$F" ]
+## then
+##     sed -e 's/public int getValue/@Override public int getValue/' < $F > F 
+##     mv F $F
+## fi

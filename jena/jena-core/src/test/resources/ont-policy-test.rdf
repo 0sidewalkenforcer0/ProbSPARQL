@@ -1,0 +1,45 @@
+<?xml version='1.0'?>
+
+<rdf:RDF
+  xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xml:base  ="http://jena.hpl.hp.com/schemas/2003/03/ont-manager"
+  xmlns     ="http://jena.hpl.hp.com/schemas/2003/03/ont-manager#"
+>
+
+<!--
+    An augmented set of mappings for locally cached ontologies, used in the test scripts
+-->
+
+<DocumentManagerPolicy>
+    <!-- policy for controlling the document manager's behaviour -->
+    <processImports rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</processImports>
+    <cacheModels    rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</cacheModels>
+</DocumentManagerPolicy>
+
+
+<OntologySpec>
+    <!-- local version of the OWL language ontology (in OWL) -->
+    <publicURI rdf:resource="http://www.w3.org/2002/07/owl" />
+    <altURL    rdf:resource="file:vocabularies/owl.owl" />
+    <language  rdf:resource="http://www.w3.org/2002/07/owl#" />
+    <prefix    rdf:datatype="http://www.w3.org/2001/XMLSchema#string">owl</prefix>
+</OntologySpec>
+
+<OntologySpec>
+    <!-- local version of the RDFS vocabulary -->
+    <publicURI rdf:resource="http://www.w3.org/2000/01/rdf-schema" />
+    <altURL    rdf:resource="file:vocabularies/rdf-schema.rdf" />
+    <language  rdf:resource="http://www.w3.org/2000/01/rdf-schema#" />
+    <prefix    rdf:datatype="http://www.w3.org/2001/XMLSchema#string">rdfs</prefix>
+</OntologySpec>
+
+<OntologySpec>
+    <publicURI rdf:resource="http://www.daml.org/2001/03/daml+oil" />
+    <altURL    rdf:resource="file:vocabularies/daml+oil.daml" />
+    <language  rdf:resource="http://www.daml.org/2001/03/daml+oil#" />
+    <prefix    rdf:datatype="http://www.w3.org/2001/XMLSchema#string">daml</prefix>
+</OntologySpec>
+
+
+</rdf:RDF>

@@ -1,0 +1,437 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+options
+{
+   JAVA_UNICODE_ESCAPE   = false ;
+   UNICODE_INPUT         = true ;
+
+  STATIC                = false ;
+//   DEBUG_PARSER          = true ;
+//   DEBUG_TOKEN_MANAGER   = true ;
+}
+
+PARSER_BEGIN(SSE_ParserCore)
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+package org.apache.jena.sparql.sse.lang.javacc ;
+
+import org.apache.jena.sparql.sse.lang.ParserSSEBase ;
+import static org.apache.jena.riot.lang.LangParserLib.*;
+
+public class SSE_ParserCore extends ParserSSEBase
+{
+}
+
+PARSER_END(SSE_ParserCore)
+
+// Now has explicit WS control in the grammar.
+// Policy - eat trailing WS
+
+// ---- Entry points : check for EOF.
+
+void parse() : { }
+{
+    [ <BOM> ]
+    { parseStart() ; }
+    (<WS>)*
+    TermOrList()
+    <EOF>
+    { parseFinish() ; }
+}
+
+// Parse one atom  - non-compound RDF term.
+void atom() : { }
+{
+    { parseStart() ; }
+    TermAtom()
+    <EOF>
+    { parseFinish() ; }
+}
+
+// ----
+
+void TermOrList() : { }
+{
+  ( TermAtom() (<WS>)* | List() )
+}
+
+void List() : { Token t ; }
+{
+    // The OP token must exclude these
+  ( t = <LPAREN> 
+    (<WS>)*
+    { listStart(t.beginLine, t.beginColumn) ; }
+    BareList() 
+    t = <RPAREN>
+    (<WS>)*
+    { listFinish(t.beginLine, t.beginColumn) ; }
+
+  | t = <LBRACKET> 
+    (<WS>)*
+    { listStart(t.beginLine, t.beginColumn) ; }
+    BareList() 
+    t = <RBRACKET>
+    (<WS>)*
+    { listFinish(t.beginLine, t.beginColumn) ; }  )
+}
+
+void BareList() : { }
+{
+  ( 
+     TermOrList()
+     // White space swallowed
+  )*
+}
+
+void TermAtom() : { }
+{
+  Symbol() | RDFTermAtom()
+}
+
+// Atomic RDF terms URI, literal, bnode, variable.
+// Not quoted triple. unless <<>> support is active.
+void RDFTermAtom() : { }
+{
+    IRIref()
+  |
+    PrefixedName()
+  | 
+    Var()
+  |
+    Literal()
+  |
+    BlankNode()
+  |
+    TripleTerm()
+}
+
+
+void Symbol() : { Token t ; }
+{
+    t = <SYMBOL>
+    { emitSymbol(t.beginLine, t.beginColumn, t.image) ; }
+}
+
+void IRIref() : { Token t ; String s ; }
+{
+  t = <IRIref>
+    { 
+      s = t.image ;
+      s = stripQuotes(s) ;
+      s = unescapeStr(s, t.beginLine, t.beginColumn) ;
+      emitIRI(t.beginLine, t.beginColumn, s) ; } 
+}
+
+void PrefixedName() : { Token t ; }
+{
+  t = <PNAME>
+    { emitPName(t.beginLine, t.beginColumn, t.image) ; }
+}
+
+void Var() : { Token t ; }
+{
+    // VAR_NAMED:   "?"  and any legal SPARQL variable.
+    // VAR_NAMED2:  "?." and non-legal SPARQL variable (usually allocated)
+    // VAR_ANON:    "??" : Anon variables.
+
+
+    // Includes "?" as a variable which allocated one from ?0, ?1, ?2 
+    //    Legal SPARQL syntax.
+    // Includes "??" as a variable for anon non-distinguished variables.
+    // Includes non-distinguished variables as ??0
+    // Includes internal allocated variables as ?.0
+
+//  ( t = <VAR_NAMED> | t = <VAR_NAMED2> | t = <VAR_ANON> )
+  ( t = <VAR_NAMED> | t = <VAR_OTHER> )
+  { emitVar(t.beginLine, t.beginColumn, stripChars(t.image, 1)) ; }
+}
+
+void Literal() : { }
+{
+ ( RDFLiteral()
+ | NumericLiteral()
+// | BooleanLiteral() // Do as a symbol.
+ )
+}
+
+void BlankNode() : { Token t ; }
+{
+  t = <BLANK_NODE_LABEL>
+    { emitBNode(t.beginLine, t.beginColumn, stripChars(t.image, 2)) ; }  
+//|
+//  t = <LBRACKET> <RBRACKET> { return emitBNode(t.beginLine, t.beginColumn) ; }
+//  t = <ANON> { return emitBNode(t.beginLine, t.beginColumn) ; }
+}
+
+void TripleTerm() :     { Token t1 = null ; Token t2 = null ; }
+{
+    t1 = <L_TRIPLE>
+    (<WS>)*
+    { tripleTermStart(t1.beginLine, t1.beginColumn); }
+    RDFTermAtom()
+    (<WS>)*
+    RDFTermAtom()
+    (<WS>)*
+    RDFTermAtom()
+    (<WS>)*
+    t2 = <R_TRIPLE>
+    { tripleTermFinish(t2.beginLine, t2.beginColumn); }
+}
+
+void RDFLiteral() : { Token t = null ; int currLine ; int currColumn ;
+                      String lex ; String lang = null ;
+                      String dt_iri = null ; String dt_pn = null ; }
+{
+  ( t = <STRING_LITERAL1> { lex = stripQuotes(t.image) ; }
+  | t = <STRING_LITERAL2> { lex = stripQuotes(t.image) ; }
+  | t = <STRING_LITERAL_LONG1> { lex = stripQuotes3(t.image) ; }
+  | t = <STRING_LITERAL_LONG2> { lex = stripQuotes3(t.image) ; }
+  )
+  { currLine = t.beginLine ; currColumn = t.beginColumn ;
+    lex = unescapeStr(lex, currLine, currColumn) ;
+  }
+
+  // Optional lang tag and datatype.
+  (
+     t = <LANG_DIR> { lang = stripChars(t.image, 1) ; }
+  |
+    <DATATYPE> 
+    ( t = <IRIref> { dt_iri  = stripQuotes(t.image) ; }
+    | t = <PNAME>  { dt_pn = t.image ; }
+    )
+  )?
+  { emitLiteral(currLine, currColumn, lex, lang, dt_iri, dt_pn) ; }
+} 
+
+void NumericLiteral() : { Token t ; }
+{
+  t = <INTEGER>
+   { emitLiteralInteger(t.beginLine, t.beginColumn, t.image) ; }
+| t = <DECIMAL>
+   { emitLiteralDecimal(t.beginLine, t.beginColumn, t.image) ; }
+| t = <DOUBLE>
+   { emitLiteralDouble(t.beginLine, t.beginColumn, t.image) ; }
+}
+
+// Node BooleanLiteral() : {}
+// {
+//   <TRUE> { return XSD_TRUE ; }
+//  |
+//   <FALSE> { return XSD_FALSE ; }
+// }
+
+TOKEN: { <WS: " " | "\t" | "\n" | "\r" | "\f"> }
+
+// No whitespace skipping.
+// SKIP : { <WS> }    //" " | "\t" | "\n" | "\r" | "\f" }
+
+SPECIAL_TOKEN :
+{
+    <SINGLE_LINE_COMMENT1: "#" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? > 
+|
+    // Lisp-style comments (makes Emacs lisp-mode more useful)
+    <SINGLE_LINE_COMMENT2: ";" (~["\n","\r"])* ("\n"|"\r"|"\r\n")? >
+}
+
+TOKEN:
+{
+   <IRIref:  "<"
+               ( ~[ ">","<", "\"", "{", "}", "^", "\\", "|", "`","\u0000"-"\u0020"]
+               | <UCHAR>
+               )*
+             ">" >
+
+|  <PNAME: (<PN_PREFIX>)? ":" (<PN_LOCAL>)? >
+|  <BLANK_NODE_LABEL: "_:" (<PN_LOCAL>)? >  // Allows no label
+
+    // Co-ordinate with ARQConstants
+    // Named variable - allows no name
+|  <VAR_NAMED:   "?" (<VARNAME>)?>
+
+//     // Non-distinguished variable (BNode in SPARQL)
+// |  <VAR_NAMED2:   "?." (~[" " , "\t" , "\n" , "\r" , "\f",
+//                             "(", ")", "[", "]", "{", "}"])* >
+// 
+// |  <VAR_ANON:     "??" (~[ " " , "\t" , "\n" , "\r" , "\f",
+//                            "(", ")", "[", "]", "{", "}"])* >
+
+| <VAR_OTHER: "?" (<SYM>)+ >
+}
+
+TOKEN :
+{
+  < BOM:     "\uFEFF">
+| < #DIGITS: (["0"-"9"])+>
+| < INTEGER: (["+","-"])? <DIGITS> >
+| < DECIMAL: (["+","-"])? ( <DIGITS> "." (<DIGITS>)* | "." <DIGITS> ) >
+| < DOUBLE:   // Required exponent.
+      ( (["+","-"])? 
+        (["0"-"9"])+ "." (["0"-"9"])* <EXPONENT>
+        | "." (["0"-"9"])+ (<EXPONENT>)
+        | (["0"-"9"])+ <EXPONENT>
+      )
+      >
+| < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+| < #QUOTE_3D: "\"\"\"">
+| < #QUOTE_3S: "'''">
+
+| < #ECHAR:      "\\" ( "t"|"b"|"n"|"r"|"f"|"\\"|"\""|"'") >
+| < #UCHAR:      <UCHAR4> | <UCHAR8> >
+| < #UCHAR4:     "\\" "u" <HEX> <HEX> <HEX> <HEX> >
+| < #UCHAR8:     "\\" "U" <HEX> <HEX> <HEX> <HEX> <HEX> <HEX> <HEX> <HEX> >
+
+| < STRING_LITERAL1: 
+      // Single quoted string
+      "'" ( (~["'","\\","\n","\r"]) | <ECHAR> | <UCHAR> )* "'" >
+| < STRING_LITERAL2:
+    // Double quoted string
+      "\"" ( (~["\"","\\","\n","\r"]) | <ECHAR> | <UCHAR> )* "\"" >
+| < STRING_LITERAL_LONG1:
+     <QUOTE_3S> 
+      ( ("'" | "''")? (~["'","\\"] | <ECHAR> | <UCHAR> ))*
+     <QUOTE_3S> >
+| < STRING_LITERAL_LONG2: 
+     <QUOTE_3D> 
+      ( ("\"" | "\"\"")? (~["\"","\\"] | <ECHAR> | <UCHAR> ))*
+     <QUOTE_3D> >
+}
+
+TOKEN :
+{
+  < LPAREN:    "(" >
+| < RPAREN:    ")" >
+
+| < LBRACE:    "{" >
+| < RBRACE:    "}" >
+
+| < LBRACKET:  "[" >
+| < RBRACKET:  "]" >
+
+// RDF 1.2 triple term.
+| < L_TRIPLE : "<<(" >
+| < R_TRIPLE : ")>>" >
+}
+
+// Specials for literals trailing parts
+// Otherwise include in Symbol() rule for when out of position.
+TOKEN :
+{
+  < DATATYPE: "^^" >
+|  <LANG_DIR: <AT> (<A2Z>)+("-" (<A2ZN>)+)* ( "--" (<A2Z>)* )? >
+| < #AT: "@">
+|  <#A2Z: ["a"-"z","A"-"Z"]>
+|  <#A2ZN: ["a"-"z","A"-"Z","0"-"9"]>
+}
+
+TOKEN:
+{
+  <#PN_CHARS_BASE:
+          ["A"-"Z"] | ["a"-"z"] |
+          ["\u00C0"-"\u00D6"] | ["\u00D8"-"\u00F6"] | ["\u00F8"-"\u02FF"] |
+          ["\u0370"-"\u037D"] | ["\u037F"-"\u1FFF"] |
+          ["\u200C"-"\u200D"] | ["\u2070"-"\u218F"] | ["\u2C00"-"\u2FEF"] |
+          ["\u3001"-"\uD7FF"] | ["\uF900"-"\uFFFD"]
+          // | [#x10000-#xEFFFF]
+          >
+|
+  // With underscore
+  <#PN_CHARS_U: <PN_CHARS_BASE> | "_" >
+|
+  <#PN_CHARS: (<PN_CHARS_U> | "-" | ["0"-"9"] | "\u00B7" |
+              ["\u0300"-"\u036F"] | ["\u203F"-"\u2040"] ) >
+|
+  // No leading "_", no trailing ".", can have dot inside prefix name.
+  <#PN_PREFIX: <PN_CHARS_BASE> ((<PN_CHARS>|".")* <PN_CHARS>)?  >
+|
+  // Local part.
+  <#PN_LOCAL: (<PN_CHARS_U> | ":" | ["0"-"9"] | <PLX> ) 
+              ( (<PN_CHARS> | "." |":" | <PLX> )* 
+                (<PN_CHARS> | ":" | <PLX>) )?  >
+|
+  <#VARNAME: ( <PN_CHARS_U> | ["0"-"9"] )
+             ( <PN_CHARS_U> | ["0"-"9"] | "\u00B7" |
+               ["\u0300"-"\u036F"] | ["\u203F"-"\u2040"] )* >
+|
+  < #PN_LOCAL_ESC: "\\" 
+          ( "_" | 
+            "~" | "." | "-" | "!" | "$" | "&" | "'" | 
+           "(" | ")" | "*" | "+" | "," | ";" | "=" | 
+           "/" | "?" | "#" | "@" | "%" ) >
+|
+  <#PLX:  <PERCENT> | <PN_LOCAL_ESC> >
+|
+  < #HEX: ["0"-"9"] | ["A"-"F"] | ["a"-"f"] >
+|
+  < #PERCENT: "%" <HEX> <HEX> >
+
+}
+
+TOKEN:
+{
+  // Anything left that isn't structural
+  // Excludes:
+  //   LPAREN and RPAREN / LBRACKET/RBRACKET / LBRACE/RBRACE
+  //   Quotes, Whitespace
+  <#SYM:  (~["<", ">", "(", ")", "[", "]", "{", "}", "'", "\"", " ", "\t","\n","\r","\f" ])>
+|
+  <#SYM1: (~["^", "@",
+             "(", ")", "[", "]", "{", "}", "'", "\"", " ", "\t","\n","\r","\f" ])>
+| <#SYM_ESC: "\\" ( " " | "'" | "\"" ) >
+|
+  <SYMBOL: ( "<" | ">" 
+           | (<SYM1> (<SYM>)*)
+           ) >
+}
+
+// Catch-all tokens.  Must be last.  
+// Any non-whitespace.  Causes a parser exception, rather than a
+// token manager error (with hidden line numbers).
+// Only bad IRIs (e.g. spaces) now give unhelpful parse errors.
+TOKEN:
+{
+  <#UNKNOWN: (~[" ","\t","\n","\r","\f" ])+ >
+}
+
+/*
+# Local Variables:
+# tab-width: 4
+# indent-tabs-mode: nil
+# comment-default-style: "//"
+# End:
+*/

@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+# Extract tokens (will need more editting)
+# Fixes:
+##  IRIref
+##  Replace " for '
+
+## WARNING: This script will do the bulk work of translation but it is imperfect.
+## The output will need editing for us in HTML as W3C BNF
+
+$/ = undef ;
+$_ = <> ;
+
+## JavaCC Comments
+s!//.*!!g ;
+
+## Find TOKEN { } blocks, terminated by } at start of line.
+# A block is \WTOKEN { ... }
+# Not greedy to find end brace
+@t = m/[^_]TOKEN\s*(?:\[IGNORE_CASE\])?\s*:\s*\n\{(.*?)\n\}/sg ;
+
+#{\s*([^{}]*)}/sg ;
+
+## For each block of TOKENS
+for $t (@t)
+{
+    $t =~ s/\r//g ;
+
+    #print "\nTEXT:\nT:",$t,":\n" ;
+
+    ## Split on | to get individual tokens
+    
+    @s = split(/\n\|/,$t) ;
+    for $s (@s)
+    {
+	## Trim
+	$s =~ s/^\s+//s;
+	$s =~ s/\s+$//s;
+	
+	($name, $rule) = split(/:/,$s,2) ;
+
+
+	## Leading < and excess whitespace
+	$name =~ s/^\s*\<\s*// ;
+	$name =~ s/\s+$// ;
+
+	## Remove # for internal tokens
+	$name =~ s/^#// ;
+	
+	## Trailing > and excess whitespace
+	$rule =~ s/^\s+// ;
+	$rule =~ s/\s*\>\s*$// ;
+
+	## Flatten around |
+	$rule =~ s/\|\s*\n\s*/\|/sg ;
+	$rule =~ s/\n\s*\|/\|/sg ;
+
+	## Replace wrapping " with '
+	## This may corrupt a token but cover the majority of cases - check output
+	$rule =~ s/^"/'/;
+	$rule =~ s/"$/'/;
+
+## 	print "NAME: /",$name , "/\n" ;
+## 	print "-->   ", $rule , "\n" ;
+
+	## Format and output
+	$spc = ' ' x (15-length($name)) ;
+
+	print "<",$name,">", $spc, " ::= ",$rule,"\n" ;
+    }
+}

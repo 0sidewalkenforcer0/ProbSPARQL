@@ -1,0 +1,23 @@
+<?xml version='1.0'?>
+
+<rdf:RDF
+  xmlns:rdf ="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns     ="http://jena.hpl.hp.com/schemas/2003/03/ont-manager#"
+>
+
+<!--
+    Test case: specify an alternative for testImport4/b.owl
+
+	Author: Ian Dickinson, mailto:ian_dickinson@users.sourceforge.net
+	CVS:    $Id: ont-policy.rdf,v 1.2 2009-10-06 13:04:44 ian_dickinson Exp $
+-->
+
+<OntologySpec>
+	<!-- local version of the OWL language ontology (in OWL) -->
+	<publicURI rdf:resource="http://example.org/foo/bar/b.owl" />
+	<altURL    rdf:resource="b.owl" />
+	<language  rdf:resource="http://www.w3.org/2002/07/owl" />
+</OntologySpec>
+
+</rdf:RDF>

@@ -1,0 +1,114 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.jena.sparql.sse.writers;
+
+import java.util.List;
+
+import org.apache.jena.atlas.io.IndentedWriter;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.serializer.SerializationContext;
+import org.apache.jena.sparql.sse.Item;
+import org.apache.jena.sparql.sse.ItemLift;
+import org.apache.jena.sparql.sse.ItemWriter;
+import org.apache.jena.sparql.sse.Tags;
+
+public class WriterNode
+{
+    private static final int NL = SSEWriteLib.NL;
+    private static final int NoNL = SSEWriteLib.NoNL;
+    private static final int NoSP = SSEWriteLib.NoSP;
+
+    public static void output(IndentedWriter out, Triple triple, SerializationContext naming) {
+        SSEWriteLib.startOneLine(out, Tags.tagTriple);
+        outputPlain(out, triple, naming);
+        SSEWriteLib.finishOneLine(out, Tags.tagTriple);
+    }
+
+    public static void outputNoTag(IndentedWriter out, Triple triple, SerializationContext naming) {
+        // No tag, with ()
+        out.print("(");
+        outputPlain(out, triple, naming);
+        out.print(")");
+    }
+
+    public static void outputPlain(IndentedWriter out, Triple triple, SerializationContext naming) {
+        // No tag, no ()
+        output(out, triple.getSubject(), naming);
+        out.print(" ");
+        output(out, triple.getPredicate(), naming);
+        out.print(" ");
+        output(out, triple.getObject(), naming);
+    }
+
+    public static void output(IndentedWriter out, Quad quad, SerializationContext naming) {
+        SSEWriteLib.startOneLine(out, Tags.tagQuad);
+        outputPlain(out, quad, naming);
+        SSEWriteLib.finishOneLine(out, Tags.tagQuad);
+    }
+
+    public static void outputNoTag(IndentedWriter out, Quad quad, SerializationContext naming) {
+        // No tag, with ()
+        out.print("(");
+        outputPlain(out, quad, naming);
+        out.print(")");
+    }
+
+    public static void outputPlain(IndentedWriter out, Quad quad, SerializationContext naming) {
+        output(out, quad.getGraph(), naming);
+        out.print(" ");
+        output(out, quad.getSubject(), naming);
+        out.print(" ");
+        output(out, quad.getPredicate(), naming);
+        out.print(" ");
+        output(out, quad.getObject(), naming);
+    }
+
+    public static void output(IndentedWriter out, Node node, SerializationContext sCxt) {
+        // Symbols in ItemWriter
+        Item item = ItemLift.lowerCompound(node);
+        if ( item != null )
+            ItemWriter.write(out, item, sCxt);
+        else
+            ItemWriter.write(out, node, sCxt);
+    }
+
+    public static void output(IndentedWriter out, List<Node> nodeList, SerializationContext naming) {
+        out.print("(");
+        boolean first = true;
+        for ( Node node : nodeList ) {
+            if ( !first )
+                out.print(" ");
+            output(out, node, naming);
+            first = false;
+        }
+        out.print(")");
+    }
+
+    public static void outputVars(IndentedWriter out, List<Var> vars, SerializationContext sContext) {
+        SSEWriteLib.start(out, Tags.tagVars, SSEWriteLib.NoSP);
+        for ( Var v : vars ) {
+            out.print(" ?");
+            out.print(v.getVarName());
+        }
+        SSEWriteLib.finish(out, Tags.tagVars);
+    }
+}

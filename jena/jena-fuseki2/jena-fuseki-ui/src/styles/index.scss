@@ -1,0 +1,81 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@import '/node_modules/bootstrap/dist/css/bootstrap.min';
+@import '/node_modules/bootstrap/scss/bootstrap.scss';
+@import 'upload.scss';
+
+#app {
+  .navbar {
+    .navbar-brand {
+      a {
+        color: $gray-600;
+        &:hover {
+          color: $gray-800;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+  .badge {
+    &[href="#"] {
+      cursor: pointer;
+    }
+  }
+  #status-icon {
+    width: 2em;
+    height: 2em;
+    circle {
+      &.success {
+        fill: $success;
+      }
+      &.failure {
+        fill: $danger;
+      }
+    }
+  }
+  // tables, some inherited from Bootstrap Vue, to complement Bootstrap CSS.
+  table.jena-table {
+    &[aria-busy=true] {
+      opacity: 0.55;
+    }
+    &.table-fixed {
+      table-layout: fixed;
+    }
+    thead {
+      tr {
+        [aria-sort] {
+          cursor: pointer;
+          background-image: none;
+          background-repeat: no-repeat;
+          background-size: 0.65em 1em;
+          background-position: right calc(0.75rem / 2) center;
+          padding-right: calc(0.75rem + 0.65em);
+        }
+        [aria-sort="none"] {
+          background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27101%27 height=%27101%27 view-box=%270 0 101 101%27 preserveAspectRatio=%27none%27%3e%3cpath fill=%27black%27 opacity=%27.3%27 d=%27M51 1l25 23 24 22H1l25-22zM51 101l25-23 24-22H1l25 22z%27/%3e%3c/svg%3e");
+        }
+        [aria-sort="ascending"] {
+          background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27101%27 height=%27101%27 view-box=%270 0 101 101%27 preserveAspectRatio=%27none%27%3e%3cpath fill=%27black%27 d=%27M51 1l25 23 24 22H1l25-22z%27/%3e%3cpath fill=%27black%27 opacity=%27.3%27 d=%27M51 101l25-23 24-22H1l25 22z%27/%3e%3c/svg%3e");
+        }
+        [aria-sort="descending"] {
+          background-image: url("data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27101%27 height=%27101%27 view-box=%270 0 101 101%27 preserveAspectRatio=%27none%27%3e%3cpath fill=%27black%27 opacity=%27.3%27 d=%27M51 1l25 23 24 22H1l25-22z%27/%3e%3cpath fill=%27black%27 d=%27M51 101l25-23 24-22H1l25 22z%27/%3e%3c/svg%3e");
+        }
+      }
+    }
+  }
+}

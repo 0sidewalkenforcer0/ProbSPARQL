@@ -1,0 +1,172 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.jena.geosparql.implementation.index;
+
+import static org.apache.jena.geosparql.implementation.index.CacheConfiguration.MAP_EXPIRY_INTERVAL;
+import static org.apache.jena.geosparql.implementation.index.CacheConfiguration.UNLIMITED_MAP;
+
+import java.util.Objects;
+
+import org.apache.jena.atlas.lib.Cache;
+import org.apache.jena.geosparql.implementation.DimensionInfo;
+import org.apache.jena.geosparql.implementation.GeometryWrapper;
+import org.apache.jena.geosparql.implementation.jts.GeometryTransformation;
+import org.apache.jena.geosparql.implementation.registry.MathTransformRegistry;
+import org.apache.jena.geosparql.implementation.registry.SRSRegistry;
+import org.locationtech.jts.geom.Geometry;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.FactoryException;
+
+/**
+ *
+ *
+ */
+public class GeometryTransformIndex {
+
+    private static boolean INDEX_ACTIVE = false;
+    private static Cache<IndexKey, GeometryWrapper>
+            GEOMETRY_TRANSFORM_INDEX = CacheConfiguration.create(UNLIMITED_MAP, MAP_EXPIRY_INTERVAL);
+
+    /**
+     *
+     * @param sourceGeometryWrapper
+     * @param srsURI
+     * @param storeSRSTransform
+     * @return GeometryWrapper following transformation.
+     * @throws TransformException
+     * @throws org.opengis.util.FactoryException
+     */
+    public static final GeometryWrapper transform(GeometryWrapper sourceGeometryWrapper, String srsURI, Boolean storeSRSTransform) throws TransformException, FactoryException {
+
+        GeometryWrapper transformedGeometryWrapper;
+        IndexKey key = new IndexKey(sourceGeometryWrapper.getLexicalForm(), srsURI);
+
+        if (INDEX_ACTIVE && storeSRSTransform) {
+
+            transformedGeometryWrapper = GEOMETRY_TRANSFORM_INDEX.getIfPresent(key);
+            if (transformedGeometryWrapper == null) {
+                transformedGeometryWrapper = transform(sourceGeometryWrapper, srsURI);
+                GEOMETRY_TRANSFORM_INDEX.put(key, transformedGeometryWrapper);
+            }
+
+        } else {
+            transformedGeometryWrapper = transform(sourceGeometryWrapper, srsURI);
+        }
+
+        return transformedGeometryWrapper;
+    }
+
+    private static GeometryWrapper transform(GeometryWrapper sourceGeometryWrapper, String srsURI) throws MismatchedDimensionException, FactoryException, TransformException {
+        CoordinateReferenceSystem sourceCRS = sourceGeometryWrapper.getCRS();
+        CoordinateReferenceSystem targetCRS = SRSRegistry.getCRS(srsURI);
+        MathTransform transform = MathTransformRegistry.getMathTransform(sourceCRS, targetCRS);
+        Geometry parsingGeometry = sourceGeometryWrapper.getParsingGeometry();
+
+        //Transform the coordinates into a new Geometry.
+        Geometry transformedGeometry = GeometryTransformation.transform(parsingGeometry, transform);
+
+        //Construct a new GeometryWrapper using info from original GeometryWrapper.
+        String geometryDatatypeURI = sourceGeometryWrapper.getGeometryDatatypeURI();
+        DimensionInfo dimensionInfo = sourceGeometryWrapper.getDimensionInfo();
+        return new GeometryWrapper(transformedGeometry, srsURI, geometryDatatypeURI, dimensionInfo);
+    }
+
+    /**
+     * Empty the Geometry Transform Index.
+     */
+    public static final void clear() {
+        GEOMETRY_TRANSFORM_INDEX.clear();
+    }
+
+    /**
+     *
+     * @return Number of items in the index.
+     */
+    public static final long getGeometryTransformIndexSize() {
+        return GEOMETRY_TRANSFORM_INDEX.size();
+    }
+
+    /**
+     *
+     * @return True if index is active.
+     */
+    public static boolean isIndexActive() {
+        return INDEX_ACTIVE;
+    }
+
+    /**
+     * Sets whether the index is active.
+     *
+     * @param indexActive
+     */
+    public static void setIndexActive(boolean indexActive) {
+        INDEX_ACTIVE = indexActive;
+    }
+
+    /**
+     * Reset the index to the provided max size and expiry interval.<br>
+     * All contents will be lost.
+     *
+     * @param maxSize
+     * @param expiryInterval
+     */
+    public static void reset(int maxSize, long expiryInterval) {
+        GEOMETRY_TRANSFORM_INDEX = CacheConfiguration.create(maxSize, expiryInterval);
+    }
+
+    private static class IndexKey {
+
+         private final String sourceGeometryLiteral;
+         private final String srsURI;
+
+        public IndexKey(String sourceGeometryLiteral, String srsURI) {
+            this.sourceGeometryLiteral = sourceGeometryLiteral;
+            this.srsURI = srsURI;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 47 * hash + Objects.hashCode(this.sourceGeometryLiteral);
+            hash = 47 * hash + Objects.hashCode(this.srsURI);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final IndexKey other = (IndexKey) obj;
+            if (!Objects.equals(this.sourceGeometryLiteral, other.sourceGeometryLiteral)) {
+                return false;
+            }
+            return Objects.equals(this.srsURI, other.srsURI);
+        }
+
+    }
+}

@@ -1,0 +1,28 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+## See https://s.apache.org/asfyaml
+
+notifications:
+    commits:       commits@jena.apache.org
+    issues:        issues@jena.apache.org
+    pullrequests:  pr@jena.apache.org
+    jira_options:  link label
+    discussions:   issues@jena.apache.org
+
+github:
+  description: "Apache Jena, A free and open source Java framework for building Semantic Web and Linked Data applications."
+  homepage: https://jena.apache.org/
+  protected_branches:
+    main: {}
+  features:
+    issues: true
+    discussions: true
+  labels:
+    - apache
+    - jena
+    - rdf
+    - sparql
+  enabled_merge_buttons:
+    squash: false
+    rebase: true
+    merge: false

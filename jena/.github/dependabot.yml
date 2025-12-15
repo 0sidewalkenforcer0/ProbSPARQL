@@ -1,0 +1,44 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+version: 2
+updates:
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      maven-patch-group:
+        update-types:
+        - "patch"
+        exclude-patterns:
+        - "org.apache.commons:*"
+        - "commons-*:*"
+      apache-commons-group:
+        patterns:
+        - "org.apache.commons:*"
+        - "commons-*:*"
+        update-types:
+        - "minor"
+
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule: 
+      interval: monthly
+      day: "tuesday"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "npm"
+    directory: "/jena-fuseki2/jena-fuseki-ui"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    versioning-strategy: increase-if-necessary
+    groups:
+      npm-patch-group:
+        update-types:
+        - "patch"
+    open-pull-requests-limit: 10

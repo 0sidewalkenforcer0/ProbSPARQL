@@ -1,0 +1,1328 @@
+==== Apache Jena 5.6.0
+Released: 2025-10-15
+Issues: https://s.apache.org/jena-5.6.0-issues
+Announcement:
+https://lists.apache.org/thread/joh04217qs9h14g01qqf4dp3s1cqy2q9
+
+== Preparation for Jena 6.0.0
+
+In preparation for Jena 6.0.0, the 5.6.0 release has code deprecations 
+indicating methods, classes and modules that are planned for removal.
+
+For Jena 6:
+
+* Minimum Java version: Java 21
+* Lucene update to 10.* (this requires Java21+)
+* Retire jena-permissions
+* Retire the Fuseki WAR file, jena-fuseki-webapp, jena-fuseki-war
+* Code deprecation removal
+* Deprecation of TDB1 but not for removal
+* Remove Graph Capabilities and Graph.dependsOn
+* No RDF/XML in jena-core/main
+* Remove ARQ initial bindings
+* Switching to org.apache.jena.ontapi (artifact jena-ontapi)
+    from the original org.apache.jena.ontology (part of jena-core)
+* Switch to jena-iri3986 as the IRI parser; retire jena-iri
+
+== Other items in Jena 5.6.0
+
+* Use async HTTP; abortable remote query requests
+* Update to Titanium json-ld v1.7.0
+* Jena testing switches to Junit6.
+
+== Contributions to Jena 5.6.0:
+
+@shawnsmith:
+* Fix for resolved URIs in jena-iri3986
+https://github.com/apache/jena/issues/3465
+
+Aklakan:
+* GH-3464: ASync HTTP
+  https://github.com/apache/jena/pull/3464
+  Switch Jena's HTTP request processing (HttpLib) to using
+    HttpClient.async.
+* GH-3437: Initialize fields of Cmds.java before JenaSystem.init()
+* Allow transform from NodeValue to Var.
+* GH-2048: Remove left-over dependencies to expiring-map and rdf-tables.
+* Use kryo-shaded instead of kryo in order to avoid conflicts with asm.
+* Support CONSTRUCT_JSON query type in RDFLinkHTTP.
+* Allow Node_Ext to be wrapped as NodeValueNode without further checks.
+* Revert fontawesome
+
+sszuev:
+* GH-3322: [jena-ontapi] add assemblers
+
+@arne-bdt:
+* GH-3323 COALESCE checks variable bindings 
+
+
+==== Apache Jena 5.5.0
+Released: 2025-07-18
+Issues: https://s.apache.org/jena-5.5.0-issues
+Announcement:
+https://lists.apache.org/thread/9dtbh9j30qh03bbgj4j27htx7fdbmyy8
+
+== RDF 1.2
+
+There is a Model API class StatementTerm for RDF 1.2 triple terms.
+This change reflects the W3C Working Groups decision. It is only permitted 
+in the only in the object position. Unlike the work of the RDF-star CG, 
+triple terms are not valid in the subject position.
+Most application code will be using reifiers : Model.createReifier
+
+== Fuseki/TDB2
+
+There is a fix to release database files promptly on deletion.
+This includes after compaction.
+https://github.com/apache/jena/issues/3240
+
+== Preparation for Jena 6.0.0
+
+In preparation for a future Jena 6.0.0, the 5.5.0 release has code deprecations
+indicating methods, classes and modules that are planned for removal.
+
+== Contributions
+
+@ebremer
+GH-2411: Command line improvements (arq)
+Issue #2411, PR #3216
+
+Aklakan
++ Add GeoSPARQL to jena-fuseki-server
+ https://github.com/apache/jena/issues/3026
+ https://github.com/apache/jena/pull/3027
+
++ Fixed ExprUtils.eval raising exception because of null dataset.
+
++ Support for uploading compressed data with GSP and SPARQL
+  https://github.com/apache/jena/issues/3258
+  https://github.com/apache/jena/pull/3266
+
+@fpotier
+GH-3221 Fix SchemaDO._abstract URI
+
+Kengo Seki / @sekikn
+Fix DBpedia examples
+https://github.com/apache/jena/pull/3252
+
+
+==== Apache Jena 5.4.0
+Released: 2025-04-27
+Issues: https://s.apache.org/jena-5.4.0-issues
+Announcement:
+https://lists.apache.org/thread/j8qx6zbxgl12d42q3bpckfxjh760jx9m
+
+Jena 5.4.0 introduces a preview of RDF 1.2 support.
+This work is *experimental* and is subject to change
+in future releases.
+
+== RDF 1.2
+
+RDF 1.2 is different to the RDF-star Community Group proposal. This 
+release gives users a chance to assess the impact if they use any of the 
+RDF-star CG work (i.e. have << >> in the data).
+
+The RDF 1.2 / SPARQL 1.2 specs aren't finished.
+Jena will track the work of the RDF and SPARQL Working Group.
+
+In this experimental release:
+- Triple terms and rdf:reifies.
+- Initial text direction of literals.
+- API updated for RDF 1.2.
+- Turtle, Trig, N-Triples, Q-quads and SPARQL parsing updated for
+   triple terms and initial text direction.
+
+Not in this experimental release:
+- Rendering of SPARQL result sets in the Fuseki UI
+- RDF/XML support
+- Turtle pretty printing. The turtle output is correct RDF 1.2 but
+   there is no Turtle pretty printing using the syntax for reified
+   triples or annotations.
+- HTTP protocol changes
+- There are working group discussions about version directives which
+   are still in-progress within the working group. There is nothing
+   in the experimental Jena code.
+
+The RDF 1.2 Primer:
+https://www.w3.org/TR/rdf12-primer/#section-triple-terms
+
+RDF 1.2 Concepts and Abstract Syntax
+https://www.w3.org/TR/rdf12-concepts/
+
+RDF 1.2 Turtle
+https://www.w3.org/TR/rdf12-turtle/
+
+SPARQL 1.2 Query
+https://www.w3.org/TR/sparql12-query/
+
+These document are currently working group drafts.
+
+==  New artifact
+
+Jena 5.4.0 introduces a new module jena-langtag for language tag parsing 
+in compliance with RFC 5646. Language tag validation is strengthened. 
+When parsing, language tag violations are still treated as warnings.
+
+== Contributions
+
+@Ostrzyciel has contributed several test cases for initialization
+and also cleaning up of Jena's use of Apache Xerces-derived code for RDF 
+datatypes:
+
+@OyvindLGjesdal has contributed improvement to the jena-text build for 
+java21 and also in fixing the unstable build on github actions.
+
+@Aklakan has contributed support for timeouts in SPARQL Updates, 
+provided fixes for closing execution iterators, OpAsQuery, and for 
+NodeFmtLib.
+
+Committers with PRs: rvesse, sszuev, kinow, arne-bdt, afs
+
+
+==== Apache Jena 5.3.0
+Released: 2025-01-21
+Issues: https://s.apache.org/jena-5.3.0-issues
+Announcement:
+https://lists.apache.org/thread/4gk0kpf75hyk58db343hx13nzq8pvldg
+
+Jena 5.3.0 has changes in the structure of the Fuseki server; a new IRI provider; and clean-up and simplification of Jena's use of Apache Xerces code in RDF Datatypes.
+
+==== Contributions
+
+@Ostrzyciel has contributed several test cases for initialization in
+
+  Datatypes:
+  https://github.com/apache/jena/issues/2797
+
+  JenaSystem.init deadlock
+  https://github.com/apache/jena/issues/2787
+
+  TypeMapper.getSafeTypeByName race condition
+  https://github.com/apache/jena/issues/2795
+
+and also cleaning up of Jena's use of Apache Xerces-derived code for RDF datatypes:
+
+ https://github.com/apache/jena/issues/2828
+ PRs:
+    GH-2828: Remove unused code in ext.xerces
+      https://github.com/apache/jena/pulls/2906
+    GH-2828: Remove validation for XML-only datatypes
+      https://github.com/apache/jena/pulls/2846
+    GH-2797: Lazy init for ValidationState hash maps
+      https://github.com/apache/jena/pulls/2798
+
+@OyvindLGjesdal
+  Improve jena-text build (java21->)
+  https://github.com/apache/jena/pull/2782
+
+@Aklakan
+  Support for Timeouts on Updates
+  https://github.com/apache/jena/issues/2821
+
+Committers with PRs: rvesse, sszuev, kinow, arne-bdt, afs
+
+and not forgetting @dependabot
+
+==== Fuseki
+
+The artifact jena-fuseki-main now has equivalent functionality, including UI, to the former Fuseki/webapp packaging.
+
+The artifact jena-fuseki-server packages jena-fuseki-main with dependencies and UI files into a single jar. This is now the jar
+in the Fuseki download.
+
+It should be a drop-in replacement.
+
+There is no functionality added or removed; it is a better base for future development.
+
+Fuseki/webapp packaging for the WAR file which will continue to be produced but may not get all future Fuseki development features.
+
+==== IRI3986
+
+Issue: https://github.com/apache/jena/issues/2800
+New maven artifact and jar: jena-iri3986.
+
+This adds a new IRI parser and checker. It is the upcoming replacement for jena-iri.
+
+General URIs are handled, with additional URI scheme specific rules for:
+   http:, https:, did:, file:,
+   urn:, (including urn:uuid:, urn:oid:),
+   example:
+and non-standard schemes
+   uuid: and oid:
+
+When parsing, "Bad syntax", that is, not passing the grammar of RFC 3986 is treated as a parse error. Violations of scheme-specific rules are warnings. The severity levels can be adjusted.
+
+This is the same as principle as Jena has had, but the parser/checker is
+jena-iri3986 supports URI scheme-specific rules for the latest
+
+This new IRI implementation is not active by default.
+
+It is activated by setting the environment variable
+
+   JENA_IRIPROVIDER=IRI3986
+
+or java system property, then call SystemIRIx.reset().
+
+On the command line, try it out with
+
+    env JENA_IRIPROVIDER=IRI3986 riot MyInterestingData.ttl 
+
+
+==== Apache Jena 5.2.0
+Released: 2024-10-15
+Issues: https://s.apache.org/jena-5.2.0-issues
+Announcement:
+https://lists.apache.org/thread/ynf70r2z6cs7x48cvytqqk5bxh6qln9l
+
+The main feature for Jena 5.2.0 is an implementation of CDT "Composite Datatype
+Literals", an experimental idea for dealing with maps and lists in RDF and
+SPARQL while remaining within RDF 1.1.
+
+All issues in the release:
+  https://s.apache.org/jena-5.2.0-issues
+
+and includes
+
+* hash join improvements
+* performance improvements for RDF/XML parsing, and for command startup.
+* refinement of jena-ontapi
+
+== CDT : "Composite Datatype Literals"
+This is a contribution from AWSlabs.
+
+The website:
+  https://github.com/awslabs/SPARQL-CDTs
+Spec:
+  https://w3id.org/awslabs/neptune/SPARQL-CDTs/spec/latest.html
+
+SPARQL
+  https://github.com/w3c/sparql-dev/tree/main/SEP/SEP-0009
+
+Issue: https://github.com/apache/jena/issues/2518
+PR:    https://github.com/apache/jena/pull/2501
+
+This is "experimental" meaning it is subject to change.  There should be no impact if the feature isn't used.
+
+== Contributions
+
+CDT: Composite Datatype Literals
+Olaf Hartig (@Hartig) et al.
+  https://github.com/apache/jena/issues/2518
+  https://github.com/w3c/sparql-dev/tree/main/SEP/SEP-0009
+  https://github.com/awslabs/SPARQL-CDTs
+
+Hash join improvements.
+  @Aklakan Claus Stadler
+  https://github.com/apache/jena/issues/2404
+  https://github.com/apache/jena/pull/2405
+
+GH-2580: Added parseCheck flags to query and update exec builders
+  https://github.com/apache/jena/issues/2580
+This helps when dealing with vendor extensions to SPARQL.
+  @Aklakan Claus Stadler
+
+GH-2578: Fix Quad.isTriple() handling in JenaTitanium
+  @Ostrzyciel Piotr Sowiński
+
+
+==== Apache Jena 5.1.0
+Released: 2024-07-18
+Issues: https://s.apache.org/jena-5.1.0-issues
+Announcement:
+https://lists.apache.org/thread/hx8zljq8hn5p1ddb2qf66f1jwo6kfs0q
+
+The major item for the 5.1.0 release is the new artifact jena-ontapi:
+
+It has API support for working with OWL2 as well as other ontologies. It 
+is the long-term replacement for org.apache.jena.ontology.
+
+   https://github.com/apache/jena/issues/2160
+
+This is a contribution from @sszuev
+
+== Contributions
+
+@karolina-telicent
+   Prefixes Service
+     New endpoint for Fuseki to give read and read-write access to the
+     prefixes of a dataset enabling lookup and modification over HTTP.
+   https://github.com/apache/jena/issues/2543
+
+Micrometer - Prometheus upgrade
+   See 
+https://github.com/micrometer-metrics/micrometer/wiki/1.13-Migration-Guide
+   https://github.com/apache/jena/pull/2480
+
+Value space of rdf:XMLLiteral changed to be RDF 1.1/1.2 value semantics.
+   Issue https://github.com/apache/jena/issues/2430
+   The value space in RDF 1.0 was different.
+
+@TelicentPaul - Paul Gallagher
+Migrating Base 64 operations from Apache Commons Codec to Util package.
+   https://github.com/apache/jena/pull/2409
+
+@thomasjtaylor Thomas J. Taylor
+     Fix for NodeValueFloat
+     https://github.com/apache/jena/pull/2374
+
+@Aklakan Claus Stadler
+"Incorrect JoinClassifier results with unbound values."
+   https://github.com/apache/jena/issues/2412
+
+@Aklakan Claus Stadler
+   "QueryExec: abort before exec is ignored."
+   https://github.com/apache/jena/issues/2394
+
+@osi peter royal
+   Track rule engine instances
+   https://github.com/apache/jena/issues/2382
+   https://github.com/apache/jena/pull/2432
+
+Normalization/Canonicalization of values
+   Including RDFParserBuilder.canonicalValues
+     This has been reworked to provide a consistent framework
+     and also guarantee the same behavior between parsing
+     and TDB2 handling of values.
+   https://github.com/apache/jena/issues/2557
+
+
+==== Apache Jena 5.0.0
+Released: 2024-03-20
+Issues: https://s.apache.org/jena-5.0.0-issues
+which includes the ones specifically related to Jena5:
+  https://github.com/apache/jena/issues?q=label%3Ajena5
+Announcement:
+https://lists.apache.org/thread/hn1d1mpg9hwv7m0m620j53jgpw2rrdyz
+
+== Apache Jena 5.0.0-rc1
+Released: 2024-02-14
+
+* Minimum Java requirement: Java 17
+* Language tags are case-insensitive unique.
+* Term graphs for in-memory models
+* RRX - New RDF/XML parser
+* Remove support for JSON-LD 1.0
+* Turtle/Trig Output : default output PREFIX and BASE
+* New artifacts : jena-bom and OWASP CycloneDX SBOM
+* API deprecation removal
+* Dependency updates :
+    Note: slf4j update : v1 to v2 (needs log4j change)
+
+== Contributions
+
+Configurable CORS headers for Fuseki
+  From Paul Gallagher
+
+Balduin Landolt @BalduinLandolt - javadoc fix for Literal.getString.
+
+@OyvindLGjesdal - https://github.com/apache/jena/pull/2121 -- text index fix
+
+Tong Wang @wang3820 Fix tests due to hashmap order
+
+Explicit Accept headers on RDFConnectionRemote fix
+  from @Aklakan
+
+** Java and Servlet versions
+
+Java 17 or later is required.
+Java 17 language constructs now are used in the codebase.
+
+Jakarta JavaEE required for deploying the WAR file (Apache Tomcat10 or later)
+
+** Language tags
+
+Language tags become are case-insensitive unique.
+"abc"@EN and "abc"@en are the same RDF term.
+Internally, language tags are formatted using the algorithm of RFC 5646.
+
+Examples "@en", "@en-GB", "@en-Latn-GB".
+
+SPARQL LANG(?literal) will return a formatted language tag.
+
+Data stored in TDB using language tags must be reloaded.
+
+** Term graphs
+
+Graphs are now term graphs in the API or SPARQL. That is, they do not match
+"same value" for some of the Java mapped datatypes. The model API already
+normalizes values written.
+
+TDB1, TDB2 keep their value canonicalization during data loading.
+
+A legacy value-graph implementation can be obtained from GraphMemFactory.
+
+** RRX - New RDF/XML parser
+
+RRX is the default RDF/XML parser. RIOT uses RRX.
+
+The ARP parser is still temporarily available for transition assistance.
+
+** Remove support for JSON-LD 1.0
+
+JSON-LD 1.1, using Titanium-JSON-LD, is the supported version of JSON-LD.
+
+https://github.com/filip26/titanium-json-ld
+
+** Turtle/Trig Output
+
+"PREFIX" and "BASE" are output by default for Turtle and TriG output.
+
+** Artifacts
+
+There is now a release BOM for Jena artifacts - artifact org.apache.jena:jena-bom
+
+There are now OWASP CycloneDX SBOM for Jena artifacts.
+https://github.com/CycloneDX
+
+jena-tdb is renamed jena-tdb1.
+
+jena-jdbc is no longer released
+
+** Dependencies
+
+The update to slf4j 2.x means the log4j artifact changes to
+"log4j-slf4j2-impl" (was "log4j-slf4j-impl").
+
+== API Users
+
+** Deprecation removal
+
+There has been a clearing out of deprecated functions, methods and classes. This includes the deprecations in Jena 4.10.0 added to show code that is being removed in Jena5.
+
+** QueryExecutionFactory
+
+QueryExecutionFactory is simplified to cover commons cases only; it becomes a way to call the general QueryExecution builders which are preferred and provide all full query execution setup controls.
+
+Local execution builder:
+QueryExecution.create()...
+
+Remote execution builder:
+QueryExecution.service(URL)...
+
+** QueryExecution variable substitution
+
+Using "substitution", where the query is modified by replacing one or more variables by RDF terms, is now preferred to using "initial bindings", where query solutions include (var,value) pairs.
+
+"substitution" is available for all queries, local and remote, not just local executions.
+
+Rename TDB1 packages org.apache.jena.tdb -> org.apache.jena.tdb1
+
+== Fuseki Users
+
+Fuseki: Uses the Jakarta namespace for servlets and Fuseki has been upgraded to use Eclipse Jetty12.
+
+Apache Tomcat10 or later, is required for running the WAR file.
+Tomcat 9 or earlier will not work.
+
+
+==== Apache Jena 4.10.0
+Released: 2023-11-01
+Issues: https://s.apache.org/jena-4.10.0-issues
+Announcement: https://lists.apache.org/thread/th447c7r0kl26s5f4j1nt5gj10dl8q5x
+
+In this release:
+
+* Prepare for Jena5
+
+   Check use of deprecated API calls
+     These are largely being removed in Jena5.
+
+   Jena5 will require Java17
+
+   jena5 Fuseki will switch from javax.servlet to jakarta.servlet
+     This will require use of Apache Tomcat 10 to run the WAR file.
+
+   jena-jdbc is planned for retirement in Jena 5.0.0
+
+See the Jena5 label in the github issues area:
+
+https://github.com/apache/jena/issues?q=is%3Aissue+label%3Ajena5
+
+* Development will switch to Jena5.
+   The 'main' branch is now for Jena5 development.
+   There is a branch 'jena4' marking the 4.10.0 release
+
+== Notes
+
+All issues: https://s.apache.org/jena-4.10.0-issues
+
+There is a CHANGES.txt in the root of the repository
+with the history of announcement messages.
+
+== Contributions:
+
+Shawn Smith
+"Race condition with QueryEngineRegistry and
+UpdateEngineRegistry init()"
+   https://issues.apache.org/jira/browse/JENA-2356
+
+Ali Ariff
+"Labeling for Blank Nodes Across Writers"
+   https://github.com/apache/jena/issues/1997
+
+sszuev
+"jena-core: add more javadocs about Graph-mem thread-safety and 
+ConcurrentModificationException"
+   https://github.com/apache/jena/pull/1994
+
+sszuev
+GH-1419: fix DatasetGraphMap#clear
+   https://github.com/apache/jena/issue/1419
+
+sszuev
+GH-1374: add copyWithRegisties Context helper method
+   https://github.com/apache/jena/issue/1374
+
+
+All issues in this release:
+     https://s.apache.org/jena-4.10.0-issues
+
+== Key upgrades
+
+org.apache.lucene : 9.5.0 -> 9.7.0
+org.apache.commons:commons-lang3: 3.12.0 -> 3.13.0
+org.apache.sis.core:sis-referencing : 1.1 -> 1.4
+
+
+==== Apache Jena 4.9.0
+Released: 2023-07-08
+Issues: https://s.apache.org/jena-4.9.0-issues
+Announcement: 
+https://lists.apache.org/thread/vhn0olwcmv755np52qqddn74d5hrnot8
+
+In this release:
+
+* New in-memory graph implementations
+
+* Important update to Fuseki UI.
+   Switch from TriplyDB/(yasr,yasqe) to zazuko/(yasr,yasqe)
+   This changes picks up some security fixes in yasr and
+   Fuseki users are advised to upgrade to get these fixes.
+
+* Prepare for Jena5:
+   Deprecate JSON-LD 1.0 constants
+   Deprecate API calls that may be removed.
+
+== Notes
+
+All issues: https://s.apache.org/jena-4.9.0-issues
+
+There is a CHANGES.txt in the root of the repository
+with the history of previous announcement messages.
+
+== Jena5
+
+Plans for jena5 include:
+* Require Java17
+* Move from javvax.servlet.* to jakara.servlet.* (Jetty11)
+* Drop JSON-LD 1.0 subsystem.
+
+It will not happen until after Java21 is released in
+keeping with the policy of supporting two java versions.
+
+Jena 4.9.0 is built for a minimum of Java11.
+It has been tested on Java17 and Java21 EA.
+
+== Items in this release
+
+Arne Berdhardt
+https://github.com/apache/jena/issues/1912
+New implementations of in-memory graphs with better storage and performance.
+
+See the issue for performance details.
+
+See GraphMemFactory for access to these new graph implementations.
+
+Arne has also provided a performance analysis and improvements for the 
+existing default in-memory graphs together with a benchmarking framework
+   https://github.com/apache/jena/pull/1279
+
+-- 
+
+Switch from TriplyDB/(yasr,yasqe) to zazuko/(yasr,yasqe)
+to pick up fixes.
+Thank you Zazuko!
+
+This changes picks up some security fixes in yasr and users are advised 
+to upgrade to get these fixes.
+
+-- 
+
+SERVICE on/off control
+https://github.com/apache/jena/pull/1906
+
+Provide the ability to switch off all SERVICE processing completely.
+Use
+   Code: arq:httpServiceAllowed
+   or http://jena.apache.org/ARQ#httpServiceAllowed=false
+to disable.
+
+e.g.
+   fuseki-server --set arq:httpServiceAllowed=false ....
+
+-- 
+
+Additional restrictions and control for SPARQL script functions
+   https://github.com/apache/jena/pull/1908
+
+There is a new Jena context setting
+   http://jena.apache.org/ARQ#scriptAllowList
+which is on the command line:
+   arq:scriptAllowList
+and java constant
+   ARQ.symCustomFunctionScriptAllowList
+
+Its value is a comma separated list of function names.
+   "function1,function2"
+Only the functions in this can be called from SPARQL.
+
+As in Jena 4.8.0, the Java system property "jena:scripting" must also be 
+set to "true" to enable script functions.
+   Website (when published):
+   https://jena.apache.org/documentation/query/javascript-functions
+
+-- 
+
+Track RDF 1.2 and SPARQL 1.2
+Specific SPARQL 1.2 parser, tracking the RDF-star working group.
+   All features are also available in the default SPARQL parser.
+
+-- 
+
+Ryan Shaw(@rybesh)
+   new Turtle RDFFormat
+   https://github.com/apache/jena/issues/1924
+
+-- 
+
+Simon Bin (@SimonBin)
+   A fix for incorrect integer cast in scripting.NV
+   https://github.com/apache/jena/pull/1851
+
+-- 
+
+Alexander Ilin-Tomich (@ailintom)
+   Fix for SPARQL_Update verification and /HTTP PATCH
+
+-- 
+
+Ryan Shaw (@rybesh)
+   Script fix for additional classpath elements
+   https://github.com/apache/jena/pull/1877
+
+-- 
+
+FusekiModules:
+Issue: https://github.com/apache/jena/issues/1897
+
+There is a change in that the interface for automatically loading 
+modules from the classpath has changed to FusekiAutoModule. The 
+interface FusekiModule is now the configuration lifecycle only. This is 
+to allow for programmatically set up a Fuskei server with Fuseki 
+modules, including custom one from the calling application.
+
+
+==== Apache Jena 4.8.0
+Released: 2023-04-23
+Issues: https://s.apache.org/jena-4.8.0-issues
+Announcement: 
+https://lists.apache.org/thread/o5x5tls77t13c3mc93dp2h4fgh1hr6kp
+
+* The RDF/XML parser has been converted to use the
+  Jena IRI abstraction IRIx.
+  https://github.com/apache/jena/issues/1773
+
+See below.
+
+* New keyword in SPARQL : "ADJUST"
+  https://github.com/apache/jena/issues/1706
+
+ADJUST adjusts the timezone of time and date related datatypes.
+It calls one of:
+  fn:adjust-dateTime-to-timezone
+  fn:adjust-date-to-timezone
+  fn:adjust-time-to-timezone
+based on argument type.
+
+== Notes
+
+All issues: https://s.apache.org/jena-4.8.0-issues
+
+There is a CHANGES.txt in the root of the repository
+with the history of announcement messages.
+
+@lucasvr (Lucas C. Villa Real) provided an analysis and improvement to bulk loading operations.
+  https://github.com/apache/jena/issues/1803
+  https://github.com/apache/jena/pull/1819
+
+@wjl110 - Shiro upgrade PR#1728
+  https://github.com/apache/jena/pull/1728
+
+Lucene upgrade from 9.4.2 to 9.5.0
+  https://github.com/apache/jena/pull/1740
+  https://lists.apache.org/thread/696xgpyg2441kzdowmp1b40tshctw25c
+
+@dplagge (Daniel Plagge) - Delta graph fix
+https://github.com/apache/jena/issue/1751
+
+Simon Bin: Fix for sharing link in Fuseki and YASGE
+  https://github.com/apache/jena/issues/1745
+
+Improved performance of "GRAPH ?g {}" (all graph names)
+Prefix scan -- GRAPH ?G
+  https://github.com/apache/jena/issues/1639
+  https://github.com/apache/jena/pull/1655
+
+Custom Javascript execution checking:
+  Use of javascript or Python to write custom functions
+  new requires system property -Djena:scripting=true
+
+@nichtich (Jakob Voß) jena-site improvements:
+  https://github.com/apache/jena-site/pull/151
+
+@sverholen JENA-2350 Pass JsonLdOptions to titanium for json-ld 1.1
+
+Simon Bin: Fix for working on non-root gsp-rw endpoint
+   https://github.com/apache/jena/issues/1679
+
+== RDF/XML reader changes.
+
+* The RDF/XML parser has been converted to use the
+  Jena IRI abstraction IRIx.
+  https://github.com/apache/jena/issues/1773
+
+Uses of RDF/XML read through RIOT (RDFDataMgr, RDFParser) and from the command line "riot" should see no changes except where both WARN and ERROR were reported, now only the ERROR happens.
+
+Code that directly calls the RDF/XML parser will encounter the behaviour seen from RIOT. Relative IRIs will not be in the parsed data. IRI errors are reported as errors.
+
+The original RDF/XML parser is still accessible:
+https://jena.apache.org/documentation/io/rdfxml-io.html
+
+From the command line: "riot --set xmlrdf:xmlrdf0=true ..."
+
+This is the first part of a move to convert the RDF/XML parser to be consistent with the rest of Jena parsing
+
+1. unified IRI treatment of error handling and reporting throughout Jena
+2. improve maintainability
+3. allow for alternative providers of IRI functionality
+
+
+==== Apache Jena 4.7.0
+Released: 2023-01-03
+Issues: https://s.apache.org/jena-4.7.0-issues
+Announcement:
+https://lists.apache.org/thread/2flk0xyz1bf0xpfmk1jgz74cvdog40z9
+
+Major items:
+
+* Lucene upgrade  8.11.1 to 9.4.1 - @OyvindLGjesdal
+    There are changes to the stopword setting in the default
+    configuration of Lucene's StandardAnalyzer
+  Issue: https://github.com/apache/jena/issues/1581
+  PR: https://github.com/apache/jena/pull/1582
+
+
+* LATERAL joins
+    This is an experimental feature.
+  Documentation:
+    https://jena.apache.org/documentation/query/lateral-join.html
+
+
+* RDF Patch
+  Documentation:
+    https://jena.apache.org/documentation/rdfpatch/
+
+
+* Path improvements - @SimonBin et al
+  https://github.com/apache/jena/pull/1616
+  https://github.com/apache/jena/pull/1638
+  Plan: https://github.com/apache/jena/issues/1629
+
+All GH issues for this release:
+
+Contributors:
+  OyvindL Gjesdal
+  Simon Bin
+  Alexandre Ardhuin
+  Claus Stadler
+  Brian Vvosburgh
+  Eric Prud'hommeaux
+
+
+==== Apache Jena 4.6.1
+Released: 2022-09-06
+Announcement:
+https://lists.apache.org/thread/vrkn42nkr82wlkwyv4vlg57rqg035kx2
+
+This release has a bug fix release for TDB2 and Fuseki.
+https://github.com/apache/jena/issues/1499
+
+Users should upgrade from 4.6.0. 
+
+
+==== Apache Jena 4.6.0
+Released: 2022-08-25
+Issues: https://s.apache.org/jena-4.6.0-issues
+Announcement:
+https://lists.apache.org/thread/63vtkb9hwzzd9mrmmxr2xsmd5zvw53vv
+
+-- Bulk retrieval and caching for SERVICE clauses
+
+There is a new module "jena-serviceenhancer", a contribution from Claus Stadler, for federated query, including caching remote data and controlling execution order for SERVICE.
+
+https://jena.apache.org/documentation/query/service_enhancer.html
+
+-- GeoSPARQL: GML handling.
+
+GH-1299 - The GeoSPARQL has acknowledged a mistake in their documentation whereby the wrong namespace was being used for "gml:".
+https://github.com/opengeospatial/ogc-geosparql/pull/334
+
+This also leads to problems with interoperation with GML data sources.
+Unfortunately the change impacts impacts existing data and any spatial indexes would will need to be deleted and rebuilt.
+
+https://github.com/apache/jena/issues/1299
+
+-- SHACL listener
+
+This contribution by Florian Kleedorfer adds listeners to the SHACL validation execution.
+
+https://jena.apache.org/documentation/shacl/#validationlistener
+
+-- Helper for authentication with a bearer token.
+
+GH-1292: https://github.com/apache/jena/issues/1292
+Add support for authentication with a bearer token
+
+https://jena.apache.org/documentation/sparql-apis/http-auth#bearer-authentication
+
+-- Contributions:
+
+@swartik - script fix
+@sszuev - context handling
+@AtesComp - improvement to node checking.
+
+== Details
+
+GH issues:
+https://github.com/apache/jena/issues?q=is%3Aissue+closed%3A2022-05-04..2022-08-20
+
+JIRA Tickets this release:
+https://s.apache.org/jena-4.6.0-jira
+
+
+==== Apache Jena 4.5.0
+Released: 2022-05-04
+Issues: https://s.apache.org/jena-4.5.0-issues
+Announcement:
+https://lists.apache.org/thread/qgjynztx70fhz7h86o6dfopv14dtgrc2
+
+* New, faster, streaming, more robust JSON result set reader.
+   https://issues.apache.org/jira/browse/JENA-2302
+   Contribution from Claus Stadler
+
+* JENA-2315, JENA-2316 -- SHACL fixes (Jakub Wach)
+
+* Improvement to GitHub actions :: @neilnaveen
+
+== JSON-LD 1.1
+
+* JSON-LD 1.1 is the default for parsing and writing JSON-LD
+
+Apache Jena uses titanium-json-ld:
+   https://github.com/filip26/titanium-json-ld
+
+JSON-LD 1.1 is largely compatible with JSON-LD 1.0.
+
+The JSON-LD working group listed the visible changes:
+https://www.w3.org/TR/json-ld11/#changes-from-10
+
+If you find JSON-LD has changed in the triples generated, you can test 
+JSON-LD 1.0 compared to  1.1 with the json-ld.org playground:
+
+   https://json-ld.org/playground/
+   https://json-ld.org/playground/1.0/
+
+Announcement:
+https://lists.apache.org/thread/qgjynztx70fhz7h86o6dfopv14dtgrc2
+
+== Details
+
+GH issues:
+https://github.com/apache/jena/issues?q=is%3Aissue+closed%3A2022-01-30..2022-05-04
+
+JIRA Tickets this release:
+https://s.apache.org/jena-4.5.0-jira
+
+
+==== Apache Jena 4.4.0
+Released: 2022-02-02
+Announcement:
+https://lists.apache.org/thread/6dp7ogjhj09qon25fx2jsfgk3ljff9hj
+
+The Apache Jena development community is pleased to
+announce the release of Apache Jena 4.4.0.
+
+== New Fuseki UI
+
+The main item in this release is the updated Fuseki UI thanks to work by 
+Bruno.  The UI has been rewritten for improved maintenance and style. We 
+look forward to evolving this new code base.
+
+== Dependency Updates
+
+   Apache log4j is at 2.17.1
+   Apache Lucene: is updated to 8.10.1 -> 8.11.1
+   Titanium JSON-LD updated 1.1.0 -> 1.2.0
+
+as well as all other dependences being checked for updates.
+
+== Community Contributions
+
+Erich Bremer
+Jan Martin Keil
+
+== Fuseki war file
+
+The war file for Fuseki is no longer in the apache-jena-fuseki zip 
+download. Instead, it is available from the downloads page.
+
+https://jena.apache.org/download/
+
+This halves the size of the zip/tar.gz for the standalone server.
+
+The Fuseki war file does not work in Tomcat10 due to the javax->jakarta 
+switchover. Apache Tomcat provide a converter:
+https://tomcat.apache.org/download-migration.cgi
+
+== Fuseki: HTML file upload support
+
+Fuseki: serviceUpload (HTML file upload only service) is no longer added 
+in a default configuration.  Existing configurations are unaffected.
+
+This is not SPARQL GSP.
+
+GSP (POST/PUT) endpoint accepts HTML file uploads as well as the usual 
+direct POST/PUT with content-type.
+
+== Improved bulk loader
+
+This release includes the version of the TDB2 xloader for very large 
+datasets.
+
+It has been used to load 16.6B triples (WikiData all) into TDB2 and 
+loading truthy (6B) on modest hardware. Thanks to Marco, Lorenz and 
+Øyvind for running Wikidata load trails.
+
+The loader now now has "--threads=" which been reported to give improved 
+load times  (if the server has the hardware!).
+
+== Assembler for GeoSPARQL
+
+This makes it easier to use GeoPSARQL in a plain Fuseki.
+
+https://jena.apache.org/documentation/geosparql/geosparql-assembler.html
+
+== All tickets in the release
+
+https://s.apache.org/jena-4.4.0-jira
+
+
+==== Apache Jena 4.3.2
+Released: 2021-12-19
+Annoucement:
+https://lists.apache.org/thread/nh7mctmcx7yhjh3krjyy9jcfy9zdwqmb
+
+The Apache Jena development community is pleased to
+announce the release of Apache Jena 4.3.2.
+
+This release updates the version of log4j2 used
+in Fuseki to version 2.16.0 of log4j2.
+
+Fuseki users should upgrade as soon as possible.
+
+Uses of Jena libraries should to check their application logging 
+dependences and update as necessary.
+
+== Changes
+
+JENA-2214: Upgrade to Log4j2 2.16.0
+
+JENA-2216: Fuseki/GeoSPARQL startup fix.
+JENA-2215: Fix inclusion of log4j in the Fuseki war file.
+
+
+==== Apache Jena 4.3.1
+Released: 2021-12-17
+Annoucement:
+https://lists.apache.org/thread/pgz3roryymvw6lf5zs43m0f8p48o11s7
+
+This release updates the version of log4j2 used in Fuseki.
+
+Fuseki users should upgrade as soon as possible.
+
+Uses of Jena libraries should to check their application logging 
+dependences and update as necessary.
+
+== Changes
+
+JENA-2211: Upgrade to Log4j2 2.15.0
+
+JENA-2209, JENA-2210: xloader improvements
+
+JENA-2207: Fix for SERVICE
+
+
+==== Apache Jena 4.3.0
+Released: 2021-12-09
+Annoucement:
+https://lists.apache.org/thread/j6xqhbzxw9ct0owl5ghd8zrpz9lqn5pl
+
+* java.net.http
+
+There is a change to use JDK java.net.http package for HTTP. This 
+affects HTTP authentication.
+
+See notes below.
+
+* JENA-2125: Internal reorganisation of SPARQL APIs.
+
+Coupled with the change to use java.net.http, new patterns for working 
+with SPARQL have been added.
+
+https://jena.apache.org/documentation/sparql-apis/#changes
+
+* JENA-2175: xloader
+
+There is a new experimental bulk loader for TDB2 "xloader" and TDB1 
+tdblaoder2 is rename xloader. The TDB2 is better.
+
+The target is being able to load large data on modest hardware. For 
+example, 1B triples and beyond, loading to disk rather than SSD. It is 
+reliable, rather than fast.
+
+https://jena.staged.apache.org/documentation/tdb/tdb-xloader.html
+
+tdb2.xloader is still in development to reduce its requirements for 
+intermediate disk space - please provide feedback, positive and negative.
+
+* All Tickets this release:
+https://s.apache.org/jena-4.3.0-jira
+
+
+Contributions:
+
+Stefan Obermeier
+  - Add jena-examples to modules in parent pom
+
+Erich Bremer
+  - Update EnhGraph.java
+
+Florian Kleedorfer
+  - Fix copy/paste error in validation report message
+
+Jan-Martin Keil
+  - Dataset: enable named Models with blank node name
+
+jena-site:
+   Michael Wechner
+   michi AT wyona.com
+   @den1s0v
+   Robin Vobruba
+
+== Notes
+
+* HTTP usage provided by the JDK java.net.http package, with
+challenge-based authentication provided on top by Jena.
+
+* Execution objects (QueryExecution, UpdateExecution, RDFConnection)
+have a companion builders for detailed configuration. Previous factory 
+classes remain but builders are preferred.
+
+This is especially important for HTTP as there many configuration
+options that may be needed (including template queries).
+
+* Timeouts - remote only supports the overall query execution. 
+(connection timeout on HttpClient but due to connection caching and now 
+HTTP/2 it is unclear how meaningful that is per request)
+
+* HTTP/2 support (comes from using java.net.http package)
+
+See notes on changes:
+
+https://jena.apache.org/documentation/sparql-apis/#changes
+
+
+==== Apache Jena 4.2.0
+Released: 2021-09-16
+Announcement:
+https://lists.apache.org/thread/mwrdh3xtbm4ly1dk9ro2mdd82fppc9f2
+
+* ShEx engine
+   JENA-2112
+   See https://jena.apache.org/documentation/shex/
+
+* Support for reading JSON-LD 1.1
+   JENA-1948
+   JSON-LD 1.1 uses the Titanium system.
+   https://github.com/filip26/titanium-json-ld
+
+jsonld-java is still there for JSON-LD 1.0.
+In this release, JSON-LD 1.0 is the default for reading JSON-LD.
+
+JENA-2114: SHACL: Provide SPARQL targets
+
+JENA-2123: Upgrade to Jetty10
+
+Contributions:
+
+Claus Sadler:
+JENA-2132 : RDF-star fix
+JENA-2154 : Custom SERVICE executors
+   Experimental: Using SERVICE for extension functionality.
+
+Erich Bremer:
+JENA-2159: schema.org vocabulary
+JENA-2155: Add Web Access Control vocabulary
+
+Jan Martin Keil:
+JENA-2142: Extend DatatypeFormatException
+
+Tickets this release:
+https://s.apache.org/jena-4.2.0-jira
+
+== Notes
+
+This release does not include binary artifacts for OSGi.
+
+Due to problems encountered late in the development cycle, we have not 
+released OSGi artifacts to maven central.
+
+If you are able to help with the production of Jena's OSGi artifacts, 
+please drop into the dev@ list.
+
+
+==== Apache Jena 4.1.0
+Released: 2021-06-04 
+Announcement:
+https://lists.apache.org/thread/m7m73dl7mgp3k5ljolc1tvrt7b202l3w
+
+* RDF-star implementation up-to-date with community work.
+
+* IRIx fixes
+
+* Datasets+RDFS
+
+JENA-2081: Add /$/compact/* endpoint to Fuseki main
+Brandon Sarà
+
+JENA-2096: Add CLI&Fuseki parameters to delete old DB after compaction
+Brandon Sarà
+
+JENA-2086: TDB2 improvement - read under load
+   report and analysis : Zak Mc Kracken
+
+JENA-1262: Sorting prefixes in pretty Turtle output
+Merlin Bögershausen
+
+Documentation edits:
+Leon Poon
+
+JENA-2110: a quick reference section to documentation/tools/
+Bob DuCharme
+
+jena-permissions
+https://jena.apache.org/documentation/permissions/
+
+Datasets+RDFS
+JENA-2089
+https://jena.apache.org/documentation/rdfs/
+
+RDF-star:
+JENA-2107 : Performance fix (Lorenz Bühmann)
+JENA-2103 : Align to RDF-star community work
+JENA-2080 : RDF-star/Trix-star
+
+IRI cleanup:
+JENA-2097 : UUID IRIs cause RiotException
+JENA-2094 : Valid IRI using @ Symbol causes error
+
+Graph API:
+JENA-2909: Add Graph.stream(s,p,o)
+JENA-2091: Add Graph.add(s,p,o) and Graph.delete(s,p,o)
+
+
+27 tickets this release:
+https://s.apache.org/jena-4.1.0-jira
+
+
+==== Apache Jena 4.0.0
+Released:2021-04-01
+Annoucement:
+https://lists.apache.org/thread/m7m73dl7mgp3k5ljolc1tvrt7b202l3w
+
+The Apache Jena development community is pleased to
+announce the release of Apache Jena 4.0.0
+
+* Require Java11 runtime.
+
+* RDF-star implementation up-to-date with community work.
+
+* IRIx abstraction
+   See notes about future changes.
+
+* Add support for scripting languages other than JavaScript
+   JENA-1951 - Pavel Mikhailovskii
+
+* Model API fix Alt, Seq, Bag (Containers)
+   JENA-2075
+
+* jena-core: rename RDFReader as RDFReaderI
+   and RDFWriter a RDFWriterI to avoid name clashes
+   JENA-2038
+
+* Upgrade to Apache Lucene 8.8.0
+   See notes.
+
+* Remove property functions:
+         list:listMember list:listIndex, list:listLength
+    Use list:member, list:index, list:length
+
+* Retire modules SDB, jena-text-es, and jena-elephas
+
+* The default git branch is 'main'
+
+* Deprecation cleanup
+
+62 tickets this release:
+https://s.apache.org/jena-4.0.0-jira
+
+== Notes
+
+Lucene:
+
+This is a major version number upgrade. Apache Lucene policy is 
+generally "two major versions" so if your text index was created awhile 
+ago, you may need to reload even if you have been upgrading Jena itself.
+
+     https://lucene.apache.org/core/8_8_0/MIGRATE.html
+
+IRIs:
+
+There is a new internal API for working with different IRI implementations.
+
+The implementation in Jena 4.0.0 is the same as Jena3 jena-iri.
+
+There a some areas to be aware of for future changes:
+
++ %ZZ (%-and non-hex digits) are illegal syntax in IRIs.
+   It has never been legal in the RFCs but could be read in.
+
++ urn: The correct form of a URN, by the RFC definition, is
+   urn:NID:NSS where NID is at least two characters and NSS is at least
+   one character.
+
+   <urn:x:abcd> is illegal as is <urn:abc:>
+   These are not rejected by Jena 4.0.0 but be warned!
+
+If you have custom URIs schemes, please ensure they match the syntax of 
+RFC 3986/3987.
