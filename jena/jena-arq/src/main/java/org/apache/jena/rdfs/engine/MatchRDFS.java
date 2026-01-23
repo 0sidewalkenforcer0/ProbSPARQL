@@ -74,6 +74,11 @@ public abstract class MatchRDFS<X, T> extends CxtInf<X, T> implements Match<X,T>
     }
 
     @Override
+    public MapperX<X, T> getMapper() {
+        return mapper;
+    }
+
+    @Override
     public final Stream<T> match(X s, X p, X o) { return matchWithInf(s, p ,o); }
 
     /*

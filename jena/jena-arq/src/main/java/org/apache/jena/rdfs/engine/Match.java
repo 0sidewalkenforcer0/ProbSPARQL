@@ -20,10 +20,25 @@ package org.apache.jena.rdfs.engine;
 
 import java.util.stream.Stream;
 
+import org.apache.jena.graph.Node;
+
 /**
  * Match by S/P/O where {@code X} is the RDF term representation (Node, NodeId) and
  * {@code T} is the tuple (triple, quad, tuple) representation.
  */
 public interface Match<X, T> {
     public Stream<T> match(X s, X p, X o);
+
+    public default boolean contains(X s, X p, X o) {
+        try (Stream<T> stream = match(s, p, o)) {
+            return stream.findFirst().isPresent();
+        }
+    }
+
+    /**
+     * The mapper for reuse with wrappers.
+     * Note that this indirectly ties the {@link Match} interface to the {@link Node} realm:
+     * One can use the mapper to obtain X for e.g. RDF.Nodes.type.
+     */
+    MapperX<X, T> getMapper();
 }
