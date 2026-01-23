@@ -50,7 +50,7 @@ Download from [Adoptium](https://adoptium.net/temurin/releases/?version=21)
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/0sidewalkenforcer0/ProbSPARQL.git
+git clone <repository-url>
 cd ProbSPARQL
 ```
 
@@ -192,6 +192,7 @@ The `examples/queries/` directory contains ready-to-use queries:
 | `U4_distribution_manipulation.sparql` | Extract mean, std, quantiles |
 | `U5_similarityjoin_test.sparql` | SIMILARITYJOIN operator examples |
 | `U6_fusejoin_comparison.sparql` | FUSEJOIN (Bayesian fusion) examples |
+| `U7_complex_filter_pattern.sparql` | Complex nested graph pattern with probabilistic filter |
 
 ### Run All Example Queries
 
@@ -200,7 +201,7 @@ A convenience script is provided to run all U1-U6 queries:
 ```bash
 cd examples/queries
 
-# Run all queries (U1-U6)
+# Run all queries (U1-U7)
 ./run_all_queries.sh
 
 # Run a single query
