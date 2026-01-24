@@ -18,12 +18,13 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <jena.version>6.0.0-SNAPSHOT</jena.version>
+        <jena.official.version>5.6.0</jena.official.version>
         <junit.version>5.10.0</junit.version>
         <slf4j.version>2.0.9</slf4j.version>
     </properties>
 
     <dependencies>
-        <!-- Apache Jena Core Dependencies -->
+        <!-- Apache Jena Core Dependencies (modified version with ProbSPARQL extensions) -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-core</artifactId>
@@ -36,17 +37,42 @@
             <version>${jena.version}</version>
         </dependency>
         
+        <!-- Use official TDB2 since the local version is incomplete, exclude conflicting jena-core/arq -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-tdb2</artifactId>
-            <version>${jena.version}</version>
+            <version>${jena.official.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-arq</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
-        <!-- Apache Jena Fuseki for SPARQL HTTP Endpoint -->
+        <!-- Apache Jena Fuseki for SPARQL HTTP Endpoint (official version), exclude conflicting deps -->
         <dependency>
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-fuseki-main</artifactId>
-            <version>${jena.version}</version>
+            <version>${jena.official.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-arq</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.jena</groupId>
+                    <artifactId>jena-tdb2</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- JSON Processing -->

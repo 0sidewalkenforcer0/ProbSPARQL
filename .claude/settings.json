@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/guaiguai/.m2/repository/org/apache/jena/*"
+    ]
+  }
+}

@@ -42,7 +42,7 @@ public class JSDivergence extends FunctionBase2 {
     
     public static final String URI = "http://probsparql.org/function#jsdivergence";
     
-    private static final int DEFAULT_SAMPLES = 10000;
+    private static final int DEFAULT_SAMPLES = 1000;
     private static final java.util.Random random = new java.util.Random(42);
     
     /**

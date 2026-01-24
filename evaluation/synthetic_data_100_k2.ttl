@@ -1,0 +1,1309 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ag: <http://example.org/ontology/anglegrinder#> .
+@prefix cfm: <http://example.org/ontology/cfm#> .
+@prefix om: <http://example.org/ontology/om#> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+@prefix ex: <http://example.org/data/> .
+
+
+ex:entity_00001 a ag:CrownGear ;
+    rdfs:label "Gear #1"@en ;
+    cfm:hasCharacteristic ex:char_00001 .
+
+ex:meas_00001 cfm:measuresCharacteristic ex:char_00001 ;
+    cfm:hasInputPointCloud ex:pc_00001 ;
+    cfm:hasInputVoxelGrid ex:pc_00001 ;
+    cfm:hasProbabilisticValue ex:rv_00001 ;
+    om:hasValue "10.84"^^xsd:double .
+
+ex:rv_00001 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.17041257325083664,0.8295874267491634],"means":[[10.639828449884018],[14.286601598865081]],"covariances":[[[0.48753655057753353]],[[0.76094093572117]]]}"^^uq:gmmLiteral .
+
+ex:entity_00002 a ag:HistoricalGear ;
+    rdfs:label "Gear #2"@en ;
+    cfm:hasCharacteristic ex:char_00002 .
+
+ex:meas_00002 cfm:measuresCharacteristic ex:char_00002 ;
+    cfm:hasInputPointCloud ex:pc_00002 ;
+    cfm:hasInputVoxelGrid ex:pc_00002 ;
+    cfm:hasProbabilisticValue ex:rv_00002 ;
+    om:hasValue "10.58"^^xsd:double .
+
+ex:rv_00002 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.10447714384133515,0.8955228561586649],"means":[[5.498122613438267],[14.816965410863688]],"covariances":[[[0.487918155679124]],[[0.802395737812199]]]}"^^uq:gmmLiteral .
+
+ex:entity_00003 a ag:CrownGear ;
+    rdfs:label "Gear #3"@en ;
+    cfm:hasCharacteristic ex:char_00003 .
+
+ex:meas_00003 cfm:measuresCharacteristic ex:char_00003 ;
+    cfm:hasInputPointCloud ex:pc_00003 ;
+    cfm:hasInputVoxelGrid ex:pc_00003 ;
+    cfm:hasProbabilisticValue ex:rv_00003 ;
+    om:hasValue "9.43"^^xsd:double .
+
+ex:rv_00003 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.3689759568914688,0.6310240431085312],"means":[[10.488770903802873],[6.690238446518651]],"covariances":[[[0.5821667043027123]],[[0.8824874419416117]]]}"^^uq:gmmLiteral .
+
+ex:entity_00004 a ag:HistoricalGear ;
+    rdfs:label "Gear #4"@en ;
+    cfm:hasCharacteristic ex:char_00004 .
+
+ex:meas_00004 cfm:measuresCharacteristic ex:char_00004 ;
+    cfm:hasInputPointCloud ex:pc_00004 ;
+    cfm:hasInputVoxelGrid ex:pc_00004 ;
+    cfm:hasProbabilisticValue ex:rv_00004 ;
+    om:hasValue "10.82"^^xsd:double .
+
+ex:rv_00004 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.2493928507868691,0.7506071492131309],"means":[[8.052898533835531],[13.968038280416897]],"covariances":[[[0.945361616558511]],[[0.1165870118256664]]]}"^^uq:gmmLiteral .
+
+ex:entity_00005 a ag:CrownGear ;
+    rdfs:label "Gear #5"@en ;
+    cfm:hasCharacteristic ex:char_00005 .
+
+ex:meas_00005 cfm:measuresCharacteristic ex:char_00005 ;
+    cfm:hasInputPointCloud ex:pc_00005 ;
+    cfm:hasInputVoxelGrid ex:pc_00005 ;
+    cfm:hasProbabilisticValue ex:rv_00005 ;
+    om:hasValue "11.46"^^xsd:double .
+
+ex:rv_00005 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7192268581854376,0.28077314181456237],"means":[[13.206372064287796],[5.371568463949048]],"covariances":[[[0.9302257064733793]],[[0.5002824777496259]]]}"^^uq:gmmLiteral .
+
+ex:entity_00006 a ag:HistoricalGear ;
+    rdfs:label "Gear #6"@en ;
+    cfm:hasCharacteristic ex:char_00006 .
+
+ex:meas_00006 cfm:measuresCharacteristic ex:char_00006 ;
+    cfm:hasInputPointCloud ex:pc_00006 ;
+    cfm:hasInputVoxelGrid ex:pc_00006 ;
+    cfm:hasProbabilisticValue ex:rv_00006 ;
+    om:hasValue "9.56"^^xsd:double .
+
+ex:rv_00006 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6333982529172141,0.3666017470827859],"means":[[13.314033492409813],[10.37189320545897]],"covariances":[[[0.9519052876879908]],[[0.3965053466079249]]]}"^^uq:gmmLiteral .
+
+ex:entity_00007 a ag:CrownGear ;
+    rdfs:label "Gear #7"@en ;
+    cfm:hasCharacteristic ex:char_00007 .
+
+ex:meas_00007 cfm:measuresCharacteristic ex:char_00007 ;
+    cfm:hasInputPointCloud ex:pc_00007 ;
+    cfm:hasInputVoxelGrid ex:pc_00007 ;
+    cfm:hasProbabilisticValue ex:rv_00007 ;
+    om:hasValue "8.26"^^xsd:double .
+
+ex:rv_00007 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7981055286346832,0.20189447136531674],"means":[[13.985409402960272],[9.089337598813355]],"covariances":[[[0.6602702759757783]],[[0.12572702247810086]]]}"^^uq:gmmLiteral .
+
+ex:entity_00008 a ag:HistoricalGear ;
+    rdfs:label "Gear #8"@en ;
+    cfm:hasCharacteristic ex:char_00008 .
+
+ex:meas_00008 cfm:measuresCharacteristic ex:char_00008 ;
+    cfm:hasInputPointCloud ex:pc_00008 ;
+    cfm:hasInputVoxelGrid ex:pc_00008 ;
+    cfm:hasProbabilisticValue ex:rv_00008 ;
+    om:hasValue "9.84"^^xsd:double .
+
+ex:rv_00008 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.580280636625107,0.4197193633748931],"means":[[8.363338030805323],[14.956994113882518]],"covariances":[[[0.7111080300801075]],[[0.9475829339767824]]]}"^^uq:gmmLiteral .
+
+ex:entity_00009 a ag:CrownGear ;
+    rdfs:label "Gear #9"@en ;
+    cfm:hasCharacteristic ex:char_00009 .
+
+ex:meas_00009 cfm:measuresCharacteristic ex:char_00009 ;
+    cfm:hasInputPointCloud ex:pc_00009 ;
+    cfm:hasInputVoxelGrid ex:pc_00009 ;
+    cfm:hasProbabilisticValue ex:rv_00009 ;
+    om:hasValue "8.18"^^xsd:double .
+
+ex:rv_00009 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6507883154180591,0.34921168458194096],"means":[[8.271486654329614],[5.630506657514516]],"covariances":[[[0.5259465828718645]],[[0.9863756250495496]]]}"^^uq:gmmLiteral .
+
+ex:entity_00010 a ag:HistoricalGear ;
+    rdfs:label "Gear #10"@en ;
+    cfm:hasCharacteristic ex:char_00010 .
+
+ex:meas_00010 cfm:measuresCharacteristic ex:char_00010 ;
+    cfm:hasInputPointCloud ex:pc_00010 ;
+    cfm:hasInputVoxelGrid ex:pc_00010 ;
+    cfm:hasProbabilisticValue ex:rv_00010 ;
+    om:hasValue "11.82"^^xsd:double .
+
+ex:rv_00010 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.23680543434888532,0.7631945656511147],"means":[[9.011011978063111],[9.650998123578495]],"covariances":[[[0.1298040939747423]],[[0.5735334893987958]]]}"^^uq:gmmLiteral .
+
+ex:entity_00011 a ag:CrownGear ;
+    rdfs:label "Gear #11"@en ;
+    cfm:hasCharacteristic ex:char_00011 .
+
+ex:meas_00011 cfm:measuresCharacteristic ex:char_00011 ;
+    cfm:hasInputPointCloud ex:pc_00011 ;
+    cfm:hasInputVoxelGrid ex:pc_00011 ;
+    cfm:hasProbabilisticValue ex:rv_00011 ;
+    om:hasValue "11.73"^^xsd:double .
+
+ex:rv_00011 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5390328612871301,0.4609671387128698],"means":[[7.158982277210031],[13.963866883455122]],"covariances":[[[0.5900179312560679]],[[0.4753585091530066]]]}"^^uq:gmmLiteral .
+
+ex:entity_00012 a ag:HistoricalGear ;
+    rdfs:label "Gear #12"@en ;
+    cfm:hasCharacteristic ex:char_00012 .
+
+ex:meas_00012 cfm:measuresCharacteristic ex:char_00012 ;
+    cfm:hasInputPointCloud ex:pc_00012 ;
+    cfm:hasInputVoxelGrid ex:pc_00012 ;
+    cfm:hasProbabilisticValue ex:rv_00012 ;
+    om:hasValue "9.58"^^xsd:double .
+
+ex:rv_00012 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8749500310565215,0.1250499689434785],"means":[[5.614623039390766],[11.342647571975373]],"covariances":[[[0.8646471113888562]],[[0.23205122275734566]]]}"^^uq:gmmLiteral .
+
+ex:entity_00013 a ag:CrownGear ;
+    rdfs:label "Gear #13"@en ;
+    cfm:hasCharacteristic ex:char_00013 .
+
+ex:meas_00013 cfm:measuresCharacteristic ex:char_00013 ;
+    cfm:hasInputPointCloud ex:pc_00013 ;
+    cfm:hasInputVoxelGrid ex:pc_00013 ;
+    cfm:hasProbabilisticValue ex:rv_00013 ;
+    om:hasValue "9.77"^^xsd:double .
+
+ex:rv_00013 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5219325835285785,0.4780674164714214],"means":[[12.85135576834531],[5.103140985789323]],"covariances":[[[0.18284301447027812]],[[0.8725412792452183]]]}"^^uq:gmmLiteral .
+
+ex:entity_00014 a ag:HistoricalGear ;
+    rdfs:label "Gear #14"@en ;
+    cfm:hasCharacteristic ex:char_00014 .
+
+ex:meas_00014 cfm:measuresCharacteristic ex:char_00014 ;
+    cfm:hasInputPointCloud ex:pc_00014 ;
+    cfm:hasInputVoxelGrid ex:pc_00014 ;
+    cfm:hasProbabilisticValue ex:rv_00014 ;
+    om:hasValue "11.30"^^xsd:double .
+
+ex:rv_00014 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6206143790108075,0.3793856209891926],"means":[[7.997472180289108],[12.70586644555042]],"covariances":[[[0.5148640389825274]],[[0.5464233547540883]]]}"^^uq:gmmLiteral .
+
+ex:entity_00015 a ag:CrownGear ;
+    rdfs:label "Gear #15"@en ;
+    cfm:hasCharacteristic ex:char_00015 .
+
+ex:meas_00015 cfm:measuresCharacteristic ex:char_00015 ;
+    cfm:hasInputPointCloud ex:pc_00015 ;
+    cfm:hasInputVoxelGrid ex:pc_00015 ;
+    cfm:hasProbabilisticValue ex:rv_00015 ;
+    om:hasValue "9.38"^^xsd:double .
+
+ex:rv_00015 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9907797367746375,0.009220263225362504],"means":[[5.032906237961132],[10.111018551263683]],"covariances":[[[0.49704809112798387]],[[0.5967873713617801]]]}"^^uq:gmmLiteral .
+
+ex:entity_00016 a ag:HistoricalGear ;
+    rdfs:label "Gear #16"@en ;
+    cfm:hasCharacteristic ex:char_00016 .
+
+ex:meas_00016 cfm:measuresCharacteristic ex:char_00016 ;
+    cfm:hasInputPointCloud ex:pc_00016 ;
+    cfm:hasInputVoxelGrid ex:pc_00016 ;
+    cfm:hasProbabilisticValue ex:rv_00016 ;
+    om:hasValue "11.19"^^xsd:double .
+
+ex:rv_00016 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.33726464386515337,0.6627353561348466],"means":[[9.90440767271242],[9.591503580794797]],"covariances":[[[0.841745442179342]],[[0.3158264755825991]]]}"^^uq:gmmLiteral .
+
+ex:entity_00017 a ag:CrownGear ;
+    rdfs:label "Gear #17"@en ;
+    cfm:hasCharacteristic ex:char_00017 .
+
+ex:meas_00017 cfm:measuresCharacteristic ex:char_00017 ;
+    cfm:hasInputPointCloud ex:pc_00017 ;
+    cfm:hasInputVoxelGrid ex:pc_00017 ;
+    cfm:hasProbabilisticValue ex:rv_00017 ;
+    om:hasValue "11.69"^^xsd:double .
+
+ex:rv_00017 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.3274589920116291,0.6725410079883709],"means":[[5.335911703055317],[6.634771355076459]],"covariances":[[[0.796010824301086]],[[0.20567034040541127]]]}"^^uq:gmmLiteral .
+
+ex:entity_00018 a ag:HistoricalGear ;
+    rdfs:label "Gear #18"@en ;
+    cfm:hasCharacteristic ex:char_00018 .
+
+ex:meas_00018 cfm:measuresCharacteristic ex:char_00018 ;
+    cfm:hasInputPointCloud ex:pc_00018 ;
+    cfm:hasInputVoxelGrid ex:pc_00018 ;
+    cfm:hasProbabilisticValue ex:rv_00018 ;
+    om:hasValue "8.83"^^xsd:double .
+
+ex:rv_00018 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4900722405902796,0.5099277594097205],"means":[[12.954517522057102],[7.760230917353979]],"covariances":[[[0.6349293012644863]],[[0.5217685511243114]]]}"^^uq:gmmLiteral .
+
+ex:entity_00019 a ag:CrownGear ;
+    rdfs:label "Gear #19"@en ;
+    cfm:hasCharacteristic ex:char_00019 .
+
+ex:meas_00019 cfm:measuresCharacteristic ex:char_00019 ;
+    cfm:hasInputPointCloud ex:pc_00019 ;
+    cfm:hasInputVoxelGrid ex:pc_00019 ;
+    cfm:hasProbabilisticValue ex:rv_00019 ;
+    om:hasValue "8.36"^^xsd:double .
+
+ex:rv_00019 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6506269253625906,0.3493730746374093],"means":[[13.6103166496835],[10.00676084912234]],"covariances":[[[0.5353588883423733]],[[0.20907418899464228]]]}"^^uq:gmmLiteral .
+
+ex:entity_00020 a ag:HistoricalGear ;
+    rdfs:label "Gear #20"@en ;
+    cfm:hasCharacteristic ex:char_00020 .
+
+ex:meas_00020 cfm:measuresCharacteristic ex:char_00020 ;
+    cfm:hasInputPointCloud ex:pc_00020 ;
+    cfm:hasInputVoxelGrid ex:pc_00020 ;
+    cfm:hasProbabilisticValue ex:rv_00020 ;
+    om:hasValue "11.13"^^xsd:double .
+
+ex:rv_00020 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6530449064221817,0.34695509357781834],"means":[[7.008166444866174],[7.012922507297805]],"covariances":[[[0.1486533943785575]],[[0.9698124030481572]]]}"^^uq:gmmLiteral .
+
+ex:entity_00021 a ag:CrownGear ;
+    rdfs:label "Gear #21"@en ;
+    cfm:hasCharacteristic ex:char_00021 .
+
+ex:meas_00021 cfm:measuresCharacteristic ex:char_00021 ;
+    cfm:hasInputPointCloud ex:pc_00021 ;
+    cfm:hasInputVoxelGrid ex:pc_00021 ;
+    cfm:hasProbabilisticValue ex:rv_00021 ;
+    om:hasValue "10.39"^^xsd:double .
+
+ex:rv_00021 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6998481414165073,0.30015185858349264],"means":[[8.226507440399441],[10.584747586647362]],"covariances":[[[0.7168424858900644]],[[0.9865049125312187]]]}"^^uq:gmmLiteral .
+
+ex:entity_00022 a ag:HistoricalGear ;
+    rdfs:label "Gear #22"@en ;
+    cfm:hasCharacteristic ex:char_00022 .
+
+ex:meas_00022 cfm:measuresCharacteristic ex:char_00022 ;
+    cfm:hasInputPointCloud ex:pc_00022 ;
+    cfm:hasInputVoxelGrid ex:pc_00022 ;
+    cfm:hasProbabilisticValue ex:rv_00022 ;
+    om:hasValue "8.23"^^xsd:double .
+
+ex:rv_00022 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.2825849330257973,0.7174150669742027],"means":[[12.773372360546684],[8.053939704902024]],"covariances":[[[0.12380079391125719]],[[0.6528825357630546]]]}"^^uq:gmmLiteral .
+
+ex:entity_00023 a ag:CrownGear ;
+    rdfs:label "Gear #23"@en ;
+    cfm:hasCharacteristic ex:char_00023 .
+
+ex:meas_00023 cfm:measuresCharacteristic ex:char_00023 ;
+    cfm:hasInputPointCloud ex:pc_00023 ;
+    cfm:hasInputVoxelGrid ex:pc_00023 ;
+    cfm:hasProbabilisticValue ex:rv_00023 ;
+    om:hasValue "8.88"^^xsd:double .
+
+ex:rv_00023 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.13252032431396873,0.8674796756860312],"means":[[9.473187236714272],[12.719086844326839]],"covariances":[[[0.45595599302107914]],[[0.717909580053183]]]}"^^uq:gmmLiteral .
+
+ex:entity_00024 a ag:HistoricalGear ;
+    rdfs:label "Gear #24"@en ;
+    cfm:hasCharacteristic ex:char_00024 .
+
+ex:meas_00024 cfm:measuresCharacteristic ex:char_00024 ;
+    cfm:hasInputPointCloud ex:pc_00024 ;
+    cfm:hasInputVoxelGrid ex:pc_00024 ;
+    cfm:hasProbabilisticValue ex:rv_00024 ;
+    om:hasValue "8.87"^^xsd:double .
+
+ex:rv_00024 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.23671804347117545,0.7632819565288246],"means":[[13.450497780168472],[9.19209727488709]],"covariances":[[[0.3304713515744781]],[[0.3270450247740795]]]}"^^uq:gmmLiteral .
+
+ex:entity_00025 a ag:CrownGear ;
+    rdfs:label "Gear #25"@en ;
+    cfm:hasCharacteristic ex:char_00025 .
+
+ex:meas_00025 cfm:measuresCharacteristic ex:char_00025 ;
+    cfm:hasInputPointCloud ex:pc_00025 ;
+    cfm:hasInputVoxelGrid ex:pc_00025 ;
+    cfm:hasProbabilisticValue ex:rv_00025 ;
+    om:hasValue "11.08"^^xsd:double .
+
+ex:rv_00025 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.33849453838275684,0.6615054616172432],"means":[[11.437475802963888],[13.201681966922166]],"covariances":[[[0.6113629316397781]],[[0.21065926365893833]]]}"^^uq:gmmLiteral .
+
+ex:entity_00026 a ag:HistoricalGear ;
+    rdfs:label "Gear #26"@en ;
+    cfm:hasCharacteristic ex:char_00026 .
+
+ex:meas_00026 cfm:measuresCharacteristic ex:char_00026 ;
+    cfm:hasInputPointCloud ex:pc_00026 ;
+    cfm:hasInputVoxelGrid ex:pc_00026 ;
+    cfm:hasProbabilisticValue ex:rv_00026 ;
+    om:hasValue "9.84"^^xsd:double .
+
+ex:rv_00026 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.49241154294263606,0.507588457057364],"means":[[7.4231861469349845],[11.614893851334926]],"covariances":[[[0.29672135766532026]],[[0.18628677835032093]]]}"^^uq:gmmLiteral .
+
+ex:entity_00027 a ag:CrownGear ;
+    rdfs:label "Gear #27"@en ;
+    cfm:hasCharacteristic ex:char_00027 .
+
+ex:meas_00027 cfm:measuresCharacteristic ex:char_00027 ;
+    cfm:hasInputPointCloud ex:pc_00027 ;
+    cfm:hasInputVoxelGrid ex:pc_00027 ;
+    cfm:hasProbabilisticValue ex:rv_00027 ;
+    om:hasValue "11.58"^^xsd:double .
+
+ex:rv_00027 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8972263678226037,0.10277363217739632],"means":[[12.91607216548036],[5.21525587131574]],"covariances":[[[0.6370338230148314]],[[0.5161762500914361]]]}"^^uq:gmmLiteral .
+
+ex:entity_00028 a ag:HistoricalGear ;
+    rdfs:label "Gear #28"@en ;
+    cfm:hasCharacteristic ex:char_00028 .
+
+ex:meas_00028 cfm:measuresCharacteristic ex:char_00028 ;
+    cfm:hasInputPointCloud ex:pc_00028 ;
+    cfm:hasInputVoxelGrid ex:pc_00028 ;
+    cfm:hasProbabilisticValue ex:rv_00028 ;
+    om:hasValue "8.19"^^xsd:double .
+
+ex:rv_00028 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4481050132604742,0.5518949867395258],"means":[[12.831260702756978],[9.306524020205234]],"covariances":[[[0.1937791071928079]],[[0.5730985665480678]]]}"^^uq:gmmLiteral .
+
+ex:entity_00029 a ag:CrownGear ;
+    rdfs:label "Gear #29"@en ;
+    cfm:hasCharacteristic ex:char_00029 .
+
+ex:meas_00029 cfm:measuresCharacteristic ex:char_00029 ;
+    cfm:hasInputPointCloud ex:pc_00029 ;
+    cfm:hasInputVoxelGrid ex:pc_00029 ;
+    cfm:hasProbabilisticValue ex:rv_00029 ;
+    om:hasValue "11.17"^^xsd:double .
+
+ex:rv_00029 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8348542467563044,0.16514575324369565],"means":[[7.1741448422763625],[10.277813180509234]],"covariances":[[[0.7920098953455016]],[[0.29172027935526673]]]}"^^uq:gmmLiteral .
+
+ex:entity_00030 a ag:HistoricalGear ;
+    rdfs:label "Gear #30"@en ;
+    cfm:hasCharacteristic ex:char_00030 .
+
+ex:meas_00030 cfm:measuresCharacteristic ex:char_00030 ;
+    cfm:hasInputPointCloud ex:pc_00030 ;
+    cfm:hasInputVoxelGrid ex:pc_00030 ;
+    cfm:hasProbabilisticValue ex:rv_00030 ;
+    om:hasValue "9.67"^^xsd:double .
+
+ex:rv_00030 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5641524739677475,0.4358475260322525],"means":[[5.685476210342786],[6.933324658824551]],"covariances":[[[0.5334428301623453]],[[0.20559916772747738]]]}"^^uq:gmmLiteral .
+
+ex:entity_00031 a ag:CrownGear ;
+    rdfs:label "Gear #31"@en ;
+    cfm:hasCharacteristic ex:char_00031 .
+
+ex:meas_00031 cfm:measuresCharacteristic ex:char_00031 ;
+    cfm:hasInputPointCloud ex:pc_00031 ;
+    cfm:hasInputVoxelGrid ex:pc_00031 ;
+    cfm:hasProbabilisticValue ex:rv_00031 ;
+    om:hasValue "9.69"^^xsd:double .
+
+ex:rv_00031 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.1796524138539717,0.8203475861460283],"means":[[7.890632612942598],[7.295351988559451]],"covariances":[[[0.10028107626416244]],[[0.28084044117492796]]]}"^^uq:gmmLiteral .
+
+ex:entity_00032 a ag:HistoricalGear ;
+    rdfs:label "Gear #32"@en ;
+    cfm:hasCharacteristic ex:char_00032 .
+
+ex:meas_00032 cfm:measuresCharacteristic ex:char_00032 ;
+    cfm:hasInputPointCloud ex:pc_00032 ;
+    cfm:hasInputVoxelGrid ex:pc_00032 ;
+    cfm:hasProbabilisticValue ex:rv_00032 ;
+    om:hasValue "8.95"^^xsd:double .
+
+ex:rv_00032 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8755877965768192,0.12441220342318084],"means":[[9.492913882360156],[7.418631942108065]],"covariances":[[[0.1979457015613532]],[[0.1250801583526764]]]}"^^uq:gmmLiteral .
+
+ex:entity_00033 a ag:CrownGear ;
+    rdfs:label "Gear #33"@en ;
+    cfm:hasCharacteristic ex:char_00033 .
+
+ex:meas_00033 cfm:measuresCharacteristic ex:char_00033 ;
+    cfm:hasInputPointCloud ex:pc_00033 ;
+    cfm:hasInputVoxelGrid ex:pc_00033 ;
+    cfm:hasProbabilisticValue ex:rv_00033 ;
+    om:hasValue "8.57"^^xsd:double .
+
+ex:rv_00033 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9711785603457366,0.028821439654263394],"means":[[7.837843376117575],[11.60186696616222]],"covariances":[[[0.20309817521180842]],[[0.5946785780363276]]]}"^^uq:gmmLiteral .
+
+ex:entity_00034 a ag:HistoricalGear ;
+    rdfs:label "Gear #34"@en ;
+    cfm:hasCharacteristic ex:char_00034 .
+
+ex:meas_00034 cfm:measuresCharacteristic ex:char_00034 ;
+    cfm:hasInputPointCloud ex:pc_00034 ;
+    cfm:hasInputVoxelGrid ex:pc_00034 ;
+    cfm:hasProbabilisticValue ex:rv_00034 ;
+    om:hasValue "8.06"^^xsd:double .
+
+ex:rv_00034 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.051634672162343145,0.9483653278376568],"means":[[13.613606397886013],[13.496525230505554]],"covariances":[[[0.45184432022289067]],[[0.8404425823812209]]]}"^^uq:gmmLiteral .
+
+ex:entity_00035 a ag:CrownGear ;
+    rdfs:label "Gear #35"@en ;
+    cfm:hasCharacteristic ex:char_00035 .
+
+ex:meas_00035 cfm:measuresCharacteristic ex:char_00035 ;
+    cfm:hasInputPointCloud ex:pc_00035 ;
+    cfm:hasInputVoxelGrid ex:pc_00035 ;
+    cfm:hasProbabilisticValue ex:rv_00035 ;
+    om:hasValue "9.37"^^xsd:double .
+
+ex:rv_00035 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7975166460041169,0.20248335399588316],"means":[[13.33735045786672],[5.683774277972162]],"covariances":[[[0.7122241409162663]],[[0.8180395239049802]]]}"^^uq:gmmLiteral .
+
+ex:entity_00036 a ag:HistoricalGear ;
+    rdfs:label "Gear #36"@en ;
+    cfm:hasCharacteristic ex:char_00036 .
+
+ex:meas_00036 cfm:measuresCharacteristic ex:char_00036 ;
+    cfm:hasInputPointCloud ex:pc_00036 ;
+    cfm:hasInputVoxelGrid ex:pc_00036 ;
+    cfm:hasProbabilisticValue ex:rv_00036 ;
+    om:hasValue "10.05"^^xsd:double .
+
+ex:rv_00036 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8726283674280425,0.12737163257195755],"means":[[6.660405527540975],[13.453691699275126]],"covariances":[[[0.6492503178666132]],[[0.7450038946861561]]]}"^^uq:gmmLiteral .
+
+ex:entity_00037 a ag:CrownGear ;
+    rdfs:label "Gear #37"@en ;
+    cfm:hasCharacteristic ex:char_00037 .
+
+ex:meas_00037 cfm:measuresCharacteristic ex:char_00037 ;
+    cfm:hasInputPointCloud ex:pc_00037 ;
+    cfm:hasInputVoxelGrid ex:pc_00037 ;
+    cfm:hasProbabilisticValue ex:rv_00037 ;
+    om:hasValue "11.55"^^xsd:double .
+
+ex:rv_00037 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4590208843977353,0.5409791156022647],"means":[[6.456061323444756],[5.287319278044342]],"covariances":[[[0.9953093596186576]],[[0.5607664083512589]]]}"^^uq:gmmLiteral .
+
+ex:entity_00038 a ag:HistoricalGear ;
+    rdfs:label "Gear #38"@en ;
+    cfm:hasCharacteristic ex:char_00038 .
+
+ex:meas_00038 cfm:measuresCharacteristic ex:char_00038 ;
+    cfm:hasInputPointCloud ex:pc_00038 ;
+    cfm:hasInputVoxelGrid ex:pc_00038 ;
+    cfm:hasProbabilisticValue ex:rv_00038 ;
+    om:hasValue "11.40"^^xsd:double .
+
+ex:rv_00038 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7051043575091921,0.29489564249080785],"means":[[5.073979371154309],[14.68730813319764]],"covariances":[[[0.32526202170571183]],[[0.2114223370776948]]]}"^^uq:gmmLiteral .
+
+ex:entity_00039 a ag:CrownGear ;
+    rdfs:label "Gear #39"@en ;
+    cfm:hasCharacteristic ex:char_00039 .
+
+ex:meas_00039 cfm:measuresCharacteristic ex:char_00039 ;
+    cfm:hasInputPointCloud ex:pc_00039 ;
+    cfm:hasInputVoxelGrid ex:pc_00039 ;
+    cfm:hasProbabilisticValue ex:rv_00039 ;
+    om:hasValue "8.27"^^xsd:double .
+
+ex:rv_00039 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9398206687809804,0.060179331219019666],"means":[[9.827280201288655],[8.264426786868778]],"covariances":[[[0.9218538664352655]],[[0.21037605455110742]]]}"^^uq:gmmLiteral .
+
+ex:entity_00040 a ag:HistoricalGear ;
+    rdfs:label "Gear #40"@en ;
+    cfm:hasCharacteristic ex:char_00040 .
+
+ex:meas_00040 cfm:measuresCharacteristic ex:char_00040 ;
+    cfm:hasInputPointCloud ex:pc_00040 ;
+    cfm:hasInputVoxelGrid ex:pc_00040 ;
+    cfm:hasProbabilisticValue ex:rv_00040 ;
+    om:hasValue "10.14"^^xsd:double .
+
+ex:rv_00040 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4533402485497674,0.5466597514502326],"means":[[11.314291655897382],[9.65335286861922]],"covariances":[[[0.142552190075548]],[[0.5533730908044926]]]}"^^uq:gmmLiteral .
+
+ex:entity_00041 a ag:CrownGear ;
+    rdfs:label "Gear #41"@en ;
+    cfm:hasCharacteristic ex:char_00041 .
+
+ex:meas_00041 cfm:measuresCharacteristic ex:char_00041 ;
+    cfm:hasInputPointCloud ex:pc_00041 ;
+    cfm:hasInputVoxelGrid ex:pc_00041 ;
+    cfm:hasProbabilisticValue ex:rv_00041 ;
+    om:hasValue "9.87"^^xsd:double .
+
+ex:rv_00041 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8286124824472819,0.17138751755271805],"means":[[6.4910387288220175],[11.425034636088457]],"covariances":[[[0.29259255236664944]],[[0.9338779181600455]]]}"^^uq:gmmLiteral .
+
+ex:entity_00042 a ag:HistoricalGear ;
+    rdfs:label "Gear #42"@en ;
+    cfm:hasCharacteristic ex:char_00042 .
+
+ex:meas_00042 cfm:measuresCharacteristic ex:char_00042 ;
+    cfm:hasInputPointCloud ex:pc_00042 ;
+    cfm:hasInputVoxelGrid ex:pc_00042 ;
+    cfm:hasProbabilisticValue ex:rv_00042 ;
+    om:hasValue "10.78"^^xsd:double .
+
+ex:rv_00042 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.44097380918036194,0.5590261908196382],"means":[[12.89604632171972],[12.323458815104477]],"covariances":[[[0.6140777864594817]],[[0.9230749345849539]]]}"^^uq:gmmLiteral .
+
+ex:entity_00043 a ag:CrownGear ;
+    rdfs:label "Gear #43"@en ;
+    cfm:hasCharacteristic ex:char_00043 .
+
+ex:meas_00043 cfm:measuresCharacteristic ex:char_00043 ;
+    cfm:hasInputPointCloud ex:pc_00043 ;
+    cfm:hasInputVoxelGrid ex:pc_00043 ;
+    cfm:hasProbabilisticValue ex:rv_00043 ;
+    om:hasValue "8.88"^^xsd:double .
+
+ex:rv_00043 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.46828501790268606,0.5317149820973139],"means":[[5.01889513521388],[11.315143887297465]],"covariances":[[[0.9495770911906819]],[[0.1251845548744667]]]}"^^uq:gmmLiteral .
+
+ex:entity_00044 a ag:HistoricalGear ;
+    rdfs:label "Gear #44"@en ;
+    cfm:hasCharacteristic ex:char_00044 .
+
+ex:meas_00044 cfm:measuresCharacteristic ex:char_00044 ;
+    cfm:hasInputPointCloud ex:pc_00044 ;
+    cfm:hasInputVoxelGrid ex:pc_00044 ;
+    cfm:hasProbabilisticValue ex:rv_00044 ;
+    om:hasValue "9.15"^^xsd:double .
+
+ex:rv_00044 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.41067085555728144,0.5893291444427186],"means":[[13.794591431205385],[14.46080276551538]],"covariances":[[[0.6832875608029391]],[[0.1908050592958077]]]}"^^uq:gmmLiteral .
+
+ex:entity_00045 a ag:CrownGear ;
+    rdfs:label "Gear #45"@en ;
+    cfm:hasCharacteristic ex:char_00045 .
+
+ex:meas_00045 cfm:measuresCharacteristic ex:char_00045 ;
+    cfm:hasInputPointCloud ex:pc_00045 ;
+    cfm:hasInputVoxelGrid ex:pc_00045 ;
+    cfm:hasProbabilisticValue ex:rv_00045 ;
+    om:hasValue "11.93"^^xsd:double .
+
+ex:rv_00045 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.950095164354957,0.04990483564504296],"means":[[5.462854064195919],[5.802882514647606]],"covariances":[[[0.90983115827929]],[[0.28002731334933073]]]}"^^uq:gmmLiteral .
+
+ex:entity_00046 a ag:HistoricalGear ;
+    rdfs:label "Gear #46"@en ;
+    cfm:hasCharacteristic ex:char_00046 .
+
+ex:meas_00046 cfm:measuresCharacteristic ex:char_00046 ;
+    cfm:hasInputPointCloud ex:pc_00046 ;
+    cfm:hasInputVoxelGrid ex:pc_00046 ;
+    cfm:hasProbabilisticValue ex:rv_00046 ;
+    om:hasValue "10.85"^^xsd:double .
+
+ex:rv_00046 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7203942371268773,0.2796057628731226],"means":[[14.666247703120762],[14.372103200374747]],"covariances":[[[0.8802484568622565]],[[0.3266550181546468]]]}"^^uq:gmmLiteral .
+
+ex:entity_00047 a ag:CrownGear ;
+    rdfs:label "Gear #47"@en ;
+    cfm:hasCharacteristic ex:char_00047 .
+
+ex:meas_00047 cfm:measuresCharacteristic ex:char_00047 ;
+    cfm:hasInputPointCloud ex:pc_00047 ;
+    cfm:hasInputVoxelGrid ex:pc_00047 ;
+    cfm:hasProbabilisticValue ex:rv_00047 ;
+    om:hasValue "11.57"^^xsd:double .
+
+ex:rv_00047 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.23498197666673346,0.7650180233332665],"means":[[9.789364551142839],[12.5838068704417]],"covariances":[[[0.6973668787114051]],[[0.5186628757757834]]]}"^^uq:gmmLiteral .
+
+ex:entity_00048 a ag:HistoricalGear ;
+    rdfs:label "Gear #48"@en ;
+    cfm:hasCharacteristic ex:char_00048 .
+
+ex:meas_00048 cfm:measuresCharacteristic ex:char_00048 ;
+    cfm:hasInputPointCloud ex:pc_00048 ;
+    cfm:hasInputVoxelGrid ex:pc_00048 ;
+    cfm:hasProbabilisticValue ex:rv_00048 ;
+    om:hasValue "10.41"^^xsd:double .
+
+ex:rv_00048 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5126571761801463,0.48734282381985367],"means":[[10.711094294017364],[8.24336195372312]],"covariances":[[[0.48620620662482394]],[[0.8723403194977621]]]}"^^uq:gmmLiteral .
+
+ex:entity_00049 a ag:CrownGear ;
+    rdfs:label "Gear #49"@en ;
+    cfm:hasCharacteristic ex:char_00049 .
+
+ex:meas_00049 cfm:measuresCharacteristic ex:char_00049 ;
+    cfm:hasInputPointCloud ex:pc_00049 ;
+    cfm:hasInputVoxelGrid ex:pc_00049 ;
+    cfm:hasProbabilisticValue ex:rv_00049 ;
+    om:hasValue "10.27"^^xsd:double .
+
+ex:rv_00049 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9298671786955528,0.07013282130444723],"means":[[9.17322108535673],[7.812296790556058]],"covariances":[[[0.5044298797651434]],[[0.1916596580567141]]]}"^^uq:gmmLiteral .
+
+ex:entity_00050 a ag:HistoricalGear ;
+    rdfs:label "Gear #50"@en ;
+    cfm:hasCharacteristic ex:char_00050 .
+
+ex:meas_00050 cfm:measuresCharacteristic ex:char_00050 ;
+    cfm:hasInputPointCloud ex:pc_00050 ;
+    cfm:hasInputVoxelGrid ex:pc_00050 ;
+    cfm:hasProbabilisticValue ex:rv_00050 ;
+    om:hasValue "8.51"^^xsd:double .
+
+ex:rv_00050 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.2473654174876779,0.7526345825123221],"means":[[7.142773823924134],[6.12588712821964]],"covariances":[[[0.4435567424790203]],[[0.3225771012997012]]]}"^^uq:gmmLiteral .
+
+ex:entity_00051 a ag:CrownGear ;
+    rdfs:label "Gear #51"@en ;
+    cfm:hasCharacteristic ex:char_00051 .
+
+ex:meas_00051 cfm:measuresCharacteristic ex:char_00051 ;
+    cfm:hasInputPointCloud ex:pc_00051 ;
+    cfm:hasInputVoxelGrid ex:pc_00051 ;
+    cfm:hasProbabilisticValue ex:rv_00051 ;
+    om:hasValue "10.81"^^xsd:double .
+
+ex:rv_00051 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4542051625088009,0.5457948374911991],"means":[[5.023853050042749],[11.67539921444839]],"covariances":[[[0.8555676978975006]],[[0.6165171635090437]]]}"^^uq:gmmLiteral .
+
+ex:entity_00052 a ag:HistoricalGear ;
+    rdfs:label "Gear #52"@en ;
+    cfm:hasCharacteristic ex:char_00052 .
+
+ex:meas_00052 cfm:measuresCharacteristic ex:char_00052 ;
+    cfm:hasInputPointCloud ex:pc_00052 ;
+    cfm:hasInputVoxelGrid ex:pc_00052 ;
+    cfm:hasProbabilisticValue ex:rv_00052 ;
+    om:hasValue "8.06"^^xsd:double .
+
+ex:rv_00052 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5332117690725726,0.4667882309274274],"means":[[14.407237454459448],[6.4297143137759285]],"covariances":[[[0.5744769334724606]],[[0.6138170915239052]]]}"^^uq:gmmLiteral .
+
+ex:entity_00053 a ag:CrownGear ;
+    rdfs:label "Gear #53"@en ;
+    cfm:hasCharacteristic ex:char_00053 .
+
+ex:meas_00053 cfm:measuresCharacteristic ex:char_00053 ;
+    cfm:hasInputPointCloud ex:pc_00053 ;
+    cfm:hasInputVoxelGrid ex:pc_00053 ;
+    cfm:hasProbabilisticValue ex:rv_00053 ;
+    om:hasValue "8.14"^^xsd:double .
+
+ex:rv_00053 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.26861288154581825,0.7313871184541818],"means":[[13.461627574099499],[7.653527734303351]],"covariances":[[[0.14938635556215182]],[[0.3322591060023603]]]}"^^uq:gmmLiteral .
+
+ex:entity_00054 a ag:HistoricalGear ;
+    rdfs:label "Gear #54"@en ;
+    cfm:hasCharacteristic ex:char_00054 .
+
+ex:meas_00054 cfm:measuresCharacteristic ex:char_00054 ;
+    cfm:hasInputPointCloud ex:pc_00054 ;
+    cfm:hasInputVoxelGrid ex:pc_00054 ;
+    cfm:hasProbabilisticValue ex:rv_00054 ;
+    om:hasValue "10.01"^^xsd:double .
+
+ex:rv_00054 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4532552639671771,0.5467447360328229],"means":[[6.113175747930834],[10.644448146791728]],"covariances":[[[0.6578176196641324]],[[0.7568157942135065]]]}"^^uq:gmmLiteral .
+
+ex:entity_00055 a ag:CrownGear ;
+    rdfs:label "Gear #55"@en ;
+    cfm:hasCharacteristic ex:char_00055 .
+
+ex:meas_00055 cfm:measuresCharacteristic ex:char_00055 ;
+    cfm:hasInputPointCloud ex:pc_00055 ;
+    cfm:hasInputVoxelGrid ex:pc_00055 ;
+    cfm:hasProbabilisticValue ex:rv_00055 ;
+    om:hasValue "8.48"^^xsd:double .
+
+ex:rv_00055 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.34260296701653836,0.6573970329834616],"means":[[9.535035980967434],[9.017812467755832]],"covariances":[[[0.7148301645739902]],[[0.1821640666962695]]]}"^^uq:gmmLiteral .
+
+ex:entity_00056 a ag:HistoricalGear ;
+    rdfs:label "Gear #56"@en ;
+    cfm:hasCharacteristic ex:char_00056 .
+
+ex:meas_00056 cfm:measuresCharacteristic ex:char_00056 ;
+    cfm:hasInputPointCloud ex:pc_00056 ;
+    cfm:hasInputVoxelGrid ex:pc_00056 ;
+    cfm:hasProbabilisticValue ex:rv_00056 ;
+    om:hasValue "9.47"^^xsd:double .
+
+ex:rv_00056 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.3761925824619728,0.6238074175380273],"means":[[7.3308658874713934],[6.7701598690101825]],"covariances":[[[0.35001955248381145]],[[0.15833118394865306]]]}"^^uq:gmmLiteral .
+
+ex:entity_00057 a ag:CrownGear ;
+    rdfs:label "Gear #57"@en ;
+    cfm:hasCharacteristic ex:char_00057 .
+
+ex:meas_00057 cfm:measuresCharacteristic ex:char_00057 ;
+    cfm:hasInputPointCloud ex:pc_00057 ;
+    cfm:hasInputVoxelGrid ex:pc_00057 ;
+    cfm:hasProbabilisticValue ex:rv_00057 ;
+    om:hasValue "11.20"^^xsd:double .
+
+ex:rv_00057 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5318242598747889,0.4681757401252112],"means":[[14.32210715572222],[12.267320752400153]],"covariances":[[[0.7343909094737232]],[[0.7241196106784606]]]}"^^uq:gmmLiteral .
+
+ex:entity_00058 a ag:HistoricalGear ;
+    rdfs:label "Gear #58"@en ;
+    cfm:hasCharacteristic ex:char_00058 .
+
+ex:meas_00058 cfm:measuresCharacteristic ex:char_00058 ;
+    cfm:hasInputPointCloud ex:pc_00058 ;
+    cfm:hasInputVoxelGrid ex:pc_00058 ;
+    cfm:hasProbabilisticValue ex:rv_00058 ;
+    om:hasValue "9.80"^^xsd:double .
+
+ex:rv_00058 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4526836096242297,0.5473163903757703],"means":[[11.4702169440202],[9.135141234180775]],"covariances":[[[0.14292779365180633]],[[0.4669693640419379]]]}"^^uq:gmmLiteral .
+
+ex:entity_00059 a ag:CrownGear ;
+    rdfs:label "Gear #59"@en ;
+    cfm:hasCharacteristic ex:char_00059 .
+
+ex:meas_00059 cfm:measuresCharacteristic ex:char_00059 ;
+    cfm:hasInputPointCloud ex:pc_00059 ;
+    cfm:hasInputVoxelGrid ex:pc_00059 ;
+    cfm:hasProbabilisticValue ex:rv_00059 ;
+    om:hasValue "8.99"^^xsd:double .
+
+ex:rv_00059 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8666295655258031,0.13337043447419694],"means":[[12.28784345080861],[11.957544158659491]],"covariances":[[[0.7067348765713342]],[[0.7968448766272712]]]}"^^uq:gmmLiteral .
+
+ex:entity_00060 a ag:HistoricalGear ;
+    rdfs:label "Gear #60"@en ;
+    cfm:hasCharacteristic ex:char_00060 .
+
+ex:meas_00060 cfm:measuresCharacteristic ex:char_00060 ;
+    cfm:hasInputPointCloud ex:pc_00060 ;
+    cfm:hasInputVoxelGrid ex:pc_00060 ;
+    cfm:hasProbabilisticValue ex:rv_00060 ;
+    om:hasValue "9.49"^^xsd:double .
+
+ex:rv_00060 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.17831419078976715,0.8216858092102328],"means":[[13.211090439641453],[14.991061236397455]],"covariances":[[[0.48108803450113147]],[[0.8531206893947861]]]}"^^uq:gmmLiteral .
+
+ex:entity_00061 a ag:CrownGear ;
+    rdfs:label "Gear #61"@en ;
+    cfm:hasCharacteristic ex:char_00061 .
+
+ex:meas_00061 cfm:measuresCharacteristic ex:char_00061 ;
+    cfm:hasInputPointCloud ex:pc_00061 ;
+    cfm:hasInputVoxelGrid ex:pc_00061 ;
+    cfm:hasProbabilisticValue ex:rv_00061 ;
+    om:hasValue "9.35"^^xsd:double .
+
+ex:rv_00061 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4963612398344794,0.5036387601655206],"means":[[6.537602082830939],[12.679550527509075]],"covariances":[[[0.5723390829027767]],[[0.7725929635253769]]]}"^^uq:gmmLiteral .
+
+ex:entity_00062 a ag:HistoricalGear ;
+    rdfs:label "Gear #62"@en ;
+    cfm:hasCharacteristic ex:char_00062 .
+
+ex:meas_00062 cfm:measuresCharacteristic ex:char_00062 ;
+    cfm:hasInputPointCloud ex:pc_00062 ;
+    cfm:hasInputVoxelGrid ex:pc_00062 ;
+    cfm:hasProbabilisticValue ex:rv_00062 ;
+    om:hasValue "10.21"^^xsd:double .
+
+ex:rv_00062 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.13456140003960376,0.8654385999603963],"means":[[12.451470383487425],[5.550155404270218]],"covariances":[[[0.1308180826046419]],[[0.9508725801352713]]]}"^^uq:gmmLiteral .
+
+ex:entity_00063 a ag:CrownGear ;
+    rdfs:label "Gear #63"@en ;
+    cfm:hasCharacteristic ex:char_00063 .
+
+ex:meas_00063 cfm:measuresCharacteristic ex:char_00063 ;
+    cfm:hasInputPointCloud ex:pc_00063 ;
+    cfm:hasInputVoxelGrid ex:pc_00063 ;
+    cfm:hasProbabilisticValue ex:rv_00063 ;
+    om:hasValue "9.42"^^xsd:double .
+
+ex:rv_00063 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4592648931936817,0.5407351068063182],"means":[[14.943883142888666],[8.891885496675908]],"covariances":[[[0.5135725804239518]],[[0.9918066194030027]]]}"^^uq:gmmLiteral .
+
+ex:entity_00064 a ag:HistoricalGear ;
+    rdfs:label "Gear #64"@en ;
+    cfm:hasCharacteristic ex:char_00064 .
+
+ex:meas_00064 cfm:measuresCharacteristic ex:char_00064 ;
+    cfm:hasInputPointCloud ex:pc_00064 ;
+    cfm:hasInputVoxelGrid ex:pc_00064 ;
+    cfm:hasProbabilisticValue ex:rv_00064 ;
+    om:hasValue "11.02"^^xsd:double .
+
+ex:rv_00064 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.3171677758892145,0.6828322241107855],"means":[[13.259977842348366],[7.549575688031393]],"covariances":[[[0.6887258424288147]],[[0.7912931175763521]]]}"^^uq:gmmLiteral .
+
+ex:entity_00065 a ag:CrownGear ;
+    rdfs:label "Gear #65"@en ;
+    cfm:hasCharacteristic ex:char_00065 .
+
+ex:meas_00065 cfm:measuresCharacteristic ex:char_00065 ;
+    cfm:hasInputPointCloud ex:pc_00065 ;
+    cfm:hasInputVoxelGrid ex:pc_00065 ;
+    cfm:hasProbabilisticValue ex:rv_00065 ;
+    om:hasValue "9.83"^^xsd:double .
+
+ex:rv_00065 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4270418236686388,0.5729581763313613],"means":[[5.031745681531351],[8.487598163038284]],"covariances":[[[0.7734795568380146]],[[0.10736441623696058]]]}"^^uq:gmmLiteral .
+
+ex:entity_00066 a ag:HistoricalGear ;
+    rdfs:label "Gear #66"@en ;
+    cfm:hasCharacteristic ex:char_00066 .
+
+ex:meas_00066 cfm:measuresCharacteristic ex:char_00066 ;
+    cfm:hasInputPointCloud ex:pc_00066 ;
+    cfm:hasInputVoxelGrid ex:pc_00066 ;
+    cfm:hasProbabilisticValue ex:rv_00066 ;
+    om:hasValue "10.55"^^xsd:double .
+
+ex:rv_00066 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.30531283042807894,0.694687169571921],"means":[[7.232653011168454],[9.983686787963286]],"covariances":[[[0.9952609581368033]],[[0.40914169130897704]]]}"^^uq:gmmLiteral .
+
+ex:entity_00067 a ag:CrownGear ;
+    rdfs:label "Gear #67"@en ;
+    cfm:hasCharacteristic ex:char_00067 .
+
+ex:meas_00067 cfm:measuresCharacteristic ex:char_00067 ;
+    cfm:hasInputPointCloud ex:pc_00067 ;
+    cfm:hasInputVoxelGrid ex:pc_00067 ;
+    cfm:hasProbabilisticValue ex:rv_00067 ;
+    om:hasValue "9.44"^^xsd:double .
+
+ex:rv_00067 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6399282201807465,0.36007177981925353],"means":[[13.697401895678807],[8.566214259813306]],"covariances":[[[0.5550269343477986]],[[0.4160919790715176]]]}"^^uq:gmmLiteral .
+
+ex:entity_00068 a ag:HistoricalGear ;
+    rdfs:label "Gear #68"@en ;
+    cfm:hasCharacteristic ex:char_00068 .
+
+ex:meas_00068 cfm:measuresCharacteristic ex:char_00068 ;
+    cfm:hasInputPointCloud ex:pc_00068 ;
+    cfm:hasInputVoxelGrid ex:pc_00068 ;
+    cfm:hasProbabilisticValue ex:rv_00068 ;
+    om:hasValue "11.91"^^xsd:double .
+
+ex:rv_00068 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6400373564084009,0.35996264359159913],"means":[[9.177819458620805],[8.303959021839669]],"covariances":[[[0.2512812026003727]],[[0.2516478759653513]]]}"^^uq:gmmLiteral .
+
+ex:entity_00069 a ag:CrownGear ;
+    rdfs:label "Gear #69"@en ;
+    cfm:hasCharacteristic ex:char_00069 .
+
+ex:meas_00069 cfm:measuresCharacteristic ex:char_00069 ;
+    cfm:hasInputPointCloud ex:pc_00069 ;
+    cfm:hasInputVoxelGrid ex:pc_00069 ;
+    cfm:hasProbabilisticValue ex:rv_00069 ;
+    om:hasValue "8.80"^^xsd:double .
+
+ex:rv_00069 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.2703325916510322,0.7296674083489678],"means":[[13.084081404253988],[13.309557502606882]],"covariances":[[[0.10696473146409956]],[[0.49449459689970465]]]}"^^uq:gmmLiteral .
+
+ex:entity_00070 a ag:HistoricalGear ;
+    rdfs:label "Gear #70"@en ;
+    cfm:hasCharacteristic ex:char_00070 .
+
+ex:meas_00070 cfm:measuresCharacteristic ex:char_00070 ;
+    cfm:hasInputPointCloud ex:pc_00070 ;
+    cfm:hasInputVoxelGrid ex:pc_00070 ;
+    cfm:hasProbabilisticValue ex:rv_00070 ;
+    om:hasValue "8.65"^^xsd:double .
+
+ex:rv_00070 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8095900484155899,0.19040995158441013],"means":[[10.10054224199499],[12.398302169042221]],"covariances":[[[0.10193734181140059]],[[0.10073885293358191]]]}"^^uq:gmmLiteral .
+
+ex:entity_00071 a ag:CrownGear ;
+    rdfs:label "Gear #71"@en ;
+    cfm:hasCharacteristic ex:char_00071 .
+
+ex:meas_00071 cfm:measuresCharacteristic ex:char_00071 ;
+    cfm:hasInputPointCloud ex:pc_00071 ;
+    cfm:hasInputVoxelGrid ex:pc_00071 ;
+    cfm:hasProbabilisticValue ex:rv_00071 ;
+    om:hasValue "9.64"^^xsd:double .
+
+ex:rv_00071 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.47442085331489015,0.5255791466851099],"means":[[8.017297000919365],[9.060933983586661]],"covariances":[[[0.12365767150403759]],[[0.11455093314713866]]]}"^^uq:gmmLiteral .
+
+ex:entity_00072 a ag:HistoricalGear ;
+    rdfs:label "Gear #72"@en ;
+    cfm:hasCharacteristic ex:char_00072 .
+
+ex:meas_00072 cfm:measuresCharacteristic ex:char_00072 ;
+    cfm:hasInputPointCloud ex:pc_00072 ;
+    cfm:hasInputVoxelGrid ex:pc_00072 ;
+    cfm:hasProbabilisticValue ex:rv_00072 ;
+    om:hasValue "8.11"^^xsd:double .
+
+ex:rv_00072 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.565305529106974,0.43469447089302604],"means":[[8.99748809187863],[5.664983111636655]],"covariances":[[[0.12917542738755014]],[[0.9470693359558525]]]}"^^uq:gmmLiteral .
+
+ex:entity_00073 a ag:CrownGear ;
+    rdfs:label "Gear #73"@en ;
+    cfm:hasCharacteristic ex:char_00073 .
+
+ex:meas_00073 cfm:measuresCharacteristic ex:char_00073 ;
+    cfm:hasInputPointCloud ex:pc_00073 ;
+    cfm:hasInputVoxelGrid ex:pc_00073 ;
+    cfm:hasProbabilisticValue ex:rv_00073 ;
+    om:hasValue "10.07"^^xsd:double .
+
+ex:rv_00073 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7155432340695607,0.28445676593043945],"means":[[10.478326366293313],[8.92538389565223]],"covariances":[[[0.9346777390838203]],[[0.45695289657919336]]]}"^^uq:gmmLiteral .
+
+ex:entity_00074 a ag:HistoricalGear ;
+    rdfs:label "Gear #74"@en ;
+    cfm:hasCharacteristic ex:char_00074 .
+
+ex:meas_00074 cfm:measuresCharacteristic ex:char_00074 ;
+    cfm:hasInputPointCloud ex:pc_00074 ;
+    cfm:hasInputVoxelGrid ex:pc_00074 ;
+    cfm:hasProbabilisticValue ex:rv_00074 ;
+    om:hasValue "11.60"^^xsd:double .
+
+ex:rv_00074 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.47888377348016214,0.5211162265198379],"means":[[11.737197738924216],[13.013389674317237]],"covariances":[[[0.4624063827692877]],[[0.17811982441460816]]]}"^^uq:gmmLiteral .
+
+ex:entity_00075 a ag:CrownGear ;
+    rdfs:label "Gear #75"@en ;
+    cfm:hasCharacteristic ex:char_00075 .
+
+ex:meas_00075 cfm:measuresCharacteristic ex:char_00075 ;
+    cfm:hasInputPointCloud ex:pc_00075 ;
+    cfm:hasInputVoxelGrid ex:pc_00075 ;
+    cfm:hasProbabilisticValue ex:rv_00075 ;
+    om:hasValue "9.61"^^xsd:double .
+
+ex:rv_00075 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6380128465624815,0.3619871534375185],"means":[[10.612581797262592],[7.64857528830731]],"covariances":[[[0.1644350280124811]],[[0.4821173400609724]]]}"^^uq:gmmLiteral .
+
+ex:entity_00076 a ag:HistoricalGear ;
+    rdfs:label "Gear #76"@en ;
+    cfm:hasCharacteristic ex:char_00076 .
+
+ex:meas_00076 cfm:measuresCharacteristic ex:char_00076 ;
+    cfm:hasInputPointCloud ex:pc_00076 ;
+    cfm:hasInputVoxelGrid ex:pc_00076 ;
+    cfm:hasProbabilisticValue ex:rv_00076 ;
+    om:hasValue "9.25"^^xsd:double .
+
+ex:rv_00076 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.505443055152852,0.49455694484714796],"means":[[9.861978025498818],[5.542445257379186]],"covariances":[[[0.6315280330050818]],[[0.9149851526693435]]]}"^^uq:gmmLiteral .
+
+ex:entity_00077 a ag:CrownGear ;
+    rdfs:label "Gear #77"@en ;
+    cfm:hasCharacteristic ex:char_00077 .
+
+ex:meas_00077 cfm:measuresCharacteristic ex:char_00077 ;
+    cfm:hasInputPointCloud ex:pc_00077 ;
+    cfm:hasInputVoxelGrid ex:pc_00077 ;
+    cfm:hasProbabilisticValue ex:rv_00077 ;
+    om:hasValue "10.83"^^xsd:double .
+
+ex:rv_00077 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.609704430448774,0.390295569551226],"means":[[11.148622986095141],[10.809862294119519]],"covariances":[[[0.46743719793414795]],[[0.12611169370123926]]]}"^^uq:gmmLiteral .
+
+ex:entity_00078 a ag:HistoricalGear ;
+    rdfs:label "Gear #78"@en ;
+    cfm:hasCharacteristic ex:char_00078 .
+
+ex:meas_00078 cfm:measuresCharacteristic ex:char_00078 ;
+    cfm:hasInputPointCloud ex:pc_00078 ;
+    cfm:hasInputVoxelGrid ex:pc_00078 ;
+    cfm:hasProbabilisticValue ex:rv_00078 ;
+    om:hasValue "11.19"^^xsd:double .
+
+ex:rv_00078 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6252051174876014,0.3747948825123986],"means":[[6.067446269586945],[6.925484512472439]],"covariances":[[[0.7971834391315625]],[[0.8651675626747996]]]}"^^uq:gmmLiteral .
+
+ex:entity_00079 a ag:CrownGear ;
+    rdfs:label "Gear #79"@en ;
+    cfm:hasCharacteristic ex:char_00079 .
+
+ex:meas_00079 cfm:measuresCharacteristic ex:char_00079 ;
+    cfm:hasInputPointCloud ex:pc_00079 ;
+    cfm:hasInputVoxelGrid ex:pc_00079 ;
+    cfm:hasProbabilisticValue ex:rv_00079 ;
+    om:hasValue "10.21"^^xsd:double .
+
+ex:rv_00079 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5242428646095878,0.47575713539041226],"means":[[12.383818566676794],[9.612719066241983]],"covariances":[[[0.7245203468055554]],[[0.3437308261265199]]]}"^^uq:gmmLiteral .
+
+ex:entity_00080 a ag:HistoricalGear ;
+    rdfs:label "Gear #80"@en ;
+    cfm:hasCharacteristic ex:char_00080 .
+
+ex:meas_00080 cfm:measuresCharacteristic ex:char_00080 ;
+    cfm:hasInputPointCloud ex:pc_00080 ;
+    cfm:hasInputVoxelGrid ex:pc_00080 ;
+    cfm:hasProbabilisticValue ex:rv_00080 ;
+    om:hasValue "8.06"^^xsd:double .
+
+ex:rv_00080 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4002027251599784,0.5997972748400215],"means":[[10.45234479475441],[5.422483978524271]],"covariances":[[[0.20463167761492548]],[[0.8844193241852046]]]}"^^uq:gmmLiteral .
+
+ex:entity_00081 a ag:CrownGear ;
+    rdfs:label "Gear #81"@en ;
+    cfm:hasCharacteristic ex:char_00081 .
+
+ex:meas_00081 cfm:measuresCharacteristic ex:char_00081 ;
+    cfm:hasInputPointCloud ex:pc_00081 ;
+    cfm:hasInputVoxelGrid ex:pc_00081 ;
+    cfm:hasProbabilisticValue ex:rv_00081 ;
+    om:hasValue "11.13"^^xsd:double .
+
+ex:rv_00081 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.2348105358608685,0.7651894641391315],"means":[[13.983659536545925],[13.700065306750675]],"covariances":[[[0.23035995801100723]],[[0.4351923010340326]]]}"^^uq:gmmLiteral .
+
+ex:entity_00082 a ag:HistoricalGear ;
+    rdfs:label "Gear #82"@en ;
+    cfm:hasCharacteristic ex:char_00082 .
+
+ex:meas_00082 cfm:measuresCharacteristic ex:char_00082 ;
+    cfm:hasInputPointCloud ex:pc_00082 ;
+    cfm:hasInputVoxelGrid ex:pc_00082 ;
+    cfm:hasProbabilisticValue ex:rv_00082 ;
+    om:hasValue "8.90"^^xsd:double .
+
+ex:rv_00082 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.6696272308612801,0.3303727691387199],"means":[[11.92621774744068],[6.1423525961728656]],"covariances":[[[0.9872659025052595]],[[0.4780718953369323]]]}"^^uq:gmmLiteral .
+
+ex:entity_00083 a ag:CrownGear ;
+    rdfs:label "Gear #83"@en ;
+    cfm:hasCharacteristic ex:char_00083 .
+
+ex:meas_00083 cfm:measuresCharacteristic ex:char_00083 ;
+    cfm:hasInputPointCloud ex:pc_00083 ;
+    cfm:hasInputVoxelGrid ex:pc_00083 ;
+    cfm:hasProbabilisticValue ex:rv_00083 ;
+    om:hasValue "10.92"^^xsd:double .
+
+ex:rv_00083 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7128556399801027,0.2871443600198973],"means":[[10.510159721710943],[7.013259282212755]],"covariances":[[[0.9760191854638323]],[[0.9581128817821477]]]}"^^uq:gmmLiteral .
+
+ex:entity_00084 a ag:HistoricalGear ;
+    rdfs:label "Gear #84"@en ;
+    cfm:hasCharacteristic ex:char_00084 .
+
+ex:meas_00084 cfm:measuresCharacteristic ex:char_00084 ;
+    cfm:hasInputPointCloud ex:pc_00084 ;
+    cfm:hasInputVoxelGrid ex:pc_00084 ;
+    cfm:hasProbabilisticValue ex:rv_00084 ;
+    om:hasValue "10.63"^^xsd:double .
+
+ex:rv_00084 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4416666304328577,0.5583333695671423],"means":[[13.116569791608597],[13.385905102522614]],"covariances":[[[0.4692302953033075]],[[0.21591438154527007]]]}"^^uq:gmmLiteral .
+
+ex:entity_00085 a ag:CrownGear ;
+    rdfs:label "Gear #85"@en ;
+    cfm:hasCharacteristic ex:char_00085 .
+
+ex:meas_00085 cfm:measuresCharacteristic ex:char_00085 ;
+    cfm:hasInputPointCloud ex:pc_00085 ;
+    cfm:hasInputVoxelGrid ex:pc_00085 ;
+    cfm:hasProbabilisticValue ex:rv_00085 ;
+    om:hasValue "10.88"^^xsd:double .
+
+ex:rv_00085 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.28820442457722323,0.7117955754227768],"means":[[9.006712861090737],[8.647360413309917]],"covariances":[[[0.12234937779304249]],[[0.5340036949058447]]]}"^^uq:gmmLiteral .
+
+ex:entity_00086 a ag:HistoricalGear ;
+    rdfs:label "Gear #86"@en ;
+    cfm:hasCharacteristic ex:char_00086 .
+
+ex:meas_00086 cfm:measuresCharacteristic ex:char_00086 ;
+    cfm:hasInputPointCloud ex:pc_00086 ;
+    cfm:hasInputVoxelGrid ex:pc_00086 ;
+    cfm:hasProbabilisticValue ex:rv_00086 ;
+    om:hasValue "11.06"^^xsd:double .
+
+ex:rv_00086 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.1896307786754616,0.8103692213245383],"means":[[14.27297678374173],[9.577434224686645]],"covariances":[[[0.2609194951056273]],[[0.5275114363547081]]]}"^^uq:gmmLiteral .
+
+ex:entity_00087 a ag:CrownGear ;
+    rdfs:label "Gear #87"@en ;
+    cfm:hasCharacteristic ex:char_00087 .
+
+ex:meas_00087 cfm:measuresCharacteristic ex:char_00087 ;
+    cfm:hasInputPointCloud ex:pc_00087 ;
+    cfm:hasInputVoxelGrid ex:pc_00087 ;
+    cfm:hasProbabilisticValue ex:rv_00087 ;
+    om:hasValue "10.56"^^xsd:double .
+
+ex:rv_00087 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7871633873970832,0.21283661260291678],"means":[[13.111066306710365],[13.968312945074647]],"covariances":[[[0.8054010529635722]],[[0.9641672103706557]]]}"^^uq:gmmLiteral .
+
+ex:entity_00088 a ag:HistoricalGear ;
+    rdfs:label "Gear #88"@en ;
+    cfm:hasCharacteristic ex:char_00088 .
+
+ex:meas_00088 cfm:measuresCharacteristic ex:char_00088 ;
+    cfm:hasInputPointCloud ex:pc_00088 ;
+    cfm:hasInputVoxelGrid ex:pc_00088 ;
+    cfm:hasProbabilisticValue ex:rv_00088 ;
+    om:hasValue "10.02"^^xsd:double .
+
+ex:rv_00088 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.34412869642328625,0.6558713035767137],"means":[[14.198818153777623],[6.263415307661372]],"covariances":[[[0.6504512159137484]],[[0.911954412452609]]]}"^^uq:gmmLiteral .
+
+ex:entity_00089 a ag:CrownGear ;
+    rdfs:label "Gear #89"@en ;
+    cfm:hasCharacteristic ex:char_00089 .
+
+ex:meas_00089 cfm:measuresCharacteristic ex:char_00089 ;
+    cfm:hasInputPointCloud ex:pc_00089 ;
+    cfm:hasInputVoxelGrid ex:pc_00089 ;
+    cfm:hasProbabilisticValue ex:rv_00089 ;
+    om:hasValue "9.17"^^xsd:double .
+
+ex:rv_00089 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.3995574136007952,0.6004425863992048],"means":[[8.871906922019333],[6.980322575223044]],"covariances":[[[0.8853401182662147]],[[0.8023290513118876]]]}"^^uq:gmmLiteral .
+
+ex:entity_00090 a ag:HistoricalGear ;
+    rdfs:label "Gear #90"@en ;
+    cfm:hasCharacteristic ex:char_00090 .
+
+ex:meas_00090 cfm:measuresCharacteristic ex:char_00090 ;
+    cfm:hasInputPointCloud ex:pc_00090 ;
+    cfm:hasInputVoxelGrid ex:pc_00090 ;
+    cfm:hasProbabilisticValue ex:rv_00090 ;
+    om:hasValue "10.75"^^xsd:double .
+
+ex:rv_00090 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.48372615590755325,0.5162738440924467],"means":[[11.204346558259],[6.248129451901362]],"covariances":[[[0.6500079247466597]],[[0.5495708523549947]]]}"^^uq:gmmLiteral .
+
+ex:entity_00091 a ag:CrownGear ;
+    rdfs:label "Gear #91"@en ;
+    cfm:hasCharacteristic ex:char_00091 .
+
+ex:meas_00091 cfm:measuresCharacteristic ex:char_00091 ;
+    cfm:hasInputPointCloud ex:pc_00091 ;
+    cfm:hasInputVoxelGrid ex:pc_00091 ;
+    cfm:hasProbabilisticValue ex:rv_00091 ;
+    om:hasValue "11.83"^^xsd:double .
+
+ex:rv_00091 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9753596677996053,0.024640332200394757],"means":[[5.933785181841413],[8.803669867810545]],"covariances":[[[0.5689644652070407]],[[0.8949877271121081]]]}"^^uq:gmmLiteral .
+
+ex:entity_00092 a ag:HistoricalGear ;
+    rdfs:label "Gear #92"@en ;
+    cfm:hasCharacteristic ex:char_00092 .
+
+ex:meas_00092 cfm:measuresCharacteristic ex:char_00092 ;
+    cfm:hasInputPointCloud ex:pc_00092 ;
+    cfm:hasInputVoxelGrid ex:pc_00092 ;
+    cfm:hasProbabilisticValue ex:rv_00092 ;
+    om:hasValue "10.22"^^xsd:double .
+
+ex:rv_00092 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.7192861068906932,0.2807138931093068],"means":[[6.0814218878254644],[10.95655031362246]],"covariances":[[[0.9784417710922401]],[[0.8456501984071787]]]}"^^uq:gmmLiteral .
+
+ex:entity_00093 a ag:CrownGear ;
+    rdfs:label "Gear #93"@en ;
+    cfm:hasCharacteristic ex:char_00093 .
+
+ex:meas_00093 cfm:measuresCharacteristic ex:char_00093 ;
+    cfm:hasInputPointCloud ex:pc_00093 ;
+    cfm:hasInputVoxelGrid ex:pc_00093 ;
+    cfm:hasProbabilisticValue ex:rv_00093 ;
+    om:hasValue "8.85"^^xsd:double .
+
+ex:rv_00093 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.21607057328980683,0.7839294267101932],"means":[[5.505229466870558],[9.196926097024608]],"covariances":[[[0.9220601853946407]],[[0.7033805670310073]]]}"^^uq:gmmLiteral .
+
+ex:entity_00094 a ag:HistoricalGear ;
+    rdfs:label "Gear #94"@en ;
+    cfm:hasCharacteristic ex:char_00094 .
+
+ex:meas_00094 cfm:measuresCharacteristic ex:char_00094 ;
+    cfm:hasInputPointCloud ex:pc_00094 ;
+    cfm:hasInputVoxelGrid ex:pc_00094 ;
+    cfm:hasProbabilisticValue ex:rv_00094 ;
+    om:hasValue "11.27"^^xsd:double .
+
+ex:rv_00094 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.9833366335063919,0.016663366493608108],"means":[[13.327529683486222],[8.84895661697005]],"covariances":[[[0.7131104118650625]],[[0.6975879298292152]]]}"^^uq:gmmLiteral .
+
+ex:entity_00095 a ag:CrownGear ;
+    rdfs:label "Gear #95"@en ;
+    cfm:hasCharacteristic ex:char_00095 .
+
+ex:meas_00095 cfm:measuresCharacteristic ex:char_00095 ;
+    cfm:hasInputPointCloud ex:pc_00095 ;
+    cfm:hasInputVoxelGrid ex:pc_00095 ;
+    cfm:hasProbabilisticValue ex:rv_00095 ;
+    om:hasValue "8.15"^^xsd:double .
+
+ex:rv_00095 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.691282021524851,0.30871797847514915],"means":[[12.267063115425646],[8.60050236442803]],"covariances":[[[0.4029245707173491]],[[0.8833808930291199]]]}"^^uq:gmmLiteral .
+
+ex:entity_00096 a ag:HistoricalGear ;
+    rdfs:label "Gear #96"@en ;
+    cfm:hasCharacteristic ex:char_00096 .
+
+ex:meas_00096 cfm:measuresCharacteristic ex:char_00096 ;
+    cfm:hasInputPointCloud ex:pc_00096 ;
+    cfm:hasInputVoxelGrid ex:pc_00096 ;
+    cfm:hasProbabilisticValue ex:rv_00096 ;
+    om:hasValue "10.12"^^xsd:double .
+
+ex:rv_00096 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.4417709611682586,0.5582290388317414],"means":[[13.769857420185073],[12.93815640409328]],"covariances":[[[0.4627126228938506]],[[0.206539063746862]]]}"^^uq:gmmLiteral .
+
+ex:entity_00097 a ag:CrownGear ;
+    rdfs:label "Gear #97"@en ;
+    cfm:hasCharacteristic ex:char_00097 .
+
+ex:meas_00097 cfm:measuresCharacteristic ex:char_00097 ;
+    cfm:hasInputPointCloud ex:pc_00097 ;
+    cfm:hasInputVoxelGrid ex:pc_00097 ;
+    cfm:hasProbabilisticValue ex:rv_00097 ;
+    om:hasValue "10.00"^^xsd:double .
+
+ex:rv_00097 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8132685783370802,0.18673142166291978],"means":[[11.638160624486183],[6.337606020387493]],"covariances":[[[0.2726862737024544]],[[0.9465436804701803]]]}"^^uq:gmmLiteral .
+
+ex:entity_00098 a ag:HistoricalGear ;
+    rdfs:label "Gear #98"@en ;
+    cfm:hasCharacteristic ex:char_00098 .
+
+ex:meas_00098 cfm:measuresCharacteristic ex:char_00098 ;
+    cfm:hasInputPointCloud ex:pc_00098 ;
+    cfm:hasInputVoxelGrid ex:pc_00098 ;
+    cfm:hasProbabilisticValue ex:rv_00098 ;
+    om:hasValue "8.54"^^xsd:double .
+
+ex:rv_00098 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.5654066063023528,0.43459339369764716],"means":[[14.234082899685072],[6.064721722427116]],"covariances":[[[0.2067079481897964]],[[0.39839380525744705]]]}"^^uq:gmmLiteral .
+
+ex:entity_00099 a ag:CrownGear ;
+    rdfs:label "Gear #99"@en ;
+    cfm:hasCharacteristic ex:char_00099 .
+
+ex:meas_00099 cfm:measuresCharacteristic ex:char_00099 ;
+    cfm:hasInputPointCloud ex:pc_00099 ;
+    cfm:hasInputVoxelGrid ex:pc_00099 ;
+    cfm:hasProbabilisticValue ex:rv_00099 ;
+    om:hasValue "10.74"^^xsd:double .
+
+ex:rv_00099 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.8498401428709407,0.15015985712905947],"means":[[11.984996335055037],[8.191170343477358]],"covariances":[[[0.680316306727637]],[[0.8840254265814624]]]}"^^uq:gmmLiteral .
+
+ex:entity_00100 a ag:HistoricalGear ;
+    rdfs:label "Gear #100"@en ;
+    cfm:hasCharacteristic ex:char_00100 .
+
+ex:meas_00100 cfm:measuresCharacteristic ex:char_00100 ;
+    cfm:hasInputPointCloud ex:pc_00100 ;
+    cfm:hasInputVoxelGrid ex:pc_00100 ;
+    cfm:hasProbabilisticValue ex:rv_00100 ;
+    om:hasValue "8.45"^^xsd:double .
+
+ex:rv_00100 a uq:RandomVariable ;
+    uq:hasDistribution "{"type":"gmm","version":"1.0","k":2,"d":1,"covariance_type":"full","weights":[0.14427238533576614,0.8557276146642339],"means":[[13.16619671932526],[13.832188302729774]],"covariances":[[[0.5256600654201956]],[[0.5816554888909566]]]}"^^uq:gmmLiteral .
