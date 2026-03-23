@@ -9,7 +9,6 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.pfunction.PropertyFunctionBase;
 import org.apache.jena.sparql.pfunction.PropFuncArg;
@@ -138,7 +137,6 @@ public class ExactJoinPF extends PropertyFunctionBase {
         );
         
         // Create new binding with fused result
-        Binding newBinding;
         if (fusedNode.isVariable()) {
             Var fusedVar = Var.alloc(fusedNode);
             // Return single result with fused distribution bound to variable

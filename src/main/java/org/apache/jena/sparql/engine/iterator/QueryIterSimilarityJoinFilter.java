@@ -106,13 +106,11 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
             // Compute JS divergence
             try {
                 double jsDiv = ProbSPARQL.JSDivergence(leftNode, rightNode);
-                
                 if (jsDiv <= tolerance) {
                     passedCount++;
                     return binding;
                 }
             } catch (Exception e) {
-                // Skip bindings where JS divergence computation fails
                 continue;
             }
         }

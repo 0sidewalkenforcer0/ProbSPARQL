@@ -1,0 +1,37 @@
+# MQ1_cdf_loose: U1 variant - low threshold (high selectivity ~40%)
+# Find gears with at least one tooth whose length is below 9.9mm with probability >= 0.6
+# Operations: prob:cdf
+# Complexity: Low
+# Selectivity: high (~40%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?cdfValue
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv ;
+        om:hasValue ?pointEst .
+  
+  ?rv uq:hasDistribution ?dist .
+  
+  BIND(prob:cdf(?dist, 9.9) AS ?cdfValue)
+  
+  FILTER(?cdfValue >= 0.6)
+}
+ORDER BY DESC(?cdfValue)
+LIMIT 1000

@@ -1,0 +1,98 @@
+# MacroQ4_full_inspection_report: The most complex query - full inspection decision
+# UNION of three branches:
+#   Branch A: worn teeth (cdf < 9.8 with p > 0.85) -> "wear"
+#   Branch B: sensor anomalies (JS > 0.2) -> "sensor_fault"
+#   Branch C: low motor power (mean(product) < 90) -> "power_low"
+# Return: gear, issue_type, severity_value
+# ORDER BY severity_value DESC
+# Operations: prob:cdf, prob:jsdivergence, prob:multiply, prob:mean
+# Complexity: Very High
+# Selectivity: varies by branch
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?issueType ?severityValue
+WHERE {
+  {
+    # Branch A: worn teeth
+    SELECT ?gear ?gearLabel (MAX(?cdfValue) AS ?severityValue)
+    WHERE {
+      ?gear a ag:CrownGear ;
+            rdfs:label ?gearLabel ;
+            cfm:hasCharacteristic ?tooth .
+      
+      ?meas cfm:measuresCharacteristic ?tooth ;
+            cfm:hasInputPointCloud ?pc ;
+            cfm:hasProbabilisticValue ?rv .
+      ?rv uq:hasDistribution ?dist .
+      
+      BIND(prob:cdf(?dist, 9.8) AS ?cdfValue)
+      FILTER(?cdfValue > 0.85)
+    }
+    GROUP BY ?gear ?gearLabel
+    BIND("wear" AS ?issueType)
+  }
+  UNION
+  {
+    # Branch B: sensor anomalies
+    SELECT ?gear ?gearLabel (MAX(?jsDiv) AS ?severityValue)
+    WHERE {
+      ?gear a ag:CrownGear ;
+            rdfs:label ?gearLabel ;
+            cfm:hasCharacteristic ?tooth .
+      
+      ?meas_ct cfm:measuresCharacteristic ?tooth ;
+                cfm:hasInputVoxelGrid ?voxel ;
+                cfm:hasProbabilisticValue ?rv_ct .
+      ?rv_ct uq:hasDistribution ?dist_ct .
+      
+      ?meas_sl cfm:measuresCharacteristic ?tooth ;
+                cfm:hasInputPointCloud ?pc ;
+                cfm:hasProbabilisticValue ?rv_sl .
+      ?rv_sl uq:hasDistribution ?dist_sl .
+      
+      BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+      FILTER(?jsDiv > 0.2)
+    }
+    GROUP BY ?gear ?gearLabel
+    BIND("sensor_fault" AS ?issueType)
+  }
+  UNION
+  {
+    # Branch C: low motor power
+    SELECT ?gear ?gearLabel ((90.0 - ?powerMean) AS ?severityValue)
+    WHERE {
+      ?motor a ag:Motor ;
+             ag:hasCrownGear ?gear ;
+             ag:hasSpeedCharacteristic ?speedChar ;
+             ag:hasTorqueCharacteristic ?torqueChar .
+      
+      ?gear rdfs:label ?gearLabel .
+      
+      ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+                 cfm:hasProbabilisticValue ?rvSpeed .
+      ?rvSpeed uq:hasDistribution ?speedDist .
+      
+      ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+                  cfm:hasProbabilisticValue ?rvTorque .
+      ?rvTorque uq:hasDistribution ?torqueDist .
+      
+      BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+      BIND(prob:mean(?powerDist) AS ?meanJson)
+      BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+      
+      FILTER(?powerMean < 90.0)
+    }
+    BIND("power_low" AS ?issueType)
+  }
+}
+ORDER BY DESC(?severityValue)
+LIMIT 2000

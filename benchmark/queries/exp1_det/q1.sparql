@@ -1,0 +1,17 @@
+# Exp1 Q1 DET: Threshold Filtering — deterministic baseline
+# Finds crown gear teeth whose CT point-estimate length is below 9.8 mm.
+# Measures: scalar FILTER overhead
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?gear ?char WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasCharacteristic ?char .
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputVoxelGrid ?voxel ;
+        om:hasValue ?length .
+  FILTER(?length < 9.8)
+}

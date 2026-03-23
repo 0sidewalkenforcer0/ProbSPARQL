@@ -1,165 +1,118 @@
 package org.apache.jena.probsparql.functions.manipulation;
 
+import org.apache.jena.probsparql.datatypes.DirichletDatatype;
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
+import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase1;
 
 /**
- * SPARQL function to compute the standard deviation of a GMM.
- * 
- * <p>For a GMM X ~ Σ w_i * N(μ_i, Σ_i), the variance is:</p>
- * <pre>
- * Var[X] = E[X²] - E[X]² = Σ w_i * (Σ_i + μ_i*μ_i') - E[X]*E[X]'
- * </pre>
- * 
- * <p>Returns the square root of diagonal elements of the covariance matrix
- * as a JSON string:</p>
+ * SPARQL function {@code prob:std} — polymorphic standard-deviation computation.
+ *
+ * <p>Dispatches by RDF datatype:</p>
  * <ul>
- *   <li>1D: "[0.5]"</li>
- *   <li>Multi-D: "[0.5, 0.8, 1.2]" (standard deviation for each dimension)</li>
+ *   <li>{@code uq:gmmLiteral}       → sqrt(Var[X]) via law of total variance</li>
+ *   <li>{@code uq:histLiteral}      → sqrt(Σ p_i (c_i - E[X])²)</li>
+ *   <li>{@code uq:dirichletLiteral} → per-dimension Dirichlet variance formula</li>
  * </ul>
- * 
- * <p>Usage in SPARQL:</p>
- * <pre>
- * PREFIX prob: &lt;http://probsparql.org/function#&gt;
- * SELECT ?stdDev WHERE {
- *   ?rv uq:hasDistribution ?gmm .
- *   BIND(prob:std(?gmm) AS ?stdDev)
- * }
- * </pre>
- * 
- * @author ProbSPARQL Team
  */
 public class Std extends FunctionBase1 {
-    
+
     public static final String URI = "http://probsparql.org/function#std";
-    
-    /**
-     * Compute the standard deviation of a GMM.
-     * 
-     * @param gmmNode GMM distribution
-     * @return NodeValue containing JSON string of standard deviations
-     */
+
     @Override
-    public NodeValue exec(NodeValue gmmNode) {
-        GMMValue gmm = extractGMM(gmmNode);
-        
-        double[] variance = computeVariance(gmm);
-        
-        // Convert variance to standard deviation
-        double[] std = new double[variance.length];
-        for (int i = 0; i < variance.length; i++) {
-            std[i] = Math.sqrt(variance[i]);
+    public NodeValue exec(NodeValue distNode) {
+        if (!distNode.isLiteral())
+            throw new IllegalArgumentException("prob:std: argument must be a distribution literal");
+
+        String dtype = distNode.asNode().getLiteralDatatypeURI();
+
+        if (GMMDatatype.URI.equals(dtype)) {
+            GMMValue gmm = extractGMM(distNode);
+            double[] var = computeGMMVariance(gmm);
+            double[] std = new double[var.length];
+            for (int i = 0; i < var.length; i++) std[i] = Math.sqrt(var[i]);
+            return NodeValue.makeString(formatVector(std));
         }
-        
-        // Return as JSON string
-        String stdJson = formatVector(std);
-        return NodeValue.makeString(stdJson);
-    }
-    
-    /**
-     * Extract GMMValue from NodeValue.
-     */
-    private GMMValue extractGMM(NodeValue node) {
-        if (!node.isLiteral()) {
-            throw new IllegalArgumentException(
-                "Argument must be a GMM literal");
-        }
-        
-        Object value = node.asNode().getLiteralValue();
-        if (!(value instanceof GMMValue)) {
-            throw new IllegalArgumentException(
-                "Argument must be of type " + GMMDatatype.URI);
-        }
-        
-        return (GMMValue) value;
-    }
-    
-    /**
-     * Compute variance (diagonal elements) using the formula:
-     * Var[X] = E[X²] - E[X]²
-     *        = Σ w_i * (diag(Σ_i) + μ_i²) - μ²
-     */
-    private double[] computeVariance(GMMValue gmm) {
-        int K = gmm.getK();
-        int d = gmm.getD();
-        
-        double[] weights = gmm.getWeights();
-        double[][] means = gmm.getMeans();
-        double[][][] covariances = gmm.getCovariances();
-        String covType = gmm.getCovarianceType();
-        
-        // Compute E[X]
-        double[] mean = new double[d];
-        for (int i = 0; i < K; i++) {
-            for (int j = 0; j < d; j++) {
-                mean[j] += weights[i] * means[i][j];
+
+        if (HistogramDatatype.URI.equals(dtype)) {
+            HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
+            double mu  = hist.mean();
+            double[] probs   = hist.probabilities();
+            double[] centers = hist.binCenters();
+            double var = 0.0;
+            for (int i = 0; i < hist.getB(); i++) {
+                double d = centers[i] - mu;
+                var += probs[i] * d * d;
             }
+            return NodeValue.makeString(String.format("[%.6f]", Math.sqrt(var)));
         }
-        
-        // Compute E[X²] = Σ w_i * (diag(Σ_i) + μ_i²)
+
+        if (DirichletDatatype.URI.equals(dtype)) {
+            DirichletValue dir = extractDirichlet(distNode);
+            return NodeValue.makeString(formatVector(dir.std()));
+        }
+
+        throw new IllegalArgumentException("prob:std: unsupported distribution type: " + dtype);
+    }
+
+    private GMMValue extractGMM(NodeValue node) {
+        Object v = node.asNode().getLiteralValue();
+        if (!(v instanceof GMMValue))
+            throw new IllegalArgumentException("Argument must be of type " + GMMDatatype.URI);
+        return (GMMValue) v;
+    }
+
+    private DirichletValue extractDirichlet(NodeValue node) {
+        Object v = node.asNode().getLiteralValue();
+        if (!(v instanceof DirichletValue))
+            throw new IllegalArgumentException("Argument must be of type " + DirichletDatatype.URI);
+        return (DirichletValue) v;
+    }
+
+    private double[] computeGMMVariance(GMMValue gmm) {
+        int K = gmm.getK(), d = gmm.getD();
+        double[] weights      = gmm.getWeights();
+        double[][] means      = gmm.getMeans();
+        double[][][] covs     = gmm.getCovariances();
+        String covType        = gmm.getCovarianceType();
+        double[] mean = new double[d];
+        for (int i = 0; i < K; i++)
+            for (int j = 0; j < d; j++)
+                mean[j] += weights[i] * means[i][j];
         double[] secondMoment = new double[d];
         for (int i = 0; i < K; i++) {
             for (int j = 0; j < d; j++) {
-                // Get diagonal element of covariance
-                double covDiag = getCovarianceDiagonal(covariances[i], covType, j, d);
-                
-                // E[X²] component: w_i * (Σ_ii + μ_i²)
+                double covDiag = getCovDiagonal(covs[i], covType, j);
                 secondMoment[j] += weights[i] * (covDiag + means[i][j] * means[i][j]);
             }
         }
-        
-        // Var[X] = E[X²] - E[X]²
         double[] variance = new double[d];
-        for (int i = 0; i < d; i++) {
-            variance[i] = secondMoment[i] - mean[i] * mean[i];
-            
-            // Ensure non-negative due to numerical errors
-            if (variance[i] < 0) {
-                variance[i] = 0;
-            }
-        }
-        
+        for (int j = 0; j < d; j++)
+            variance[j] = Math.max(0.0, secondMoment[j] - mean[j] * mean[j]);
         return variance;
     }
-    
-    /**
-     * Get diagonal element of covariance matrix.
-     */
-    private double getCovarianceDiagonal(double[][] cov, String type, int idx, int d) {
-        switch (type) {
-            case "full":
-                return cov[idx][idx];
-                
-            case "diag":
-                return cov[idx][0];
-                
-            case "spherical":
-                return cov[0][0];
-                
-            default:
-                throw new IllegalStateException("Unknown covariance type: " + type);
-        }
+
+    private double getCovDiagonal(double[][] cov, String type, int idx) {
+        return switch (type) {
+            case "full"      -> cov[idx][idx];
+            case "diag"      -> cov[0][idx];
+            case "spherical" -> cov[0][0];
+            default -> throw new IllegalStateException("Unknown covariance type: " + type);
+        };
     }
-    
-    /**
-     * Format vector as JSON string.
-     */
+
     private String formatVector(double[] vector) {
-        if (vector.length == 1) {
-            return String.format("[%.6f]", vector[0]);
-        }
-        
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {
-            if (i > 0) {
-                sb.append(", ");
-            }
+            if (i > 0) sb.append(", ");
             sb.append(String.format("%.6f", vector[i]));
         }
         sb.append("]");
-        
         return sb.toString();
     }
 }

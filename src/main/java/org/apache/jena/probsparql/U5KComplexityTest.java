@@ -213,7 +213,6 @@ public class U5KComplexityTest {
     }
     
     private static double logGaussianPDF(double[] x, double[] mean, double[][] cov) {
-        int d = x.length;
         double diff = x[0] - mean[0];
         double var = cov[0][0];
         double mahal = diff * diff / var;

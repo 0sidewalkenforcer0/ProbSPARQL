@@ -1,0 +1,55 @@
+# MacroQ2_anomaly_then_fuse: Two-step pipeline in one query
+# Step 1: Filter to tooth measurements where CT and SL are CONSISTENT (JS divergence < 0.15)
+# Step 2: For those consistent pairs, FUSEJOIN the distributions
+# Step 3: Return gear, tooth, fused MAP value
+# Only return results where MAP value < 9.9 (potentially worn even after fusion)
+# Operations: prob:jsdivergence, FUSEJOIN, prob:map
+# Complexity: High
+# Selectivity: low (~15-25%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?tooth ?toothLabel ?jsDiv ?fusedMap
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?tooth .
+  
+  ?tooth rdfs:label ?toothLabel .
+  
+  # CT measurement
+  ?meas_ct cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  # SL measurement
+  ?meas_sl cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  # Step 1: Check consistency
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+  FILTER(?jsDiv < 0.15)
+  
+  # Step 2: Fuse distributions
+  FUSEJOIN(?dist_ct, ?dist_sl, 0.15, ?fusedDist)
+  
+  # Step 3: Extract MAP
+  BIND(prob:map(?fusedDist) AS ?mapJson)
+  BIND(xsd:double(REPLACE(?mapJson, "[\\[\\]]", "")) AS ?fusedMap)
+  
+  # Only return potentially worn after fusion
+  FILTER(?fusedMap < 9.9)
+}
+ORDER BY ?fusedMap
+LIMIT 1000

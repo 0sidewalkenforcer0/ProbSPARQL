@@ -1,0 +1,15 @@
+# Exp1 Q4 DET: Pure Graph Traversal — deterministic baseline
+# Returns all CT measurement point-estimate lengths without any computation.
+# Measures: pure I/O and literal retrieval overhead (scalar xsd:double)
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?gear ?length WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasCharacteristic ?char .
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputVoxelGrid ?voxel ;
+        om:hasValue ?length .
+}

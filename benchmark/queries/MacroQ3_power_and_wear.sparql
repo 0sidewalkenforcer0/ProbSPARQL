@@ -1,0 +1,65 @@
+# MacroQ3_power_and_wear: Join motor power computation with gear wear assessment
+# Compute power distribution (prob:multiply of speed and torque)
+# Simultaneously check if the gear attached to that motor has any worn teeth (prob:cdf > 0.8)
+# Return: motor, powerDist mean, worst tooth CDF value
+# Filter: only motors with at least one worn tooth
+# Operations: prob:multiply, prob:mean, prob:cdf
+# Complexity: High
+# Selectivity: low (~15-25%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?powerMean ?worstCdf
+WHERE {
+  # Motor with speed and torque
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar ;
+         ag:hasCrownGear ?gear .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  # Compute power distribution
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+  BIND(prob:mean(?powerDist) AS ?meanJson)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+  
+  # Check gear for worn teeth
+  ?gear cfm:hasCharacteristic ?tooth .
+  ?tooth rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?tooth ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv .
+  ?rv uq:hasDistribution ?toothDist .
+  
+  BIND(prob:cdf(?toothDist, 9.8) AS ?cdfValue)
+  
+  # Only motors with worn gears, get worst tooth
+  FILTER EXISTS {
+    ?gear cfm:hasCharacteristic ?wt .
+    ?wt rdfs:label ?wtLabel .
+    ?wmeas cfm:measuresCharacteristic ?wt ;
+           cfm:hasProbabilisticValue ?wrv .
+    ?wrv uq:hasDistribution ?wtdist .
+    FILTER(prob:cdf(?wtdist, 9.8) > 0.8)
+  }
+}
+GROUP BY ?motor ?motorLabel ?powerMean
+ORDER BY ?powerMean
+LIMIT 1000

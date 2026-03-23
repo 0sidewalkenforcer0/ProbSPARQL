@@ -31,3 +31,13 @@ test-output/
 # Jena TDB databases
 TDB/
 TDB2/
+
+# Benchmark data and generated results (regenerable via scripts)
+benchmark/data/**/*.ttl
+benchmark/data/*.ttl
+benchmark/results/**/*.png
+benchmark/results/**/*.pdf
+benchmark/results/**/*.svg
+benchmark/results/**/*.csv
+benchmark/results/**/*.json
+benchmark/results/**/*.tex

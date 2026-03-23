@@ -1,0 +1,19 @@
+# Exp1 Q1 PROB: Threshold Filtering — probabilistic version
+# Selects crown gear teeth where P(length < 9.8 mm) >= 0.9 using prob:cdf.
+# Measures: CDF computation + probabilistic FILTER overhead vs Q1 DET
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?char WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasCharacteristic ?char .
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputVoxelGrid ?voxel ;
+        cfm:hasProbabilisticValue ?rv .
+  ?rv uq:hasDistribution ?dist .
+  BIND(prob:cdf(?dist, 9.8) AS ?p)
+  FILTER(?p >= 0.9)
+}

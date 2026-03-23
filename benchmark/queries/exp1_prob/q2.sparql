@@ -1,0 +1,22 @@
+# Exp1 Q2 PROB: Statistical Summary — probabilistic version
+# Computes the mean of the power distribution (speed x torque) per motor.
+# Measures: prob:multiply + prob:mean overhead vs Q2 DET
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?motor ?meanPower WHERE {
+  ?motor a ag:Motor ;
+         ag:hasSpeedCharacteristic  ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  ?sm cfm:measuresCharacteristic ?speedChar ;
+      cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?gmmSpeed .
+  ?tm cfm:measuresCharacteristic ?torqueChar ;
+      cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?gmmTorque .
+  BIND(prob:multiply(?gmmSpeed, ?gmmTorque) AS ?powerDist)
+  BIND(prob:mean(?powerDist) AS ?meanPower)
+}

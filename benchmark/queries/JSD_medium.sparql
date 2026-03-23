@@ -1,0 +1,41 @@
+# JSD_medium: Medium selectivity (~25% results)
+# Threshold: JSD > 0.15
+# Expected: ~25% of gear-tooth pairs match
+# Use case: 展示系统在中等等待时间的表现
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://www.w3.org/2001/XMLSchema#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?tooth ?jsd
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?tooth .
+  
+  # CT measurement
+  ?meas_ct cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  # SL measurement
+  ?meas_sl cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  # Compute JSD
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsd)
+  
+  # Medium filter: ~25% should pass
+  FILTER(?jsd > 0.15)
+}
+ORDER BY DESC(?jsd)
+LIMIT 1000

@@ -1,0 +1,15 @@
+# SimilarityJoin Benchmark Query
+# Finds all (left, right) pairs where JSD(left_gmm, right_gmm) <= 0.3
+#
+# Uses the relational SIMILARITYJOIN syntax:
+#   { leftPattern } SIMILARITYJOIN(?g1, ?g2, 0.3) { rightPattern }
+
+PREFIX prob: <http://example.org/prob#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+
+SELECT ?s1 ?s2
+WHERE {
+  { ?s1 a prob:LeftEntity  ; prob:hasGMM ?g1 . }
+  SIMILARITYJOIN(?g1, ?g2, 0.3)
+  { ?s2 a prob:RightEntity ; prob:hasGMM ?g2 . }
+}

@@ -2855,7 +2855,13 @@ endTriplesBlock() ;
         jj_la1[78] = jj_gen;
         break label_19;
       }
-      el = GraphPatternNotTriples();
+      // If the next tokens are { GroupGraphPattern } SIMILARITYJOIN(...), parse the whole construct
+      // as a relational SimilarityJoinGraphPattern (non-legacy mode) so the pruning code path is used.
+      if (jj_2_4(2147483647)) {
+        el = SimilarityJoinGraphPattern();
+      } else {
+        el = GraphPatternNotTriples();
+      }
 elg.addElement(el) ;
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case DOT:{

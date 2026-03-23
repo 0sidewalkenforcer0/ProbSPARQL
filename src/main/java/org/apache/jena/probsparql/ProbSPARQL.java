@@ -1,7 +1,13 @@
 package org.apache.jena.probsparql;
 
 import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.probsparql.datatypes.DirichletDatatype;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
+import org.apache.jena.probsparql.functions.comparison.PolyJSD;
+import org.apache.jena.probsparql.functions.thresholding.HistogramCDF;
+import org.apache.jena.probsparql.functions.manipulation.HistogramMean;
 import org.apache.jena.probsparql.functions.thresholding.PDF;
 import org.apache.jena.probsparql.functions.thresholding.CDF;
 import org.apache.jena.probsparql.functions.thresholding.LogPDF;
@@ -89,9 +95,13 @@ public class ProbSPARQL {
         // Ensure Jena system is initialized
         org.apache.jena.sys.JenaSystem.init();
         
-        // Register custom GMM datatype
+        // Register custom datatypes
         TypeMapper.getInstance().registerDatatype(GMMDatatype.INSTANCE);
         logger.info("Registered custom datatype: {}", GMMDatatype.URI);
+        TypeMapper.getInstance().registerDatatype(HistogramDatatype.INSTANCE);
+        logger.info("Registered custom datatype: {}", HistogramDatatype.URI);
+        TypeMapper.getInstance().registerDatatype(DirichletDatatype.INSTANCE);
+        logger.info("Registered custom datatype: {}", DirichletDatatype.URI);
         
         // Register custom SPARQL functions for probabilistic operators
         FunctionRegistry functionRegistry = FunctionRegistry.get();
@@ -101,12 +111,15 @@ public class ProbSPARQL {
         functionRegistry.put(CDF.URI, CDF.class);
         functionRegistry.put(LogPDF.URI, LogPDF.class);
         functionRegistry.put(LogCDF.URI, LogCDF.class);
-        logger.info("Registered {} thresholding functions", 4);
+        functionRegistry.put(HistogramCDF.URI, HistogramCDF.class);
+        logger.info("Registered {} thresholding functions", 5);
         
         // Category 2: Probabilistic Comparison Operators
         functionRegistry.put(KLDivergence.URI, KLDivergence.class);
         functionRegistry.put(JSDivergence.URI, JSDivergence.class);
-        logger.info("Registered {} comparison functions", 2);
+        functionRegistry.put(HistogramJSD.URI, HistogramJSD.class);
+        functionRegistry.put(PolyJSD.URI, PolyJSD.class);   // polymorphic prob:jsd
+        logger.info("Registered {} comparison functions", 4);
         
         // Category 3: Probabilistic Transformation Operators
         functionRegistry.put(Scale.URI, Scale.class);
@@ -126,7 +139,8 @@ public class ProbSPARQL {
         functionRegistry.put(Mix.URI, Mix.class);
         functionRegistry.put(Fuse.URI, Fuse.class);
         functionRegistry.put(Quantile.URI, Quantile.class);
-        logger.info("Registered {} manipulation functions", 7);
+        functionRegistry.put(HistogramMean.URI, HistogramMean.class);
+        logger.info("Registered {} manipulation functions", 8);
         
         // Category 5: Probabilistic Property Functions (JOIN operations)
         PropertyFunctionRegistry pfRegistry = PropertyFunctionRegistry.get();

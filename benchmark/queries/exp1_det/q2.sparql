@@ -1,0 +1,17 @@
+# Exp1 Q2 DET: Statistical Summary — deterministic baseline
+# Computes scalar power = speed * torque for each motor.
+# Measures: scalar arithmetic overhead
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?motor (?speed * ?torque AS ?power) WHERE {
+  ?motor a ag:Motor ;
+         ag:hasSpeedCharacteristic  ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  ?sm cfm:measuresCharacteristic ?speedChar ;
+      om:hasValue ?speed .
+  ?tm cfm:measuresCharacteristic ?torqueChar ;
+      om:hasValue ?torque .
+}

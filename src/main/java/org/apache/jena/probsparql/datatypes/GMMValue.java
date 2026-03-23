@@ -2,6 +2,7 @@ package org.apache.jena.probsparql.datatypes;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents a Gaussian Mixture Model (GMM) value.
@@ -12,7 +13,7 @@ import java.util.Objects;
  * @author ProbSPARQL Team
  * @version 1.0.0
  */
-public class GMMValue {
+public class GMMValue implements Sampleable {
     
     /** Number of mixture components */
     private final int K;
@@ -72,7 +73,7 @@ public class GMMValue {
             }
             weightSum += w;
         }
-        if (Math.abs(weightSum - 1.0) > 1e-6) {
+        if (Math.abs(weightSum - 1.0) > 1e-4) {
             throw new IllegalArgumentException("Weights must sum to 1.0, got: " + weightSum);
         }
         
@@ -362,5 +363,142 @@ public class GMMValue {
     @Override
     public String toString() {
         return "GMMValue{K=" + K + ", d=" + d + ", covariance_type='" + covarianceType + "'}";
+    }
+
+    // -----------------------------------------------------------------------
+    // Sampleable implementation
+    // -----------------------------------------------------------------------
+
+    /**
+     * Draw n samples from this GMM: first select component proportional to weight,
+     * then sample from the corresponding Gaussian.
+     */
+    @Override
+    public double[][] sample(int n) {
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        double[][] samples = new double[n][d];
+        for (int s = 0; s < n; s++) {
+            // Select component
+            int k = selectComponent(rng);
+            // Sample from Gaussian component k
+            samples[s] = sampleGaussian(rng, means[k], covariances[k], covarianceType, d);
+        }
+        return samples;
+    }
+
+    /**
+     * Evaluate log-density at point x: log sum_k w_k * N(x | mu_k, Sigma_k)
+     * Uses log-sum-exp for numerical stability.
+     */
+    @Override
+    public double logPdf(double[] x) {
+        double[] logTerms = new double[K];
+        for (int k = 0; k < K; k++) {
+            logTerms[k] = Math.log(weights[k]) + logGaussianDensity(x, means[k], covariances[k], covarianceType, d);
+        }
+        return logSumExp(logTerms);
+    }
+
+    private int selectComponent(ThreadLocalRandom rng) {
+        double u = rng.nextDouble();
+        double cumulative = 0.0;
+        for (int k = 0; k < K - 1; k++) {
+            cumulative += weights[k];
+            if (u < cumulative) return k;
+        }
+        return K - 1;
+    }
+
+    private static double[] sampleGaussian(ThreadLocalRandom rng, double[] mu,
+                                            double[][] cov, String covType, int d) {
+        double[] z = new double[d];
+        for (int j = 0; j < d; j++) z[j] = rng.nextGaussian();
+        // Apply covariance transform
+        switch (covType.toLowerCase()) {
+            case "spherical" -> {
+                double std = Math.sqrt(cov[0][0]);
+                for (int j = 0; j < d; j++) z[j] = mu[j] + std * z[j];
+            }
+            case "diag" -> {
+                for (int j = 0; j < d; j++) z[j] = mu[j] + Math.sqrt(cov[0][j]) * z[j];
+            }
+            default -> {
+                // full: Cholesky decomposition L such that L*L' = cov
+                double[][] L = cholesky(cov, d);
+                double[] x = new double[d];
+                for (int i = 0; i < d; i++) {
+                    x[i] = mu[i];
+                    for (int j = 0; j <= i; j++) x[i] += L[i][j] * z[j];
+                }
+                return x;
+            }
+        }
+        return z;
+    }
+
+    private static double logGaussianDensity(double[] x, double[] mu, double[][] cov,
+                                              String covType, int d) {
+        double mahal;
+        double logDet;
+        switch (covType.toLowerCase()) {
+            case "spherical" -> {
+                double var = cov[0][0];
+                double diff = 0.0;
+                for (int j = 0; j < d; j++) { double v = x[j] - mu[j]; diff += v * v; }
+                mahal  = diff / var;
+                logDet = d * Math.log(var);
+            }
+            case "diag" -> {
+                mahal  = 0.0;
+                logDet = 0.0;
+                for (int j = 0; j < d; j++) {
+                    mahal  += (x[j] - mu[j]) * (x[j] - mu[j]) / cov[0][j];
+                    logDet += Math.log(cov[0][j]);
+                }
+            }
+            default -> {
+                // full: solve cov * v = (x - mu) via Cholesky
+                double[][] L = cholesky(cov, d);
+                double[] diff = new double[d];
+                for (int j = 0; j < d; j++) diff[j] = x[j] - mu[j];
+                double[] v = forwardSolve(L, diff, d);
+                mahal  = 0.0;
+                for (double vi : v) mahal += vi * vi;
+                logDet = 0.0;
+                for (int j = 0; j < d; j++) logDet += 2.0 * Math.log(L[j][j] + 1e-300);
+            }
+        }
+        return -0.5 * (d * Math.log(2 * Math.PI) + logDet + mahal);
+    }
+
+    private static double[][] cholesky(double[][] A, int d) {
+        double[][] L = new double[d][d];
+        for (int i = 0; i < d; i++) {
+            for (int j = 0; j <= i; j++) {
+                double s = A[i][j];
+                for (int k = 0; k < j; k++) s -= L[i][k] * L[j][k];
+                L[i][j] = (i == j) ? Math.sqrt(Math.max(s, 1e-300)) : s / L[j][j];
+            }
+        }
+        return L;
+    }
+
+    private static double[] forwardSolve(double[][] L, double[] b, int d) {
+        double[] y = new double[d];
+        for (int i = 0; i < d; i++) {
+            y[i] = b[i];
+            for (int j = 0; j < i; j++) y[i] -= L[i][j] * y[j];
+            y[i] /= (L[i][i] + 1e-300);
+        }
+        return y;
+    }
+
+    private static double logSumExp(double[] vals) {
+        double max = Double.NEGATIVE_INFINITY;
+        for (double v : vals) if (v > max) max = v;
+        if (Double.isInfinite(max)) return Double.NEGATIVE_INFINITY;
+        double sum = 0.0;
+        for (double v : vals) sum += Math.exp(v - max);
+        return max + Math.log(sum);
     }
 }

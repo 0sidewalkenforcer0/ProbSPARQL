@@ -1,0 +1,40 @@
+# MQ3_product_filtered: U3 - compute power distribution, then filter
+# Only return motors where prob:mean(?powerDist) > 100.0
+# Operations: prob:multiply, prob:mean
+# Complexity: Medium
+# Selectivity: variable (~30-50%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?powerDist ?powerMean
+WHERE {
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+  
+  BIND(prob:mean(?powerDist) AS ?meanJson)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+  
+  FILTER(?powerMean > 100.0)
+}
+ORDER BY DESC(?powerMean)
+LIMIT 2000

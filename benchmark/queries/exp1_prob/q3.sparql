@@ -1,0 +1,23 @@
+# Exp1 Q3 PROB: Distribution Comparison — probabilistic only (no DET equivalent)
+# Finds gear teeth where JS-divergence between CT and SL distributions exceeds 0.3.
+# Measures: absolute cost of prob:jsdivergence; no overhead ratio possible.
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?char ?jsd WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasCharacteristic ?char .
+  ?meas_ct cfm:measuresCharacteristic ?char ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  ?meas_sl cfm:measuresCharacteristic ?char ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsd)
+  FILTER(?jsd > 0.3)
+}

@@ -22,18 +22,12 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * }
  * </pre>
  * 
- * <p>JS divergence is defined as:</p>
- * <pre>
- * JS(P||Q) = 0.5 * D_KL(P||M) + 0.5 * D_KL(Q||M)
- * </pre>
- * where M = 0.5 * (P + Q) is the mixture distribution.
- * 
- * <p>Properties:</p>
+ * <p>Configuration via System Properties:</p>
  * <ul>
- *   <li>Symmetric: JS(P||Q) = JS(Q||P)</li>
- *   <li>Non-negative: JS(P||Q) ≥ 0</li>
- *   <li>Bounded: JS(P||Q) ≤ log(2) ≈ 0.693</li>
- *   <li>Square root is a metric (Jensen-Shannon distance)</li>
+ *   <li>probsparql.mode: GT_100, GT_1K, GT_5K, GT_10K, V1_MC, V2_STRATIFIED, V3_SPRT, V4_BOUNDS, V5_ADAPTIVE</li>
+ *   <li>probsparql.sprt.alpha: SPRT false positive rate (default: 0.05)</li>
+ *   <li>probsparql.sprt.beta: SPRT false negative rate (default: 0.05)</li>
+ *   <li>probsparql.sprt.epsilon: SPRT decision threshold (default: 0.05)</li>
  * </ul>
  * 
  * @author ProbSPARQL Team
@@ -42,8 +36,32 @@ public class JSDivergence extends FunctionBase2 {
     
     public static final String URI = "http://probsparql.org/function#jsdivergence";
     
-    private static final int DEFAULT_SAMPLES = 1000;
+    // Samplers (initialized based on mode)
+    private final StratifiedSampler stratifiedSampler;
+    private final SPRTSampler sprtSampler;
+    private final BoundsFilterSampler boundsSampler;
+    private final AdaptiveSampler adaptiveSampler;
+    
+    // Mode configuration
+    private final String mode;
     private static final java.util.Random random = new java.util.Random(42);
+    
+    public JSDivergence() {
+        // Read mode from live system property so benchmark mode switches take effect
+        this.mode = System.getProperty("probsparql.mode", JSDivergenceConfig.MODE);
+        
+        // Initialize samplers
+        this.stratifiedSampler = new StratifiedSampler(42);
+        this.sprtSampler = new SPRTSampler(42, 
+            JSDivergenceConfig.SPRT_ALPHA, 
+            JSDivergenceConfig.SPRT_BETA, 
+            JSDivergenceConfig.SPRT_EPSILON);
+        this.boundsSampler = new BoundsFilterSampler(JSDivergenceConfig.SPRT_EPSILON);
+        this.adaptiveSampler = new AdaptiveSampler(JSDivergenceConfig.SPRT_EPSILON,
+            JSDivergenceConfig.SPRT_ALPHA,
+            JSDivergenceConfig.SPRT_BETA,
+            JSDivergenceConfig.SPRT_EPSILON);
+    }
     
     /**
      * Compute JS divergence JS(gmm1 || gmm2).
@@ -64,9 +82,54 @@ public class JSDivergence extends FunctionBase2 {
                 ", d2=" + gmm2.getD());
         }
         
-        double js = computeJSDivergence(gmm1, gmm2, DEFAULT_SAMPLES);
+        double js = computeJSDivergence(gmm1, gmm2);
         
         return NodeValue.makeDouble(js);
+    }
+    
+    /**
+     * Compute JSD based on current mode.
+     */
+    private double computeJSDivergence(GMMValue gmm1, GMMValue gmm2) {
+        switch (mode) {
+            case JSDivergenceConfig.MODE_GT_100:
+                return computeMC(gmm1, gmm2, JSDivergenceConfig.GT_100_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_GT_1K:
+                return computeMC(gmm1, gmm2, JSDivergenceConfig.GT_1K_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_GT_5K:
+                return computeMC(gmm1, gmm2, JSDivergenceConfig.GT_5K_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_GT_10K:
+                return computeMC(gmm1, gmm2, JSDivergenceConfig.GT_10K_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_V1_MC:
+                return computeMC(gmm1, gmm2, JSDivergenceConfig.V1_DEFAULT_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_V2_STRATIFIED:
+                return stratifiedSampler.computeJSD(gmm1, gmm2, JSDivergenceConfig.V2_STRATIFIED_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_V3_SPRT:
+                return sprtSampler.computeJSD(gmm1, gmm2, JSDivergenceConfig.V3_SPRT_MAX_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_V4_BOUNDS:
+                return boundsSampler.computeJSD(gmm1, gmm2, JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES);
+                
+            case JSDivergenceConfig.MODE_V5_ADAPTIVE:
+            default:
+                return adaptiveSampler.computeJSD(gmm1, gmm2, JSDivergenceConfig.V5_ADAPTIVE_MAX_SAMPLES);
+        }
+    }
+    
+    /**
+     * Standard Monte Carlo computation.
+     */
+    private double computeMC(GMMValue p, GMMValue q, int numSamples) {
+        GMMValue m = createMixture(p, q);
+        double klPM = computeKLDivergence(p, m, numSamples / 2);
+        double klQM = computeKLDivergence(q, m, numSamples / 2);
+        return 0.5 * klPM + 0.5 * klQM;
     }
     
     /**
@@ -85,26 +148,6 @@ public class JSDivergence extends FunctionBase2 {
         }
         
         return (GMMValue) value;
-    }
-    
-    /**
-     * Compute JS divergence using Monte Carlo approximation.
-     * 
-     * JS(P||Q) = 0.5 * D_KL(P||M) + 0.5 * D_KL(Q||M)
-     * where M = 0.5 * (P + Q)
-     */
-    private double computeJSDivergence(GMMValue p, GMMValue q, int numSamples) {
-        // Create mixture distribution M = 0.5*P + 0.5*Q
-        GMMValue m = createMixture(p, q);
-        
-        // Compute D_KL(P||M)
-        double klPM = computeKLDivergence(p, m, numSamples / 2);
-        
-        // Compute D_KL(Q||M)
-        double klQM = computeKLDivergence(q, m, numSamples / 2);
-        
-        // JS = 0.5 * D_KL(P||M) + 0.5 * D_KL(Q||M)
-        return 0.5 * klPM + 0.5 * klQM;
     }
     
     /**
@@ -200,7 +243,6 @@ public class JSDivergence extends FunctionBase2 {
      * Sample from GMM.
      */
     private double[] sampleFromGMM(GMMValue gmm) {
-        int K = gmm.getK();
         int d = gmm.getD();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();

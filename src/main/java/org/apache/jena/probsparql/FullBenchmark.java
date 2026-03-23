@@ -62,7 +62,6 @@ public class FullBenchmark {
         System.out.println();
         
         int[] entityCounts = {100, 500, 1000, 2000, 5000};
-        String[] queryNames = {"U1-CDF", "U2-Stats", "U3-PDF", "U4-Transform", "U5-Divergence", "U6-Fuse"};
         double[][] results = new double[entityCounts.length][6];
         
         for (int e = 0; e < entityCounts.length; e++) {

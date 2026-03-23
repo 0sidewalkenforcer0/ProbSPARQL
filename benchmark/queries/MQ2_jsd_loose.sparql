@@ -1,0 +1,40 @@
+# MQ2_jsd_loose: U2 variant - low divergence threshold (~40% results)
+# Find gears where JS divergence between CT and SL distributions exceeds 0.1
+# Operations: prob:jsdivergence
+# Complexity: Low
+# Selectivity: high (~40%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?jsDiv
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas_ct cfm:measuresCharacteristic ?char ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  ?meas_sl cfm:measuresCharacteristic ?char ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+  
+  FILTER(?jsDiv > 0.1)
+}
+ORDER BY DESC(?jsDiv)
+LIMIT 2000

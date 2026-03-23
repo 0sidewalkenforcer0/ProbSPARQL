@@ -1,0 +1,39 @@
+# MacroQ1_wear_detection: Find all gears AND their worn teeth
+# At least one tooth has prob:cdf(?dist, 9.8) >= 0.85 (worn)
+# Return: gear IRI, tooth IRI, the distribution, the CDF value, and the point estimate
+# Order by CDF value DESC
+# Operations: prob:cdf
+# Complexity: Medium
+# Selectivity: medium (~20-30%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?tooth ?toothLabel ?distribution ?cdfValue ?pointEstimate
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?tooth .
+  
+  ?tooth rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?tooth ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv ;
+        om:hasValue ?pointEstimate .
+  
+  ?rv uq:hasDistribution ?distribution .
+  
+  BIND(prob:cdf(?distribution, 9.8) AS ?cdfValue)
+  
+  FILTER(?cdfValue >= 0.85)
+}
+ORDER BY DESC(?cdfValue)
+LIMIT 2000

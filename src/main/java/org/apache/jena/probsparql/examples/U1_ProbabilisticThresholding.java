@@ -4,7 +4,7 @@ import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.util.FileManager;
+import org.apache.jena.riot.RDFDataMgr;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +30,12 @@ public class U1_ProbabilisticThresholding {
         Model model = ModelFactory.createDefaultModel();
         
         logger.info("Loading angle grinder instance data...");
-        InputStream dataStream = FileManager.get().open("examples/data/angle-grinder-instances.ttl");
-        if (dataStream == null) {
-            logger.error("Could not find data file!");
+        try (InputStream dataStream = RDFDataMgr.open("examples/data/angle-grinder-instances.ttl")) {
+            model.read(dataStream, null, "TTL");
+        } catch (Exception e) {
+            logger.error("Could not find data file: {}", e.getMessage());
             return;
         }
-        model.read(dataStream, null, "TTL");
         logger.info("Loaded {} triples", model.size());
         
         // Load and execute the query

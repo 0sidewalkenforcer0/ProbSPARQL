@@ -8,6 +8,7 @@ import org.apache.jena.sparql.engine.ExecutionContext;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.iterator.QueryIterFuseJoin;
 import org.apache.jena.sparql.engine.iterator.QueryIterFuseJoinFilter;
+import org.apache.jena.sparql.engine.iterator.QueryIterPrunedSimilarityJoin;
 import org.apache.jena.sparql.engine.iterator.QueryIterSimilarityJoin;
 import org.apache.jena.sparql.engine.iterator.QueryIterSimilarityJoinFilter;
 
@@ -159,17 +160,17 @@ public class OpExecutorProbabilistic extends OpExecutor {
             // New mode: Nested loop join between left and right patterns
             // Execute left pattern to get left table bindings
             QueryIterator leftInput = executeOp(leftOp, input);
-            
-            // Create nested loop join iterator
-            // The iterator will execute rightOp internally
-            return new QueryIterSimilarityJoin(
-                leftInput,
-                rightOp,
-                leftVar,
-                rightVar,
-                tolerance,
-                execCxt
-            );
+
+            boolean pruning = "true".equalsIgnoreCase(
+                System.getProperty("probsparql.simjoin.pruning", "false"));
+
+            if (pruning) {
+                return new QueryIterPrunedSimilarityJoin(
+                    leftInput, rightOp, leftVar, rightVar, tolerance, execCxt);
+            } else {
+                return new QueryIterSimilarityJoin(
+                    leftInput, rightOp, leftVar, rightVar, tolerance, execCxt);
+            }
         }
     }
     

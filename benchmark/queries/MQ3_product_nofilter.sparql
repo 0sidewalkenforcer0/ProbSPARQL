@@ -1,0 +1,35 @@
+# MQ3_product_nofilter: U3 - compute power distribution for ALL motors
+# Return motor IRI and powerDist literal
+# No FILTER - tests pure computation overhead
+# Operations: prob:multiply
+# Complexity: Medium
+# Selectivity: high (100%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?speedDist ?torqueDist ?powerDist
+WHERE {
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+}
+LIMIT 5000

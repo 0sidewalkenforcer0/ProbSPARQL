@@ -1,0 +1,563 @@
+# MQ1_cdf_strict: U1 variant - high threshold (low selectivity ~5%)
+# Find gears with at least one tooth whose length is below 9.6mm with probability >= 0.9
+# Operations: prob:cdf
+# Complexity: Low
+# Selectivity: low (~5%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?cdfValue
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv ;
+        om:hasValue ?pointEst .
+  
+  ?rv uq:hasDistribution ?dist .
+  
+  BIND(prob:cdf(?dist, 9.6) AS ?cdfValue)
+  
+  FILTER(?cdfValue >= 0.9)
+}
+ORDER BY DESC(?cdfValue)
+LIMIT 100
+# MQ1_cdf_loose: U1 variant - low threshold (high selectivity ~40%)
+# Find gears with at least one tooth whose length is below 9.9mm with probability >= 0.6
+# Operations: prob:cdf
+# Complexity: Low
+# Selectivity: high (~40%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?cdfValue
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?char ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv ;
+        om:hasValue ?pointEst .
+  
+  ?rv uq:hasDistribution ?dist .
+  
+  BIND(prob:cdf(?dist, 9.9) AS ?cdfValue)
+  
+  FILTER(?cdfValue >= 0.6)
+}
+ORDER BY DESC(?cdfValue)
+LIMIT 1000
+# MQ2_jsd_strict: U2 variant - high divergence threshold (~10% results)
+# Find gears where JS divergence between CT and SL distributions exceeds 0.25
+# Operations: prob:jsdivergence
+# Complexity: Low
+# Selectivity: low (~10%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?jsDiv
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas_ct cfm:measuresCharacteristic ?char ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  ?meas_sl cfm:measuresCharacteristic ?char ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+  
+  FILTER(?jsDiv > 0.25)
+}
+ORDER BY DESC(?jsDiv)
+LIMIT 500
+# MQ2_jsd_loose: U2 variant - low divergence threshold (~40% results)
+# Find gears where JS divergence between CT and SL distributions exceeds 0.1
+# Operations: prob:jsdivergence
+# Complexity: Low
+# Selectivity: high (~40%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?toothLabel ?jsDiv
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?char .
+  
+  ?char rdfs:label ?toothLabel .
+  
+  ?meas_ct cfm:measuresCharacteristic ?char ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  ?meas_sl cfm:measuresCharacteristic ?char ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+  
+  FILTER(?jsDiv > 0.1)
+}
+ORDER BY DESC(?jsDiv)
+LIMIT 2000
+# MQ3_product_nofilter: U3 - compute power distribution for ALL motors
+# Return motor IRI and powerDist literal
+# No FILTER - tests pure computation overhead
+# Operations: prob:multiply
+# Complexity: Medium
+# Selectivity: high (100%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?speedDist ?torqueDist ?powerDist
+WHERE {
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+}
+LIMIT 5000
+# MQ3_product_filtered: U3 - compute power distribution, then filter
+# Only return motors where prob:mean(?powerDist) > 100.0
+# Operations: prob:multiply, prob:mean
+# Complexity: Medium
+# Selectivity: variable (~30-50%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?powerDist ?powerMean
+WHERE {
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+  
+  BIND(prob:mean(?powerDist) AS ?meanJson)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+  
+  FILTER(?powerMean > 100.0)
+}
+ORDER BY DESC(?powerMean)
+LIMIT 2000
+# MQ4_fusion_map: U4 - FUSEJOIN with epsilon=0.3, return MAP estimate
+# Fuse caliper and laser diameter measurements, extract MAP value
+# Operations: FUSEJOIN, prob:map
+# Complexity: High
+# Selectivity: depends on consistency (~70-90%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?spindle ?spindleLabel ?fusedDist ?mapDiameter
+WHERE {
+  {
+    ?spindle a ag:Spindle ;
+             rdfs:label ?spindleLabel ;
+             ag:hasDiameterCharacteristic ?diamChar .
+    ?caliperMeas cfm:measuresCharacteristic ?diamChar ;
+                  cfm:hasProbabilisticValue ?rvCaliper .
+    ?rvCaliper uq:hasDistribution ?caliperDist .
+  }
+  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist)
+  {
+    ?laserMeas cfm:measuresCharacteristic ?diamChar ;
+               cfm:hasProbabilisticValue ?rvLaser .
+    ?rvLaser uq:hasDistribution ?laserDist .
+  }
+  
+  BIND(prob:map(?fusedDist) AS ?mapJson)
+  BIND(xsd:double(REPLACE(?mapJson, "[\\[\\]]", "")) AS ?mapDiameter)
+}
+LIMIT 5000
+# MQ4_fusion_mean_std: U4 variant - return both mean and std of fused distribution
+# Fuse caliper and laser diameter measurements, extract mean and std
+# Operations: FUSEJOIN, prob:mean, prob:std
+# Complexity: High
+# Selectivity: depends on consistency (~70-90%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?spindle ?spindleLabel ?fusedDist ?meanDiameter ?stdDev
+WHERE {
+  {
+    ?spindle a ag:Spindle ;
+             rdfs:label ?spindleLabel ;
+             ag:hasDiameterCharacteristic ?diamChar .
+    ?caliperMeas cfm:measuresCharacteristic ?diamChar ;
+                  cfm:hasProbabilisticValue ?rvCaliper .
+    ?rvCaliper uq:hasDistribution ?caliperDist .
+  }
+  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist)
+  {
+    ?laserMeas cfm:measuresCharacteristic ?diamChar ;
+               cfm:hasProbabilisticValue ?rvLaser .
+    ?rvLaser uq:hasDistribution ?laserDist .
+  }
+  
+  BIND(prob:mean(?fusedDist) AS ?meanJson)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?meanDiameter)
+  
+  BIND(prob:std(?fusedDist) AS ?stdJson)
+  BIND(xsd:double(REPLACE(?stdJson, "[\\[\\]]", "")) AS ?stdDev)
+}
+LIMIT 5000
+# MacroQ1_wear_detection: Find all gears AND their worn teeth
+# At least one tooth has prob:cdf(?dist, 9.8) >= 0.85 (worn)
+# Return: gear IRI, tooth IRI, the distribution, the CDF value, and the point estimate
+# Order by CDF value DESC
+# Operations: prob:cdf
+# Complexity: Medium
+# Selectivity: medium (~20-30%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?tooth ?toothLabel ?distribution ?cdfValue ?pointEstimate
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?tooth .
+  
+  ?tooth rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?tooth ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv ;
+        om:hasValue ?pointEstimate .
+  
+  ?rv uq:hasDistribution ?distribution .
+  
+  BIND(prob:cdf(?distribution, 9.8) AS ?cdfValue)
+  
+  FILTER(?cdfValue >= 0.85)
+}
+ORDER BY DESC(?cdfValue)
+LIMIT 2000
+# MacroQ2_anomaly_then_fuse: Two-step pipeline in one query
+# Step 1: Filter to tooth measurements where CT and SL are CONSISTENT (JS divergence < 0.15)
+# Step 2: For those consistent pairs, FUSEJOIN the distributions
+# Step 3: Return gear, tooth, fused MAP value
+# Only return results where MAP value < 9.9 (potentially worn even after fusion)
+# Operations: prob:jsdivergence, FUSEJOIN, prob:map
+# Complexity: High
+# Selectivity: low (~15-25%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?tooth ?toothLabel ?jsDiv ?fusedMap
+WHERE {
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?tooth .
+  
+  ?tooth rdfs:label ?toothLabel .
+  
+  # CT measurement
+  ?meas_ct cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputVoxelGrid ?voxel ;
+           cfm:hasProbabilisticValue ?rv_ct .
+  ?rv_ct uq:hasDistribution ?dist_ct .
+  
+  # SL measurement
+  ?meas_sl cfm:measuresCharacteristic ?tooth ;
+           cfm:hasInputPointCloud ?pc ;
+           cfm:hasProbabilisticValue ?rv_sl .
+  ?rv_sl uq:hasDistribution ?dist_sl .
+  
+  # Step 1: Check consistency
+  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+  FILTER(?jsDiv < 0.15)
+  
+  # Step 2: Fuse distributions
+  FUSEJOIN(?dist_ct, ?dist_sl, 0.15, ?fusedDist)
+  
+  # Step 3: Extract MAP
+  BIND(prob:map(?fusedDist) AS ?mapJson)
+  BIND(xsd:double(REPLACE(?mapJson, "[\\[\\]]", "")) AS ?fusedMap)
+  
+  # Only return potentially worn after fusion
+  FILTER(?fusedMap < 9.9)
+}
+ORDER BY ?fusedMap
+LIMIT 1000
+# MacroQ3_power_and_wear: Join motor power computation with gear wear assessment
+# Compute power distribution (prob:multiply of speed and torque)
+# Simultaneously check if the gear attached to that motor has any worn teeth (prob:cdf > 0.8)
+# Return: motor, powerDist mean, worst tooth CDF value
+# Filter: only motors with at least one worn tooth
+# Operations: prob:multiply, prob:mean, prob:cdf
+# Complexity: High
+# Selectivity: low (~15-25%)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?motor ?motorLabel ?powerMean ?worstCdf
+WHERE {
+  # Motor with speed and torque
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar ;
+         ag:hasCrownGear ?gear .
+  
+  ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+             cfm:hasProbabilisticValue ?rvSpeed .
+  ?rvSpeed uq:hasDistribution ?speedDist .
+  
+  ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+              cfm:hasProbabilisticValue ?rvTorque .
+  ?rvTorque uq:hasDistribution ?torqueDist .
+  
+  # Compute power distribution
+  BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+  BIND(prob:mean(?powerDist) AS ?meanJson)
+  BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+  
+  # Check gear for worn teeth
+  ?gear cfm:hasCharacteristic ?tooth .
+  ?tooth rdfs:label ?toothLabel .
+  
+  ?meas cfm:measuresCharacteristic ?tooth ;
+        cfm:hasInputPointCloud ?pc ;
+        cfm:hasProbabilisticValue ?rv .
+  ?rv uq:hasDistribution ?toothDist .
+  
+  BIND(prob:cdf(?toothDist, 9.8) AS ?cdfValue)
+  
+  # Only motors with worn gears, get worst tooth
+  FILTER EXISTS {
+    ?gear cfm:hasCharacteristic ?wt .
+    ?wt rdfs:label ?wtLabel .
+    ?wmeas cfm:measuresCharacteristic ?wt ;
+           cfm:hasProbabilisticValue ?wrv .
+    ?wrv uq:hasDistribution ?wtdist .
+    FILTER(prob:cdf(?wtdist, 9.8) > 0.8)
+  }
+}
+GROUP BY ?motor ?motorLabel ?powerMean
+ORDER BY ?powerMean
+LIMIT 1000
+# MacroQ4_full_inspection_report: The most complex query - full inspection decision
+# UNION of three branches:
+#   Branch A: worn teeth (cdf < 9.8 with p > 0.85) -> "wear"
+#   Branch B: sensor anomalies (JS > 0.2) -> "sensor_fault"
+#   Branch C: low motor power (mean(product) < 90) -> "power_low"
+# Return: gear, issue_type, severity_value
+# ORDER BY severity_value DESC
+# Operations: prob:cdf, prob:jsdivergence, prob:multiply, prob:mean
+# Complexity: Very High
+# Selectivity: varies by branch
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?issueType ?severityValue
+WHERE {
+  {
+    # Branch A: worn teeth
+    SELECT ?gear ?gearLabel (MAX(?cdfValue) AS ?severityValue)
+    WHERE {
+      ?gear a ag:CrownGear ;
+            rdfs:label ?gearLabel ;
+            cfm:hasCharacteristic ?tooth .
+      
+      ?meas cfm:measuresCharacteristic ?tooth ;
+            cfm:hasInputPointCloud ?pc ;
+            cfm:hasProbabilisticValue ?rv .
+      ?rv uq:hasDistribution ?dist .
+      
+      BIND(prob:cdf(?dist, 9.8) AS ?cdfValue)
+      FILTER(?cdfValue > 0.85)
+    }
+    GROUP BY ?gear ?gearLabel
+    BIND("wear" AS ?issueType)
+  }
+  UNION
+  {
+    # Branch B: sensor anomalies
+    SELECT ?gear ?gearLabel (MAX(?jsDiv) AS ?severityValue)
+    WHERE {
+      ?gear a ag:CrownGear ;
+            rdfs:label ?gearLabel ;
+            cfm:hasCharacteristic ?tooth .
+      
+      ?meas_ct cfm:measuresCharacteristic ?tooth ;
+                cfm:hasInputVoxelGrid ?voxel ;
+                cfm:hasProbabilisticValue ?rv_ct .
+      ?rv_ct uq:hasDistribution ?dist_ct .
+      
+      ?meas_sl cfm:measuresCharacteristic ?tooth ;
+                cfm:hasInputPointCloud ?pc ;
+                cfm:hasProbabilisticValue ?rv_sl .
+      ?rv_sl uq:hasDistribution ?dist_sl .
+      
+      BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsDiv)
+      FILTER(?jsDiv > 0.2)
+    }
+    GROUP BY ?gear ?gearLabel
+    BIND("sensor_fault" AS ?issueType)
+  }
+  UNION
+  {
+    # Branch C: low motor power
+    SELECT ?gear ?gearLabel ((90.0 - ?powerMean) AS ?severityValue)
+    WHERE {
+      ?motor a ag:Motor ;
+             ag:hasCrownGear ?gear ;
+             ag:hasSpeedCharacteristic ?speedChar ;
+             ag:hasTorqueCharacteristic ?torqueChar .
+      
+      ?gear rdfs:label ?gearLabel .
+      
+      ?speedMeas cfm:measuresCharacteristic ?speedChar ;
+                 cfm:hasProbabilisticValue ?rvSpeed .
+      ?rvSpeed uq:hasDistribution ?speedDist .
+      
+      ?torqueMeas cfm:measuresCharacteristic ?torqueChar ;
+                  cfm:hasProbabilisticValue ?rvTorque .
+      ?rvTorque uq:hasDistribution ?torqueDist .
+      
+      BIND(prob:multiply(?speedDist, ?torqueDist) AS ?powerDist)
+      BIND(prob:mean(?powerDist) AS ?meanJson)
+      BIND(xsd:double(REPLACE(?meanJson, "[\\[\\]]", "")) AS ?powerMean)
+      
+      FILTER(?powerMean < 90.0)
+    }
+    BIND("power_low" AS ?issueType)
+  }
+}
+ORDER BY DESC(?severityValue)
+LIMIT 2000
