@@ -71,8 +71,8 @@ class GMMDataLoadingTest {
         assertInstanceOf(GMMValue.class, value);
         
         GMMValue gmm = (GMMValue) value;
-        assertEquals(1, gmm.getK(), "Should have 1 component (single Gaussian)");
-        assertEquals(1, gmm.getD(), "Should be 1-dimensional");
+        assertEquals(1, gmm.getNComponents(), "Should have 1 component (single Gaussian)");
+        assertEquals(1, gmm.getDimensions(), "Should be 1-dimensional");
         assertEquals("full", gmm.getCovarianceType());
         
         double[] weights = gmm.getWeights();
@@ -110,7 +110,7 @@ class GMMDataLoadingTest {
                 assertNotNull(gmm);
                 
                 System.out.println("Random Variable: " + rv.getLocalName());
-                System.out.println("  K=" + gmm.getK() + ", d=" + gmm.getD());
+                System.out.println("  n_components=" + gmm.getNComponents() + ", dimensions=" + gmm.getDimensions());
                 System.out.println("  Covariance type: " + gmm.getCovarianceType());
                 
                 count++;
@@ -134,7 +134,7 @@ class GMMDataLoadingTest {
         Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
         GMMValue gmm = (GMMValue) gmmLit.getValue();
         
-        assertEquals(1, gmm.getK());
+        assertEquals(1, gmm.getNComponents());
         
         double[][] means = gmm.getMeans();
         assertEquals(9.2, means[0][0], 1e-9);
@@ -157,7 +157,7 @@ class GMMDataLoadingTest {
         Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
         GMMValue gmm = (GMMValue) gmmLit.getValue();
         
-        assertEquals(1, gmm.getK(), "Should be single Gaussian");
+        assertEquals(1, gmm.getNComponents(), "Should be single Gaussian");
         assertArrayEquals(new double[]{1.0}, gmm.getWeights(), 1e-9);
         assertEquals(9.6, gmm.getMeans()[0][0], 1e-9);
         assertEquals(0.09, gmm.getCovariances()[0][0][0], 1e-9);
@@ -177,7 +177,7 @@ class GMMDataLoadingTest {
         Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
         GMMValue gmm = (GMMValue) gmmLit.getValue();
         
-        assertEquals(1, gmm.getK(), "Should have 1 component");
+        assertEquals(1, gmm.getNComponents(), "Should have 1 component");
         assertArrayEquals(new double[]{1.0}, gmm.getWeights(), 1e-9);
         
         double[][] means = gmm.getMeans();

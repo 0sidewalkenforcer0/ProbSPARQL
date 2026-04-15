@@ -80,7 +80,7 @@ P2 (already done, review only):
 - **Used in:** Exp 1
 - **Content:** Same graph structure as Dataset A, but all probabilistic literals replaced with deterministic point estimates (xsd:double)
 - **Purpose:** True deterministic SPARQL baseline for overhead measurement
-- **Script needed:** `generate_dataset_deterministic.py`
+- **Script needed:** `generate_exp1_main_deterministic.py`
 
 ### Dataset B: Controlled Distribution Pairs
 
@@ -158,7 +158,7 @@ P2 (already done, review only):
 - Line chart: x = scale, y = time, lines = deterministic vs ProbSPARQL (per K)
 
 **Implementation TODO:**
-- [ ] Create `generate_dataset_deterministic.py`
+- [ ] Create `generate_exp1_main_deterministic.py`
 - [ ] Update `ScalabilityBenchmark.java`: add deterministic queries, increase `BENCHMARK_RUNS` to 30
 - [ ] Integrate `ScalabilityBenchmark.java` into `run_all_experiments.sh`
 - [ ] Create proper `analyze_exp1.py` (not reusing SimJoin data)
@@ -334,7 +334,7 @@ Repeat Exp 3.1 with histogram pairs.
 - [ ] Implement histogram JS divergence (discrete KL → JS)
 - [ ] Implement histogram `prob:cdf`, `prob:mean`, `prob:map`
 - [ ] Create `generate_histogram_variants.py` (converts GMM datasets → histogram)
-- [ ] Create `HistogramBenchmark.java` (runs Exp 4.1 and 4.2)
+- [ ] Exp 4 is now covered by the newer pipeline classes and scripts
 - [ ] Create `analyze_exp4.py`
 
 ---
@@ -344,7 +344,7 @@ Repeat Exp 3.1 with histogram pairs.
 ### P0 — Blocking (must complete before submission)
 
 **Exp 1 Fix:**
-- [ ] `generate_dataset_deterministic.py` — deterministic parallel of Dataset A
+- [ ] `generate_exp1_main_deterministic.py` — deterministic parallel of Dataset A
 - [ ] Update `ScalabilityBenchmark.java` — real baseline queries, `BENCHMARK_RUNS = 30`
 - [ ] Integrate into `run_all_experiments.sh`
 - [ ] `analyze_exp1.py` — proper overhead analysis
@@ -353,7 +353,7 @@ Repeat Exp 3.1 with histogram pairs.
 - [ ] `uq:histogramLiteral` datatype in Jena ARQ
 - [ ] Histogram operators: JS divergence, CDF, mean, MAP
 - [ ] `generate_histogram_variants.py`
-- [ ] `HistogramBenchmark.java`
+- [ ] Exp 4 pipeline classes (`Exp4DispatchTest`, `Exp4MicroBenchmark`, `Exp4CrossTypeJSD`, `Exp4EndToEnd`, `Exp4DirichletDemo`)
 - [ ] `analyze_exp4.py`
 
 ### P1 — Essential for credibility

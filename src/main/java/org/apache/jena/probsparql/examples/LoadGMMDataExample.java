@@ -70,8 +70,8 @@ public class LoadGMMDataExample {
         Literal gmmLiteral = stmt.getLiteral();
         GMMValue gmm = (GMMValue) gmmLiteral.getValue();
         
-        System.out.println("  K (components): " + gmm.getK());
-        System.out.println("  d (dimensions): " + gmm.getD());
+        System.out.println("  K (components): " + gmm.getNComponents());
+        System.out.println("  d (dimensions): " + gmm.getDimensions());
         System.out.println("  Covariance type: " + gmm.getCovarianceType());
         
         System.out.print("  Weights: [");
@@ -86,7 +86,7 @@ public class LoadGMMDataExample {
         double[][] means = gmm.getMeans();
         printMatrix(means);
         
-        if (gmm.getK() <= 3) {  // Only print covariances for small models
+        if (gmm.getNComponents() <= 3) {  // Only print covariances for small models
             System.out.println("  Covariances:");
             double[][][] covariances = gmm.getCovariances();
             for (int i = 0; i < covariances.length; i++) {

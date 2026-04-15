@@ -97,10 +97,7 @@ public class Exp4CrossTypeJSD {
         double totalErr = 0;  int count = 0;
         for (int i = 1; i <= n; i++) {
             HistogramValue h1 = randHist(B, rng);
-            HistogramValue h2 = randHist(B, rng);
-
-            // Make h2 share same bin edges as h1 for compatibility
-            h2 = new HistogramValue(B, h1.getMin(), h1.getMax(), randCounts(B, rng));
+            HistogramValue h2 = new HistogramValue(h1.getBins(), randomWeights(B, rng));
 
             long t0 = System.nanoTime();
             double jsdSame  = org.apache.jena.probsparql.functions.comparison
@@ -176,8 +173,7 @@ public class Exp4CrossTypeJSD {
 
             // Make bins compatible
             HistogramValue h1c = h1;
-            HistogramValue h2c = new HistogramValue(B, h1.getMin(), h1.getMax(),
-                    resampleCounts(h2, h1, B, rng));
+            HistogramValue h2c = rebinHistogram(h2, h1, rng);
 
             long t0S = System.nanoTime();
             double jsdSame = org.apache.jena.probsparql.functions.comparison
@@ -210,8 +206,8 @@ public class Exp4CrossTypeJSD {
      * where alpha_0_bar = sum(alpha) - alpha_0.
      */
     private static Sampleable dirMarginal1D(DirichletValue dir, ThreadLocalRandom rng) {
-        double a0    = dir.getAlpha()[0];
-        double aRest = dir.getAlpha0() - a0;   // getAlpha0() = sum(alpha)
+        double a0    = dir.getAlphas()[0];
+        double aRest = dir.getAlphasSum() - a0;   // getAlphasSum() = sum(alphas)
         return new Sampleable() {
             // Gamma-based Beta sampling: X = G1/(G1+G2)
             @Override public double[][] sample(int n) {
@@ -274,8 +270,7 @@ public class Exp4CrossTypeJSD {
             HistogramValue h2 = histFromDirMarginal(d, B, rng);
 
             HistogramValue h1c = h1;
-            HistogramValue h2c = new HistogramValue(B, h1.getMin(), h1.getMax(),
-                    resampleCounts(h2, h1, B, rng));
+            HistogramValue h2c = rebinHistogram(h2, h1, rng);
 
             long t0S = System.nanoTime();
             double jsdSame = org.apache.jena.probsparql.functions.comparison
@@ -321,20 +316,24 @@ public class Exp4CrossTypeJSD {
     private static DirichletValue randDir(int k, ThreadLocalRandom rng) {
         double[] alpha = new double[k];
         for (int i = 0; i < k; i++) alpha[i] = rng.nextDouble(0.5, 5.0);
-        return new DirichletValue(k, alpha);
+        return new DirichletValue(alpha);
     }
 
     private static HistogramValue randHist(int B, ThreadLocalRandom rng) {
         double lo = rng.nextDouble(8.0, 11.0), hi = lo + rng.nextDouble(3.0, 8.0);
-        int[] counts = new int[B];
-        for (int i = 0; i < B; i++) counts[i] = rng.nextInt(1, 50);
-        return new HistogramValue(B, lo, hi, counts);
+        double[] bins = equalWidthBins(lo, hi, B);
+        return new HistogramValue(bins, randomWeights(B, rng));
     }
 
-    private static int[] randCounts(int B, ThreadLocalRandom rng) {
-        int[] c = new int[B];
-        for (int i = 0; i < B; i++) c[i] = rng.nextInt(1, 50);
-        return c;
+    private static double[] randomWeights(int B, ThreadLocalRandom rng) {
+        double[] w = new double[B];
+        double sum = 0.0;
+        for (int i = 0; i < B; i++) {
+            w[i] = rng.nextDouble(0.1, 1.0);
+            sum += w[i];
+        }
+        for (int i = 0; i < B; i++) w[i] /= sum;
+        return w;
     }
 
     /** Build a histogram of the first dimension of a GMM by MC sampling. */
@@ -360,32 +359,51 @@ public class Exp4CrossTypeJSD {
         if (range < 1e-12) { range = 1.0; hi = lo + 1.0; }
         // add small buffer
         lo -= range * 0.05;  hi += range * 0.05;
-        double bw = (hi - lo) / B;
+        double[] bins = equalWidthBins(lo, hi, B);
         int[] counts = new int[B];
         for (double v : vals) {
-            int bin = (int) ((v - lo) / bw);
+            int bin = findBin(v, bins);
             if (bin < 0) bin = 0; if (bin >= B) bin = B - 1;
             counts[bin]++;
         }
-        return new HistogramValue(B, lo, hi, counts);
+        double total = vals.length;
+        double[] weights = new double[B];
+        for (int i = 0; i < B; i++) weights[i] = counts[i] / total;
+        return new HistogramValue(bins, weights);
     }
 
-    /** Resample counts of h2 onto the bin grid of h1 (simple rebin). */
-    private static int[] resampleCounts(HistogramValue h2, HistogramValue h1, int B,
-                                         ThreadLocalRandom rng) {
-        // Quick approach: redistribute total mass uniformly
-        int total = 0;
-        for (int c : h2.getCounts()) total += c;
+    /** Resample h2 onto the bin grid of h1 using Monte Carlo rebinning. */
+    private static HistogramValue rebinHistogram(HistogramValue h2, HistogramValue h1,
+                                                 ThreadLocalRandom rng) {
+        int B = h1.getBinCount();
+        double[] targetBins = h1.getBins();
+        double[][] samples = h2.sample(10_000);
         int[] counts = new int[B];
-        // Distribute proportionally (approx)
-        double[] probs = h2.probabilities();
-        int placed = 0;
-        for (int i = 0; i < B - 1; i++) {
-            counts[i] = (int) Math.round(probs[i] * total);
-            placed += counts[i];
+        for (double[] sample : samples) {
+            int bin = findBin(sample[0], targetBins);
+            if (bin < 0) bin = 0;
+            if (bin >= B) bin = B - 1;
+            counts[bin]++;
         }
-        counts[B - 1] = Math.max(1, total - placed);
-        return counts;
+        double[] weights = new double[B];
+        for (int i = 0; i < B; i++) weights[i] = counts[i] / 10_000.0;
+        return new HistogramValue(targetBins, weights);
+    }
+
+    private static double[] equalWidthBins(double lo, double hi, int B) {
+        double[] bins = new double[B + 1];
+        double width = (hi - lo) / B;
+        for (int i = 0; i <= B; i++) bins[i] = lo + i * width;
+        return bins;
+    }
+
+    private static int findBin(double v, double[] bins) {
+        if (v <= bins[0]) return 0;
+        if (v >= bins[bins.length - 1]) return bins.length - 2;
+        for (int i = 0; i < bins.length - 1; i++) {
+            if (v >= bins[i] && v < bins[i + 1]) return i;
+        }
+        return bins.length - 2;
     }
 
     private static String fmt(double v) { return String.format("%.6f", v); }

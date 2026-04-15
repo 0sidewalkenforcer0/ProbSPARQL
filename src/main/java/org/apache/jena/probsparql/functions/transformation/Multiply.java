@@ -67,10 +67,10 @@ public class Multiply extends FunctionBase2 {
         GMMValue gmm2 = extractGMM(gmm2Node, "second");
         
         // Validate 1-D constraint
-        if (gmm1.getD() != 1 || gmm2.getD() != 1) {
+        if (gmm1.getDimensions() != 1 || gmm2.getDimensions() != 1) {
             throw new IllegalArgumentException(
-                "multiply() only supports 1-D GMMs. Got d1=" + gmm1.getD() + 
-                ", d2=" + gmm2.getD() + ". For multi-dimensional multiplication, " +
+                "multiply() only supports 1-D GMMs. Got d1=" + gmm1.getDimensions() +
+                ", d2=" + gmm2.getDimensions() + ". For multi-dimensional multiplication, " +
                 "use prob:joint() to create joint distribution.");
         }
         
@@ -145,7 +145,7 @@ public class Multiply extends FunctionBase2 {
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         
-        for (int k = 0; k < gmm.getK(); k++) {
+        for (int k = 0; k < gmm.getNComponents(); k++) {
             mean += weights[k] * means[k][0];
         }
         
@@ -162,7 +162,7 @@ public class Multiply extends FunctionBase2 {
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
         
-        for (int k = 0; k < gmm.getK(); k++) {
+        for (int k = 0; k < gmm.getNComponents(); k++) {
             double mu_k = means[k][0];
             double sigma2_k = covariances[k][0][0]; // Variance of component k
             

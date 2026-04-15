@@ -93,7 +93,7 @@ public class U4_DistributionManipulation {
                     // Get fused GMM to check K
                     Object fusedDistValue = solution.get("fusedDist").asNode().getLiteralValue();
                     GMMValue fusedGMM = (GMMValue) fusedDistValue;
-                    int K = fusedGMM.getK();
+                    int K = fusedGMM.getNComponents();
                     
                     logger.info(String.format("%-30s %-15.3f %-15.3f %-15.4f %-20s %-15s %-15.4f", 
                         spindleLabel, 

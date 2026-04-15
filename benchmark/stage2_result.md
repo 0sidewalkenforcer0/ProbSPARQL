@@ -35,7 +35,7 @@ Stage 2 completed two complementary goals:
 |-------|-----------|--------------|
 | `ScalabilityBenchmark.java` | **Exp 1** — DET vs PROB overhead: 5 dataset scales × 4 K-values × {Q-BGP, Q-CDF, Q-Mean} query pairs, 15 warm-up + 30 timed repetitions | `benchmark/results/exp1_overhead.csv` |
 | `InEngineVsExternalBenchmark.java` | **Exp 2** — In-engine JSD vs external Python MC: pair counts {100, 500, 1K, 5K, 10K} × θ {0.1, 0.3, 0.5} | `benchmark/results/exp2_inengine.csv`, `exp2_pairs.json` |
-| `HistogramBenchmark.java` | **Exp 4** — GMM vs Histogram (B=50) vs Histogram (B=100) latency + JSD accuracy | `benchmark/results/exp4_overhead.csv`, `exp4_accuracy.csv` |
+| `Exp4DispatchTest.java`, `Exp4MicroBenchmark.java`, `Exp4CrossTypeJSD.java`, `Exp4EndToEnd.java`, `Exp4DirichletDemo.java` | **Exp 4** — current generalization pipeline | `benchmark/results/exp4_*.csv` |
 
 Also updated: `ClassificationAccuracyBenchmark.java` — raised `REPEAT` constant from 5 → 10 repetitions.
 
@@ -43,12 +43,12 @@ Also updated: `ClassificationAccuracyBenchmark.java` — raised `REPEAT` constan
 
 | Script | Purpose |
 |--------|---------|
-| `benchmark/scripts/generate_dataset_deterministic.py` | Converts GMM TTL → `xsd:double` point-value TTL for deterministic (DET) baseline dataset |
+| `benchmark/scripts/Experiments1/generate_exp1_main_deterministic.py` | Converts GMM TTL → `xsd:double` point-value TTL for deterministic (DET) baseline dataset |
 | `benchmark/scripts/generate_histogram_variants.py` | Converts GMM TTL → histogram TTL with configurable bin counts (B=20, 50, 100) |
-| `benchmark/scripts/exp2_external_baseline.py` | Pure-Python Monte Carlo JSD baseline: 5 000 samples per pair, matches `exp2_pairs.json` pairing |
-| `benchmark/scripts/analyze_exp2.py` | Merges in-engine + external CSVs, computes speedup ratio, produces latency comparison plot |
-| `benchmark/scripts/analyze_exp1_proper.py` | Reads `exp1_overhead.csv`, outputs per-query DET/PROB overhead tables and plot |
-| `benchmark/scripts/analyze_exp4.py` | Reads `exp4_overhead.csv` + `exp4_accuracy.csv`, produces bar and scatter plots |
+| `benchmark/scripts/Experiments2/exp2_external_baseline.py` | Pure-Python Monte Carlo JSD baseline: 5 000 samples per pair, matches `exp2_pairs.json` pairing |
+| `benchmark/scripts/Experiments2/analyze_exp2.py` | Merges in-engine + external CSVs, computes speedup ratio, produces latency comparison plot |
+| `benchmark/scripts/Experiments1/analyze_exp1_main.py` | Reads `exp1_overhead.csv`, outputs per-query DET/PROB overhead tables and plot |
+| `benchmark/scripts/Experiments4/analyze_exp4.py` | Reads the current Exp 4 CSV suite (`exp4_dispatch.csv`, `exp4_micro.csv`, `exp4_crosstype.csv`, `exp4_endtoend.csv`, `exp4_dirichlet_demo.csv`) |
 
 ### 2.4 Shell Script Update
 
@@ -57,7 +57,7 @@ Also updated: `ClassificationAccuracyBenchmark.java` — raised `REPEAT` constan
 - Step 0b: generate histogram variants
 - Step 1a: run Exp 1 (`ScalabilityBenchmark`)
 - Step 1b: run Exp 2 (`InEngineVsExternalBenchmark`)
-- Step 5: run Exp 4 (`HistogramBenchmark`)
+- Step 5: run the current Exp 4 pipeline (`run_exp4_full.sh`)
 - Updated analysis section for all new scripts
 
 ---
@@ -110,8 +110,8 @@ Run `benchmark/scripts/run_all_experiments.sh` to generate all outputs.
 | `benchmark/results/exp1_overhead.csv` | `ScalabilityBenchmark` | Scale, K, QueryID, Type, Median_ms, IQR_ms, OverheadRatio |
 | `benchmark/results/exp2_inengine.csv` | `InEngineVsExternalBenchmark` | NPairs, Theta, Approach, Median_ms, ResultCount |
 | `benchmark/results/exp2_external.csv` | `exp2_external_baseline.py` | NPairs, Theta, Approach, Median_ms, ResultCount |
-| `benchmark/results/exp4_overhead.csv` | `HistogramBenchmark` | N, Repr, QueryID, Median_ms, IQR_ms, OverheadRatio |
-| `benchmark/results/exp4_accuracy.csv` | `HistogramBenchmark` | B, Pair, PredJSD, Correct_30pct |
+| `benchmark/results/exp4_dispatch.csv` | `Exp4DispatchTest` | Function, DistType, Status, ResultCount |
+| `benchmark/results/exp4_micro.csv` | `Exp4MicroBenchmark` | Function, DistType, Param, MedianUs, IQRUs |
 
 ---
 

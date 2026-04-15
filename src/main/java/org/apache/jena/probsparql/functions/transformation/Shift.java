@@ -85,8 +85,8 @@ public class Shift extends FunctionBase2 {
      * Y = X + b => μ_Y = μ_X + b, Σ_Y = Σ_X
      */
     private GMMValue shiftGMM(GMMValue gmm, double b) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         String covType = gmm.getCovarianceType();
         
         double[] weights = gmm.getWeights().clone();

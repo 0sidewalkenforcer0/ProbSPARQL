@@ -90,7 +90,7 @@ public class U4_DistributionManipulation_Fuzzy {
                 System.out.printf("Spindle: %s%n", spindleLabel);
                 System.out.printf("├─ Sensors: %s + %s%n", caliperLabel, laserLabel);
                 System.out.printf("├─ Compatibility: ✓ Passed fuzzyJoin (JS < 0.3)%n");
-                System.out.printf("├─ Fused Distribution: K=%d components%n", fusedGMM.getK());
+                System.out.printf("├─ Fused Distribution: K=%d components%n", fusedGMM.getNComponents());
                 System.out.printf("├─ MAP Diameter:  %.4f mm (for robot control)%n", mapDiameter);
                 System.out.printf("├─ Mean Diameter: %.4f mm (for statistics)%n", meanDiameter);
                 System.out.printf("├─ Std Deviation: %.4f mm (uncertainty)%n", stdDev);

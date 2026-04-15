@@ -1,0 +1,9 @@
+{
+  "dataset": "exp5_gears_1_000_000_pass_0p01",
+  "n_gears": 1000000,
+  "pass_frac": 0.01,
+  "opt_present_frac": 0.7,
+  "neither_frac": 0.30000000000000004,
+  "seed": 42,
+  "ttl": "/Users/gujianyang/WorkSpace/ProbSPARQL/benchmark/data/exp5/exp5_gears_1_000_000_pass_0p01.ttl"
+}

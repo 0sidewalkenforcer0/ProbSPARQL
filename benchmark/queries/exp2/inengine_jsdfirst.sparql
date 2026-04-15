@@ -1,0 +1,11 @@
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+SELECT ?rv1 ?rv2 WHERE {
+    ?rv1 uq:hasDistribution ?d1 .
+    ?rv2 uq:hasDistribution ?d2 .
+    BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)
+    FILTER(?jsd <= __THETA__)
+    FILTER(str(?rv1) < str(?rv2))
+    FILTER(prob:modeCount(?d1) > 1)
+    FILTER(prob:modeCount(?d2) > 1)
+}

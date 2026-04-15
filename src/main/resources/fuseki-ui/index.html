@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ProbSPARQL Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c2430;
+      --muted: #5b6675;
+      --line: #d7dde5;
+      --panel: #ffffff;
+      --page: #f5f7fa;
+      --accent: #116b5f;
+      --accent-dark: #0c5149;
+      --danger: #9f2d20;
+      --code: #111827;
+      --soft: #eef3f6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    header {
+      padding: 28px clamp(16px, 4vw, 48px) 18px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 720;
+    }
+
+    .meta {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      width: min(1240px, 100%);
+      margin: 0 auto;
+      padding: 24px clamp(16px, 4vw, 48px) 42px;
+    }
+
+    .toolbar,
+    .dataset-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      min-width: min(100%, 620px);
+    }
+
+    .import-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      min-width: min(100%, 620px);
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 680;
+    }
+
+    select {
+      min-width: min(100%, 420px);
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 36px 0 10px;
+      background: #ffffff;
+      color: var(--ink);
+      font: 14px/1.2 inherit;
+    }
+
+    input[type="file"] {
+      max-width: min(100%, 320px);
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 10px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .endpoint {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #ffffff;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      min-height: 38px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 680;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button.secondary {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+    }
+
+    button.secondary:hover {
+      border-color: #a8b4c2;
+      background: var(--soft);
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.68;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .pane {
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .pane-title {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+    }
+
+    .query-name {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 620;
+      overflow-wrap: anywhere;
+      text-align: right;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 430px;
+      resize: vertical;
+      border: 0;
+      outline: none;
+      padding: 14px;
+      color: var(--code);
+      font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      tab-size: 2;
+    }
+
+    .status {
+      min-height: 32px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .result {
+      max-height: 430px;
+      overflow: auto;
+    }
+
+    .dataset {
+      margin-top: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.25;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      min-width: 0;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px 14px;
+    }
+
+    .stat-value {
+      font-size: 26px;
+      line-height: 1.1;
+      font-weight: 760;
+      color: var(--ink);
+    }
+
+    .stat-label {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .table-wrap {
+      max-height: 370px;
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--soft);
+      font-weight: 720;
+    }
+
+    td {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      color: var(--code);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    @media (max-width: 920px) {
+      .workbench,
+      .dataset-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      textarea {
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .control-row,
+      .import-row,
+      select,
+      input[type="file"],
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ProbSPARQL Demo</h1>
+    <div class="meta">
+      <span>Dataset: /probsparql</span>
+      <span>Query endpoint: /probsparql/query</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="control-row">
+        <label for="querySelect">Query</label>
+        <select id="querySelect"></select>
+        <button id="reset" class="secondary" type="button">Reset</button>
+      </div>
+      <button id="run" type="button">Run Query</button>
+    </div>
+
+    <section class="workbench">
+      <div class="pane">
+        <div class="pane-title">
+          <span>SPARQL</span>
+          <span id="queryName" class="query-name"></span>
+        </div>
+        <textarea id="query" spellcheck="false"></textarea>
+      </div>
+
+      <div class="pane">
+        <div class="pane-title">Results</div>
+        <div id="status" class="status">Ready</div>
+        <div id="result" class="result">
+          <pre>No result</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="dataset">
+      <div class="dataset-toolbar">
+        <h2>Dataset</h2>
+        <div class="import-row">
+          <label for="ttlFile">TTL file</label>
+          <input id="ttlFile" type="file" accept=".ttl,text/turtle">
+          <button id="uploadTtl" type="button">Upload TTL</button>
+          <div class="endpoint">Upload endpoint: POST /probsparql</div>
+          <button id="refreshDataset" class="secondary" type="button">Refresh Dataset</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div id="tripleCount" class="stat-value">-</div>
+          <div class="stat-label">Triples</div>
+        </div>
+        <div class="stat">
+          <div id="classCount" class="stat-value">-</div>
+          <div class="stat-label">Types</div>
+        </div>
+        <div class="stat">
+          <div id="predicateCount" class="stat-value">-</div>
+          <div class="stat-label">Predicates</div>
+        </div>
+        <div class="stat">
+          <div id="rvCount" class="stat-value">-</div>
+          <div class="stat-label">Random Variables</div>
+        </div>
+      </div>
+
+      <div class="dataset-grid">
+        <div class="pane">
+          <div class="pane-title">Type Counts</div>
+          <div id="typeStatus" class="status">Ready</div>
+          <div id="typeResult" class="table-wrap">
+            <pre>No result</pre>
+          </div>
+        </div>
+
+        <div class="pane">
+          <div class="pane-title">Triples</div>
+          <div id="tripleStatus" class="status">Ready</div>
+          <div id="tripleResult" class="table-wrap">
+            <pre>No result</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const endpoint = "/probsparql/query";
+
+    const exampleQueries = [
+      {
+        id: "u1",
+        label: "U1 Probabilistic Thresholding",
+        source: "examples/queries/U1_probabilistic_thresholding.sparql",
+        query: `# U1: Probabilistic Thresholding
+# "Give me all gears whose tooth length is below 9.8mm with probability at least 0.9."
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+SELECT ?gear ?gearLabel ?pointEstimate ?probability
+WHERE {
+  # Crown gears with tooth length measurement
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?characteristic .
+  
+  ?measurement cfm:measuresCharacteristic ?characteristic ;
+               cfm:hasInputPointCloud ?pointCloud ;
+               cfm:hasProbabilisticValue ?rv ;
+               om:hasValue ?pointEstimate .
+  
+  ?rv uq:hasDistribution ?distribution .
+  
+  # CDF(9.8) = P(X <= 9.8)
+  BIND(prob:cdf(?distribution, 9.8) AS ?probability)
+  
+  # Filter: P(X < 9.8mm) >= 0.9
+  FILTER(?probability >= 0.9)
+}
+ORDER BY DESC(?probability)`
+      },
+      {
+        id: "u2",
+        label: "U2 Probabilistic Comparison",
+        source: "examples/queries/U2_probabilistic_comparison.sparql",
+        query: `# U2: Probabilistic Comparison and Matching
+# "Find all gears where the JS divergence between CT and SL tooth-length distributions exceeds 0.2."
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX core: <http://example.org/ontology/core#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?gearLabel ?ct_mean ?sl_mean ?jsDivergence
+WHERE {
+  # Crown gears with measurements
+  ?gear a ag:CrownGear ;
+        rdfs:label ?gearLabel ;
+        cfm:hasCharacteristic ?characteristic .
+  
+  # CT Scanner measurement
+  ?measurement_ct cfm:measuresCharacteristic ?characteristic ;
+                  cfm:hasInputVoxelGrid ?voxelGrid ;
+                  cfm:hasProbabilisticValue ?rv_ct ;
+                  om:hasValue ?ct_mean .
+  ?rv_ct uq:hasDistribution ?gmm_ct .
+  
+  # Structured-Light measurement
+  ?measurement_sl cfm:measuresCharacteristic ?characteristic ;
+                  cfm:hasInputPointCloud ?pointCloud ;
+                  cfm:hasProbabilisticValue ?rv_sl ;
+                  om:hasValue ?sl_mean .
+  ?rv_sl uq:hasDistribution ?gmm_sl .
+  
+  # Jensen-Shannon divergence
+  BIND(prob:jsdivergence(?gmm_ct, ?gmm_sl) AS ?jsDivergence)
+  
+  # Filter: JS divergence > 0.2
+  FILTER(?jsDivergence > 0.2)
+}
+ORDER BY DESC(?jsDivergence)`
+      },
+      {
+        id: "u3",
+        label: "U3 Distribution Transformation",
+        source: "examples/queries/U3_distribution_transformation.sparql",
+        query: `# U3: Distribution Transformation and Propagation
+# "Retrieve all motors with their speed, torque, and computed power with uncertainty propagation."
+# Formula: P (watts) = omega (rad/s) * tau (Nm)
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?motor ?gmmSpeed ?gmmTorque ?powerDist
+WHERE {
+  # Motors with performance characteristics
+  ?motor a ag:Motor ;
+         rdfs:label ?motorLabel ;
+         ag:hasSpeedCharacteristic ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  
+  # Speed measurement (rad/s)
+  ?speedMeasure cfm:measuresCharacteristic ?speedChar ;
+                cfm:hasProbabilisticValue ?rvSpeed ;
+                om:hasValue ?speedRadPerSec .
+  ?rvSpeed uq:hasDistribution ?gmmSpeed .
+  
+  # Torque measurement (Nm)
+  ?torqueMeasure cfm:measuresCharacteristic ?torqueChar ;
+                 cfm:hasProbabilisticValue ?rvTorque ;
+                 om:hasValue ?torqueNm .
+  ?rvTorque uq:hasDistribution ?gmmTorque .
+  
+  # Power distribution: P = omega * tau
+  BIND(prob:multiply(?gmmSpeed, ?gmmTorque) AS ?powerDist)
+}
+ORDER BY DESC(?speedRadPerSec)`
+      },
+      {
+        id: "u4",
+        label: "U4 Distribution Manipulation",
+        source: "examples/queries/U4_distribution_manipulation.sparql",
+        query: `# U4: Distribution Manipulation
+# "For spindles, fuse caliper and laser measurements, then extract MAP diameter for robot control."
+#
+# The data has one caliper distribution and one laser distribution per spindle diameter.
+# This query first pairs measurements by the shared diameter characteristic, then applies
+# the ProbSPARQL functions directly:
+# - prob:jsdivergence checks whether the two distributions are close enough.
+# - prob:fuse creates the fused posterior distribution.
+# - prob:map, prob:mean, and prob:std extract actionable summaries.
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?spindle ?spindleLabel ?caliperValue ?laserValue ?jsDivergence
+       ?fusedDist ?mapDiameter ?meanDiameter ?stdDev
+WHERE {
+  ?spindle a ag:Spindle ;
+           rdfs:label ?spindleLabel ;
+           ag:hasDiameterCharacteristic ?diameterChar .
+
+  ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ;
+                  rdfs:label ?caliperLabel ;
+                  cfm:hasProbabilisticValue ?rvCaliper ;
+                  om:hasValue ?caliperValue .
+  FILTER(CONTAINS(?caliperLabel, "Caliper"))
+  ?rvCaliper uq:hasDistribution ?caliperDist .
+
+  ?laserMeasure cfm:measuresCharacteristic ?diameterChar ;
+                rdfs:label ?laserLabel ;
+                cfm:hasProbabilisticValue ?rvLaser ;
+                om:hasValue ?laserValue .
+  FILTER(CONTAINS(?laserLabel, "Laser"))
+  ?rvLaser uq:hasDistribution ?laserDist .
+
+  BIND(prob:jsdivergence(?caliperDist, ?laserDist) AS ?jsDivergence)
+  FILTER(?jsDivergence <= 0.3)
+
+  BIND(prob:fuse(?caliperDist, ?laserDist) AS ?fusedDist)
+  BIND(prob:map(?fusedDist) AS ?mapDiameter)
+  BIND(prob:mean(?fusedDist) AS ?meanDiameter)
+  BIND(prob:std(?fusedDist) AS ?stdDev)
+}
+ORDER BY ?spindleLabel`
+      },
+      {
+        id: "u5",
+        label: "U5 Similarity Join",
+        source: "examples/queries/U5_similarityjoin_test.sparql",
+        query: `# U5: Probabilistic Similarity Search (New Relational SIMILARITYJOIN Syntax)
+# "For the current gear, retrieve all historical gears whose CT tooth-length distributions are similar."
+#
+# New Syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance) { rightPattern }
+# - Left table: Current gears with CT measurements
+# - Right table: Historical gears with CT measurements
+# - Join condition: JS(?currentDist, ?historicalDist) <= 0.3
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX ex: <http://example.org/data/>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?currentGear ?historicalGear ?currentDist ?historicalDist
+WHERE {
+  # Left table: Current gears with CT measurements
+  {
+    ?currentGear a ag:CrownGear ;
+                 cfm:hasCharacteristic ?currentChar .
+    ?currentMeasure cfm:hasInputVoxelGrid ?vg ;
+                    cfm:measuresCharacteristic ?currentChar ;
+                    cfm:hasProbabilisticValue ?rvCurrent .
+    ?rvCurrent uq:hasDistribution ?currentDist .
+  }
+  # SIMILARITYJOIN: Find similar historical cases (JS divergence <= 0.3)
+  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3)
+  {
+    # Right table: Historical gears with CT measurements
+    ?historicalGear a ag:HistoricalGear ;
+                    cfm:hasCharacteristic ?histChar .
+    ?histMeasure cfm:hasInputVoxelGrid ?hvg ;
+                 cfm:measuresCharacteristic ?histChar ;
+                 cfm:hasProbabilisticValue ?rvHist .
+    ?rvHist uq:hasDistribution ?historicalDist .
+  }
+}`
+      },
+      {
+        id: "u6",
+        label: "U6 Fuse Join Comparison",
+        source: "examples/queries/U6_fusejoin_comparison.sparql",
+        query: `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om: <http://example.org/ontology/om#>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex: <http://example.org/data/>
+
+# Comparison: FUSEJOIN vs SIMILARITYJOIN
+# FUSEJOIN creates a fused distribution when JS divergence <= tolerance
+# SIMILARITYJOIN keeps original distributions when JS divergence <= tolerance
+
+SELECT ?spindle ?caliperDist ?laserDist ?fusedDist
+WHERE {
+  ?spindle a ag:Spindle ; 
+           ag:hasDiameterCharacteristic ?diameterChar .
+  
+  ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ; 
+                  cfm:hasProbabilisticValue ?rvCaliper .
+  
+  ?rvCaliper uq:hasDistribution ?caliperDist .
+  
+  ?laserMeasure cfm:measuresCharacteristic ?diameterChar ; 
+                cfm:hasProbabilisticValue ?rvLaser .
+  
+  ?rvLaser uq:hasDistribution ?laserDist .
+  
+  # FUSEJOIN: Creates ?fusedDist from ?caliperDist and ?laserDist
+  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist) { }
+}`
+      }
+    ];
+
+    const datasetQueries = {
+      stats: `PREFIX uq: <http://example.org/ontology/uncertainty#>
+SELECT ?triples ?types ?predicates ?randomVariables
+WHERE {
+  { SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o } }
+  { SELECT (COUNT(DISTINCT ?type) AS ?types) WHERE { ?s a ?type } }
+  { SELECT (COUNT(DISTINCT ?p) AS ?predicates) WHERE { ?s ?p ?o } }
+  { SELECT (COUNT(?rv) AS ?randomVariables) WHERE { ?rv uq:hasDistribution ?dist } }
+}`,
+      types: `SELECT ?type (COUNT(?s) AS ?count)
+WHERE {
+  ?s a ?type .
+}
+GROUP BY ?type
+ORDER BY DESC(?count)
+LIMIT 20`,
+      triples: `SELECT ?s ?p ?o
+WHERE {
+  ?s ?p ?o .
+}
+LIMIT 60`
+    };
+
+    const runButton = document.getElementById("run");
+    const resetButton = document.getElementById("reset");
+    const refreshDatasetButton = document.getElementById("refreshDataset");
+    const uploadTtlButton = document.getElementById("uploadTtl");
+    const ttlFileInput = document.getElementById("ttlFile");
+    const querySelect = document.getElementById("querySelect");
+    const queryName = document.getElementById("queryName");
+    const queryInput = document.getElementById("query");
+    const statusNode = document.getElementById("status");
+    const resultNode = document.getElementById("result");
+    const typeStatusNode = document.getElementById("typeStatus");
+    const tripleStatusNode = document.getElementById("tripleStatus");
+    const typeResultNode = document.getElementById("typeResult");
+    const tripleResultNode = document.getElementById("tripleResult");
+    const tripleCountNode = document.getElementById("tripleCount");
+    const classCountNode = document.getElementById("classCount");
+    const predicateCountNode = document.getElementById("predicateCount");
+    const rvCountNode = document.getElementById("rvCount");
+
+    function selectedExample() {
+      return exampleQueries.find((entry) => entry.id === querySelect.value) || exampleQueries[0];
+    }
+
+    function setStatus(node, text, isError = false) {
+      node.textContent = text;
+      node.classList.toggle("error", isError);
+    }
+
+    function setQuery(entry) {
+      queryInput.value = entry.query;
+      queryName.textContent = entry.source;
+    }
+
+    function populateQuerySelect() {
+      exampleQueries.forEach((entry) => {
+        const option = document.createElement("option");
+        option.value = entry.id;
+        option.textContent = entry.label;
+        querySelect.appendChild(option);
+      });
+      setQuery(exampleQueries[0]);
+    }
+
+    async function sparql(query) {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/sparql-query",
+          "Accept": "application/sparql-results+json, application/json"
+        },
+        body: query
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `HTTP ${response.status}`);
+      }
+      return JSON.parse(text);
+    }
+
+    async function uploadTtl() {
+      const file = ttlFileInput.files && ttlFileInput.files[0];
+      if (!file) {
+        setStatus(tripleStatusNode, "Choose a TTL file first", true);
+        return;
+      }
+
+      uploadTtlButton.disabled = true;
+      setStatus(tripleStatusNode, `Uploading ${file.name}...`);
+
+      try {
+        const response = await fetch("/probsparql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/turtle",
+            "Accept": "application/json"
+          },
+          body: file
+        });
+        const text = await response.text();
+        if (!response.ok) {
+          throw new Error(text || `HTTP ${response.status}`);
+        }
+        setStatus(tripleStatusNode, `Uploaded ${file.name}`);
+        ttlFileInput.value = "";
+        await refreshDataset();
+      } catch (error) {
+        renderFallback(tripleResultNode, error.message);
+        setStatus(tripleStatusNode, "TTL upload failed", true);
+      } finally {
+        uploadTtlButton.disabled = false;
+      }
+    }
+
+    function renderFallback(target, value) {
+      target.innerHTML = "";
+      const pre = document.createElement("pre");
+      pre.textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+      target.appendChild(pre);
+    }
+
+    function renderTable(target, json) {
+      const bindings = json.results && Array.isArray(json.results.bindings)
+        ? json.results.bindings
+        : [];
+      const vars = json.head && Array.isArray(json.head.vars) ? json.head.vars : [];
+
+      if (!vars.length) {
+        renderFallback(target, json);
+        return bindings.length;
+      }
+
+      target.innerHTML = "";
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      vars.forEach((name) => {
+        const th = document.createElement("th");
+        th.textContent = name;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      bindings.forEach((row) => {
+        const tr = document.createElement("tr");
+        vars.forEach((name) => {
+          const td = document.createElement("td");
+          td.textContent = row[name] ? row[name].value : "";
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      target.appendChild(table);
+      return bindings.length;
+    }
+
+    function valueOf(binding, name) {
+      return binding && binding[name] ? binding[name].value : "-";
+    }
+
+    async function runQuery() {
+      runButton.disabled = true;
+      setStatus(statusNode, "Running...");
+
+      try {
+        const json = await sparql(queryInput.value);
+        const count = renderTable(resultNode, json);
+        setStatus(statusNode, `${count} result row${count === 1 ? "" : "s"}`);
+      } catch (error) {
+        renderFallback(resultNode, error.message);
+        setStatus(statusNode, "Query failed", true);
+      } finally {
+        runButton.disabled = false;
+      }
+    }
+
+    async function refreshDataset() {
+      refreshDatasetButton.disabled = true;
+      setStatus(typeStatusNode, "Loading...");
+      setStatus(tripleStatusNode, "Loading...");
+
+      try {
+        const statsJson = await sparql(datasetQueries.stats);
+        const stats = statsJson.results.bindings[0] || {};
+        tripleCountNode.textContent = valueOf(stats, "triples");
+        classCountNode.textContent = valueOf(stats, "types");
+        predicateCountNode.textContent = valueOf(stats, "predicates");
+        rvCountNode.textContent = valueOf(stats, "randomVariables");
+      } catch (error) {
+        tripleCountNode.textContent = "-";
+        classCountNode.textContent = "-";
+        predicateCountNode.textContent = "-";
+        rvCountNode.textContent = "-";
+        setStatus(typeStatusNode, "Stats failed", true);
+      }
+
+      try {
+        const typeJson = await sparql(datasetQueries.types);
+        const typeCount = renderTable(typeResultNode, typeJson);
+        setStatus(typeStatusNode, `${typeCount} type row${typeCount === 1 ? "" : "s"}`);
+      } catch (error) {
+        renderFallback(typeResultNode, error.message);
+        setStatus(typeStatusNode, "Type query failed", true);
+      }
+
+      try {
+        const tripleJson = await sparql(datasetQueries.triples);
+        const tripleCount = renderTable(tripleResultNode, tripleJson);
+        setStatus(tripleStatusNode, `${tripleCount} triple row${tripleCount === 1 ? "" : "s"}`);
+      } catch (error) {
+        renderFallback(tripleResultNode, error.message);
+        setStatus(tripleStatusNode, "Triple query failed", true);
+      } finally {
+        refreshDatasetButton.disabled = false;
+      }
+    }
+
+    querySelect.addEventListener("change", () => setQuery(selectedExample()));
+    resetButton.addEventListener("click", () => setQuery(selectedExample()));
+    runButton.addEventListener("click", runQuery);
+    uploadTtlButton.addEventListener("click", uploadTtl);
+    refreshDatasetButton.addEventListener("click", refreshDataset);
+
+    populateQuerySelect();
+    refreshDataset();
+  </script>
+</body>
+</html>

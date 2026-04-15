@@ -39,7 +39,7 @@ public class ModeCount extends FunctionBase1 {
     public NodeValue exec(NodeValue gmmNode) {
         GMMValue gmm = extractGMM(gmmNode);
         
-        int K = gmm.getK();
+        int K = gmm.getNComponents();
         
         return NodeValue.makeInteger(K);
     }

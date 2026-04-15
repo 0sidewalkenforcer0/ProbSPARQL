@@ -51,7 +51,7 @@ public class LogCDF extends FunctionBase2 {
         GMMValue gmm = extractGMM(gmmNode);
         
         // Extract evaluation point
-        double[] point = extractPoint(pointNode, gmm.getD());
+        double[] point = extractPoint(pointNode, gmm.getDimensions());
         
         // Compute Log-CDF
         double logCumulativeProbability = computeLogCDF(gmm, point);
@@ -141,8 +141,8 @@ public class LogCDF extends FunctionBase2 {
      * Uses log-sum-exp trick for numerical stability.
      */
     private double computeLogCDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

@@ -57,10 +57,10 @@ public class Fuse extends FunctionBase2 {
         GMMValue likelihood = extractGMM(likelihoodNode, "likelihood");
         
         // Validate compatibility
-        if (prior.getD() != likelihood.getD()) {
+        if (prior.getDimensions() != likelihood.getDimensions()) {
             throw new IllegalArgumentException(
                 "GMMs must have same dimensionality for fusion. Got d_prior=" + 
-                prior.getD() + ", d_likelihood=" + likelihood.getD());
+                prior.getDimensions() + ", d_likelihood=" + likelihood.getDimensions());
         }
         
         GMMValue posterior = computeFusion(prior, likelihood);
@@ -98,9 +98,9 @@ public class Fuse extends FunctionBase2 {
      * - w_ij = c_ij * w1_i * w2_j
      */
     private GMMValue computeFusion(GMMValue prior, GMMValue likelihood) {
-        int K1 = prior.getK();
-        int K2 = likelihood.getK();
-        int d = prior.getD();
+        int K1 = prior.getNComponents();
+        int K2 = likelihood.getNComponents();
+        int d = prior.getDimensions();
         
         int K = K1 * K2;
         
@@ -231,8 +231,8 @@ public class Fuse extends FunctionBase2 {
      * Convert GMM covariances to full matrices.
      */
     private double[][][] toFullCovariances(GMMValue gmm) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         String type = gmm.getCovarianceType();
         double[][][] covs = gmm.getCovariances();
         

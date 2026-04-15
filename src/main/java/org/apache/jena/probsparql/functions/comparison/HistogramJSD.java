@@ -17,8 +17,8 @@ import org.apache.jena.sparql.function.FunctionBase2;
  *
  * <p>Convention: 0 log(0/m) = 0 (no contribution from empty bins).</p>
  *
- * <p>Both histograms must have the same number of bins and the same [min, max]
- * range; an {@link IllegalArgumentException} is thrown otherwise.</p>
+ * <p>Both histograms must have the same bin boundaries; an
+ * {@link IllegalArgumentException} is thrown otherwise.</p>
  *
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -39,10 +39,9 @@ public class HistogramJSD extends FunctionBase2 {
 
         if (!h1.isCompatible(h2))
             throw new IllegalArgumentException(
-                    "Histograms must have the same B, min and max. "
-                    + "Got B1=" + h1.getB() + " B2=" + h2.getB()
-                    + " min1=" + h1.getMin() + " min2=" + h2.getMin()
-                    + " max1=" + h1.getMax() + " max2=" + h2.getMax());
+                    "Histograms must have the same bin boundaries. "
+                    + "Got bins1=" + java.util.Arrays.toString(h1.getBins())
+                    + " bins2=" + java.util.Arrays.toString(h2.getBins()));
 
         double jsd = computeJSD(h1.probabilities(), h2.probabilities());
         return NodeValue.makeDouble(jsd);

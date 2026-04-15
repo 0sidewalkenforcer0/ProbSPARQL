@@ -85,8 +85,8 @@ public class Scale extends FunctionBase2 {
      * Y = c * X => μ_Y = c * μ_X, Σ_Y = c² * Σ_X
      */
     private GMMValue scaleGMM(GMMValue gmm, double c) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         String covType = gmm.getCovarianceType();
         
         double[] weights = gmm.getWeights().clone();

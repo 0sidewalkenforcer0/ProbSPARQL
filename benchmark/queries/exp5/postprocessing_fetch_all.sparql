@@ -1,0 +1,17 @@
+# Exp5: Post-processing baseline with late filter
+# Goal:
+#   Fetch all candidate gears and optional right-hand data first.
+#   The cdf filter is intentionally not applied in SPARQL; it must be evaluated
+#   afterwards in external/manual post-processing.
+
+PREFIX : <http://example.org/exp5#>
+
+SELECT ?gear ?d ?ctDist ?lightDist
+WHERE {
+  ?gear :toothLength ?d .
+
+  OPTIONAL {
+    ?gear :ctMeasurement ?ctDist .
+    ?gear :lightMeasurement ?lightDist .
+  }
+}

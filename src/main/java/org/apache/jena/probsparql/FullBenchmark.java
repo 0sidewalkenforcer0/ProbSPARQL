@@ -453,10 +453,10 @@ public class FullBenchmark {
     }
     
     private static GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getK();
-        int kQ = q.getK();
+        int kP = p.getNComponents();
+        int kQ = q.getNComponents();
         int newK = kP + kQ;
-        int d = p.getD();
+        int d = p.getDimensions();
         
         double[] newWeights = new double[newK];
         double[][] newMeans = new double[newK][d];
@@ -502,7 +502,7 @@ public class FullBenchmark {
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
-        int d = gmm.getD();
+        int d = gmm.getDimensions();
         
         int component = sampleCategorical(weights);
         return sampleGaussian(means[component], covariances[component], d);
@@ -563,7 +563,7 @@ public class FullBenchmark {
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
-        int K = gmm.getK();
+        int K = gmm.getNComponents();
         
         double maxLogComp = Double.NEGATIVE_INFINITY;
         double[] logComps = new double[K];

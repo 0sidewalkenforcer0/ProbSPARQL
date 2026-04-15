@@ -9,15 +9,17 @@ Conversion:
   1. Parse the gmm literal JSON (K=3, d=1, diag covariance)
   2. Draw SAMPLES=10 000 Monte-Carlo samples from the 1-D mixture
   3. Clip to [mean − 4σ, mean + 4σ]
-  4. Build B equal-width bins → JSON: {"B":<b>,"min":<lo>,"max":<hi>,"counts":[...]}
-  5. Attach as uq:histLiteral; retype the RV as uq:HistogramVariable
+  4. Build B bins → JSON: {"bins":[...],"weights":[...]}
+  5. Replace the GMM lexical form with a histogram lexical form on the same
+     cfm:hasDistribution edge, preserving the surrounding Exp1 RDF structure
+     (measurement -> RV -> distribution).
 
 Output: benchmark/data/exp4/exp4_E{3,5,7}_hist_B{50,100}.ttl
 
 Usage:
     python generate_histogram_datasets.py
     python generate_histogram_datasets.py --scales E3 E5 --bins 50
-    python generate_histogram_datasets.py --input-dir benchmark/data/exp1
+    python generate_histogram_datasets.py --input-dir benchmark/data/exp1/main
 """
 import argparse
 import json
@@ -38,7 +40,7 @@ except ImportError:
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
-UQ           = Namespace("http://example.org/ontology/uncertainty#")
+CFM          = Namespace("http://example.org/ontology/cfm#")
 GMM_DTYPE    = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
 HIST_DTYPE   = URIRef("http://example.org/ontology/uncertainty#histLiteral")
 
@@ -66,7 +68,7 @@ def gmm_json_to_histogram(json_str: str, B: int, rng: np.random.Generator,
                            lo: float, hi: float) -> str:
     """Convert a 1-D K-component GMM JSON string to a histogram JSON string."""
     obj = json.loads(json_str)
-    k        = obj["K"]
+    k        = obj["n_components"]
     weights  = np.asarray(obj["weights"], dtype=float)
     weights /= weights.sum()
     means    = np.asarray([m[0] for m in obj["means"]], dtype=float)
@@ -81,20 +83,34 @@ def gmm_json_to_histogram(json_str: str, B: int, rng: np.random.Generator,
     comps   = rng.choice(k, size=SAMPLES, p=weights)
     samples = means[comps] + stds[comps] * rng.standard_normal(SAMPLES)
 
-    counts, _ = np.histogram(samples, bins=B, range=(lo, hi))
-    return json.dumps({"B": B, "min": round(lo, 6), "max": round(hi, 6),
-                       "counts": counts.tolist()})
+    counts, edges = np.histogram(samples, bins=B, range=(lo, hi))
+    total = counts.sum()
+    if total == 0:
+        weights_out = np.full(B, 1.0 / B)
+    else:
+        weights_out = counts / total
+    rounded_weights = rounded_probabilities(weights_out)
+    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+                       "weights": rounded_weights})
+
+
+def rounded_probabilities(weights, decimals: int = 6):
+    arr = np.asarray(weights, dtype=float)
+    if arr.size == 1:
+        return [1.0]
+    rounded = np.round(arr, decimals)
+    diff = round(1.0 - float(rounded.sum()), decimals)
+    rounded[-1] = round(float(rounded[-1] + diff), decimals)
+    return [float(x) for x in rounded.tolist()]
 
 
 def convert_graph(g: Graph, B: int, rng: np.random.Generator) -> Graph:
     out = Graph()
     for prefix, ns in g.namespaces():
         out.bind(prefix, ns)
-    out.bind("uq", UQ)
+    out.bind("cfm", CFM)
 
-    rv_type   = UQ.RandomVariable
-    hist_type = UQ.HistogramVariable
-    has_dist  = UQ.hasDistribution
+    has_dist = CFM.hasDistribution
 
     # ── Pass 1: compute global bin range across all GMM literals ─────────────
     global_lo, global_hi = float("inf"), float("-inf")
@@ -113,8 +129,6 @@ def convert_graph(g: Graph, B: int, rng: np.random.Generator) -> Graph:
         if p == has_dist and hasattr(o, "datatype") and o.datatype == GMM_DTYPE:
             hist_json = gmm_json_to_histogram(str(o), B, rng, global_lo, global_hi)
             out.add((s, has_dist, Literal(hist_json, datatype=HIST_DTYPE)))
-        elif p == RDF.type and o == rv_type:
-            out.add((s, RDF.type, hist_type))
         else:
             out.add((s, p, o))
     return out
@@ -152,7 +166,7 @@ def main():
     script_dir  = os.path.dirname(os.path.realpath(__file__))
     project_root = os.path.realpath(os.path.join(script_dir, "../../.."))
 
-    input_dir  = args.input_dir  or os.path.join(project_root, "benchmark/data/exp1")
+    input_dir  = args.input_dir  or os.path.join(project_root, "benchmark/data/exp1/main")
     output_dir = args.output_dir or os.path.join(project_root, "benchmark/data/exp4")
 
     SAMPLES = args.samples

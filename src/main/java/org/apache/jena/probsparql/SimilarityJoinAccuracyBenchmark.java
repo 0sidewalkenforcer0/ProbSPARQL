@@ -8,13 +8,10 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.engine.QueryEngineProbabilistic;
 import org.apache.jena.sparql.engine.QueryIterator;
-import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
-import org.apache.jena.probsparql.functions.comparison.JSDivergence;
 import org.apache.jena.probsparql.functions.comparison.JSDivergenceConfig;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.sparql.expr.NodeValue;
 
 import java.io.*;
 import java.util.*;
@@ -136,7 +133,7 @@ public class SimilarityJoinAccuracyBenchmark {
         
         for (GMMValue g1 : left) {
             for (GMMValue g2 : right) {
-                if (g1.getD() != g2.getD()) continue;
+                if (g1.getDimensions() != g2.getDimensions()) continue;
                 try {
                     double val = computeJSD(g1, g2, mode);
                     jsds.add(val);

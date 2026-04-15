@@ -12,7 +12,7 @@ PREFIX ag: <http://example.org/ontology/anglegrinder#>
 PREFIX cfm: <http://example.org/ontology/cfm#>
 PREFIX uq: <http://example.org/ontology/uncertainty#>
 PREFIX ex: <http://example.org/data/>
-PREFIX prob: <http://example.org/function/prob#>
+PREFIX prob: <http://probsparql.org/function#>
 
 SELECT ?currentGear ?historicalGear ?currentDist ?historicalDist
 WHERE {

@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Represents a Dirichlet distribution Dir(α₁, …, αₖ) over the (k-1)-simplex.
  *
- * <p>JSON literal format: {@code {"type":"dirichlet","k":4,"alpha":[2.5,1.0,3.0,0.5]}}</p>
+ * <p>JSON literal format: {@code {"alphas":[2.5,1.0,3.0,0.5]}}</p>
  *
  * <p>The Dirichlet distribution is parameterised by a concentration vector α ∈ ℝᵏ, αᵢ > 0.
  * Its density over the simplex Δₖ = {x : xᵢ ≥ 0, Σxᵢ = 1} is:
@@ -19,35 +19,26 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class DirichletValue implements Sampleable {
 
-    private final int      k;
-    private final double[] alpha;
-    /** α₀ = Σ αᵢ */
-    private final double   alpha0;
-    /** log B(α) = Σ log Γ(αᵢ) - log Γ(α₀), pre-computed for logPdf efficiency. */
-    private final double   logBeta;
+    private final double[] alphas;
 
-    public DirichletValue(int k, double[] alpha) {
-        if (k <= 0) throw new IllegalArgumentException("k must be positive");
-        if (alpha == null || alpha.length != k)
-            throw new IllegalArgumentException("alpha must have length k=" + k);
-        double sum = 0.0;
-        for (double a : alpha) {
+    public DirichletValue(double[] alphas) {
+        int dimensions = alphas == null ? 0 : alphas.length;
+        if (dimensions < 2) throw new IllegalArgumentException("Dirichlet dimension must be at least 2");
+        if (alphas == null || alphas.length != dimensions)
+            throw new IllegalArgumentException("alphas must have length dimensions=" + dimensions);
+        for (double a : alphas) {
             if (a <= 0.0) throw new IllegalArgumentException("All alpha values must be positive");
-            sum += a;
         }
-        this.k      = k;
-        this.alpha  = alpha.clone();
-        this.alpha0 = sum;
-        this.logBeta = logBetaFn(alpha, sum);
+        this.alphas = alphas.clone();
     }
 
     // -----------------------------------------------------------------------
     // Accessors
     // -----------------------------------------------------------------------
 
-    public int      getK()      { return k; }
-    public double[] getAlpha()  { return alpha.clone(); }
-    public double   getAlpha0() { return alpha0; }
+    public int      getDimensions() { return alphas.length; }
+    public double[] getAlphas()     { return alphas.clone(); }
+    public double   getAlphasSum()  { return sumAlphas(); }
 
     // -----------------------------------------------------------------------
     // Statistical summary
@@ -56,11 +47,13 @@ public class DirichletValue implements Sampleable {
     /**
      * Component-wise mean: E[Xᵢ] = αᵢ / α₀.
      *
-     * @return array of length k
+     * @return array of length dimensions
      */
     public double[] mean() {
-        double[] m = new double[k];
-        for (int i = 0; i < k; i++) m[i] = alpha[i] / alpha0;
+        int dimensions = getDimensions();
+        double alphasSum = sumAlphas();
+        double[] m = new double[dimensions];
+        for (int i = 0; i < dimensions; i++) m[i] = alphas[i] / alphasSum;
         return m;
     }
 
@@ -68,30 +61,40 @@ public class DirichletValue implements Sampleable {
      * Component-wise standard deviation: sqrt(Var[Xᵢ]).
      * Var[Xᵢ] = αᵢ (α₀ - αᵢ) / (α₀² (α₀ + 1))
      *
-     * @return array of length k
+     * @return array of length dimensions
      */
     public double[] std() {
-        double[] s = new double[k];
-        double denom = alpha0 * alpha0 * (alpha0 + 1.0);
-        for (int i = 0; i < k; i++) {
-            double var = alpha[i] * (alpha0 - alpha[i]) / denom;
+        int dimensions = getDimensions();
+        double alphasSum = sumAlphas();
+        double[] s = new double[dimensions];
+        double denom = alphasSum * alphasSum * (alphasSum + 1.0);
+        for (int i = 0; i < dimensions; i++) {
+            double var = alphas[i] * (alphasSum - alphas[i]) / denom;
             s[i] = Math.sqrt(Math.max(0.0, var));
         }
         return s;
     }
 
     /**
-     * MAP (mode) estimate: mode_i = (αᵢ - 1) / (α₀ - k).
-     * Only well-defined when all αᵢ > 1 (α₀ > k).
-     * If α₀ ≤ k, returns the mean as a fallback.
+     * MAP (mode) estimate: mode_i = (αᵢ - 1) / (α₀ - dimensions).
+     * Only well-defined when all αᵢ > 1 (α₀ > dimensions).
+     * If α₀ ≤ dimensions, returns the mean as a fallback.
      *
-     * @return array of length k, on the simplex
+     * @return array of length dimensions, on the simplex
      */
     public double[] map() {
-        if (alpha0 <= k) return mean();   // degenerate; use mean as fallback
-        double denom = alpha0 - k;
-        double[] m = new double[k];
-        for (int i = 0; i < k; i++) m[i] = Math.max(0.0, (alpha[i] - 1.0) / denom);
+        int dimensions = getDimensions();
+        double alphasSum = sumAlphas();
+        for (double alpha : alphas) {
+            if (alpha <= 1.0) {
+                return mean();
+            }
+        }
+        double denom = alphasSum - dimensions;
+        double[] m = new double[dimensions];
+        for (int i = 0; i < dimensions; i++) {
+            m[i] = (alphas[i] - 1.0) / denom;
+        }
         return m;
     }
 
@@ -103,16 +106,18 @@ public class DirichletValue implements Sampleable {
      * I_x(αᵢ, α₀ − αᵢ) using a continued-fraction approximation.</p>
      *
      * @param x   value in [0, 1]
-     * @param dim dimension index (0-based), must be in [0, k)
+     * @param dim dimension index (0-based), must be in [0, dimensions)
      * @return cumulative probability in [0, 1]
      */
     public double marginalCdf(double x, int dim) {
-        if (dim < 0 || dim >= k)
-            throw new IllegalArgumentException("dim must be in [0, k), got: " + dim);
+        int dimensions = getDimensions();
+        double alphasSum = sumAlphas();
+        if (dim < 0 || dim >= dimensions)
+            throw new IllegalArgumentException("dim must be in [0, dimensions), got: " + dim);
         if (x <= 0.0) return 0.0;
         if (x >= 1.0) return 1.0;
-        double a = alpha[dim];
-        double b = alpha0 - alpha[dim];
+        double a = alphas[dim];
+        double b = alphasSum - alphas[dim];
         return regularizedIncompleteBeta(x, a, b);
     }
 
@@ -124,34 +129,44 @@ public class DirichletValue implements Sampleable {
      * Draw n samples from Dir(α) using the Gamma-distribution method:
      * draw Gᵢ ~ Gamma(αᵢ, 1) independently, then normalise xᵢ = Gᵢ / ΣGⱼ.
      *
-     * @return double[n][k], each row on the simplex
+     * @return double[n][dimensions], each row on the simplex
      */
     @Override
     public double[][] sample(int n) {
+        int dimensions = getDimensions();
         ThreadLocalRandom rng = ThreadLocalRandom.current();
-        double[][] out = new double[n][k];
+        double[][] out = new double[n][dimensions];
         for (int s = 0; s < n; s++) {
             double sum = 0.0;
-            for (int i = 0; i < k; i++) {
-                out[s][i] = sampleGamma(rng, alpha[i]);
+            for (int i = 0; i < dimensions; i++) {
+                out[s][i] = sampleGamma(rng, alphas[i]);
                 sum += out[s][i];
             }
-            for (int i = 0; i < k; i++) out[s][i] /= sum;
+            for (int i = 0; i < dimensions; i++) out[s][i] /= sum;
         }
         return out;
     }
 
     /**
-     * Log-density at point x (length k, on the simplex).
+     * Log-density at point x (length dimensions, on the simplex).
      * log p(x|α) = -logB(α) + Σ (αᵢ-1) log xᵢ
      */
     @Override
     public double logPdf(double[] x) {
-        if (x.length != k) throw new IllegalArgumentException("x.length must equal k=" + k);
-        double logp = -logBeta;
-        for (int i = 0; i < k; i++) {
-            if (x[i] <= 0.0) return Double.NEGATIVE_INFINITY;
-            logp += (alpha[i] - 1.0) * Math.log(x[i]);
+        int dimensions = getDimensions();
+        double alphasSum = sumAlphas();
+        if (x.length != dimensions) {
+            throw new IllegalArgumentException("x.length must equal dimensions=" + dimensions);
+        }
+        double sum = 0.0;
+        double logp = -logBetaFn(alphas, alphasSum);
+        for (int i = 0; i < dimensions; i++) {
+            if (x[i] <= 0.0 || x[i] > 1.0) return Double.NEGATIVE_INFINITY;
+            sum += x[i];
+            logp += (alphas[i] - 1.0) * Math.log(x[i]);
+        }
+        if (Math.abs(sum - 1.0) > 1e-9) {
+            return Double.NEGATIVE_INFINITY;
         }
         return logp;
     }
@@ -161,11 +176,12 @@ public class DirichletValue implements Sampleable {
     // -----------------------------------------------------------------------
 
     public String toJSON() {
+        int dimensions = getDimensions();
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"type\":\"dirichlet\",\"k\":").append(k).append(",\"alpha\":[");
-        for (int i = 0; i < k; i++) {
+        sb.append("{\"alphas\":[");
+        for (int i = 0; i < dimensions; i++) {
             if (i > 0) sb.append(',');
-            sb.append(alpha[i]);
+            sb.append(alphas[i]);
         }
         sb.append("]}");
         return sb.toString();
@@ -173,7 +189,7 @@ public class DirichletValue implements Sampleable {
 
     @Override
     public String toString() {
-        return "DirichletValue{k=" + k + ", alpha=" + Arrays.toString(alpha) + "}";
+        return "DirichletValue{dimensions=" + getDimensions() + ", alphas=" + Arrays.toString(alphas) + "}";
     }
 
     // -----------------------------------------------------------------------
@@ -183,10 +199,16 @@ public class DirichletValue implements Sampleable {
     /**
      * log B(α) = Σ log Γ(αᵢ) − log Γ(α₀)
      */
-    private static double logBetaFn(double[] alpha, double alpha0) {
+    private static double logBetaFn(double[] alphas, double alphasSum) {
         double s = 0.0;
-        for (double a : alpha) s += logGamma(a);
-        return s - logGamma(alpha0);
+        for (double a : alphas) s += logGamma(a);
+        return s - logGamma(alphasSum);
+    }
+
+    private double sumAlphas() {
+        double sum = 0.0;
+        for (double a : alphas) sum += a;
+        return sum;
     }
 
     /**

@@ -9,7 +9,6 @@ import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -183,7 +182,7 @@ public class ProbabilisticJoinTest {
             GMMValue fusedGMM = (GMMValue) fusedNode.getLiteralValue();
             
             // Fused GMM should have K=1 (product of two single Gaussians)
-            assertEquals(1, fusedGMM.getK());
+            assertEquals(1, fusedGMM.getNComponents());
         }
     }
     
@@ -357,7 +356,7 @@ public class ProbabilisticJoinTest {
             GMMValue fusedGMM = (GMMValue) fusedNode.getLiteralValue();
             
             // Fusion of two bimodal GMMs: K = 2 * 2 = 4
-            assertEquals(4, fusedGMM.getK());
+            assertEquals(4, fusedGMM.getNComponents());
         }
     }
     

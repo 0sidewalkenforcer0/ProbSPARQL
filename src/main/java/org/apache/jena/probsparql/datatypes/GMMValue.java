@@ -2,13 +2,14 @@ package org.apache.jena.probsparql.datatypes;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Represents a Gaussian Mixture Model (GMM) value.
  * 
  * A well-formed GMM literal must contain exactly six top-level fields in this order:
- * "K", "d", "covariance_type", "weights", "means", and "covariances".
+ * "n_components", "dimensions", "covariance_type", "weights", "means", and "covariances".
  * 
  * @author ProbSPARQL Team
  * @version 1.0.0
@@ -16,10 +17,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GMMValue implements Sampleable {
     
     /** Number of mixture components */
-    private final int K;
+    private final int nComponents;
     
     /** Dimensionality of the GMM */
-    private final int d;
+    private final int dimensions;
     
     /** Type of covariance matrix (e.g., "full", "diagonal", "spherical") */
     private final String covarianceType;
@@ -36,33 +37,33 @@ public class GMMValue implements Sampleable {
     /**
      * Construct a GMM value.
      * 
-     * @param K number of mixture components
-     * @param d dimensionality
+     * @param nComponents number of mixture components
+     * @param dimensions dimensionality
      * @param covarianceType covariance matrix type
      * @param weights component weights
      * @param means component means
      * @param covariances component covariances
      * @throws IllegalArgumentException if validation fails
      */
-    public GMMValue(int K, int d, String covarianceType, 
+    public GMMValue(int nComponents, int dimensions, String covarianceType,
                     double[] weights, double[][] means, double[][][] covariances) {
-        if (K <= 0) {
-            throw new IllegalArgumentException("K must be positive, got: " + K);
+        if (nComponents <= 0) {
+            throw new IllegalArgumentException("K must be positive, got: " + nComponents);
         }
-        if (d <= 0) {
-            throw new IllegalArgumentException("d must be positive, got: " + d);
+        if (dimensions <= 0) {
+            throw new IllegalArgumentException("dimensions must be positive, got: " + dimensions);
         }
         if (covarianceType == null || covarianceType.trim().isEmpty()) {
             throw new IllegalArgumentException("covariance_type cannot be null or empty");
         }
-        if (weights == null || weights.length != K) {
-            throw new IllegalArgumentException("weights array must have length K=" + K);
+        if (weights == null || weights.length != nComponents) {
+            throw new IllegalArgumentException("weights array must have length nComponents=" + nComponents);
         }
-        if (means == null || means.length != K) {
-            throw new IllegalArgumentException("means array must have length K=" + K);
+        if (means == null || means.length != nComponents) {
+            throw new IllegalArgumentException("means array must have length nComponents=" + nComponents);
         }
-        if (covariances == null || covariances.length != K) {
-            throw new IllegalArgumentException("covariances array must have length K=" + K);
+        if (covariances == null || covariances.length != nComponents) {
+            throw new IllegalArgumentException("covariances array must have length nComponents=" + nComponents);
         }
         
         // Validate weights sum to 1.0 (with tolerance for floating point errors)
@@ -78,18 +79,18 @@ public class GMMValue implements Sampleable {
         }
         
         // Validate means dimensions
-        for (int i = 0; i < K; i++) {
-            if (means[i] == null || means[i].length != d) {
+        for (int i = 0; i < nComponents; i++) {
+            if (means[i] == null || means[i].length != dimensions) {
                 throw new IllegalArgumentException(
-                    "means[" + i + "] must have length d=" + d);
+                    "means[" + i + "] must have length dimensions=" + dimensions);
             }
         }
         
         // Validate covariances based on covariance_type
-        validateCovariances(K, d, covarianceType, covariances);
+        validateCovariances(nComponents, dimensions, covarianceType, covariances);
         
-        this.K = K;
-        this.d = d;
+        this.nComponents = nComponents;
+        this.dimensions = dimensions;
         this.covarianceType = covarianceType;
         this.weights = Arrays.copyOf(weights, weights.length);
         this.means = deepCopy2D(means);
@@ -98,12 +99,12 @@ public class GMMValue implements Sampleable {
     
     // Getters
     
-    public int getK() {
-        return K;
+    public int getNComponents() {
+        return nComponents;
     }
     
-    public int getD() {
-        return d;
+    public int getDimensions() {
+        return dimensions;
     }
     
     public String getCovarianceType() {
@@ -124,19 +125,19 @@ public class GMMValue implements Sampleable {
     
     /**
      * Convert to JSON string representation.
-     * Fields are ordered: K, d, covariance_type, weights, means, covariances
+     * Fields are ordered: n_components, dimensions, covariance_type, weights, means, covariances
      * 
      * @return JSON string
      */
     public String toJSON() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("\"K\":").append(K).append(",");
-        sb.append("\"d\":").append(d).append(",");
+        sb.append("\"n_components\":").append(nComponents).append(",");
+        sb.append("\"dimensions\":").append(dimensions).append(",");
         sb.append("\"covariance_type\":\"").append(covarianceType).append("\",");
         sb.append("\"weights\":").append(arrayToJSON(weights)).append(",");
         sb.append("\"means\":").append(array2DToJSON(means)).append(",");
-        sb.append("\"covariances\":").append(array3DToJSON(covariances));
+        sb.append("\"covariances\":").append(covariancesToJSON());
         sb.append("}");
         return sb.toString();
     }
@@ -169,6 +170,27 @@ public class GMMValue implements Sampleable {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    private String covariancesToJSON() {
+        return switch (covarianceType) {
+            case "full" -> array3DToJSON(covariances);
+            case "diag" -> {
+                double[][] diag = new double[nComponents][];
+                for (int i = 0; i < nComponents; i++) {
+                    diag[i] = Arrays.copyOf(covariances[i][0], covariances[i][0].length);
+                }
+                yield array2DToJSON(diag);
+            }
+            case "spherical" -> {
+                double[] spherical = new double[nComponents];
+                for (int i = 0; i < nComponents; i++) {
+                    spherical[i] = covariances[i][0][0];
+                }
+                yield arrayToJSON(spherical);
+            }
+            default -> throw new IllegalStateException("Unknown covariance type: " + covarianceType);
+        };
     }
     
     private static double[][] deepCopy2D(double[][] original) {
@@ -220,7 +242,7 @@ public class GMMValue implements Sampleable {
             for (int j = 0; j < d; j++) {
                 if (covariances[i][j] == null || covariances[i][j].length != d) {
                     throw new IllegalArgumentException(
-                        "For 'full' covariance: covariances[" + i + "][" + j + "] must have length d=" + d);
+                        "For 'full' covariance: covariances[" + i + "][" + j + "] must have length dimensions=" + d);
                 }
             }
             
@@ -248,7 +270,7 @@ public class GMMValue implements Sampleable {
             }
             if (covariances[i][0] == null || covariances[i][0].length != d) {
                 throw new IllegalArgumentException(
-                    "For 'diag' covariance: covariances[" + i + "][0] must have length d=" + d + ", got: " +
+                    "For 'diag' covariance: covariances[" + i + "][0] must have length dimensions=" + d + ", got: " +
                     (covariances[i][0] == null ? "null" : covariances[i][0].length));
             }
             
@@ -343,8 +365,8 @@ public class GMMValue implements Sampleable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GMMValue gmmValue = (GMMValue) o;
-        return K == gmmValue.K &&
-               d == gmmValue.d &&
+        return nComponents == gmmValue.nComponents &&
+               dimensions == gmmValue.dimensions &&
                covarianceType.equals(gmmValue.covarianceType) &&
                Arrays.equals(weights, gmmValue.weights) &&
                Arrays.deepEquals(means, gmmValue.means) &&
@@ -353,7 +375,7 @@ public class GMMValue implements Sampleable {
     
     @Override
     public int hashCode() {
-        int result = Objects.hash(K, d, covarianceType);
+        int result = Objects.hash(nComponents, dimensions, covarianceType);
         result = 31 * result + Arrays.hashCode(weights);
         result = 31 * result + Arrays.deepHashCode(means);
         result = 31 * result + Arrays.deepHashCode(covariances);
@@ -362,7 +384,7 @@ public class GMMValue implements Sampleable {
     
     @Override
     public String toString() {
-        return "GMMValue{K=" + K + ", d=" + d + ", covariance_type='" + covarianceType + "'}";
+        return "GMMValue{n_components=" + nComponents + ", dimensions=" + dimensions + ", covariance_type='" + covarianceType + "'}";
     }
 
     // -----------------------------------------------------------------------
@@ -376,14 +398,33 @@ public class GMMValue implements Sampleable {
     @Override
     public double[][] sample(int n) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
-        double[][] samples = new double[n][d];
+        double[][] samples = new double[n][dimensions];
         for (int s = 0; s < n; s++) {
             // Select component
             int k = selectComponent(rng);
             // Sample from Gaussian component k
-            samples[s] = sampleGaussian(rng, means[k], covariances[k], covarianceType, d);
+            samples[s] = sampleGaussian(rng, means[k], covariances[k], covarianceType, dimensions);
         }
         return samples;
+    }
+
+    /**
+     * Draw a single sample using a caller-provided RNG. This keeps higher-level
+     * sampling methods reproducible without duplicating GMM sampling logic.
+     */
+    public double[] sampleOne(Random rng) {
+        int k = selectComponent(rng);
+        return sampleGaussian(rng, means[k], covariances[k], covarianceType, dimensions);
+    }
+
+    /**
+     * Draw a single sample from a specific mixture component using a caller-provided RNG.
+     */
+    public double[] sampleComponent(int component, Random rng) {
+        if (component < 0 || component >= nComponents) {
+            throw new IllegalArgumentException("component index out of range: " + component);
+        }
+        return sampleGaussian(rng, means[component], covariances[component], covarianceType, dimensions);
     }
 
     /**
@@ -392,9 +433,9 @@ public class GMMValue implements Sampleable {
      */
     @Override
     public double logPdf(double[] x) {
-        double[] logTerms = new double[K];
-        for (int k = 0; k < K; k++) {
-            logTerms[k] = Math.log(weights[k]) + logGaussianDensity(x, means[k], covariances[k], covarianceType, d);
+        double[] logTerms = new double[nComponents];
+        for (int k = 0; k < nComponents; k++) {
+            logTerms[k] = Math.log(weights[k]) + logGaussianDensity(x, means[k], covariances[k], covarianceType, dimensions);
         }
         return logSumExp(logTerms);
     }
@@ -402,11 +443,21 @@ public class GMMValue implements Sampleable {
     private int selectComponent(ThreadLocalRandom rng) {
         double u = rng.nextDouble();
         double cumulative = 0.0;
-        for (int k = 0; k < K - 1; k++) {
+        for (int k = 0; k < nComponents - 1; k++) {
             cumulative += weights[k];
             if (u < cumulative) return k;
         }
-        return K - 1;
+        return nComponents - 1;
+    }
+
+    private int selectComponent(Random rng) {
+        double u = rng.nextDouble();
+        double cumulative = 0.0;
+        for (int k = 0; k < nComponents - 1; k++) {
+            cumulative += weights[k];
+            if (u < cumulative) return k;
+        }
+        return nComponents - 1;
     }
 
     private static double[] sampleGaussian(ThreadLocalRandom rng, double[] mu,
@@ -424,6 +475,31 @@ public class GMMValue implements Sampleable {
             }
             default -> {
                 // full: Cholesky decomposition L such that L*L' = cov
+                double[][] L = cholesky(cov, d);
+                double[] x = new double[d];
+                for (int i = 0; i < d; i++) {
+                    x[i] = mu[i];
+                    for (int j = 0; j <= i; j++) x[i] += L[i][j] * z[j];
+                }
+                return x;
+            }
+        }
+        return z;
+    }
+
+    private static double[] sampleGaussian(Random rng, double[] mu,
+                                           double[][] cov, String covType, int d) {
+        double[] z = new double[d];
+        for (int j = 0; j < d; j++) z[j] = rng.nextGaussian();
+        switch (covType.toLowerCase()) {
+            case "spherical" -> {
+                double std = Math.sqrt(cov[0][0]);
+                for (int j = 0; j < d; j++) z[j] = mu[j] + std * z[j];
+            }
+            case "diag" -> {
+                for (int j = 0; j < d; j++) z[j] = mu[j] + Math.sqrt(cov[0][j]) * z[j];
+            }
+            default -> {
                 double[][] L = cholesky(cov, d);
                 double[] x = new double[d];
                 for (int i = 0; i < d; i++) {

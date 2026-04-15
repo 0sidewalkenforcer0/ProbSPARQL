@@ -5,7 +5,7 @@ package org.apache.jena.probsparql.exp2;
  *
  * {@link org.apache.jena.sparql.engine.iterator.QueryIterPrunedSimilarityJoin}
  * writes its final stats here when close() is called, so that
- * {@code Exp2Benchmark.collectPruningStats()} can retrieve them.
+ * the active Exp2 benchmark harness can retrieve them.
  */
 public final class Exp2PruningHolder {
 

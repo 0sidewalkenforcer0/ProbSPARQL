@@ -81,6 +81,8 @@ public class SelectivityBenchmark {
         System.out.println("Thresholds : " + Arrays.toString(THRESHOLDS));
         System.out.println("Methods    : " + Arrays.toString(MODES));
         System.out.println("Datasets   : " + Arrays.toString(DATASETS));
+        System.out.println("Warmup runs: " + warmup);
+        System.out.println("Limit graphs: " + limitGraphs);
         System.out.println("Iterations : " + iterations);
         System.out.println();
 

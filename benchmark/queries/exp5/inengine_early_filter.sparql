@@ -1,0 +1,18 @@
+# Exp5: In-engine early filter before OPTIONAL expansion
+# Goal:
+#   Use probabilistic filtering on the left side to shrink the candidate gear set
+#   before evaluating the optional right-hand patterns.
+
+PREFIX :     <http://example.org/exp5#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?ctDist ?lightDist
+WHERE {
+  ?gear :toothLength ?d .
+  FILTER(prob:cdf(?d, 9.8) >= 0.9)
+
+  OPTIONAL {
+    ?gear :ctMeasurement ?ctDist .
+    ?gear :lightMeasurement ?lightDist .
+  }
+}

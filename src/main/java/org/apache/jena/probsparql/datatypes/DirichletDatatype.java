@@ -9,12 +9,10 @@ import org.apache.jena.datatypes.DatatypeFormatException;
  * Custom RDF datatype for Dirichlet distribution literals.
  *
  * <p>Lexical form is a JSON object:</p>
- * <pre>{"type":"dirichlet","k":4,"alpha":[2.5,1.0,3.0,0.5]}</pre>
+ * <pre>{"alphas":[2.5,1.0,3.0,0.5]}</pre>
  *
  * <ul>
- *   <li>type  – must be the string {@code "dirichlet"}</li>
- *   <li>k     – positive integer, the dimension of the simplex</li>
- *   <li>alpha – array of k positive concentration parameters</li>
+ *   <li>alphas – array of strictly positive concentration parameters</li>
  * </ul>
  *
  * <p>URI: {@code http://example.org/ontology/uncertainty#dirichletLiteral}</p>
@@ -40,35 +38,33 @@ public class DirichletDatatype extends BaseDatatype {
         try {
             JsonNode root = MAPPER.readTree(lexicalForm);
 
-            // Validate required fields
-            if (!root.has("type") || !root.has("k") || !root.has("alpha"))
+            if (!root.isObject())
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Dirichlet literal must contain fields: type, k, alpha");
+                        "Dirichlet literal must be a JSON object");
 
-            String type = root.get("type").asText();
-            if (!"dirichlet".equals(type))
+            if (root.size() != 1 || !root.has("alphas"))
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'type' must be 'dirichlet', got: " + type);
+                        "Dirichlet literal must contain exactly one top-level field: alphas");
 
-            int k = root.get("k").asInt();
-            if (k <= 0)
+            JsonNode alphaNode = root.get("alphas");
+            if (!alphaNode.isArray())
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'k' must be a positive integer, got: " + k);
+                        "Field 'alphas' must be an array");
 
-            JsonNode alphaNode = root.get("alpha");
-            if (!alphaNode.isArray() || alphaNode.size() != k)
+            int k = alphaNode.size();
+            if (k < 2)
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'alpha' must be an array of length k=" + k);
+                        "Field 'alphas' must contain at least 2 values, got: " + k);
 
             double[] alpha = new double[k];
             for (int i = 0; i < k; i++) {
                 alpha[i] = alphaNode.get(i).asDouble();
                 if (alpha[i] <= 0.0)
                     throw new DatatypeFormatException(lexicalForm, this,
-                            "All alpha values must be positive, got alpha[" + i + "]=" + alpha[i]);
+                            "All alpha values must be positive, got alphas[" + i + "]=" + alpha[i]);
             }
 
-            return new DirichletValue(k, alpha);
+            return new DirichletValue(alpha);
         } catch (DatatypeFormatException e) {
             throw e;
         } catch (Exception e) {

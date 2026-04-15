@@ -253,7 +253,7 @@ class TransformationFunctionsTest {
             GMMValue sum = (GMMValue) sumLiteral.getValue();
             
             // Should have K1 * K2 = 2 * 2 = 4 components
-            assertEquals(4, sum.getK());
+            assertEquals(4, sum.getNComponents());
             
             // Verify weights sum to 1
             double weightSum = 0.0;
@@ -350,7 +350,7 @@ class TransformationFunctionsTest {
             GMMValue joint = (GMMValue) jointLiteral.getValue();
             
             // Should be 2-dimensional
-            assertEquals(2, joint.getD());
+            assertEquals(2, joint.getDimensions());
             
             // Mean should be [3, 5]
             assertEquals(3.0, joint.getMeans()[0][0], 1e-6);

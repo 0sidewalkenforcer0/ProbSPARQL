@@ -26,7 +26,7 @@ echo ""
 # ------------------------------------------------------------------
 echo "[Step 1/4] Generating benchmark datasets..."
 cd "$PROJECT_DIR"
-python3 benchmark/scripts/generate_sim_join_data.py --n 100 --seed 42
+python3 benchmark/scripts/Experiments3/generate_sim_join_data.py --n 100 --seed 42
 echo ""
 
 # ------------------------------------------------------------------

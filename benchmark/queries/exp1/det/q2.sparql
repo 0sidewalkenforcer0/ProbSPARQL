@@ -1,0 +1,16 @@
+# Exp1 Q2 DET: Probabilistic Filtering baseline
+# Selects CT tooth measurements whose point-estimate length is below 9.8 mm.
+# Purpose: deterministic counterpart of the probabilistic filtering query.
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?gear ?value WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               om:hasValue ?value .
+  FILTER(?value < 9.8)
+}

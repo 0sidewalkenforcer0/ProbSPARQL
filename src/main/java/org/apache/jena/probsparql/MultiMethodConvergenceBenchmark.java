@@ -93,7 +93,7 @@ public class MultiMethodConvergenceBenchmark {
         for (int i = 0; i < nAligned; i++) {
             GMMValue g1 = leftGMMs.get(i);
             GMMValue g2 = rightGMMs.get(i);
-            if (g1.getD() != g2.getD()) continue;
+            if (g1.getDimensions() != g2.getDimensions()) continue;
             double jsd = referenceSampler.computeJSD(g1, g2, QUICK_SAMPLES);
             double dist = Math.abs(jsd - 0.3);
             if (dist < closestDist) {
@@ -192,7 +192,7 @@ public class MultiMethodConvergenceBenchmark {
 
     /** Plain Monte Carlo JSD (V1_MC). */
     private static double computeMC(GMMValue p, GMMValue q, int n, Random rng) {
-        int kP = p.getK(), kQ = q.getK(), kM = kP + kQ, d = p.getD();
+        int kP = p.getNComponents(), kQ = q.getNComponents(), kM = kP + kQ, d = p.getDimensions();
         double[] wM = new double[kM];
         double[][] meansM = new double[kM][];
         double[][][] covsM = new double[kM][][];
@@ -214,40 +214,12 @@ public class MultiMethodConvergenceBenchmark {
     private static double klMC(GMMValue p, GMMValue q, int n, Random rng) {
         double sum = 0;
         for (int i = 0; i < n; i++) {
-            double[] x   = sampleGMM(p, rng);
-            double   lp  = logPDF(p, x);
-            double   lq  = logPDF(q, x);
+            double[] x   = p.sampleOne(rng);
+            double   lp  = p.logPdf(x);
+            double   lq  = q.logPdf(x);
             sum += lp - lq;
         }
         return sum / n;
-    }
-
-    private static double[] sampleGMM(GMMValue g, Random rng) {
-        double[] w = g.getWeights();
-        double r = rng.nextDouble(), cum = 0;
-        int k = 0;
-        for (; k < w.length - 1; k++) { cum += w[k]; if (r < cum) break; }
-        double[] mean = g.getMeans()[k];
-        double var    = g.getCovariances()[k][0][0];
-        double[] x    = new double[g.getD()];
-        for (int j = 0; j < g.getD(); j++) x[j] = mean[j] + Math.sqrt(var) * rng.nextGaussian();
-        return x;
-    }
-
-    private static double logPDF(GMMValue g, double[] x) {
-        double[] w = g.getWeights();
-        double maxL = Double.NEGATIVE_INFINITY;
-        double[] ls = new double[w.length];
-        for (int k = 0; k < w.length; k++) {
-            double[] mean = g.getMeans()[k];
-            double var    = g.getCovariances()[k][0][0];
-            double diff   = x[0] - mean[0];
-            ls[k] = Math.log(w[k]) - 0.5 * Math.log(2 * Math.PI * var) - 0.5 * diff * diff / var;
-            if (ls[k] > maxL) maxL = ls[k];
-        }
-        double s = 0;
-        for (double l : ls) s += Math.exp(l - maxL);
-        return maxL + Math.log(s);
     }
 
     // -----------------------------------------------------------------------

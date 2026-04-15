@@ -90,8 +90,8 @@ public class LinearTransform extends FunctionBase3 {
      * Σ_Y = a² * Σ_X
      */
     private GMMValue linearTransform(GMMValue gmm, double a, double b) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         String covType = gmm.getCovarianceType();
         
         double[] weights = gmm.getWeights().clone();

@@ -76,10 +76,10 @@ public class Joint extends FunctionBase2 {
      * Compute joint distribution of independent GMMs.
      */
     private GMMValue computeJoint(GMMValue gmm1, GMMValue gmm2) {
-        int K1 = gmm1.getK();
-        int K2 = gmm2.getK();
-        int d1 = gmm1.getD();
-        int d2 = gmm2.getD();
+        int K1 = gmm1.getNComponents();
+        int K2 = gmm2.getNComponents();
+        int d1 = gmm1.getDimensions();
+        int d2 = gmm2.getDimensions();
         
         int K = K1 * K2;
         int d = d1 + d2;

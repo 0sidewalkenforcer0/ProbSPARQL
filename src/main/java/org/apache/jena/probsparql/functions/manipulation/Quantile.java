@@ -50,9 +50,9 @@ public class Quantile extends FunctionBase2 {
         double q = extractDouble(qNode, "quantile probability");
         
         // Validate 1D
-        if (gmm.getD() != 1) {
+        if (gmm.getDimensions() != 1) {
             throw new IllegalArgumentException(
-                "Quantile function only supports 1D GMMs. Got d=" + gmm.getD());
+                "Quantile function only supports 1D GMMs. Got d=" + gmm.getDimensions());
         }
         
         // Validate probability range
@@ -156,7 +156,7 @@ public class Quantile extends FunctionBase2 {
      * Get reasonable search bounds as [mean - 6*std, mean + 6*std].
      */
     private double[] getSearchBounds(GMMValue gmm) {
-        int K = gmm.getK();
+        int K = gmm.getNComponents();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
@@ -205,7 +205,7 @@ public class Quantile extends FunctionBase2 {
      * CDF(x) = Σ w_i * Φ((x - μ_i) / σ_i)
      */
     private double cdf(GMMValue gmm, double x) {
-        int K = gmm.getK();
+        int K = gmm.getNComponents();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

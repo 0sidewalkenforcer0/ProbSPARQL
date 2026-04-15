@@ -181,12 +181,12 @@ public class ProbabilisticJoins {
                 }
                 
                 // Type-aware validation: all GMMs must have same dimensionality
-                int d = gmms.get(0).getD();
+                int d = gmms.get(0).getDimensions();
                 for (int i = 1; i < gmms.size(); i++) {
-                    if (gmms.get(i).getD() != d) {
+                    if (gmms.get(i).getDimensions() != d) {
                         throw new IllegalArgumentException(
                             "All distributions must have same dimensionality for fusion. " +
-                            "Expected d=" + d + ", got d=" + gmms.get(i).getD() + 
+                            "Expected d=" + d + ", got d=" + gmms.get(i).getDimensions() +
                             " at position " + i);
                     }
                 }

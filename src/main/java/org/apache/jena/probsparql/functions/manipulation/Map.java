@@ -16,7 +16,7 @@ import org.apache.jena.sparql.function.FunctionBase1;
  * <p>Dispatches by RDF datatype:</p>
  * <ul>
  *   <li>{@code uq:gmmLiteral}       → mean of component with maximum weight</li>
- *   <li>{@code uq:histLiteral}      → centre of the bin with the most counts</li>
+ *   <li>{@code uq:histLiteral}      → centre of the bin with the highest probability mass</li>
  *   <li>{@code uq:dirichletLiteral} → (αᵢ − 1) / (α₀ − k) if all αᵢ > 1</li>
  * </ul>
  */
@@ -38,11 +38,11 @@ public class Map extends FunctionBase1 {
 
         if (HistogramDatatype.URI.equals(dtype)) {
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
-            int[] counts  = hist.getCounts();
+            double[] probs = hist.probabilities();
             double[] centers = hist.binCenters();
             int maxBin = 0;
-            for (int i = 1; i < hist.getB(); i++)
-                if (counts[i] > counts[maxBin]) maxBin = i;
+            for (int i = 1; i < hist.getBinCount(); i++)
+                if (probs[i] > probs[maxBin]) maxBin = i;
             return NodeValue.makeString(String.format("[%.6f]", centers[maxBin]));
         }
 
@@ -72,7 +72,7 @@ public class Map extends FunctionBase1 {
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         int maxIdx = 0;
-        for (int i = 1; i < gmm.getK(); i++)
+        for (int i = 1; i < gmm.getNComponents(); i++)
             if (weights[i] > weights[maxIdx]) maxIdx = i;
         return means[maxIdx];
     }

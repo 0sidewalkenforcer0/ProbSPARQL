@@ -40,30 +40,29 @@ public class StratifiedSampler {
      * Samples are drawn proportionally from each component.
      */
     private double computeKLStratified(GMMValue p, GMMValue q, int numSamples) {
-        double sum = 0.0;
-        int K = p.getK();
+        int K = p.getNComponents();
+        double[] weights = p.getWeights();
         
         // Allocate samples to each component based on weight
-        int[] samplesPerComponent = allocateSamples(p.getWeights(), numSamples);
+        int[] samplesPerComponent = allocateSamples(weights, numSamples);
+        double estimate = 0.0;
         
         for (int k = 0; k < K; k++) {
             int compSamples = samplesPerComponent[k];
             if (compSamples == 0) continue;
-            
-            double[] mean = p.getMeans()[k];
-            double[][] cov = p.getCovariances()[k];
-            String covType = p.getCovarianceType();
-            int d = p.getD();
-            
+
+            double compSum = 0.0;
             for (int i = 0; i < compSamples; i++) {
-                double[] sample = sampleGaussian(mean, cov, covType, d);
-                double logP = computeLogPDF(p, sample);
-                double logQ = computeLogPDF(q, sample);
-                sum += (logP - logQ);
+                double[] sample = p.sampleComponent(k, random);
+                double logP = p.logPdf(sample);
+                double logQ = q.logPdf(sample);
+                compSum += (logP - logQ);
             }
+
+            estimate += weights[k] * (compSum / compSamples);
         }
         
-        return sum / numSamples;
+        return estimate;
     }
     
     /**
@@ -72,21 +71,27 @@ public class StratifiedSampler {
     private int[] allocateSamples(double[] weights, int totalSamples) {
         int K = weights.length;
         int[] samples = new int[K];
-        
-        // First pass: allocate proportionally
-        for (int k = 0; k < K; k++) {
-            samples[k] = (int) Math.round(weights[k] * totalSamples);
-        }
-        
-        // Adjust to ensure total equals totalSamples
+        double[] remainders = new double[K];
         int allocated = 0;
-        for (int s : samples) allocated += s;
-        int diff = totalSamples - allocated;
         
-        // Distribute remaining samples randomly
-        if (diff != 0) {
-            int idx = random.nextInt(K);
-            samples[idx] += diff;
+        // First pass: floor the exact allocation.
+        for (int k = 0; k < K; k++) {
+            double exact = weights[k] * totalSamples;
+            samples[k] = (int) Math.floor(exact);
+            remainders[k] = exact - samples[k];
+            allocated += samples[k];
+        }
+
+        // Distribute remaining samples to the largest fractional remainders.
+        int remaining = totalSamples - allocated;
+        while (remaining > 0) {
+            int best = 0;
+            for (int k = 1; k < K; k++) {
+                if (remainders[k] > remainders[best]) best = k;
+            }
+            samples[best]++;
+            remainders[best] = -1.0;
+            remaining--;
         }
         
         return samples;
@@ -96,10 +101,10 @@ public class StratifiedSampler {
      * Create mixture distribution M = 0.5*P + 0.5*Q.
      */
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getK();
-        int kQ = q.getK();
+        int kP = p.getNComponents();
+        int kQ = q.getNComponents();
         int kM = kP + kQ;
-        int d = p.getD();
+        int d = p.getDimensions();
         String covType = p.getCovarianceType();
         
         double[] weightsM = new double[kM];
@@ -130,123 +135,12 @@ public class StratifiedSampler {
             }
             return copy;
         } else if ("diag".equals(covType)) {
-            double[][] copy = new double[cov.length][1];
-            for (int i = 0; i < cov.length; i++) {
-                copy[i][0] = cov[i][0];
-            }
+            double[][] copy = new double[1][cov[0].length];
+            System.arraycopy(cov[0], 0, copy[0], 0, cov[0].length);
             return copy;
         } else {
             return new double[][] {{cov[0][0]}};
         }
     }
     
-    private double[] sampleGaussian(double[] mean, double[][] covariance, 
-                                   String covType, int d) {
-        double[] sample = new double[d];
-        
-        if (d == 1) {
-            double stddev = Math.sqrt(covariance[0][0]);
-            sample[0] = mean[0] + stddev * random.nextGaussian();
-        } else {
-            double[][] fullCov = toFullCovariance(covariance, covType, d);
-            double[][] L = MatrixUtils.choleskyDecomposition(fullCov, d);
-            
-            double[] z = new double[d];
-            for (int i = 0; i < d; i++) {
-                z[i] = random.nextGaussian();
-            }
-            
-            double[] Lz = MatrixUtils.matrixVectorMultiply(L, z, d);
-            for (int i = 0; i < d; i++) {
-                sample[i] = mean[i] + Lz[i];
-            }
-        }
-        
-        return sample;
-    }
-    
-    private double computeLogPDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
-        double[] weights = gmm.getWeights();
-        double[][] means = gmm.getMeans();
-        double[][][] covariances = gmm.getCovariances();
-        String covType = gmm.getCovarianceType();
-        
-        double[] logComponents = new double[K];
-        
-        for (int k = 0; k < K; k++) {
-            double logWeight = Math.log(weights[k]);
-            double logGaussian = evaluateLogGaussian(point, means[k], covariances[k], covType, d);
-            logComponents[k] = logWeight + logGaussian;
-        }
-        
-        return logSumExp(logComponents);
-    }
-    
-    private double evaluateLogGaussian(double[] x, double[] mean, 
-                                       double[][] covariance, String covType, int d) {
-        double[] diff = MatrixUtils.subtract(x, mean, d);
-        
-        double logDet;
-        double mahalanobis;
-        
-        if (d == 1) {
-            double variance = covariance[0][0];
-            logDet = Math.log(variance);
-            mahalanobis = (diff[0] * diff[0]) / variance;
-        } else {
-            double[][] fullCov = toFullCovariance(covariance, covType, d);
-            double det = MatrixUtils.determinant(fullCov, d);
-            logDet = Math.log(det);
-            double[][] covInv = MatrixUtils.invertMatrix(fullCov, d);
-            mahalanobis = MatrixUtils.quadraticForm(diff, covInv, d);
-        }
-        
-        double logNormalization = -0.5 * d * Math.log(2 * Math.PI) - 0.5 * logDet;
-        double logExponent = -0.5 * mahalanobis;
-        
-        return logNormalization + logExponent;
-    }
-    
-    private double[][] toFullCovariance(double[][] cov, String type, int d) {
-        double[][] full = new double[d][d];
-        
-        if ("full".equals(type)) {
-            return cov;
-        } else if ("diag".equals(type)) {
-            for (int i = 0; i < d; i++) {
-                for (int j = 0; j < d; j++) {
-                    full[i][j] = (i == j) ? cov[i][0] : 0.0;
-                }
-            }
-            return full;
-        } else {
-            double variance = cov[0][0];
-            for (int i = 0; i < d; i++) {
-                for (int j = 0; j < d; j++) {
-                    full[i][j] = (i == j) ? variance : 0.0;
-                }
-            }
-            return full;
-        }
-    }
-    
-    private double logSumExp(double[] logValues) {
-        double maxLog = logValues[0];
-        for (int i = 1; i < logValues.length; i++) {
-            if (logValues[i] > maxLog) maxLog = logValues[i];
-        }
-        
-        if (Double.isInfinite(maxLog) && maxLog < 0) {
-            return Double.NEGATIVE_INFINITY;
-        }
-        
-        double sum = 0.0;
-        for (double logValue : logValues) {
-            sum += Math.exp(logValue - maxLog);
-        }
-        
-        return maxLog + Math.log(sum);
-    }
 }

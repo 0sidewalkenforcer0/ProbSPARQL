@@ -19,7 +19,7 @@
 #   bash benchmark/scripts/Experiments4/run_exp4_demo.sh
 #
 # Optional env overrides:
-#   OUTPUT_DIR   SKIP_BUILD   JAVA_HOME
+#   OUTPUT_DIR   SKIP_BUILD   JAVA_HOME   FORCE_DATA
 # =============================================================================
 set -euo pipefail
 
@@ -29,6 +29,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4_demo}"
 DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
+FORCE_DATA="${FORCE_DATA:-0}"
 
 # ── Java 21 ─────────────────────────────────────────────────────────────────
 if [[ -z "${JAVA_HOME:-}" ]]; then
@@ -86,10 +87,12 @@ fi
 echo
 echo ">>> Phase 1: Checking / generating datasets..."
 t0=$SECONDS
-SAMPLE_HIST="${DATA_DIR}/exp4/exp4_E3_hist_B50.ttl"
-SAMPLE_DIR="${DATA_DIR}/exp4/exp4_dirichlet.ttl"
+EXP4_DATA_DIR="${DATA_DIR}/exp4"
+SAMPLE_HIST="${EXP4_DATA_DIR}/exp4_E3_hist_B50.ttl"
+SAMPLE_DIR="${EXP4_DATA_DIR}/exp4_dirichlet.ttl"
+SAMPLE_CROSS="${EXP4_DATA_DIR}/exp4_crosstype_gmm_hist.ttl"
 
-if [[ -s "$SAMPLE_HIST" && -s "$SAMPLE_DIR" ]]; then
+if [[ "${FORCE_DATA}" != "1" && -s "$SAMPLE_HIST" && -s "$SAMPLE_DIR" && -s "$SAMPLE_CROSS" ]]; then
     echo "    Exp4 datasets already present — SKIP_DATA."
     T_DATA=0
 elif [[ -z "$PYTHON_BIN" ]]; then
@@ -99,11 +102,11 @@ else
     echo "    Generating exp4 datasets (first-time setup)..."
     "$PYTHON_BIN" "${SCRIPT_DIR}/generate_histogram_datasets.py" \
         --input-dir  "${DATA_DIR}/exp1" \
-        --output-dir "${DATA_DIR}/exp4"
+        --output-dir "${EXP4_DATA_DIR}"
     "$PYTHON_BIN" "${SCRIPT_DIR}/generate_dirichlet_dataset.py" \
-        --output-dir "${DATA_DIR}/exp4"
+        --output-dir "${EXP4_DATA_DIR}"
     "$PYTHON_BIN" "${SCRIPT_DIR}/generate_crosstype_pairs.py" \
-        --output-dir "${DATA_DIR}/exp4"
+        --output-dir "${EXP4_DATA_DIR}"
     T_DATA=$(( SECONDS - t0 ))
     echo "    Dataset generation: ${T_DATA}s"
 fi
@@ -169,7 +172,7 @@ echo "    Done in ${T_DIRICHLET}s."
 echo
 echo ">>> Phase 7: Analysis..."
 if [[ -n "$PYTHON_BIN" ]]; then
-    "$PYTHON_BIN" "${PROJECT_ROOT}/benchmark/scripts/analyze_exp4.py" \
+    "$PYTHON_BIN" "${PROJECT_ROOT}/benchmark/scripts/Experiments4/analyze_exp4.py" \
         --input  "$OUTPUT_DIR" \
         --output "$OUTPUT_DIR" \
         || echo "    WARNING: Analysis returned non-zero exit."

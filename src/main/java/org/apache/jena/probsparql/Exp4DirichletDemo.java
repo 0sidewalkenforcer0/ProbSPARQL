@@ -173,7 +173,7 @@ public class Exp4DirichletDemo {
     }
 
     private static String makeDirJson(int k, java.util.concurrent.ThreadLocalRandom rng) {
-        StringBuilder sb = new StringBuilder("{\"type\":\"dirichlet\",\"k\":" + k + ",\"alpha\":[");
+        StringBuilder sb = new StringBuilder("{\"alphas\":[");
         for (int i = 0; i < k; i++) {
             if (i > 0) sb.append(",");
             sb.append(String.format("%.4f", rng.nextDouble(0.5, 5.0)));
@@ -188,12 +188,12 @@ public class Exp4DirichletDemo {
         try {
             com.fasterxml.jackson.databind.ObjectMapper om = new com.fasterxml.jackson.databind.ObjectMapper();
             com.fasterxml.jackson.databind.JsonNode node = om.readTree(measuredJson);
-            com.fasterxml.jackson.databind.JsonNode alphaNode = node.get("alpha");
+            com.fasterxml.jackson.databind.JsonNode alphaNode = node.get("alphas");
             double[] alpha = new double[k];
             double sum = 0;
             for (int i = 0; i < k; i++) { alpha[i] = alphaNode.get(i).asDouble(); sum += alpha[i]; }
             double uniVal = sum / k;
-            StringBuilder sb = new StringBuilder("{\"type\":\"dirichlet\",\"k\":" + k + ",\"alpha\":[");
+            StringBuilder sb = new StringBuilder("{\"alphas\":[");
             for (int i = 0; i < k; i++) {
                 if (i > 0) sb.append(",");
                 double smoothed = 0.6 * alpha[i] + 0.4 * uniVal;

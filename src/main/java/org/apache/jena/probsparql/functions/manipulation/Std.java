@@ -43,11 +43,16 @@ public class Std extends FunctionBase1 {
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
             double mu  = hist.mean();
             double[] probs   = hist.probabilities();
-            double[] centers = hist.binCenters();
+            double[] bins = hist.getBins();
             double var = 0.0;
-            for (int i = 0; i < hist.getB(); i++) {
-                double d = centers[i] - mu;
-                var += probs[i] * d * d;
+            for (int i = 0; i < hist.getBinCount(); i++) {
+                double lo = bins[i];
+                double hi = bins[i + 1];
+                double width = hi - lo;
+                double center = 0.5 * (lo + hi);
+                double d = center - mu;
+                double withinBinVar = (width * width) / 12.0;
+                var += probs[i] * (d * d + withinBinVar);
             }
             return NodeValue.makeString(String.format("[%.6f]", Math.sqrt(var)));
         }
@@ -75,7 +80,7 @@ public class Std extends FunctionBase1 {
     }
 
     private double[] computeGMMVariance(GMMValue gmm) {
-        int K = gmm.getK(), d = gmm.getD();
+        int K = gmm.getNComponents(), d = gmm.getDimensions();
         double[] weights      = gmm.getWeights();
         double[][] means      = gmm.getMeans();
         double[][][] covs     = gmm.getCovariances();

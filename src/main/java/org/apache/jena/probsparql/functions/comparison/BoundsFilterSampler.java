@@ -15,6 +15,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
  * @author ProbSPARQL Team
  */
 public class BoundsFilterSampler {
+    private static final int DEFAULT_BOUND_BINS = 32;
     
     // Filter configuration
     private final double boundsThreshold;  // If JSD > this, reject immediately
@@ -37,13 +38,12 @@ public class BoundsFilterSampler {
      */
     public double[] checkBounds(GMMValue p, GMMValue q) {
         totalPairs++;
-        
-        // Compute multiple bounds
-        double meanDistBound = computeMeanDistanceBound(p, q);
-        double varianceBound = computeVarianceBound(p, q);
-        
-        // Use the tighter (larger) lower bound
-        double lowerBound = Math.max(meanDistBound, varianceBound);
+
+        // Use a conservative lower bound derived from discretization (DPI).
+        // The heuristic moment-based scores below are still available as helpers,
+        // but they are not used for definitive filtering because they are not
+        // guaranteed lower bounds.
+        double lowerBound = computeDiscretizedJSD(p, q, DEFAULT_BOUND_BINS);
         
         if (lowerBound > boundsThreshold) {
             // Guaranteed to exceed threshold - filter out
@@ -63,13 +63,13 @@ public class BoundsFilterSampler {
      * JSD >= 0.5 * ||mean1 - mean2||^2 / (var1 + var2)
      */
     public double computeMeanDistanceBound(GMMValue p, GMMValue q) {
-        if (p.getD() != 1) {
+        if (p.getDimensions() != 1) {
             // Only optimize for 1D case
             return 0.0;
         }
         
-        double[] meansP = p.getMeans()[0];
-        double[] meansQ = q.getMeans()[0];
+        double[] meansP = componentMeans1D(p);
+        double[] meansQ = componentMeans1D(q);
         
         // Use weighted mean of each GMM
         double meanP = weightedMean(meansP, p.getWeights());
@@ -98,15 +98,18 @@ public class BoundsFilterSampler {
      * Compute lower bound based on variance difference.
      */
     public double computeVarianceBound(GMMValue p, GMMValue q) {
-        if (p.getD() != 1) {
+        if (p.getDimensions() != 1) {
             return 0.0;
         }
         
-        double[] meansP = p.getMeans()[0];
-        double[] meansQ = q.getMeans()[0];
+        double[] meansP = componentMeans1D(p);
+        double[] meansQ = componentMeans1D(q);
         
         double varP = weightedVariance(meansP, p.getWeights(), p.getCovariances());
         double varQ = weightedVariance(meansQ, q.getWeights(), q.getCovariances());
+        if (varP < 1e-12 || varQ < 1e-12) {
+            return Math.abs(varP - varQ) > 1e-12 ? Math.log(2.0) : 0.0;
+        }
         
         // If variances are very different, JSD is large
         double varRatio = Math.max(varP / varQ, varQ / varP);
@@ -140,6 +143,16 @@ public class BoundsFilterSampler {
         }
         return sum;
     }
+
+    private double[] componentMeans1D(GMMValue gmm) {
+        double[][] allMeans = gmm.getMeans();
+        int k = gmm.getNComponents();
+        double[] means = new double[k];
+        for (int i = 0; i < k; i++) {
+            means[i] = allMeans[i][0];
+        }
+        return means;
+    }
     
     /**
      * Compute a valid lower bound on JSD(g1, g2) using discretized histogram binning.
@@ -163,7 +176,7 @@ public class BoundsFilterSampler {
      * @return valid lower bound in [0, log(2)]
      */
     public double computeDiscretizedJSD(GMMValue g1, GMMValue g2, int numBins) {
-        if (g1.getD() != 1) return 0.0;
+        if (g1.getDimensions() != 1) return 0.0;
 
         // --- Compute support range covering both GMMs ---
         double lo = Double.MAX_VALUE;
@@ -171,7 +184,7 @@ public class BoundsFilterSampler {
 
         double[][] means1 = g1.getMeans();
         double[][][] covs1 = g1.getCovariances();
-        for (int i = 0; i < g1.getK(); i++) {
+        for (int i = 0; i < g1.getNComponents(); i++) {
             double mu  = means1[i][0];
             double sig = Math.sqrt(covs1[i][0][0]);
             lo = Math.min(lo, mu - 4.0 * sig);
@@ -180,7 +193,7 @@ public class BoundsFilterSampler {
 
         double[][] means2 = g2.getMeans();
         double[][][] covs2 = g2.getCovariances();
-        for (int i = 0; i < g2.getK(); i++) {
+        for (int i = 0; i < g2.getNComponents(); i++) {
             double mu  = means2[i][0];
             double sig = Math.sqrt(covs2[i][0][0]);
             lo = Math.min(lo, mu - 4.0 * sig);
@@ -224,7 +237,7 @@ public class BoundsFilterSampler {
         double[][] means = gmm.getMeans();
         double[][][] covs = gmm.getCovariances();
 
-        for (int k = 0; k < gmm.getK(); k++) {
+        for (int k = 0; k < gmm.getNComponents(); k++) {
             double mu  = means[k][0];
             double sig = Math.sqrt(covs[k][0][0]);
             double w   = weights[k];
@@ -269,22 +282,16 @@ public class BoundsFilterSampler {
     }
 
     /**
-     * Compute JSD with bounds filter.
-     * Returns: {jsd, samplesUsed}
+     * Compute JSD using only the conservative lower-bound strategy.
+     * Returns: {lowerBound, samplesUsed}
+     *
+     * This method intentionally does not fall back to sampling. It exists as a
+     * pure bound-based baseline so that V4 can be evaluated independently from
+     * the full adaptive pipeline used in V5.
      */
     public double[] computeJSDWithFilter(GMMValue p, GMMValue q, int defaultSamples) {
         double[] boundsResult = checkBounds(p, q);
-        
-        if (boundsResult[0] > 0.5) {
-            // Filtered by bounds
-            return new double[] {boundsResult[1], 0};
-        }
-        
-        // Need actual computation - use stratified sampling
-        StratifiedSampler sampler = new StratifiedSampler(42);
-        double jsd = sampler.computeJSD(p, q, defaultSamples);
-        
-        return new double[] {jsd, defaultSamples};
+        return new double[] {boundsResult[1], 0};
     }
     
     /**

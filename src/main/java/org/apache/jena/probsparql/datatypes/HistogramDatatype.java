@@ -12,14 +12,12 @@ import java.util.List;
 /**
  * Custom RDF datatype for 1-D histogram literals.
  *
- * <p>Lexical form is a JSON object with exactly four fields in this order:</p>
- * <pre>{"B":50,"min":8.0,"max":12.0,"counts":[3,5,8,...]}</pre>
+ * <p>Lexical form is a JSON object with exactly two fields in this order:</p>
+ * <pre>{"bins":[0.0,10.0,20.0,30.0],"weights":[0.2,0.5,0.3]}</pre>
  *
  * <ul>
- *   <li>B      – integer, number of bins (&gt; 0)</li>
- *   <li>min    – number, left edge of the histogram</li>
- *   <li>max    – number, right edge of the histogram (must be > min)</li>
- *   <li>counts – integer array of length B with non-negative values</li>
+ *   <li>bins    – numeric array of length N+1 with strictly increasing boundaries</li>
+ *   <li>weights – numeric array of length N with non-negative values summing to 1</li>
  * </ul>
  *
  * <p>Singleton access via {@link #INSTANCE}.</p>
@@ -31,7 +29,7 @@ public class HistogramDatatype extends BaseDatatype {
 
     public static final HistogramDatatype INSTANCE = new HistogramDatatype();
 
-    private static final String[] REQUIRED_FIELDS = {"B", "min", "max", "counts"};
+    private static final String[] REQUIRED_FIELDS = {"bins", "weights"};
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -57,46 +55,60 @@ public class HistogramDatatype extends BaseDatatype {
 
             validateFieldOrder(root, lexicalForm);
 
-            // B
-            JsonNode bNode = root.get("B");
-            if (bNode == null || !bNode.isInt())
+            JsonNode binsNode = root.get("bins");
+            if (binsNode == null || !binsNode.isArray())
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'B' must be an integer");
-            int B = bNode.asInt();
+                        "Field 'bins' must be an array");
 
-            // min
-            JsonNode minNode = root.get("min");
-            if (minNode == null || !minNode.isNumber())
+            JsonNode weightsNode = root.get("weights");
+            if (weightsNode == null || !weightsNode.isArray())
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'min' must be a number");
-            double min = minNode.asDouble();
+                        "Field 'weights' must be an array");
 
-            // max
-            JsonNode maxNode = root.get("max");
-            if (maxNode == null || !maxNode.isNumber())
+            if (binsNode.size() < 2)
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'max' must be a number");
-            double max = maxNode.asDouble();
+                        "Field 'bins' must have length at least 2");
 
-            // counts
-            JsonNode countsNode = root.get("counts");
-            if (countsNode == null || !countsNode.isArray())
+            int n = binsNode.size() - 1;
+            if (weightsNode.size() != n)
                 throw new DatatypeFormatException(lexicalForm, this,
-                        "Field 'counts' must be an array");
-            if (countsNode.size() != B)
-                throw new DatatypeFormatException(lexicalForm, this,
-                        "counts length (" + countsNode.size() + ") must equal B (" + B + ")");
+                        "weights length (" + weightsNode.size() + ") must equal bins.length - 1 (" + n + ")");
 
-            int[] counts = new int[B];
-            for (int i = 0; i < B; i++) {
-                JsonNode elem = countsNode.get(i);
-                if (!elem.isInt() && !elem.isLong())
+            double[] bins = new double[n + 1];
+            for (int i = 0; i < bins.length; i++) {
+                JsonNode elem = binsNode.get(i);
+                if (!elem.isNumber())
                     throw new DatatypeFormatException(lexicalForm, this,
-                            "counts[" + i + "] must be an integer");
-                counts[i] = elem.asInt();
+                            "bins[" + i + "] must be numeric");
+                bins[i] = elem.asDouble();
+                if (i > 0 && !(bins[i] > bins[i - 1])) {
+                    throw new DatatypeFormatException(lexicalForm, this,
+                            "bins must be strictly increasing; bins[" + (i - 1) + "]="
+                                    + bins[i - 1] + ", bins[" + i + "]=" + bins[i]);
+                }
             }
 
-            return new HistogramValue(B, min, max, counts);
+            double[] weights = new double[n];
+            double sum = 0.0;
+            for (int i = 0; i < n; i++) {
+                JsonNode elem = weightsNode.get(i);
+                if (!elem.isNumber())
+                    throw new DatatypeFormatException(lexicalForm, this,
+                            "weights[" + i + "] must be numeric");
+                weights[i] = elem.asDouble();
+                if (weights[i] < 0.0) {
+                    throw new DatatypeFormatException(lexicalForm, this,
+                            "weights[" + i + "] must be non-negative");
+                }
+                sum += weights[i];
+            }
+
+            if (Math.abs(sum - 1.0) > 1e-6) {
+                throw new DatatypeFormatException(lexicalForm, this,
+                        "weights must sum to 1.0 within tolerance; got: " + sum);
+            }
+
+            return new HistogramValue(bins, weights);
 
         } catch (DatatypeFormatException e) {
             throw e;

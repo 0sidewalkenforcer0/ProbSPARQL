@@ -100,13 +100,16 @@ public class AdaptiveSampler {
             return new double[] {sprtResult[0], sprtResult[1], 1};  // method 1 = SPRT
         }
         
-        // Step 3: Full stratified sampling
+        // Step 3: Remaining-budget stratified refinement
         startTime = System.nanoTime();
-        double jsd = stratifiedSampler.computeJSD(p, q, maxSamples);
+        int remainingBudget = Math.max(1, maxSamples - (int) sprtResult[1]);
+        double stratifiedJsd = stratifiedSampler.computeJSD(p, q, remainingBudget);
+        double jsd = ((sprtResult[0] * sprtResult[1]) + (stratifiedJsd * remainingBudget))
+                / (sprtResult[1] + remainingBudget);
         stratifiedTimeNanos += System.nanoTime() - startTime;
         
         fullStratified++;
-        return new double[] {jsd, maxSamples, 2};  // method 2 = stratified
+        return new double[] {jsd, sprtResult[1] + remainingBudget, 2};  // method 2 = stratified
     }
     
     /**

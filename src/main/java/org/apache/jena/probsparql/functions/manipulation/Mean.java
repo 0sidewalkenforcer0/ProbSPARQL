@@ -68,7 +68,7 @@ public class Mean extends FunctionBase1 {
     }
 
     private double[] computeGMMMean(GMMValue gmm) {
-        int K = gmm.getK(), d = gmm.getD();
+        int K = gmm.getNComponents(), d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means  = gmm.getMeans();
         double[] mean = new double[d];

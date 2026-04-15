@@ -390,42 +390,42 @@ ex:measurement_sl_008 a om:Measure ;
 
 ex:rv_ct_001 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #001)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.15],[9.05]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.15],[9.05]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT bimodal: 75% gear body N(9.15,σ=0.2) + 25% edge artifact N(9.05,σ=0.3)"@en .
 
 ex:rv_ct_002 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #002)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.8],[9.75],[9.9]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.8],[9.75],[9.9]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT trimodal: material density variation across tooth (60% mid + 30% base + 10% tip)"@en .
 
 ex:rv_ct_003 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #003)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.2],[10.1]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.2],[10.1]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT bimodal: 70% primary measurement + 30% partial volume effect"@en .
 
 ex:rv_ct_004 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #004)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.05],[8.95]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.05],[8.95]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT bimodal: 65% main + 35% wear-induced scatter (worn gear)"@en .
 
 ex:rv_ct_005 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #005)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[9.25],[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[9.25],[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT trimodal: severe wear creates heterogeneous density (50% + 30% + 20%)"@en .
 
 ex:rv_ct_006 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #006)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.45],[9.35]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.45],[9.35]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT bimodal: 80% primary + 20% beam hardening artifact"@en .
 
 ex:rv_ct_007 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #007)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.0],[9.85]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.0],[9.85]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT bimodal with systematic bias: 70% N(10.0) + 30% N(9.85) ⚠️ ABNORMAL divergence from SL"@en .
 
 ex:rv_ct_008 a uq:RandomVariable ;
     rdfs:label "CT Tooth Length Uncertainty (Gear #008)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[10.2],[10.1],[10.35]],\"covariances\":[[[0.06]],[[0.09]],[[0.12]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[10.2],[10.1],[10.35]],\"covariances\":[[[0.06]],[[0.09]],[[0.12]]]}"^^uq:gmmLiteral ;
     rdfs:comment "CT trimodal calibration drift: 50% + 30% + 20% ⚠️ ABNORMAL divergence from SL"@en .
 
 # ============================================
@@ -434,42 +434,42 @@ ex:rv_ct_008 a uq:RandomVariable ;
 
 ex:rv_sl_001 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #001)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.2],[9.35]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 80% clear scan N(9.2) + 20% reflection noise N(9.35) → U1: WORN"@en .
 
 ex:rv_sl_002 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #002)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.6],[9.75]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.6],[9.75]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 75% primary + 25% partial occlusion → U1: MODERATE wear"@en .
 
 ex:rv_sl_003 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #003)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.5],[10.3]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.5],[10.3]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 70% good scan + 30% shadow artifact → U1: NORMAL"@en .
 
 ex:rv_sl_004 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #004)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.85,0.15],\"means\":[[9.1],[9.25]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.85,0.15],\"means\":[[9.1],[9.25]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 85% primary + 15% surface roughness → U1: CRITICAL WEAR"@en .
 
 ex:rv_sl_005 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #005)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.9,0.1],\"means\":[[9.3],[9.45]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.9,0.1],\"means\":[[9.3],[9.45]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 90% clear + 10% glare artifact → U1: SEVERE WEAR"@en .
 
 ex:rv_sl_006 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #006)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.5],[9.65]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[9.5],[9.65]],\"covariances\":[[[0.12]],[[0.20]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 75% main + 25% environmental noise → U1: BORDERLINE"@en .
 
 ex:rv_sl_007 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #007)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.16]],[[0.30]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.16]],[[0.30]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 65% + 35% high variance → U1: NORMAL, U2: ⚠️ ABNORMAL vs CT"@en .
 
 ex:rv_sl_008 a uq:RandomVariable ;
     rdfs:label "Structured-Light Tooth Length Uncertainty (Gear #008)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.20]],[[0.30]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[10.8],[10.6]],\"covariances\":[[[0.20]],[[0.30]]]}"^^uq:gmmLiteral ;
     rdfs:comment "SL bimodal: 60% + 40% mixed modes → U1: NORMAL, U2: ⚠️ ABNORMAL vs CT"@en .
 
 # ============================================
@@ -488,6 +488,10 @@ ex:rv_sl_008 a uq:RandomVariable ;
 om:revolutionsPerMinute a om:AngularVelocityUnit ;
     rdfs:label "revolutions per minute"@en ;
     rdfs:comment "RPM: rotational speed unit (1 RPM = 2π/60 rad/s)"@en .
+
+om:radianPerSecond a om:AngularVelocityUnit ;
+    rdfs:label "radian per second"@en ;
+    rdfs:comment "SI angular velocity unit used for motor power calculation"@en .
 
 om:newtonMetre a om:TorqueUnit ;
     rdfs:label "newton metre"@en ;
@@ -562,7 +566,7 @@ ex:measurement_speed_001 a om:Measure ;
     cfm:measuresCharacteristic ex:speed_char_001 ;
     cfm:hasProbabilisticValue ex:rv_speed_001 ;
     om:hasValue "1151.9"^^xsd:double ;
-    om:hasUnit om:revolutionsPerMinute ;
+    om:hasUnit om:radianPerSecond ;
     rdfs:comment "Optical encoder: 11000 RPM → 1151.9 rad/s, ±5.24 rad/s noise"@en .
 
 ex:measurement_speed_002 a om:Measure ;
@@ -570,7 +574,7 @@ ex:measurement_speed_002 a om:Measure ;
     cfm:measuresCharacteristic ex:speed_char_002 ;
     cfm:hasProbabilisticValue ex:rv_speed_002 ;
     om:hasValue "1047.2"^^xsd:double ;
-    om:hasUnit om:revolutionsPerMinute ;
+    om:hasUnit om:radianPerSecond ;
     rdfs:comment "Standard encoder: 10000 RPM → 1047.2 rad/s, ±6.28 rad/s noise"@en .
 
 ex:measurement_speed_003 a om:Measure ;
@@ -578,7 +582,7 @@ ex:measurement_speed_003 a om:Measure ;
     cfm:measuresCharacteristic ex:speed_char_003 ;
     cfm:hasProbabilisticValue ex:rv_speed_003 ;
     om:hasValue "995.0"^^xsd:double ;
-    om:hasUnit om:revolutionsPerMinute ;
+    om:hasUnit om:radianPerSecond ;
     rdfs:comment "Bearing wear: 9500 RPM → 995.0 rad/s, ±8.38 rad/s uncertainty"@en .
 
 # ============================================
@@ -618,35 +622,35 @@ ex:measurement_torque_003 a om:Measure ;
 # Motor 001: 11000 RPM → 1151.9 rad/s, σ = 50 RPM → 5.24 rad/s
 ex:rv_speed_001 a uq:RandomVariable ;
     rdfs:label "Speed Distribution (Motor #001)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[1151.9],[1145.0]],\"covariances\":[[[27.5]],[[50.0]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[1151.9],[1145.0]],\"covariances\":[[[27.5]],[[50.0]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Speed bimodal: 80% steady N(1151.9,σ=5.24) + 20% vibration mode N(1145.0,σ=7.07)"@en .
 
 # Motor 002: 10000 RPM → 1047.2 rad/s, σ = 60 RPM → 6.28 rad/s
 ex:rv_speed_002 a uq:RandomVariable ;
     rdfs:label "Speed Distribution (Motor #002)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1047.2],[1040.0]],\"covariances\":[[[39.5]],[[60.0]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1047.2],[1040.0]],\"covariances\":[[[39.5]],[[60.0]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Speed bimodal: 75% normal N(1047.2,σ=6.28) + 25% load fluctuation N(1040.0,σ=7.75)"@en .
 
 # Motor 003: 9500 RPM → 995.0 rad/s, σ = 80 RPM → 8.38 rad/s
 ex:rv_speed_003 a uq:RandomVariable ;
     rdfs:label "Speed Distribution (Motor #003)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[995.0],[985.0]],\"covariances\":[[[70.4]],[[100.0]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[995.0],[985.0]],\"covariances\":[[[70.4]],[[100.0]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Speed bimodal: 70% N(995.0,σ=8.38) + 30% bearing wear mode N(985.0,σ=10.0)"@en .
 
 # Torque distributions
 ex:rv_torque_001 a uq:RandomVariable ;
     rdfs:label "Torque Distribution (Motor #001)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[1.5],[1.48],[1.55]],\"covariances\":[[[0.0025]],[[0.0036]],[[0.0049]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[1.5],[1.48],[1.55]],\"covariances\":[[[0.0025]],[[0.0036]],[[0.0049]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Torque trimodal: 60% steady load + 30% light + 10% heavy (precision load cell)"@en .
 
 ex:rv_torque_002 a uq:RandomVariable ;
     rdfs:label "Torque Distribution (Motor #002)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1.2],[1.15]],\"covariances\":[[[0.0016]],[[0.0036]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.75,0.25],\"means\":[[1.2],[1.15]],\"covariances\":[[[0.0016]],[[0.0036]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Torque bimodal: 75% nominal N(1.2,σ=0.04) + 25% load variation N(1.15,σ=0.06)"@en .
 
 ex:rv_torque_003 a uq:RandomVariable ;
     rdfs:label "Torque Distribution (Motor #003)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[1.1],[1.05],[1.15]],\"covariances\":[[[0.0036]],[[0.0049]],[[0.0064]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[1.1],[1.05],[1.15]],\"covariances\":[[[0.0036]],[[0.0049]],[[0.0064]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Torque trimodal: 50% + 30% + 20% - high friction variability modes"@en .
 
 # ============================================
@@ -703,7 +707,7 @@ ex:measurement_diameter_caliper_001 a om:Measure ;
 
 ex:rv_diameter_caliper_001 a uq:RandomVariable ;
     rdfs:label "Caliper Distribution (Spindle #001)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[12.02],[12.08]],\"covariances\":[[[0.0001]],[[0.000225]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[12.02],[12.08]],\"covariances\":[[[0.0001]],[[0.000225]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Bimodal: 70% normal reading N(12.02mm, σ=0.01mm) + 30% parallax error N(12.08mm, σ=0.015mm)"@en .
 
 # Laser micrometer measurement (K=3 trimodal: representing elliptical cross-section)
@@ -717,7 +721,7 @@ ex:measurement_diameter_laser_001 a om:Measure ;
 
 ex:rv_diameter_laser_001 a uq:RandomVariable ;
     rdfs:label "Laser Distribution (Spindle #001)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[12.01],[12.015],[12.005]],\"covariances\":[[[0.000025]],[[0.000036]],[[0.000049]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[12.01],[12.015],[12.005]],\"covariances\":[[[0.000025]],[[0.000036]],[[0.000049]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Trimodal ellipticity: 50% N(12.01mm,σ=0.005mm) + 30% N(12.015mm,σ=0.006mm) + 20% N(12.005mm,σ=0.007mm)"@en .
 
 # ============================================
@@ -734,7 +738,7 @@ ex:measurement_diameter_caliper_002 a om:Measure ;
 
 ex:rv_diameter_caliper_002 a uq:RandomVariable ;
     rdfs:label "Caliper Distribution (Spindle #002)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[11.98],[12.04]],\"covariances\":[[[0.000144]],[[0.0004]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[11.98],[12.04]],\"covariances\":[[[0.000144]],[[0.0004]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Bimodal: 65% N(11.98mm, σ=0.012mm) + 35% N(12.04mm, σ=0.02mm) - higher parallax variance"@en .
 
 ex:measurement_diameter_laser_002 a om:Measure ;
@@ -747,7 +751,7 @@ ex:measurement_diameter_laser_002 a om:Measure ;
 
 ex:rv_diameter_laser_002 a uq:RandomVariable ;
     rdfs:label "Laser Distribution (Spindle #002)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.25,0.15],\"means\":[[12.00],[12.01],[11.99]],\"covariances\":[[[0.000064]],[[0.0001]],[[0.000081]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.25,0.15],\"means\":[[12.00],[12.01],[11.99]],\"covariances\":[[[0.000064]],[[0.0001]],[[0.000081]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Trimodal: 60% N(12.00mm,σ=0.008mm) + 25% N(12.01mm,σ=0.01mm) + 15% N(11.99mm,σ=0.009mm)"@en .
 
 # ============================================
@@ -764,7 +768,7 @@ ex:measurement_diameter_caliper_003 a om:Measure ;
 
 ex:rv_diameter_caliper_003 a uq:RandomVariable ;
     rdfs:label "Caliper Distribution (Spindle #003)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[12.05],[12.12]],\"covariances\":[[[0.000196]],[[0.000625]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.4],\"means\":[[12.05],[12.12]],\"covariances\":[[[0.000196]],[[0.000625]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Bimodal: 60% N(12.05mm, σ=0.014mm) + 40% N(12.12mm, σ=0.025mm) - workshop conditions"@en .
 
 ex:measurement_diameter_laser_003 a om:Measure ;
@@ -777,7 +781,7 @@ ex:measurement_diameter_laser_003 a om:Measure ;
 
 ex:rv_diameter_laser_003 a uq:RandomVariable ;
     rdfs:label "Laser Distribution (Spindle #003)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.45,0.35,0.2],\"means\":[[12.03],[12.04],[12.01]],\"covariances\":[[[0.0001]],[[0.000144]],[[0.000121]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.45,0.35,0.2],\"means\":[[12.03],[12.04],[12.01]],\"covariances\":[[[0.0001]],[[0.000144]],[[0.000121]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Trimodal: 45% N(12.03mm,σ=0.01mm) + 35% N(12.04mm,σ=0.012mm) + 20% N(12.01mm,σ=0.011mm)"@en .
 
 # ============================================
@@ -810,7 +814,7 @@ ex:historical_voxel_001 a cfm:VoxelGrid ;
 
 ex:rv_historical_001 a uq:RandomVariable ;
     rdfs:label "Historical CT Distribution (Case #001)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.1],[10.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.7,0.3],\"means\":[[10.1],[10.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Normal wear pattern - similar to crowngear_003 CT distribution"@en .
 
 # Historical Gear Case #2: Severe Wear Pattern
@@ -835,7 +839,7 @@ ex:historical_voxel_002 a cfm:VoxelGrid ;
 
 ex:rv_historical_002 a uq:RandomVariable ;
     rdfs:label "Historical CT Distribution (Case #002)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.1],[9.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.65,0.35],\"means\":[[9.1],[9.0]],\"covariances\":[[[0.04]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Severe wear pattern - similar to crowngear_004 CT distribution"@en .
 
 # Historical Gear Case #3: Moderate Wear Pattern
@@ -860,7 +864,7 @@ ex:historical_voxel_003 a cfm:VoxelGrid ;
 
 ex:rv_historical_003 a uq:RandomVariable ;
     rdfs:label "Historical CT Distribution (Case #003)"@en ;
-    uq:hasDistribution "{\"K\":2,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.5],[9.4]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.8,0.2],\"means\":[[9.5],[9.4]],\"covariances\":[[[0.06]],[[0.12]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Moderate wear pattern - similar to crowngear_006 CT distribution"@en .
 
 # Historical Gear Case #4: Light Wear Pattern  
@@ -885,5 +889,5 @@ ex:historical_voxel_004 a cfm:VoxelGrid ;
 
 ex:rv_historical_004 a uq:RandomVariable ;
     rdfs:label "Historical CT Distribution (Case #004)"@en ;
-    uq:hasDistribution "{\"K\":3,\"d\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.9],[9.85],[10.0]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":1,\"covariance_type\":\"full\",\"weights\":[0.6,0.3,0.1],\"means\":[[9.9],[9.85],[10.0]],\"covariances\":[[[0.04]],[[0.06]],[[0.09]]]}"^^uq:gmmLiteral ;
     rdfs:comment "Light wear pattern - similar to crowngear_002 CT distribution"@en .

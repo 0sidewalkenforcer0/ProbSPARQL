@@ -7,7 +7,6 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
 import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
-import org.apache.jena.probsparql.utils.MatrixUtils;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
@@ -43,7 +42,7 @@ public class CDF extends FunctionBase2 {
         if (GMMDatatype.URI.equals(dtype)) {
             // --- GMM path (original implementation) ---
             GMMValue gmm = extractGMM(distNode);
-            double[] point = extractPoint(pointNode, gmm.getD());
+            double[] point = extractPoint(pointNode, gmm.getDimensions());
             return NodeValue.makeDouble(computeCDF(gmm, point));
         }
 
@@ -117,8 +116,8 @@ public class CDF extends FunctionBase2 {
     // -----------------------------------------------------------------------
 
     private double computeCDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

@@ -98,7 +98,7 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
     @Override
     protected void closeIterator()  {
-        // Publish final stats so Exp2Benchmark can retrieve them
+        // Publish final stats so the Exp2 benchmark harness can retrieve them
         Exp2PruningHolder.set(pruningStats);
     }
 

@@ -44,7 +44,7 @@ public class Marginal extends FunctionBase2 {
     @Override
     public NodeValue exec(NodeValue gmmNode, NodeValue dimNode) {
         GMMValue gmm = extractGMM(gmmNode);
-        int dimension = extractDimension(dimNode, gmm.getD());
+        int dimension = extractDimension(dimNode, gmm.getDimensions());
         
         GMMValue marginalGMM = computeMarginal(gmm, dimension);
         
@@ -94,8 +94,8 @@ public class Marginal extends FunctionBase2 {
      * Compute marginal distribution over specified dimension.
      */
     private GMMValue computeMarginal(GMMValue gmm, int dim) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         String covType = gmm.getCovarianceType();
         
         // For 1D GMMs, marginal is the GMM itself

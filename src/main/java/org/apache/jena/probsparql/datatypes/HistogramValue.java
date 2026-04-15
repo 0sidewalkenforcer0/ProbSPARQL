@@ -7,89 +7,71 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Represents a 1-D histogram distribution.
  *
- * Lexical form (JSON): {"B":50,"min":8.0,"max":12.0,"counts":[3,5,8,...]}
+ * Lexical form (JSON): {"bins":[0.0,10.0,20.0,30.0],"weights":[0.2,0.5,0.3]}
  *
  * <ul>
- *   <li>B      – number of equal-width bins</li>
- *   <li>min    – left edge of the first bin (inclusive)</li>
- *   <li>max    – right edge of the last bin (exclusive, except at boundary)</li>
- *   <li>counts – non-negative integer observation count per bin (length == B)</li>
+ *   <li>bins    – strictly increasing bin boundaries, length N+1</li>
+ *   <li>weights – non-negative probability masses, length N, summing to 1</li>
  * </ul>
  */
 public class HistogramValue implements Sampleable {
 
-    private final int    B;
-    private final double min;
-    private final double max;
-    private final int[]  counts;
-    private final long   total;
+    private final double[] bins;
+    private final double[] weights;
 
-    public HistogramValue(int B, double min, double max, int[] counts) {
-        if (B <= 0)
-            throw new IllegalArgumentException("B must be positive, got: " + B);
-        if (min >= max)
-            throw new IllegalArgumentException("min must be < max, got min=" + min + " max=" + max);
-        if (counts == null || counts.length != B)
-            throw new IllegalArgumentException("counts must have length B=" + B);
-
-        long sum = 0;
-        for (int c : counts) {
-            if (c < 0)
-                throw new IllegalArgumentException("counts must be non-negative, got: " + c);
-            sum += c;
+    public HistogramValue(double[] bins, double[] weights) {
+        if (bins == null || bins.length < 2) {
+            throw new IllegalArgumentException("bins must have length at least 2");
         }
-        this.B      = B;
-        this.min    = min;
-        this.max    = max;
-        this.counts = counts.clone();
-        this.total  = sum;
+        if (weights == null || weights.length != bins.length - 1) {
+            throw new IllegalArgumentException("weights must have length bins.length - 1");
+        }
+
+        double prev = bins[0];
+        for (int i = 1; i < bins.length; i++) {
+            if (!(bins[i] > prev)) {
+                throw new IllegalArgumentException("bins must be strictly increasing");
+            }
+            prev = bins[i];
+        }
+
+        double sum = 0.0;
+        for (double w : weights) {
+            if (w < 0.0) {
+                throw new IllegalArgumentException("weights must be non-negative");
+            }
+            sum += w;
+        }
+        if (Math.abs(sum - 1.0) > 1e-6) {
+            throw new IllegalArgumentException("weights must sum to 1.0, got: " + sum);
+        }
+
+        this.bins = bins.clone();
+        this.weights = weights.clone();
     }
 
     // -----------------------------------------------------------------------
     // Accessors
     // -----------------------------------------------------------------------
 
-    public int    getB()      { return B; }
-    public double getMin()    { return min; }
-    public double getMax()    { return max; }
-    public long   getTotal()  { return total; }
+    public double[] getBins() { return bins.clone(); }
+    public double[] getWeights() { return weights.clone(); }
+    public int getBinCount() { return weights.length; }
 
-    /** Returns a defensive copy. */
-    public int[] getCounts() { return counts.clone(); }
+    /** Returns the bin boundaries. */
+    public double[] edges() { return getBins(); }
 
-    /** Width of a single bin: (max - min) / B */
-    public double binWidth() { return (max - min) / B; }
-
-    /** B+1 bin edge values. */
-    public double[] edges() {
-        double w = binWidth();
-        double[] e = new double[B + 1];
-        for (int i = 0; i <= B; i++) e[i] = min + i * w;
-        return e;
-    }
-
-    /** B bin centre values. */
+    /** Bin centre values. */
     public double[] binCenters() {
-        double w = binWidth();
-        double[] c = new double[B];
-        for (int i = 0; i < B; i++) c[i] = min + (i + 0.5) * w;
+        double[] c = new double[getBinCount()];
+        for (int i = 0; i < getBinCount(); i++) {
+            c[i] = 0.5 * (bins[i] + bins[i + 1]);
+        }
         return c;
     }
 
-    /**
-     * Normalised probability mass per bin.
-     * If total == 0 a uniform distribution is returned.
-     */
-    public double[] probabilities() {
-        double[] p = new double[B];
-        if (total == 0) {
-            double u = 1.0 / B;
-            Arrays.fill(p, u);
-        } else {
-            for (int i = 0; i < B; i++) p[i] = (double) counts[i] / total;
-        }
-        return p;
-    }
+    /** Normalised probability mass per bin. */
+    public double[] probabilities() { return getWeights(); }
 
     /**
      * CDF evaluated at {@code x} using linear interpolation within bins.
@@ -97,41 +79,47 @@ public class HistogramValue implements Sampleable {
      * @return cumulative probability in [0, 1]
      */
     public double cdf(double x) {
-        if (x <= min) return 0.0;
-        if (x >= max) return 1.0;
-        double w = binWidth();
-        int bin = (int) Math.floor((x - min) / w);
-        if (bin >= B) bin = B - 1;
+        if (x <= bins[0]) return 0.0;
+        if (x >= bins[bins.length - 1]) return 1.0;
 
-        long cumPrev = 0;
-        for (int i = 0; i < bin; i++) cumPrev += counts[i];
-
-        // Linear interpolation inside current bin
-        double frac = (x - (min + bin * w)) / w;
-        double cum  = cumPrev + counts[bin] * frac;
-        return total == 0 ? 0.0 : cum / total;
+        double cumulative = 0.0;
+        for (int i = 0; i < getBinCount(); i++) {
+            double lo = bins[i];
+            double hi = bins[i + 1];
+            double mass = weights[i];
+            if (x >= hi) {
+                cumulative += mass;
+                continue;
+            }
+            if (x > lo) {
+                double frac = (x - lo) / (hi - lo);
+                cumulative += mass * frac;
+            }
+            break;
+        }
+        return Math.max(0.0, Math.min(cumulative, 1.0));
     }
 
-    /**
-     * Expected value: sum of (bin_center * probability).
-     */
+    /** Expected value: sum of (bin_center * probability). */
     public double mean() {
-        if (total == 0) return (min + max) / 2.0;
         double[] centers = binCenters();
         double sum = 0.0;
-        for (int i = 0; i < B; i++) sum += centers[i] * counts[i];
-        return sum / total;
+        for (int i = 0; i < getBinCount(); i++) sum += centers[i] * weights[i];
+        return sum;
     }
 
     /**
      * Check structural compatibility with another histogram
-     * (same B, same min, same max within floating-point tolerance).
+     * (same bin boundaries within floating-point tolerance).
      */
     public boolean isCompatible(HistogramValue other) {
-        if (this.B != other.B) return false;
-        double eps = 1e-9 * (max - min);
-        return Math.abs(this.min - other.min) <= eps
-            && Math.abs(this.max - other.max) <= eps;
+        if (this.getBinCount() != other.getBinCount()) return false;
+        double scale = Math.max(1.0, Math.abs(bins[bins.length - 1] - bins[0]));
+        double eps = 1e-9 * scale;
+        for (int i = 0; i < bins.length; i++) {
+            if (Math.abs(this.bins[i] - other.bins[i]) > eps) return false;
+        }
+        return true;
     }
 
     // -----------------------------------------------------------------------
@@ -143,15 +131,13 @@ public class HistogramValue implements Sampleable {
         if (this == o) return true;
         if (!(o instanceof HistogramValue)) return false;
         HistogramValue h = (HistogramValue) o;
-        return B == h.B
-            && Double.compare(min, h.min) == 0
-            && Double.compare(max, h.max) == 0
-            && Arrays.equals(counts, h.counts);
+        return Arrays.equals(bins, h.bins)
+            && Arrays.equals(weights, h.weights);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(B, min, max, Arrays.hashCode(counts));
+        return Objects.hash(Arrays.hashCode(bins), Arrays.hashCode(weights));
     }
 
     // -----------------------------------------------------------------------
@@ -160,44 +146,45 @@ public class HistogramValue implements Sampleable {
 
     /**
      * Draw n samples from this histogram: select bin with probability proportional
-     * to counts, then draw uniformly within that bin.
+     * to weights, then draw uniformly within that bin.
      */
     @Override
     public double[][] sample(int n) {
         ThreadLocalRandom rng = ThreadLocalRandom.current();
-        double[] probs = probabilities();
-        double bw = binWidth();
         double[][] samples = new double[n][1];
         for (int s = 0; s < n; s++) {
-            // Multinomial bin selection
             double u = rng.nextDouble();
             double cum = 0.0;
-            int bin = B - 1;
-            for (int i = 0; i < B; i++) {
-                cum += probs[i];
+            int bin = getBinCount() - 1;
+            for (int i = 0; i < getBinCount(); i++) {
+                cum += weights[i];
                 if (u <= cum) { bin = i; break; }
             }
-            // Uniform within bin
-            double lo = min + bin * bw;
-            samples[s][0] = lo + rng.nextDouble() * bw;
+            double lo = bins[bin];
+            double hi = bins[bin + 1];
+            samples[s][0] = lo + rng.nextDouble() * (hi - lo);
         }
         return samples;
     }
 
     /**
-     * Log piecewise-constant density: log(p_bin / bin_width).
-     * Returns NEGATIVE_INFINITY for points outside [min, max].
+     * Log piecewise-constant density: log(weight_bin / bin_width).
+     * Returns NEGATIVE_INFINITY for points outside the support interval.
      */
     @Override
     public double logPdf(double[] x) {
         double v = x[0];
-        if (v < min || v >= max) return Double.NEGATIVE_INFINITY;
-        double bw = binWidth();
-        int bin = Math.min((int) ((v - min) / bw), B - 1);
-        if (total == 0) return Math.log(1.0 / (B * bw));
-        double p = (double) counts[bin] / total;
-        if (p <= 0.0) return Double.NEGATIVE_INFINITY;
-        return Math.log(p / bw);
+        if (v < bins[0] || v >= bins[bins.length - 1]) return Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < getBinCount(); i++) {
+            double lo = bins[i], hi = bins[i + 1];
+            if (v >= lo && v < hi) {
+                double width = hi - lo;
+                double p = weights[i];
+                if (p <= 0.0) return Double.NEGATIVE_INFINITY;
+                return Math.log(p / width);
+            }
+        }
+        return Double.NEGATIVE_INFINITY;
     }
 
     // -----------------------------------------------------------------------
@@ -206,13 +193,15 @@ public class HistogramValue implements Sampleable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"B\":").append(B);
-        sb.append(",\"min\":").append(min);
-        sb.append(",\"max\":").append(max);
-        sb.append(",\"counts\":[");
-        for (int i = 0; i < B; i++) {
+        sb.append("{\"bins\":[");
+        for (int i = 0; i < bins.length; i++) {
             if (i > 0) sb.append(',');
-            sb.append(counts[i]);
+            sb.append(bins[i]);
+        }
+        sb.append("],\"weights\":[");
+        for (int i = 0; i < weights.length; i++) {
+            if (i > 0) sb.append(',');
+            sb.append(weights[i]);
         }
         sb.append("]}");
         return sb.toString();

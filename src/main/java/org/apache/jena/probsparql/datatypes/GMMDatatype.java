@@ -18,7 +18,7 @@ import java.util.List;
  * 
  * A well-formed lexical form MUST be a JSON object with exactly six top-level fields,
  * in this order and with no additional fields:
- * "K", "d", "covariance_type", "weights", "means", and "covariances".
+ * "n_components", "dimensions", "covariance_type", "weights", "means", and "covariances".
  * 
  * @author ProbSPARQL Team
  * @version 1.0.0
@@ -34,7 +34,7 @@ public class GMMDatatype extends BaseDatatype {
     public static final GMMDatatype INSTANCE = new GMMDatatype();
     
     /** Expected field names in required order */
-    private static final String[] REQUIRED_FIELDS = {"K", "d", "covariance_type", "weights", "means", "covariances"};
+    private static final String[] REQUIRED_FIELDS = {"n_components", "dimensions", "covariance_type", "weights", "means", "covariances"};
     
     /** JSON parser */
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -70,16 +70,16 @@ public class GMMDatatype extends BaseDatatype {
             validateFieldOrder(root, lexicalForm);
             
             // Extract K
-            JsonNode kNode = root.get("K");
+            JsonNode kNode = root.get("n_components");
             if (kNode == null || !kNode.isInt()) {
-                throw new DatatypeFormatException(lexicalForm, this, "Field 'K' must be an integer");
+                throw new DatatypeFormatException(lexicalForm, this, "Field 'n_components' must be an integer");
             }
             int K = kNode.asInt();
             
             // Extract d
-            JsonNode dNode = root.get("d");
+            JsonNode dNode = root.get("dimensions");
             if (dNode == null || !dNode.isInt()) {
-                throw new DatatypeFormatException(lexicalForm, this, "Field 'd' must be an integer");
+                throw new DatatypeFormatException(lexicalForm, this, "Field 'dimensions' must be an integer");
             }
             int d = dNode.asInt();
             
@@ -143,7 +143,8 @@ public class GMMDatatype extends BaseDatatype {
         for (int i = 0; i < REQUIRED_FIELDS.length; i++) {
             if (!actualFields.get(i).equals(REQUIRED_FIELDS[i])) {
                 throw new DatatypeFormatException(lexicalForm, this,
-                    "Field at position " + i + " must be '" + REQUIRED_FIELDS[i] + "', found: '" + actualFields.get(i) + "'");
+                    "Fields must be exactly " + String.join(", ", REQUIRED_FIELDS)
+                    + " in order; found: " + actualFields);
             }
         }
     }

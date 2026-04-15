@@ -7,7 +7,7 @@ writes new TTL files in which each GMM is replaced by a 1-D histogram
 approximation encoded as ``uq:histLiteral``.
 
 JSON schema expected by HistogramDatatype.java:
-    {"B":<int>, "min":<double>, "max":<double>, "counts":[<int>, ...]}
+    {"bins":[<double>, ...], "weights":[<double>, ...]}
 
 For each GMM:
   1. Draw ``SAMPLES`` Monte-Carlo samples from the 1-D mixture.
@@ -58,7 +58,7 @@ RANDOM_SEED     = 42
 def gmm_to_histogram(json_str: str, B: int, rng: np.random.Generator) -> str:
     """Sample from a 1-D GMM and return a ``uq:histLiteral`` JSON string."""
     obj = json.loads(json_str)
-    k = obj["K"]
+    k = obj["n_components"]
     weights = np.asarray(obj["weights"], dtype=float)
     means   = np.asarray([m[0] for m in obj["means"]], dtype=float)
 
@@ -82,9 +82,14 @@ def gmm_to_histogram(json_str: str, B: int, rng: np.random.Generator) -> str:
     lo = global_mean - 4.0 * global_std
     hi = global_mean + 4.0 * global_std
 
-    counts, _ = np.histogram(samples, bins=B, range=(lo, hi))
-    return json.dumps({"B": B, "min": round(lo, 6), "max": round(hi, 6),
-                       "counts": counts.tolist()})
+    counts, edges = np.histogram(samples, bins=B, range=(lo, hi))
+    total = counts.sum()
+    if total == 0:
+        weights_out = np.full(B, 1.0 / B)
+    else:
+        weights_out = counts / total
+    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+                       "weights": [round(float(w), 6) for w in weights_out.tolist()]})
 
 
 # ---------------------------------------------------------------------------

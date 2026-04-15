@@ -25,6 +25,10 @@ export JAVA_HOME="${JAVA_HOME:-/Library/Java/JavaVirtualMachines/temurin-21.jdk/
 DATA_DIR="$PROJECT_DIR/benchmark/data"
 RESULTS_DIR="$PROJECT_DIR/benchmark/results"
 SCRIPTS_DIR="$PROJECT_DIR/benchmark/scripts"
+EXP1_SCRIPTS_DIR="$SCRIPTS_DIR/Experiments1"
+EXP2_SCRIPTS_DIR="$SCRIPTS_DIR/Experiments2"
+EXP3_SCRIPTS_DIR="$SCRIPTS_DIR/Experiments3"
+EXP4_SCRIPTS_DIR="$SCRIPTS_DIR/Experiments4"
 
 SKIP_JAVA=false
 SKIP_PLOTS=false
@@ -47,17 +51,13 @@ print_header() {
 # ─────────────────────────────────────────────────────────────────────────────
 # Step 0a — Generate data
 # ─────────────────────────────────────────────────────────────────────────────
-print_header "Step 0a: Generate Deterministic Datasets"
-python3 "$SCRIPTS_DIR/generate_dataset_deterministic.py" \
-    --input-dir  "$DATA_DIR" \
-    --output-dir "$DATA_DIR"
+print_header "Step 0a: Generate Exp1 Datasets"
+python3 "$EXP1_SCRIPTS_DIR/generate_exp1_main_probabilistic.py" \
+    --output-dir "$DATA_DIR/exp1"
 
-print_header "Step 0b: Generate Histogram Datasets (B=50,100)"
-python3 "$SCRIPTS_DIR/generate_histogram_variants.py" \
-    --bins 50 100 \
-    --scales S0 S1 S2 S3 S4 \
-    --input-dir  "$DATA_DIR" \
-    --output-dir "$DATA_DIR"
+python3 "$EXP1_SCRIPTS_DIR/generate_exp1_main_deterministic.py" \
+    --input-dir  "$DATA_DIR/exp1" \
+    --output-dir "$DATA_DIR/exp1"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Compile
@@ -103,33 +103,13 @@ if ! $SKIP_JAVA; then
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Step 1b — Exp 2: In-Engine vs External JSD  
-# ─────────────────────────────────────────────────────────────────────────────
-if ! $SKIP_JAVA; then
-    print_header "Step 1b/8: Exp 2 — In-Engine vs External JSD"
-    cd "$PROJECT_DIR"
-    run_java org.apache.jena.probsparql.InEngineVsExternalBenchmark \
-        --output-dir "$RESULTS_DIR"
-fi
-
-if ! $SKIP_PLOTS; then
-    if [[ -f "$RESULTS_DIR/exp2_inengine.csv" ]]; then
-        echo ""
-        echo "  [Exp 2] Running external Python baseline..."
-        python3 "$SCRIPTS_DIR/exp2_external_baseline.py" \
-            --pairs  "$RESULTS_DIR/exp2_pairs.json" \
-            --output "$RESULTS_DIR" || true
-    fi
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Step 1c — Re-run SimJoin Performance Benchmark (if needed)
 # ─────────────────────────────────────────────────────────────────────────────
 if ! $SKIP_JAVA; then
     print_header "Step 1c/8: Exp 1 (legacy) — SimJoin Performance (V1-V5 × datasets)"
     if [[ ! -f "$RESULTS_DIR/simjoin_results.csv" ]]; then
         cd "$PROJECT_DIR"
-        python3 "$SCRIPTS_DIR/generate_sim_join_data.py" --n 100 --seed 42
+        python3 "$EXP3_SCRIPTS_DIR/generate_sim_join_data.py" --n 100 --seed 42
         run_java org.apache.jena.probsparql.SimilarityJoinBenchmark \
             --data-dir  "$DATA_DIR" \
             --query     "$PROJECT_DIR/benchmark/queries/simjoin_benchmark.sparql" \
@@ -175,57 +155,28 @@ if ! $SKIP_JAVA; then
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Step 5 — Exp 4: Histogram Datatype Overhead
-# ─────────────────────────────────────────────────────────────────────────────
-if ! $SKIP_JAVA; then
-    print_header "Step 5/8: Exp 4 — Histogram Datatype Overhead"
-    cd "$PROJECT_DIR"
-    run_java org.apache.jena.probsparql.HistogramBenchmark \
-        --output-dir "$RESULTS_DIR"
-fi
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Step 6 — Generate all plots
 # ─────────────────────────────────────────────────────────────────────────────
 if ! $SKIP_PLOTS; then
     print_header "Step 6/8: Generate Analysis Plots"
     cd "$PROJECT_DIR"
 
-    # ── Exp 1: Overhead (new) ────────────────────────────────────────────────
-    if [[ -f "$RESULTS_DIR/exp1_overhead.csv" ]]; then
+    # ── Exp 1: Overhead ──────────────────────────────────────────────────────
+    if [[ -f "$RESULTS_DIR/exp1_raw.csv" ]]; then
         echo ""
         echo "  [Exp 1] DET vs PROB overhead analysis..."
-        python3 "$SCRIPTS_DIR/analyze_exp1_proper.py" \
-            --input  "$RESULTS_DIR/exp1_overhead.csv" \
+        python3 "$EXP1_SCRIPTS_DIR/analyze_exp1_main.py" \
+            --input  "$RESULTS_DIR/exp1_raw.csv" \
             --output "$RESULTS_DIR"
     else
-        echo "  [Exp 1] SKIP exp1_overhead.csv not found"
+        echo "  [Exp 1] SKIP exp1_raw.csv not found"
     fi
-
-    # ── Exp 2: In-engine vs external ────────────────────────────────────────
-    if [[ -f "$RESULTS_DIR/exp2_inengine.csv" && -f "$RESULTS_DIR/exp2_external.csv" ]]; then
-        echo ""
-        echo "  [Exp 2] In-engine vs external comparison..."
-        python3 "$SCRIPTS_DIR/analyze_exp2.py" \
-            --input  "$RESULTS_DIR" \
-            --output "$RESULTS_DIR"
-    else
-        echo "  [Exp 2] SKIP — exp2_*.csv files not found"
-    fi
-
-    # ── Exp 1 (legacy): Performance baseline ────────────────────────────────
-    echo ""
-    echo "  [Exp 1 legacy] Latency & overhead analysis..."
-    python3 "$SCRIPTS_DIR/analyze_exp1_scalability.py" \
-        --results-csv  "$RESULTS_DIR/simjoin_results.csv" \
-        --accuracy-csv "$RESULTS_DIR/simjoin_accuracy_latency.csv" \
-        --output       "$RESULTS_DIR"
 
     # ── Exp 3.1: Classification accuracy ───────────────────────────────────
     if [[ -f "$RESULTS_DIR/exp3_1_classification.csv" ]]; then
         echo ""
         echo "  [Exp 3.1] Classification accuracy analysis..."
-        python3 "$SCRIPTS_DIR/analyze_exp3_1_accuracy.py" \
+        python3 "$EXP3_SCRIPTS_DIR/analyze_exp3_1_accuracy.py" \
             --input  "$RESULTS_DIR/exp3_1_classification.csv" \
             --output "$RESULTS_DIR"
     else
@@ -236,7 +187,7 @@ if ! $SKIP_PLOTS; then
     if [[ -f "$RESULTS_DIR/exp3_2_convergence_multimethod.csv" ]]; then
         echo ""
         echo "  [Exp 3.2] Multi-method convergence analysis..."
-        python3 "$SCRIPTS_DIR/analyze_exp3_2_convergence.py" \
+        python3 "$EXP3_SCRIPTS_DIR/analyze_exp3_2_convergence.py" \
             --input  "$RESULTS_DIR/exp3_2_convergence_multimethod.csv" \
             --output "$RESULTS_DIR"
     else
@@ -247,7 +198,7 @@ if ! $SKIP_PLOTS; then
     if [[ -f "$RESULTS_DIR/exp3_3_selectivity.csv" ]]; then
         echo ""
         echo "  [Exp 3.3] Selectivity sensitivity analysis..."
-        python3 "$SCRIPTS_DIR/analyze_exp3_3_selectivity.py" \
+        python3 "$EXP3_SCRIPTS_DIR/analyze_exp3_3_selectivity.py" \
             --input  "$RESULTS_DIR/exp3_3_selectivity.csv" \
             --output "$RESULTS_DIR"
     else
@@ -275,16 +226,6 @@ if ! $SKIP_PLOTS; then
             --output "$RESULTS_DIR/plot_convergence.png" 2>/dev/null || true
     fi
 
-    # ── Exp 4: Histogram overhead ────────────────────────────────────────────
-    if [[ -f "$RESULTS_DIR/exp4_overhead.csv" ]]; then
-        echo ""
-        echo "  [Exp 4] Histogram overhead & accuracy analysis..."
-        python3 "$SCRIPTS_DIR/analyze_exp4.py" \
-            --input  "$RESULTS_DIR" \
-            --output "$RESULTS_DIR"
-    else
-        echo "  [Exp 4] SKIP — exp4_overhead.csv not found"
-    fi
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -294,12 +235,11 @@ echo "  Results:  $RESULTS_DIR"
 echo ""
 
 for f in \
-    exp1_overhead.csv \
+    exp1_raw.csv \
+    exp1_summary.csv \
     exp2_inengine.csv \
     exp2_external.csv \
     exp2_pairs.json \
-    exp4_overhead.csv \
-    exp4_accuracy.csv \
     simjoin_results.csv \
     simjoin_accuracy_latency.csv \
     exp3_1_classification.csv \

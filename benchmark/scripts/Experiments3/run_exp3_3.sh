@@ -46,6 +46,7 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
     export JAVA_HOME
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
+export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" \
 
 echo "=================================================================="
 echo "  Experiment 3.3 — Selectivity Sensitivity"
@@ -127,7 +128,7 @@ for D in easy medium hard mixed; do
     fi
 done
 if [[ $MISSING -eq 1 ]]; then
-    echo "  Run: python3 benchmark/scripts/generate_sim_join_data.py --output-dir $DATA_DIR"
+    echo "  Run: python3 benchmark/scripts/Experiments3/generate_sim_join_data.py --output-dir $DATA_DIR"
     exit 1
 fi
 
@@ -136,9 +137,15 @@ echo
 echo "[4/4] Running SelectivityBenchmark..."
 START_TS=$SECONDS
 
+NUM_INTERATIONS="${NUM_INTERATIONS:-10}"
+NUM_WARMUP="${NUM_WARMUP:-3}"
+NUM_LIMIT_GRAPHS="${NUM_LIMIT_GRAPHS:-1000000}"
+
+
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.SelectivityBenchmark" \
-    "-Dexec.args=--data-dir ${DATA_DIR} --gt-csv ${GT_CSV} --output-dir ${OUTPUT_DIR}" \
+    "-Dexec.args=--data-dir ${DATA_DIR} --gt-csv ${GT_CSV} --output-dir ${OUTPUT_DIR}
+     --iterations ${NUM_INTERATIONS} --warmup ${NUM_WARMUP} --limit-graphs ${NUM_LIMIT_GRAPHS}"  \
     2>&1 | tee "${OUTPUT_DIR}/exp3_3_run.log"
 
 ELAPSED=$(( SECONDS - START_TS ))

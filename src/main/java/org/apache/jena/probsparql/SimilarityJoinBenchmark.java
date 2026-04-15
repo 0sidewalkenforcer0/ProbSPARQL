@@ -229,7 +229,7 @@ public class SimilarityJoinBenchmark {
         // Run nested loop through adaptive sampler
         for (org.apache.jena.probsparql.datatypes.GMMValue lg : leftGMMs) {
             for (org.apache.jena.probsparql.datatypes.GMMValue rg : rightGMMs) {
-                if (lg.getD() == rg.getD()) {
+                if (lg.getDimensions() == rg.getDimensions()) {
                     sampler.computeJSDAdaptive(lg, rg, JSDivergenceConfig.V5_ADAPTIVE_MAX_SAMPLES);
                 }
             }

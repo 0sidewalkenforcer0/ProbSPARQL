@@ -9,7 +9,7 @@
 #   Phase 2 — Exp 4.1  Exp4DispatchTest     (polymorphic dispatch verification)
 #   Phase 3 — Exp 4.2  Exp4MicroBenchmark   (per-operation latency)
 #   Phase 4 — Exp 4.3  Exp4CrossTypeJSD     (cross-type JSD accuracy)
-#   Phase 5 — Exp 4.4  Exp4EndToEnd         (end-to-end Q1/Q3 GMM vs Hist)
+#   Phase 5 — Exp 4.4  Exp4EndToEnd         (end-to-end Q2 Filter/Q4 JSD GMM vs Hist)
 #   Phase 6 — Exp 4.5  Exp4DirichletDemo    (Dirichlet qualitative demo)
 #   Phase 7 — Analysis  analyze_exp4.py     (charts + console tables)
 #
@@ -23,6 +23,7 @@
 #   DATA_DIR    — override data directory    (default: benchmark/data)
 #   SKIP_BUILD  — set to 1 to skip Maven compile
 #   SKIP_DATA   — set to 1 to skip Python dataset generation
+#   FORCE_DATA  — set to 1 to force regenerating all Exp4 datasets
 #   JAVA_HOME   — override Java 21 home
 # =============================================================================
 set -euo pipefail
@@ -30,10 +31,11 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4_full}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4_full_new}"
 DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SKIP_DATA="${SKIP_DATA:-0}"
+FORCE_DATA="${FORCE_DATA:-0}"
 
 # ── Java 21 resolution ──────────────────────────────────────────────────────
 if [[ -z "${JAVA_HOME:-}" ]]; then
@@ -45,6 +47,7 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
     export JAVA_HOME
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
+export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" 
 
 # ── Python / venv ────────────────────────────────────────────────────────────
 PYTHON_BIN=""
@@ -82,26 +85,52 @@ fi
 # ── Phase 1: Dataset generation ─────────────────────────────────────────────
 if [[ "${SKIP_DATA}" != "1" ]]; then
     echo
-    echo ">>> Phase 1: Generating datasets..."
+    echo ">>> Phase 1: Checking / generating datasets..."
 
     if [[ -z "$PYTHON_BIN" ]]; then
         echo "    WARNING: Python with numpy+rdflib not found — skipping dataset generation."
         echo "    Pre-generated datasets must already be present in $DATA_DIR/exp4/"
     else
-        echo "    1a. Histogram datasets from exp1 K=3 files..."
-        "$PYTHON_BIN" "${SCRIPT_DIR}/generate_histogram_datasets.py" \
-            --input-dir  "${DATA_DIR}/exp1" \
-            --output-dir "${DATA_DIR}/exp4"
+        EXP4_DATA_DIR="${DATA_DIR}/exp4"
+        mkdir -p "$EXP4_DATA_DIR"
 
-        echo "    1b. Dirichlet dataset (100 components, k=4)..."
-        "$PYTHON_BIN" "${SCRIPT_DIR}/generate_dirichlet_dataset.py" \
-            --output-dir "${DATA_DIR}/exp4"
+        HIST_MISSING=0
+        for scale in E3 E5 E7; do
+            for bins in 50 100; do
+                if [[ ! -s "${EXP4_DATA_DIR}/exp4_${scale}_hist_B${bins}.ttl" ]]; then
+                    HIST_MISSING=1
+                fi
+            done
+        done
+        if [[ "${FORCE_DATA}" == "1" || "${HIST_MISSING}" == "1" ]]; then
+            echo "    1a. Histogram datasets from exp1 K=3 files..."
+            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_histogram_datasets.py" \
+                --input-dir  "${DATA_DIR}/exp1" \
+                --output-dir "${EXP4_DATA_DIR}"
+        else
+            echo "    1a. Histogram datasets already present — skip."
+        fi
 
-        echo "    1c. Cross-type JSD pairs (100 GMM↔Hist + 100 Dir↔Hist)..."
-        "$PYTHON_BIN" "${SCRIPT_DIR}/generate_crosstype_pairs.py" \
-            --output-dir "${DATA_DIR}/exp4"
+        if [[ "${FORCE_DATA}" == "1" || ! -s "${EXP4_DATA_DIR}/exp4_dirichlet.ttl" ]]; then
+            echo "    1b. Dirichlet dataset (100 components, k=4)..."
+            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_dirichlet_dataset.py" \
+                --output-dir "${EXP4_DATA_DIR}"
+        else
+            echo "    1b. Dirichlet dataset already present — skip."
+        fi
 
-        echo "    Dataset generation complete."
+        if [[ "${FORCE_DATA}" == "1" \
+           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_gmm_hist.ttl" \
+           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_dir_hist.ttl" \
+           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_gt.csv" ]]; then
+            echo "    1c. Cross-type JSD pairs (100 GMM↔Hist + 100 Dir↔Hist)..."
+            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_crosstype_pairs.py" \
+                --output-dir "${EXP4_DATA_DIR}"
+        else
+            echo "    1c. Cross-type datasets already present — skip."
+        fi
+
+        echo "    Dataset check complete."
     fi
 fi
 
@@ -140,7 +169,7 @@ echo ">>> Phase 7: Analysis..."
 if [[ -z "$PYTHON_BIN" ]]; then
     echo "    WARNING: Python not available — skipping analysis."
 else
-    "$PYTHON_BIN" "${PROJECT_ROOT}/benchmark/scripts/analyze_exp4.py" \
+    "$PYTHON_BIN" "${PROJECT_ROOT}/benchmark/scripts/Experiments4/analyze_exp4.py" \
         --input  "$OUTPUT_DIR" \
         --output "$OUTPUT_DIR" \
         || echo "    WARNING: Analysis script returned non-zero exit code."

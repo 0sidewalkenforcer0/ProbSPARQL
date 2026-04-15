@@ -2,7 +2,6 @@ package org.apache.jena.probsparql.functions.thresholding;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.probsparql.utils.MatrixUtils;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
@@ -44,7 +43,7 @@ public class PDF extends FunctionBase2 {
         GMMValue gmm = extractGMM(gmmNode);
         
         // Extract evaluation point
-        double[] point = extractPoint(pointNode, gmm.getD());
+        double[] point = extractPoint(pointNode, gmm.getDimensions());
         
         // Compute PDF
         double density = computePDF(gmm, point);
@@ -136,8 +135,8 @@ public class PDF extends FunctionBase2 {
      * PDF(x) = Σ(k=1 to K) w_k * N(x | μ_k, Σ_k)
      */
     private double computePDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

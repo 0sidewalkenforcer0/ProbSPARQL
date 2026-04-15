@@ -12,7 +12,7 @@ of the measured α (closer to uniform), enabling realistic JSD pairs.
 
 Output: benchmark/data/exp4/exp4_dirichlet.ttl
 
-JSON format: {"type":"dirichlet","k":4,"alpha":[2.5,1.0,3.0,0.5]}
+JSON format: {"alphas":[2.5,1.0,3.0,0.5]}
 Datatype URI: http://example.org/ontology/uncertainty#dirichletLiteral
 
 Usage:
@@ -55,7 +55,7 @@ SMOOTH_FACTOR = 0.4
 
 
 def make_dirichlet_literal(alpha: np.ndarray, k: int) -> Literal:
-    obj = {"type": "dirichlet", "k": k, "alpha": [round(float(a), 6) for a in alpha]}
+    obj = {"alphas": [round(float(a), 6) for a in alpha]}
     return Literal(json.dumps(obj), datatype=DIR_DTYPE)
 
 

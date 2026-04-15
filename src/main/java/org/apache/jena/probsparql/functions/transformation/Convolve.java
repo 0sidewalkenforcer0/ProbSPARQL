@@ -49,10 +49,10 @@ public class Convolve extends FunctionBase2 {
         GMMValue gmm2 = extractGMM(gmm2Node, "second");
         
         // Validate compatibility
-        if (gmm1.getD() != gmm2.getD()) {
+        if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
                 "GMMs must have same dimensionality for convolution. Got d1=" + 
-                gmm1.getD() + ", d2=" + gmm2.getD());
+                gmm1.getDimensions() + ", d2=" + gmm2.getDimensions());
         }
         
         GMMValue convolvedGMM = computeConvolution(gmm1, gmm2);
@@ -90,9 +90,9 @@ public class Convolve extends FunctionBase2 {
      * - Covariance: Σ_ij = Σ1_i + Σ2_j
      */
     private GMMValue computeConvolution(GMMValue gmm1, GMMValue gmm2) {
-        int K1 = gmm1.getK();
-        int K2 = gmm2.getK();
-        int d = gmm1.getD();
+        int K1 = gmm1.getNComponents();
+        int K2 = gmm2.getNComponents();
+        int d = gmm1.getDimensions();
         
         int K = K1 * K2;
         

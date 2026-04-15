@@ -108,7 +108,7 @@ public class QueryIterFuseJoinFilter extends QueryIter {
             GMMValue rightGMM = (GMMValue) rightNode.getLiteralValue();
             
             // Check dimensionality compatibility
-            if (leftGMM.getD() != rightGMM.getD()) {
+            if (leftGMM.getDimensions() != rightGMM.getDimensions()) {
                 continue;
             }
             

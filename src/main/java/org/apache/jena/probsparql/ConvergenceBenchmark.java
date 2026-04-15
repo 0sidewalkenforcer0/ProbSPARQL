@@ -118,7 +118,7 @@ public class ConvergenceBenchmark {
         
         for (GMMValue g1 : left) {
             for (GMMValue g2 : right) {
-                if (g1.getD() != g2.getD()) continue;
+                if (g1.getDimensions() != g2.getDimensions()) continue;
                 try {
                     double val = sampler.computeJSD(g1, g2, samples);
                     jsds.add(val);

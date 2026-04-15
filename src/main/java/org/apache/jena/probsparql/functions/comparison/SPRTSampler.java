@@ -47,9 +47,8 @@ public class SPRTSampler {
      */
     public double[] computeJSDWithStats(GMMValue p, GMMValue q, int maxSamples) {
         GMMValue m = createMixture(p, q);
-
-        // z-score for two-sided 95% CI (corresponds to alpha=beta=0.05)
-        double z = 1.96;
+        double zReject = inverseStandardNormalCDF(1.0 - alpha);
+        double zAccept = inverseStandardNormalCDF(1.0 - beta);
 
         int halfMax = maxSamples / 2;
         int n = 0;
@@ -61,14 +60,14 @@ public class SPRTSampler {
 
         while (n < halfMax) {
             // Estimate KL(p||m): sample from p, accumulate log(p(x)/m(x))
-            double[] xp = sampleFromGMM(p);
-            double vp = computeLogPDF(p, xp) - computeLogPDF(m, xp);
+            double[] xp = p.sampleOne(random);
+            double vp = p.logPdf(xp) - m.logPdf(xp);
             sumLogPM += vp;
             sumSqLogPM += vp * vp;
 
             // Estimate KL(q||m): sample from q, accumulate log(q(x)/m(x))
-            double[] xq = sampleFromGMM(q);
-            double vq = computeLogPDF(q, xq) - computeLogPDF(m, xq);
+            double[] xq = q.sampleOne(random);
+            double vq = q.logPdf(xq) - m.logPdf(xq);
             sumLogQM += vq;
             sumSqLogQM += vq * vq;
 
@@ -83,13 +82,13 @@ public class SPRTSampler {
                 double se = 0.5 * Math.sqrt((varP + varQ) / n);
 
                 if (se > 0) {
-                    if (jsdEst - z * se > epsilon) {
+                    if (jsdEst - zReject * se > epsilon) {
                         // CI entirely above epsilon → confidently dissimilar
                         earlyRejected++;
                         totalSamples += n * 2;
                         return new double[] {jsdEst, n * 2};
                     }
-                    if (jsdEst + z * se < epsilon) {
+                    if (jsdEst + zAccept * se < epsilon) {
                         // CI entirely below epsilon → confidently similar
                         earlyAccepted++;
                         totalSamples += n * 2;
@@ -120,9 +119,9 @@ public class SPRTSampler {
         double sum = 0.0;
         
         for (int i = 0; i < numSamples; i++) {
-            double[] sample = sampleFromGMM(p);
-            double logP = computeLogPDF(p, sample);
-            double logQ = computeLogPDF(q, sample);
+            double[] sample = p.sampleOne(random);
+            double logP = p.logPdf(sample);
+            double logQ = q.logPdf(sample);
             sum += (logP - logQ);
         }
         
@@ -130,8 +129,8 @@ public class SPRTSampler {
     }
     
     private double[] sampleFromGMM(GMMValue gmm) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         
         // Sample component
         double u = random.nextDouble();
@@ -181,8 +180,8 @@ public class SPRTSampler {
     }
     
     private double computeLogPDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
@@ -232,7 +231,7 @@ public class SPRTSampler {
         } else if ("diag".equals(type)) {
             for (int i = 0; i < d; i++) {
                 for (int j = 0; j < d; j++) {
-                    full[i][j] = (i == j) ? cov[i][0] : 0.0;
+                    full[i][j] = (i == j) ? cov[0][i] : 0.0;
                 }
             }
             return full;
@@ -266,10 +265,10 @@ public class SPRTSampler {
     }
     
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getK();
-        int kQ = q.getK();
+        int kP = p.getNComponents();
+        int kQ = q.getNComponents();
         int kM = kP + kQ;
-        int d = p.getD();
+        int d = p.getDimensions();
         String covType = p.getCovarianceType();
         
         double[] weightsM = new double[kM];
@@ -300,14 +299,46 @@ public class SPRTSampler {
             }
             return copy;
         } else if ("diag".equals(covType)) {
-            double[][] copy = new double[cov.length][1];
-            for (int i = 0; i < cov.length; i++) {
-                copy[i][0] = cov[i][0];
-            }
+            double[][] copy = new double[1][cov[0].length];
+            System.arraycopy(cov[0], 0, copy[0], 0, cov[0].length);
             return copy;
         } else {
             return new double[][] {{cov[0][0]}};
         }
+    }
+
+    private static double inverseStandardNormalCDF(double p) {
+        if (!(p > 0.0 && p < 1.0)) {
+            throw new IllegalArgumentException("p must be in (0,1), got " + p);
+        }
+        // Peter J. Acklam's rational approximation.
+        double[] a = {-3.969683028665376e+01, 2.209460984245205e+02,
+            -2.759285104469687e+02, 1.383577518672690e+02,
+            -3.066479806614716e+01, 2.506628277459239e+00};
+        double[] b = {-5.447609879822406e+01, 1.615858368580409e+02,
+            -1.556989798598866e+02, 6.680131188771972e+01,
+            -1.328068155288572e+01};
+        double[] c = {-7.784894002430293e-03, -3.223964580411365e-01,
+            -2.400758277161838e+00, -2.549732539343734e+00,
+            4.374664141464968e+00, 2.938163982698783e+00};
+        double[] d = {7.784695709041462e-03, 3.224671290700398e-01,
+            2.445134137142996e+00, 3.754408661907416e+00};
+        double plow = 0.02425;
+        double phigh = 1.0 - plow;
+        if (p < plow) {
+            double q = Math.sqrt(-2.0 * Math.log(p));
+            return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+                   ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0);
+        }
+        if (p > phigh) {
+            double q = Math.sqrt(-2.0 * Math.log(1.0 - p));
+            return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) /
+                    ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1.0);
+        }
+        double q = p - 0.5;
+        double r = q * q;
+        return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q /
+               (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1.0);
     }
     
     // Getters for statistics

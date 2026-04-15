@@ -225,7 +225,7 @@ public class ProbabilisticJoinFrameworkDemo {
             System.out.println(String.format("  Std:    (σ_w, σ_h) = (%.4f, %.4f) mm", 
                 Math.sqrt(fusedCov[0][0]), Math.sqrt(fusedCov[1][1])));
             System.out.println();
-            System.out.println("Dimensionality: d = " + fused.getD() + " (preserved)");
+            System.out.println("Dimensionality: d = " + fused.getDimensions() + " (preserved)");
         } else {
             System.out.println("✗ Fusion failed");
         }

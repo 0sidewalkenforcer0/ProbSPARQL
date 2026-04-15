@@ -9,7 +9,7 @@ import java.util.*;
 /**
  * Exp 4.4 — End-to-End Query Performance: GMM vs Histogram
  *
- * <p>Runs Q1 (CDF filter) and Q3 (pairwise JSD) on three dataset types:
+ * <p>Runs two Exp1-aligned probabilistic queries on three dataset types:
  * <ul>
  *   <li>GMM K=3 (from exp1 data files)</li>
  *   <li>Histogram B=50 (derived from same GMM)</li>
@@ -17,8 +17,13 @@ import java.util.*;
  * </ul>
  * at scales E3 (100 gears), E5 (1000 gears), E7 (10000 gears).
  *
- * <p>Both queries use identical SPARQL (polymorphic dispatch via {@code prob:cdf}
- * and {@code prob:jsd}).
+ * <p>The queries mirror the current Exp1 design:
+ * <ul>
+ *   <li>Q2: probabilistic filtering on CT tooth measurements via {@code prob:cdf}</li>
+ *   <li>Q4: CT-vs-SL distribution comparison on the same tooth via {@code prob:jsdivergence}</li>
+ * </ul>
+ *
+ * <p>Queries are loaded from {@code benchmark/queries/exp4/}.
  *
  * <p>Output CSV: {@code exp4_endtoend.csv}
  * <pre>Query,Scale,DistType,Param,N_entities,MedianMs,IQRMs</pre>
@@ -32,30 +37,7 @@ public class Exp4EndToEnd {
     private static int WARMUP_RUNS = 3;
     private static int TIMED_RUNS  = 10;
     private static boolean DEMO_MODE = false;
-
-    // Q1: CDF threshold filter (polymorphic — uses prob:cdf for both GMM and Hist)
-    private static final String Q1_CDF = """
-        PREFIX ag:   <http://example.org/ontology/anglegrinder#>
-        PREFIX cfm:  <http://example.org/ontology/cfm#>
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
-        PREFIX prob: <http://probsparql.org/function#>
-        SELECT (COUNT(*) AS ?n) WHERE {
-            ?rv uq:hasDistribution ?dist .
-            BIND(prob:cdf(?dist, 15.5) AS ?p)
-            FILTER(?p >= 0.8)
-        }""";
-
-    // Q3: Pairwise JSD (LIMIT 200 to keep runtime tractable at E7)
-    private static final String Q3_JSD = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
-        PREFIX prob: <http://probsparql.org/function#>
-        SELECT ?rv1 ?rv2 ?jsd WHERE {
-            ?rv1 uq:hasDistribution ?d1 .
-            ?rv2 uq:hasDistribution ?d2 .
-            FILTER(str(?rv1) < str(?rv2))
-            BIND(prob:jsd(?d1, ?d2) AS ?jsd)
-            FILTER(?jsd > 0.1)
-        } LIMIT 200""";
+    private static final String QUERY_DIR = "benchmark/queries/exp4";
 
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
@@ -72,6 +54,8 @@ public class Exp4EndToEnd {
             System.out.println("  [DEMO MODE: warmup=1, runs=1]");
         }
         new File(outputDir).mkdirs();
+        String q2Filter = readQuery(QUERY_DIR + "/q2_filter.sparql");
+        String q4Jsd = readQuery(QUERY_DIR + "/q4_jsd.sparql");
 
         System.out.println("=== Exp 4.4: End-to-End Query Performance ===");
         System.out.printf("  Data: %s  warmup=%d  runs=%d  demo=%b%n%n", dataDir, WARMUP_RUNS, TIMED_RUNS, DEMO_MODE);
@@ -90,8 +74,8 @@ public class Exp4EndToEnd {
             if (gmmDs != null) {
                 int n = countEntities(gmmDs);
                 System.out.printf("  GMM K=3  (N=%d)%n", n);
-                run("Q1-CDF", scale, "GMM", "K=3", n, gmmDs, Q1_CDF, rows);
-                run("Q3-JSD", scale, "GMM", "K=3", n, gmmDs, Q3_JSD, rows);
+                run("Q2-Filter", scale, "GMM", "K=3", n, gmmDs, q2Filter, rows);
+                run("Q4-JSD", scale, "GMM", "K=3", n, gmmDs, q4Jsd, rows);
                 gmmDs.close();
             }
 
@@ -102,8 +86,8 @@ public class Exp4EndToEnd {
                 if (histDs != null) {
                     int n = countEntities(histDs);
                     System.out.printf("  Hist B=%d  (N=%d)%n", B, n);
-                    run("Q1-CDF", scale, "Hist", "B=" + B, n, histDs, Q1_CDF, rows);
-                    run("Q3-JSD", scale, "Hist", "B=" + B, n, histDs, Q3_JSD, rows);
+                    run("Q2-Filter", scale, "Hist", "B=" + B, n, histDs, q2Filter, rows);
+                    run("Q4-JSD", scale, "Hist", "B=" + B, n, histDs, q4Jsd, rows);
                     histDs.close();
                 } else {
                     System.out.printf("  SKIP Hist B=%d: %s not found%n", B, histPath);
@@ -170,6 +154,10 @@ public class Exp4EndToEnd {
     }
 
     private static String fmt(double v) { return String.format("%.3f", v); }
+
+    private static String readQuery(String path) throws IOException {
+        return new String(java.nio.file.Files.readAllBytes(java.nio.file.Paths.get(path)));
+    }
 
     private static void writeCsv(String path, List<String[]> rows) throws IOException {
         try (PrintWriter pw = new PrintWriter(new FileWriter(path))) {

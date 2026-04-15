@@ -17,30 +17,30 @@ import java.util.*;
  *
  * <h3>Dataset naming convention</h3>
  * <pre>
- *   benchmark/data/exp1/exp1_{scale}_K{k}.ttl   — probabilistic (uq:gmmLiteral)
- *   benchmark/data/exp1/exp1_{scale}_det.ttl     — deterministic (xsd:double)
+ *   benchmark/data/exp1/main/exp1_{scale}_K{k}.ttl   — probabilistic (uq:gmmLiteral)
+ *   benchmark/data/exp1/main/exp1_{scale}_det.ttl     — deterministic (xsd:double)
  * </pre>
  *
  * <h3>Query files</h3>
  * <pre>
- *   benchmark/queries/exp1_det/q1.sparql  q2.sparql  q4.sparql
- *   benchmark/queries/exp1_prob/q1.sparql q2.sparql  q3.sparql  q4.sparql
+ *   benchmark/queries/exp1/det/q1.sparql  q2.sparql  q3.sparql
+ *   benchmark/queries/exp1/prob/q1.sparql q2.sparql  q3.sparql  q4.sparql
  * </pre>
  *
  * <h3>Output CSVs</h3>
  * <pre>
- *   benchmark/results/exp1/exp1_raw.csv     — Scale,K,QueryID,Type,Run,Time_ms
- *   benchmark/results/exp1/exp1_summary.csv — Scale,K,QueryID,Type,Median_ms,IQR_ms,OverheadRatio
+ *   benchmark/results/exp1/main/exp1_raw.csv     — Scale,K,QueryID,Type,Run,Time_ms
+ *   benchmark/results/exp1/main/exp1_summary.csv — Scale,K,QueryID,Type,Median_ms,IQR_ms,OverheadRatio
  * </pre>
  *
  * <h3>Usage</h3>
  * <pre>
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.ScalabilityBenchmark"
  *   # Optional flags:
- *   #   --data-dir   benchmark/data/exp1
- *   #   --query-dir  benchmark/queries
- *   #   --output-dir benchmark/results/exp1
- *   #   --scales     E1 E2 E3 E4 E5 E6 E7
+ *   #   --data-dir   benchmark/data/exp1/main
+ *   #   --query-dir  benchmark/queries/exp1
+ *   #   --output-dir benchmark/results/exp1/main
+ *   #   --scales     E1 E3 E5 E7
  *   #   --k-values   1 3 5 10
  * </pre>
  */
@@ -49,7 +49,7 @@ public class ScalabilityBenchmark {
     private static int WARMUP_RUNS    = 3;
     private static int BENCHMARK_RUNS = 10;
 
-    private static final String[] DEFAULT_SCALES   = {"E1", "E2", "E3", "E4", "E5", "E6", "E7"};
+    private static final String[] DEFAULT_SCALES   = {"E1", "E3", "E5", "E7"};
     private static final int[]    DEFAULT_K_VALUES  = {1, 3, 5, 10};
 
     // -----------------------------------------------------------------------
@@ -60,9 +60,9 @@ public class ScalabilityBenchmark {
         ProbSPARQL.init();
 
         // Defaults
-        String dataDir   = "benchmark/data/exp1";
-        String queryDir  = "benchmark/queries";
-        String outputDir = "benchmark/results/exp1";
+        String dataDir   = "benchmark/data/exp1/main";
+        String queryDir  = "benchmark/queries/exp1";
+        String outputDir = "benchmark/results/exp1/main";
         List<String>  scales  = new ArrayList<>(Arrays.asList(DEFAULT_SCALES));
         List<Integer> kValues = new ArrayList<>();
         for (int k : DEFAULT_K_VALUES) kValues.add(k);
@@ -104,7 +104,7 @@ public class ScalabilityBenchmark {
         // DET medians per (scale, queryId) used to compute overhead ratios
         Map<String, Double> detMedians = new HashMap<>();
 
-        String[] detQueryIds  = {"Q1", "Q2", "Q4"};
+        String[] detQueryIds  = {"Q1", "Q2", "Q3"};
         String[] probQueryIds = {"Q1", "Q2", "Q3", "Q4"};
 
         for (String scale : scales) {
@@ -117,7 +117,7 @@ public class ScalabilityBenchmark {
             Dataset detDs    = DatasetFactory.create(detModel);
 
             for (String qid : detQueryIds) {
-                String sparqlPath = queryDir + "/exp1_det/" + qid.toLowerCase() + ".sparql";
+                String sparqlPath = queryDir + "/det/" + qid.toLowerCase() + ".sparql";
                 Query  query      = loadQuery(sparqlPath);
                 long[] times      = runTimed(detDs, query);
                 double medMs      = median(times);
@@ -142,14 +142,14 @@ public class ScalabilityBenchmark {
                 Dataset probDs    = DatasetFactory.create(probModel);
 
                 for (String qid : probQueryIds) {
-                    String sparqlPath = queryDir + "/exp1_prob/" + qid.toLowerCase() + ".sparql";
+                    String sparqlPath = queryDir + "/prob/" + qid.toLowerCase() + ".sparql";
                     Query  query      = loadQuery(sparqlPath);
                     long[] times      = runTimed(probDs, query);
                     double medMs      = median(times);
                     double iqrMs      = iqr(times);
 
                     String ratioStr;
-                    if ("Q3".equals(qid)) {
+                    if ("Q4".equals(qid)) {
                         ratioStr = "—";   // No deterministic equivalent
                     } else {
                         Double detMed = detMedians.get(scale + "::" + qid);

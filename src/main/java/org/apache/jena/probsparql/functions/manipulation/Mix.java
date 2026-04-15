@@ -57,10 +57,10 @@ public class Mix extends FunctionBase3 {
         }
         
         // Validate compatibility
-        if (gmm1.getD() != gmm2.getD()) {
+        if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
                 "GMMs must have same dimensionality for mixing. Got d1=" + 
-                gmm1.getD() + ", d2=" + gmm2.getD());
+                gmm1.getDimensions() + ", d2=" + gmm2.getDimensions());
         }
         
         GMMValue mixedGMM = computeMixture(gmm1, gmm2, alpha);
@@ -106,9 +106,9 @@ public class Mix extends FunctionBase3 {
      * Result: [α*GMM1 components, (1-α)*GMM2 components]
      */
     private GMMValue computeMixture(GMMValue gmm1, GMMValue gmm2, double alpha) {
-        int K1 = gmm1.getK();
-        int K2 = gmm2.getK();
-        int d = gmm1.getD();
+        int K1 = gmm1.getNComponents();
+        int K2 = gmm2.getNComponents();
+        int d = gmm1.getDimensions();
         
         int K = K1 + K2;
         

@@ -50,10 +50,10 @@ public class KLDivergence extends FunctionBase2 {
         GMMValue gmm2 = extractGMM(gmm2Node, "second");
         
         // Validate compatibility
-        if (gmm1.getD() != gmm2.getD()) {
+        if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
-                "GMMs must have same dimensionality. Got d1=" + gmm1.getD() + 
-                ", d2=" + gmm2.getD());
+                "GMMs must have same dimensionality. Got d1=" + gmm1.getDimensions() +
+                ", d2=" + gmm2.getDimensions());
         }
         
         double kl = computeKLDivergence(gmm1, gmm2, DEFAULT_SAMPLES);
@@ -111,8 +111,8 @@ public class KLDivergence extends FunctionBase2 {
      * 2. Sample from N(μ_k, Σ_k)
      */
     private double[] sampleFromGMM(GMMValue gmm) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
@@ -193,8 +193,8 @@ public class KLDivergence extends FunctionBase2 {
      * Compute log PDF of GMM at a point.
      */
     private double computeLogPDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

@@ -72,7 +72,7 @@ echo "  Python       : $PYTHON_BIN"
 echo "  Filter       : ${ONLY:-all sub-experiments}"
 echo
 
-SCRIPTS="${PROJECT_ROOT}/benchmark/scripts"
+SCRIPTS="${PROJECT_ROOT}/benchmark/scripts/Experiments3"
 
 # ── Helper: run one analysis script ──────────────────────────────────────────
 run_analysis() {

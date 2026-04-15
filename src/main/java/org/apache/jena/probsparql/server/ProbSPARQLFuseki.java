@@ -38,6 +38,7 @@ public class ProbSPARQLFuseki {
     
     private static final int DEFAULT_PORT = 3030;
     private static final String DATASET_NAME = "probsparql";
+    private static final String STATIC_UI_DIR = new File("src/main/resources/fuseki-ui").getAbsolutePath();
     
     private FusekiServer server;
     
@@ -85,6 +86,7 @@ public class ProbSPARQLFuseki {
         logger.info("Starting Fuseki server...");
         server = FusekiServer.create()
             .port(port)
+            .staticFileBase(STATIC_UI_DIR)
             .add("/" + DATASET_NAME, dataset)
             .build();
         

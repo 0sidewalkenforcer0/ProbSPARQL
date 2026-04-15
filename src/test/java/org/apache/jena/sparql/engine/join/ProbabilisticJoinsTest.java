@@ -67,7 +67,7 @@ public class ProbabilisticJoinsTest {
         // Test join
         GMMValue result = exactJoin.join(Arrays.asList(gmm1, gmm2), 0.0);
         assertNotNull(result, "Exact join should succeed for identical distributions");
-        assertEquals(1, result.getD(), "Result should have same dimensionality");
+        assertEquals(1, result.getDimensions(), "Result should have same dimensionality");
     }
     
     @Test
@@ -116,7 +116,7 @@ public class ProbabilisticJoinsTest {
         // Test 3-way join
         GMMValue result = fuseJoin.join(Arrays.asList(gmm1, gmm2, gmm3), 0.1);
         assertNotNull(result, "3-way fuse join should succeed for compatible distributions");
-        assertEquals(1, result.getD(), "Result should maintain dimensionality");
+        assertEquals(1, result.getDimensions(), "Result should maintain dimensionality");
         
         // The fused mean should be close to 5.0 (Bayesian fusion)
         double fusedMean = result.getMeans()[0][0];

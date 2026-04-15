@@ -224,7 +224,7 @@ public class Exp4DispatchTest {
         double[] w = new double[k];
         double wSum = 0;
         for (int i = 0; i < k; i++) { w[i] = rng.nextDouble(0.1, 1.0); wSum += w[i]; }
-        StringBuilder sb = new StringBuilder("{\"K\":" + k + ",\"d\":1,\"covariance_type\":\"diag\",\"weights\":[");
+        StringBuilder sb = new StringBuilder("{\"n_components\":" + k + ",\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[");
         for (int i = 0; i < k; i++) { if (i > 0) sb.append(","); sb.append(String.format("%.6f", w[i] / wSum)); }
         sb.append("],\"means\":[");
         for (int i = 0; i < k; i++) { if (i > 0) sb.append(","); sb.append(String.format("[%.4f]", rng.nextDouble(13.0, 17.0))); }
@@ -240,15 +240,38 @@ public class Exp4DispatchTest {
     private static String makeHistJson(int B, ThreadLocalRandom rng) {
         int[] counts = new int[B];
         for (int i = 0; i < B; i++) { counts[i] = rng.nextInt(1, 50); }
-        StringBuilder sb = new StringBuilder("{\"B\":" + B + ",\"min\":" + String.format("%.4f", HIST_LO)
-                + ",\"max\":" + String.format("%.4f", HIST_HI) + ",\"counts\":[");
-        for (int i = 0; i < B; i++) { if (i > 0) sb.append(","); sb.append(counts[i]); }
+        double total = 0.0;
+        for (int c : counts) total += c;
+        StringBuilder sb = new StringBuilder("{\"bins\":[");
+        double width = (HIST_HI - HIST_LO) / B;
+        for (int i = 0; i <= B; i++) {
+            if (i > 0) sb.append(",");
+            sb.append(String.format("%.4f", HIST_LO + i * width));
+        }
+        sb.append("],\"weights\":[");
+        double[] weights = roundedWeights(counts, total);
+        for (int i = 0; i < B; i++) {
+            if (i > 0) sb.append(",");
+            sb.append(String.format("%.6f", weights[i]));
+        }
         sb.append("]}");
         return sb.toString();
     }
 
+    private static double[] roundedWeights(int[] counts, double total) {
+        int n = counts.length;
+        double[] weights = new double[n];
+        double sum = 0.0;
+        for (int i = 0; i < n - 1; i++) {
+            weights[i] = Math.round((counts[i] / total) * 1_000_000.0) / 1_000_000.0;
+            sum += weights[i];
+        }
+        weights[n - 1] = Math.round((1.0 - sum) * 1_000_000.0) / 1_000_000.0;
+        return weights;
+    }
+
     private static String makeDirJson(int k, ThreadLocalRandom rng) {
-        StringBuilder sb = new StringBuilder("{\"type\":\"dirichlet\",\"k\":" + k + ",\"alpha\":[");
+        StringBuilder sb = new StringBuilder("{\"alphas\":[");
         for (int i = 0; i < k; i++) {
             if (i > 0) sb.append(",");
             sb.append(String.format("%.4f", rng.nextDouble(0.5, 5.0)));

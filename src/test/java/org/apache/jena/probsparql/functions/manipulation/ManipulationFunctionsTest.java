@@ -186,7 +186,7 @@ public class ManipulationFunctionsTest {
         GMMValue mixed = (GMMValue) result.asNode().getLiteralValue();
         
         // Should have K=2 components
-        assertEquals(2, mixed.getK());
+        assertEquals(2, mixed.getNComponents());
         
         // Weights should be [0.7, 0.3]
         assertEquals(0.7, mixed.getWeights()[0], 1e-6);
@@ -231,7 +231,7 @@ public class ManipulationFunctionsTest {
         
         // Product of two Gaussians N(0,4) and N(6,4)
         // Posterior should be N(3.0, 2.0)
-        assertEquals(1, posterior.getK());
+        assertEquals(1, posterior.getNComponents());
         
         // Mean should be around 3.0
         double posteriorMean = posterior.getMeans()[0][0];
@@ -347,7 +347,7 @@ public class ManipulationFunctionsTest {
         GMMValue posterior = (GMMValue) result.asNode().getLiteralValue();
         
         // Should have K = 2*1 = 2 components
-        assertEquals(2, posterior.getK());
+        assertEquals(2, posterior.getNComponents());
         
         // Weights should sum to 1
         double weightSum = 0.0;

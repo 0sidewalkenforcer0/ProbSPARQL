@@ -1,0 +1,16 @@
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX om:   <http://example.org/ontology/om#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?value WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               cfm:representedBy ?rv ;
+               om:hasValue ?value .
+  ?rv cfm:hasDistribution ?distribution .
+  BIND(prob:cdf(?distribution, 9.8) AS ?p)
+  FILTER(?value < 9.8)
+}

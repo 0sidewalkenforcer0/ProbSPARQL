@@ -30,7 +30,7 @@ SCALE_MAP = {"E1": 10, "E2": 50, "E3": 100, "E4": 500,
              "E5": 1000, "E6": 5000, "E7": 10000}
 
 RESULTS_DIR = os.path.join(os.path.dirname(__file__),
-                            "..", "results", "exp1_full")
+                            "..", "results", "exp1", "main")
 CSV_PATH  = os.path.join(RESULTS_DIR, "exp1_summary.csv")
 OUT_PNG   = os.path.join(RESULTS_DIR, "exp1_chart_loglog.png")
 OUT_PDF   = os.path.join(RESULTS_DIR, "exp1_chart_loglog.pdf")

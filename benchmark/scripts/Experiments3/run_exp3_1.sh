@@ -26,7 +26,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp3_full}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp3_full/exp3_1}"
 DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 
@@ -40,6 +40,7 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
     export JAVA_HOME
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
+export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" \
 
 echo "=================================================================="
 echo "  Experiment 3.1 — SimJoin Classification Accuracy"
@@ -82,7 +83,7 @@ done
 if [[ $MISSING -eq 1 ]]; then
     echo ""
     echo "  Run generate_sim_join_data.py first:"
-    echo "    python3 benchmark/scripts/generate_sim_join_data.py --output-dir $DATA_DIR"
+    echo "    python3 benchmark/scripts/Experiments3/generate_sim_join_data.py --output-dir $DATA_DIR"
     exit 1
 fi
 
@@ -91,10 +92,18 @@ echo
 echo "[3/3] Running ClassificationAccuracyBenchmark..."
 START_TS=$SECONDS
 
+
+REPEAT="${REPEAT:-10}"
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.ClassificationAccuracyBenchmark" \
-    "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR}" \
+    "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR} --repeat ${REPEAT}"
     2>&1 | tee "${OUTPUT_DIR}/exp3_1_run.log"
+
+# Original command without REPEAT override: 
+# mvn -q exec:java \
+#     -Dexec.mainClass="org.apache.jena.probsparql.ClassificationAccuracyBenchmark" \
+#     "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR}" \
+#     2>&1 | tee "${OUTPUT_DIR}/exp3_1_run.log"
 
 ELAPSED=$(( SECONDS - START_TS ))
 echo

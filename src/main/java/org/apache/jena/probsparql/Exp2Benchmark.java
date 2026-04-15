@@ -3,39 +3,46 @@ package org.apache.jena.probsparql;
 import org.apache.jena.probsparql.exp2.Exp2PruningHolder;
 import org.apache.jena.probsparql.exp2.PruningStats;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.Lang;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Experiment 2 — In-Engine vs External (three-way comparison)
+ * Experiment 2 — In-engine Filtering vs SimilarityJoin with Mixed-K Datasets
  *
- * <p>Three approaches:
+ * <p>Three variants are compared in-process (same JVM, same GT_10K JSD):
  * <ul>
- *   <li><b>A — Naive in-engine</b>: BIND(prob:jsdivergence) + FILTER inside SPARQL</li>
- *   <li><b>B — External (fetch)</b>: bare BGP export; Python computes JSD externally</li>
- *   <li><b>C — Pruned SimJoin</b>: SIMILARITYJOIN with 5-level pruning cascade</li>
+ *   <li><b>InEngine_CheapFirst</b>:
+ *       SPARQL with modeCount filters before jsdivergence.</li>
+ *   <li><b>InEngine_JSDFirst</b>:
+ *       SPARQL with jsdivergence + threshold before modeCount filters.</li>
+ *   <li><b>SimilarityJoin</b>:
+ *       Uses filter-pushdown into iterator + discretized JSD lower bound pruning.</li>
  * </ul>
  *
- * <p>Thresholds are calibrated per-scale using percentile-based selectivity
- * (10 %, 50 %, 90 %) rather than fixed values.
+ * <p>Experimental variable: {@code unimodalFrac} — the fraction of entities with
+ * K=1 (unimodal). As unimodalFrac increases, the modeCount pre-filter eliminates
+ * more work before the expensive JSD computation, amplifying SimilarityJoin's advantage.
+ *
+ * <p>Design: {@code N_PAIRS × UNIMODAL_FRACS × SEL_LABELS} = 45 configurations.
+ * Each configuration runs WARMUP=1 + RUNS=3 for each approach; median is reported.
+ * Calibration uses multimodal-only pair JSD values.
  *
  * <p>Output files (written to {@code --output-dir}):
  * <pre>
- *   exp2_calibration.csv   — per-scale θ values
- *   exp2_a.csv             — Approach A timings
- *   exp2_b_fetch.csv       — Approach B fetch timings + export size
- *   exp2_c.csv             — Approach C timings
- *   exp2_pruning_stats.csv — per-level pruning counts for Approach C
- *   exp2_pairs_{N}.json    — exported GMM pairs for Python external baseline
+ *   exp2_calibration.csv          — per-scale/fraction θ values
+ *   exp2_inengine_cheapfirst.csv  — InEngine_CheapFirst timings
+ *   exp2_inengine_jsdfirst.csv    — InEngine_JSDFirst timings
+ *   exp2_similarityjoin.csv       — SimilarityJoin timings
+ *   exp2_pruning_stats.csv        — per-level pruning counts for SimilarityJoin
  * </pre>
- *
  * Usage:
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.Exp2Benchmark" \
- *       -Dexec.args="--output-dir benchmark/results/exp2"
+ *       -Dexec.args="--output-dir benchmark/results/exp2 --data-dir benchmark/data/exp2 --query-dir benchmark/queries/exp2"
  */
 public class Exp2Benchmark {
 
@@ -43,72 +50,26 @@ public class Exp2Benchmark {
     // Configuration
     // -----------------------------------------------------------------------
 
-    private static final int WARMUP_RUNS    = 1;
-    private static final int BENCHMARK_RUNS = 1;
+    private static int WARMUP_RUNS    = 3;
+    private static int BENCHMARK_RUNS = 10;
 
     /** Target pair counts. nEntities = ceil((1 + sqrt(1 + 8*N)) / 2) */
-    private static final int[] N_PAIRS = {100, 500, 1000, 5000, 10_000};
+    private static final int[] DEFAULT_N_PAIRS = {10_000};
 
-    private static final int K_COMPONENTS = 3;   // GMM components (fixed for this experiment)
+    /** Fraction of entities with K=1 (unimodal). Rest have K=3 (multimodal). */
+    private static final double[] UNIMODAL_FRACS = {0.2, 0.5, 0.8};
 
-    // Selectivity labels must match order of percentiles in calibration
-    private static final String[] SEL_LABELS    = {"10pct", "50pct", "90pct"};
-    private static final double[] SEL_PERCENTILES = {0.10, 0.50, 0.90};
+    private static final String[] SEL_LABELS      = {"10pct", "50pct", "90pct"};
+    private static final double[] SEL_PERCENTILES  = {0.10, 0.50, 0.90};
 
-    private static final String NS_EX   = "http://example.org/data/";
-    private static final String NS_UQ   = "http://example.org/ontology/uncertainty#";
+    private static final String NS_EX = "http://example.org/data/";
+    private static final String NS_UQ = "http://example.org/ontology/uncertainty#";
 
     // -----------------------------------------------------------------------
-    // SPARQL query templates
+    // Query loading
     // -----------------------------------------------------------------------
 
-    /** Approach A: naive in-engine filter. */
-    private static String qNaive(double theta) {
-        return String.format("""
-            PREFIX uq:   <http://example.org/ontology/uncertainty#>
-            PREFIX prob: <http://probsparql.org/function#>
-            SELECT ?rv1 ?rv2 WHERE {
-                ?rv1 uq:hasDistribution ?d1 .
-                ?rv2 uq:hasDistribution ?d2 .
-                FILTER(str(?rv1) < str(?rv2))
-                BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)
-                FILTER(?jsd <= %.6f)
-            }""", theta);
-    }
-
-    /** Calibration: collect all JSD values (no threshold). */
-    private static final String Q_COLLECT_ALL = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
-        PREFIX prob: <http://probsparql.org/function#>
-        SELECT ?jsd WHERE {
-            ?rv1 uq:hasDistribution ?d1 .
-            ?rv2 uq:hasDistribution ?d2 .
-            FILTER(str(?rv1) < str(?rv2))
-            BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)
-        }""";
-
-    /** Approach B Step 1: bare BGP export. */
-    private static final String Q_FETCH = """
-        PREFIX uq: <http://example.org/ontology/uncertainty#>
-        SELECT ?rv1 ?rv2 ?d1 ?d2 WHERE {
-            ?rv1 uq:hasDistribution ?d1 .
-            ?rv2 uq:hasDistribution ?d2 .
-            FILTER(str(?rv1) < str(?rv2))
-        }""";
-
-    /** Approach C: pruned SIMILARITYJOIN (relational semantics).
-     *  No outer FILTER needed — deduplication is handled inside the operator
-     *  when probsparql.simjoin.deduplicate=true.
-     */
-    private static String qSimJoin(double theta) {
-        return String.format("""
-            PREFIX uq: <http://example.org/ontology/uncertainty#>
-            SELECT ?rv1 ?rv2 WHERE {
-              { ?rv1 uq:hasDistribution ?d1 . }
-              SIMILARITYJOIN(?d1, ?d2, %.6f)
-              { ?rv2 uq:hasDistribution ?d2 . }
-            }""", theta);
-    }
+    private static final String THETA_PLACEHOLDER = "__THETA__";
 
     // -----------------------------------------------------------------------
     // main
@@ -117,126 +78,159 @@ public class Exp2Benchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        // Force GT_10K for all JSD computations (calibration, Approach A, and C L5 fallback)
-        System.setProperty("probsparql.mode", "GT_10K");
-        org.apache.jena.probsparql.functions.comparison.JSDivergenceConfig.reloadMode();
+        // Mode is applied after argument parsing (see below)
 
-        String outputDir = "benchmark/results/exp2";
+        String outputDir  = "benchmark/results/exp2";
+        String dataDir    = "benchmark/data/exp2";
+        String queryDir   = "benchmark/queries/exp2";
+        String jsdMode    = System.getProperty("probsparql.mode", "GT_1K");
+        int[] nPairsList  = DEFAULT_N_PAIRS;
         for (int i = 0; i < args.length; i++) {
             if ("--output-dir".equals(args[i]) && i + 1 < args.length) {
                 outputDir = args[++i];
+            } else if ("--data-dir".equals(args[i]) && i + 1 < args.length) {
+                dataDir = args[++i];
+            } else if ("--query-dir".equals(args[i]) && i + 1 < args.length) {
+                queryDir = args[++i];
+            } else if ("--mode".equals(args[i]) && i + 1 < args.length) {
+                jsdMode = args[++i];
+            } else if ("--warmup".equals(args[i]) && i + 1 < args.length) {
+                WARMUP_RUNS = Integer.parseInt(args[++i]);
+            } else if ("--runs".equals(args[i]) && i + 1 < args.length) {
+                BENCHMARK_RUNS = Integer.parseInt(args[++i]);
+            } else if ("--npairs".equals(args[i]) && i + 1 < args.length) {
+                nPairsList = parseIntList(args[++i]);
             }
         }
+        // Apply chosen mode (allows --mode GT_10K override on command line)
+        System.setProperty("probsparql.mode", jsdMode);
+        org.apache.jena.probsparql.functions.comparison.JSDivergenceConfig.reloadMode();
         new File(outputDir).mkdirs();
 
-        System.out.println("=== Exp2Benchmark: In-Engine vs External (3-way) ===");
-        System.out.printf("Warmup=%d  Runs=%d  K=%d%n%n", WARMUP_RUNS, BENCHMARK_RUNS, K_COMPONENTS);
+        System.out.println("=== Exp2Benchmark: ===");
+        System.out.printf("Warmup=%d  Runs=%d  Mode=%s%n",
+            WARMUP_RUNS, BENCHMARK_RUNS, jsdMode);
+        System.out.printf("Dataset dir=%s%n", dataDir);
+        System.out.printf("Query dir=%s%n%n", queryDir);
+
+        String qInEngineCheapFirstTemplate = readQueryTemplate(queryDir, "inengine_cheapfirst.sparql");
+        String qInEngineJsdFirstTemplate   = readQueryTemplate(queryDir, "inengine_jsdfirst.sparql");
+        String qCollectMultimodal          = readQueryTemplate(queryDir, "collect_multimodal.sparql");
+        String qSimilarityJoinTemplate     = readQueryTemplate(queryDir, "similarityjoin.sparql");
 
         // CSV row lists
-        List<String[]> calibRows    = new ArrayList<>();
-        List<String[]> aRows        = new ArrayList<>();
-        List<String[]> bFetchRows   = new ArrayList<>();
-        List<String[]> cRows        = new ArrayList<>();
-        List<String[]> pruningRows  = new ArrayList<>();
+        List<String[]> calibRows   = new ArrayList<>();
+        List<String[]> inEngineCheapFirstRows = new ArrayList<>();
+        List<String[]> inEngineJsdFirstRows   = new ArrayList<>();
+        List<String[]> similarityJoinRows     = new ArrayList<>();
+        List<String[]> pruningRows = new ArrayList<>();
 
-        calibRows.add(new String[]{"NPairs", "TotalPairs", "Theta_10pct", "Theta_50pct", "Theta_90pct"});
-        aRows.add(new String[]{"NPairs", "Selectivity", "Theta", "Time_ms", "ResultCount"});
-        bFetchRows.add(new String[]{"NPairs", "Selectivity", "Theta", "Fetch_ms", "ExportSizeBytes"});
-        cRows.add(new String[]{"NPairs", "Selectivity", "Theta", "Time_ms", "ResultCount"});
+        calibRows.add(new String[]{
+            "NPairs", "UnimodalFrac", "TotalPairs", "MultimodalPairs",
+            "Theta_10pct", "Theta_50pct", "Theta_90pct"});
+        inEngineCheapFirstRows.add(new String[]{
+            "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
+        inEngineJsdFirstRows.add(new String[]{
+            "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
+        similarityJoinRows.add(new String[]{
+            "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
         pruningRows.add(new String[]{
-            "NPairs", "Selectivity", "Theta",
+            "NPairs", "UnimodalFrac", "Selectivity", "Theta",
             "TotalPairs", "PrunedDim", "PrunedMean", "PrunedVar", "PrunedBounds",
-            "FullJSD", "ResultCount", "PruningRate"
-        });
+            "FullJSD", "ResultCount", "PruningRate"});
 
-        for (int nPairs : N_PAIRS) {
+        for (int nPairs : nPairsList) {
             int n = (int) Math.ceil((1.0 + Math.sqrt(1.0 + 8.0 * nPairs)) / 2.0);
-            System.out.printf("════ nPairs≈%d  (n=%d entities) ════════════════%n", nPairs, n);
 
-            Dataset ds = buildDataset(n);
+            for (double unimodalFrac : UNIMODAL_FRACS) {
+                System.out.printf("════ nPairs≈%d  n=%d  unimodalFrac=%.1f ══════════%n",
+                    nPairs, n, unimodalFrac);
 
-            // ── Calibration ──────────────────────────────────────────────
-            double[] thetas = calibrate(ds, nPairs);
-            int actualPairs = (int)(n * (long)(n - 1) / 2);
-            System.out.printf("  Calibration: θ₁₀=%.4f  θ₅₀=%.4f  θ₉₀=%.4f  (pairs≈%d)%n",
-                thetas[0], thetas[1], thetas[2], actualPairs);
-            calibRows.add(new String[]{
-                str(nPairs), str(actualPairs),
-                fmt(thetas[0]), fmt(thetas[1]), fmt(thetas[2])
-            });
+                Dataset ds = loadDataset(dataDir, nPairs, unimodalFrac);
 
-            // Export GMM pairs JSON (for Python external baseline) — done once per scale
-            List<String[]> pairsList = exportPairs(ds);
-            writePairsJson(outputDir + "/exp2_pairs_" + nPairs + ".json", pairsList);
+                int actualPairs = n * (n - 1) / 2;
+                int nMultimodal = n - (int)(n * unimodalFrac);
+                int multimodalPairs = nMultimodal * (nMultimodal - 1) / 2;
 
-            for (int si = 0; si < SEL_LABELS.length; si++) {
-                String sel   = SEL_LABELS[si];
-                double theta = thetas[si];
+                // ── Calibration (multimodal-only JSD) ────────────────────
+                double[] thetas = calibrate(ds, qCollectMultimodal);
+                System.out.printf(
+                    "  Calib: θ₁₀=%.4f  θ₅₀=%.4f  θ₉₀=%.4f  (mm_pairs=%d)%n",
+                    thetas[0], thetas[1], thetas[2], multimodalPairs);
+                calibRows.add(new String[]{
+                    str(nPairs), fmt(unimodalFrac),
+                    str(actualPairs), str(multimodalPairs),
+                    fmt(thetas[0]), fmt(thetas[1]), fmt(thetas[2])
+                });
 
-                System.out.printf("  ── selectivity=%s  θ=%.4f ─────────────%n", sel, theta);
+                for (int si = 0; si < SEL_LABELS.length; si++) {
+                    String sel   = SEL_LABELS[si];
+                    double theta = thetas[si];
 
-                // ── Approach A ───────────────────────────────────────────
-                TimingResult rA = measure(ds, qNaive(theta));
-                System.out.printf("     A (naive)   : %.2f ms  (%d results)%n",
-                    rA.timeMs, rA.resultCount);
-                aRows.add(new String[]{str(nPairs), sel, fmt(theta), fmt(rA.timeMs), str(rA.resultCount)});
+                    System.out.printf("  ── sel=%s  θ=%.4f ──────────────────%n", sel, theta);
 
-                // ── Approach B (fetch) ───────────────────────────────────
-                TimingResult rB = measureFetch(ds);
-                System.out.printf("     B (fetch)   : %.2f ms  (%d bytes exported)%n",
-                    rB.timeMs, rB.exportBytes);
-                bFetchRows.add(new String[]{str(nPairs), sel, fmt(theta),
-                    fmt(rB.timeMs), str(rB.exportBytes)});
+                    // ── InEngine_CheapFirst ──────────────────────────────
+                    TimingResult rInEngineCheapFirst = measureMedian(ds, withTheta(qInEngineCheapFirstTemplate, theta));
+                    System.out.printf("     InEngine_CheapFirst        : %.2f ms  (%d results)%n",
+                        rInEngineCheapFirst.timeMs, rInEngineCheapFirst.resultCount);
+                    inEngineCheapFirstRows.add(new String[]{
+                        str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
+                        fmt(rInEngineCheapFirst.timeMs), str(rInEngineCheapFirst.resultCount)});
 
-                // ── Approach C (pruned SimJoin) ───────────────────────────
-                System.setProperty("probsparql.simjoin.pruning",      "true");
-                System.setProperty("probsparql.simjoin.deduplicate",  "true");
-                try {
-                    TimingResult rC = measureWithPruning(ds, qSimJoin(theta));
-                    System.setProperty("probsparql.simjoin.pruning",     "false");
-                    System.clearProperty("probsparql.simjoin.deduplicate");
+                    // ── InEngine_JSDFirst ────────────────────────────────
+                    TimingResult rInEngineJsdFirst = measureMedian(ds, withTheta(qInEngineJsdFirstTemplate, theta));
+                    System.out.printf("     InEngine_JSDFirst          : %.2f ms  (%d results)%n",
+                        rInEngineJsdFirst.timeMs, rInEngineJsdFirst.resultCount);
+                    inEngineJsdFirstRows.add(new String[]{
+                        str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
+                        fmt(rInEngineJsdFirst.timeMs), str(rInEngineJsdFirst.resultCount)});
 
-                    System.out.printf("     C (simjoin) : %.2f ms  (%d results)  pruning=%.1f%%%n",
-                        rC.timeMs, rC.resultCount,
-                        rC.pruning != null ? rC.pruning.pruningRate() * 100 : 0.0);
+                    // ── SimilarityJoin ────────────────────────────────────
+                    System.setProperty("probsparql.simjoin.pruning",     "true");
+                    System.setProperty("probsparql.simjoin.deduplicate", "true");
+                    try {
+                        TimingResult rSimilarityJoin = measureWithPruning(ds, withTheta(qSimilarityJoinTemplate, theta));
+                        System.out.printf("     SimilarityJoin (pruning=%.1f%%): %.2f ms  (%d results)%n",
+                            rSimilarityJoin.pruning != null ? rSimilarityJoin.pruning.pruningRate() * 100 : 0.0,
+                            rSimilarityJoin.timeMs, rSimilarityJoin.resultCount);
 
-                    cRows.add(new String[]{str(nPairs), sel, fmt(theta),
-                        fmt(rC.timeMs), str(rC.resultCount)});
+                        similarityJoinRows.add(new String[]{
+                            str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
+                            fmt(rSimilarityJoin.timeMs), str(rSimilarityJoin.resultCount)});
 
-                    if (rC.pruning != null) {
-                        PruningStats ps = rC.pruning;
-                        pruningRows.add(new String[]{
-                            str(nPairs), sel, fmt(theta),
-                            str(ps.totalPairs), str(ps.prunedByDim), str(ps.prunedByMean),
-                            str(ps.prunedByVariance), str(ps.prunedByBounds),
-                            str(ps.computedFullJSD), str(ps.resultCount),
-                            fmt(ps.pruningRate())
-                        });
+                        if (rSimilarityJoin.pruning != null) {
+                            PruningStats ps = rSimilarityJoin.pruning;
+                            pruningRows.add(new String[]{
+                                str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
+                                str(ps.totalPairs), str(ps.prunedByDim), str(ps.prunedByMean),
+                                str(ps.prunedByVariance), str(ps.prunedByBounds),
+                                str(ps.computedFullJSD), str(ps.resultCount),
+                                fmt(ps.pruningRate())
+                            });
+                        }
+
+                        checkResultConsistency(
+                            rInEngineCheapFirst,
+                            rInEngineJsdFirst,
+                            rSimilarityJoin,
+                            nPairs, unimodalFrac, sel);
+
+                    } finally {
+                        System.setProperty("probsparql.simjoin.pruning",     "false");
+                        System.clearProperty("probsparql.simjoin.deduplicate");
                     }
-
-                    // ── Sanity check ─────────────────────────────────────
-                    double diff = Math.abs(rA.resultCount - rC.resultCount);
-                    if (rA.resultCount > 0 && diff / rA.resultCount > 0.05) {
-                        System.out.printf(
-                            "  [WARN] Result count mismatch: A=%d C=%d (%.1f%%)%n",
-                            rA.resultCount, rC.resultCount,
-                            diff / rA.resultCount * 100.0);
-                    }
-                } finally {
-                    System.setProperty("probsparql.simjoin.pruning",     "false");
-                    System.clearProperty("probsparql.simjoin.deduplicate");
                 }
-            }
 
-            ds.close();
-            System.out.println();
+                ds.close();
+                System.out.println();
+            }
         }
 
         // Write all CSVs
-        writeCsv(outputDir + "/exp2_calibration.csv",   calibRows);
-        writeCsv(outputDir + "/exp2_a.csv",             aRows);
-        writeCsv(outputDir + "/exp2_b_fetch.csv",       bFetchRows);
-        writeCsv(outputDir + "/exp2_c.csv",             cRows);
+        writeCsv(outputDir + "/exp2_calibration.csv", calibRows);
+        writeCsv(outputDir + "/exp2_inengine_cheapfirst.csv", inEngineCheapFirstRows);
+        writeCsv(outputDir + "/exp2_inengine_jsdfirst.csv", inEngineJsdFirstRows);
+        writeCsv(outputDir + "/exp2_similarityjoin.csv", similarityJoinRows);
         writeCsv(outputDir + "/exp2_pruning_stats.csv", pruningRows);
 
         System.out.println("Results written to: " + outputDir);
@@ -247,11 +241,11 @@ public class Exp2Benchmark {
     // -----------------------------------------------------------------------
 
     /**
-     * Run Q_COLLECT_ALL and return θ at the 10th, 50th, and 90th percentiles.
-     * These correspond to 90%, 50%, and 10% selectivity respectively.
+     * Run the multimodal-only calibration query and return θ at the 10th, 50th, 90th percentiles.
+     * Only considers multimodal-multimodal pairs, matching the retained variants.
      */
-    private static double[] calibrate(Dataset ds, int nPairs) {
-        Query q = QueryFactory.create(Q_COLLECT_ALL);
+    private static double[] calibrate(Dataset ds, String sparql) {
+        Query q = QueryFactory.create(sparql);
         List<Double> jsdValues = new ArrayList<>();
         try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
             ResultSet rs = qe.execSelect();
@@ -263,7 +257,6 @@ public class Exp2Benchmark {
             }
         }
         if (jsdValues.isEmpty()) {
-            // Degenerate case: no pairs found
             return new double[]{0.1, 0.3, 0.5};
         }
         Collections.sort(jsdValues);
@@ -282,15 +275,30 @@ public class Exp2Benchmark {
         return sorted.get(idx);
     }
 
+    private static String readQueryTemplate(String queryDir, String fileName) {
+        File file = new File(queryDir, fileName);
+        if (!file.exists()) {
+            throw new IllegalArgumentException("Missing query file: " + file);
+        }
+        try {
+            return Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Failed to read query file: " + file, e);
+        }
+    }
+
+    private static String withTheta(String template, double theta) {
+        return template.replace(THETA_PLACEHOLDER, fmt(theta));
+    }
+
     // -----------------------------------------------------------------------
     // Timing helpers
     // -----------------------------------------------------------------------
 
-    private static TimingResult measure(Dataset ds, String sparql) {
+    /** Execute query WARMUP+BENCHMARK times; report median of BENCHMARK runs. */
+    private static TimingResult measureMedian(Dataset ds, String sparql) {
         Query q = QueryFactory.create(sparql);
-        // warm-up
         for (int i = 0; i < WARMUP_RUNS; i++) execCount(ds, q);
-        // timed runs
         long[] times = new long[BENCHMARK_RUNS];
         int cnt = 0;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
@@ -299,55 +307,16 @@ public class Exp2Benchmark {
             times[i] = System.nanoTime() - t0;
         }
         Arrays.sort(times);
-        double ms = times[BENCHMARK_RUNS / 2] / 1_000_000.0;
+        double ms = times[times.length / 2] / 1_000_000.0;
         return new TimingResult(ms, cnt);
     }
 
-    private static TimingResult measureFetch(Dataset ds) {
-        Query q = QueryFactory.create(Q_FETCH);
-        // warm-up
-        for (int i = 0; i < WARMUP_RUNS; i++) execCount(ds, q);
-        // timed run — also measure export size (count bytes of literal strings)
-        long totalBytes = 0;
-        long[] times = new long[BENCHMARK_RUNS];
-        int cnt = 0;
-        for (int i = 0; i < BENCHMARK_RUNS; i++) {
-            long bytes = 0;
-            long t0 = System.nanoTime();
-            try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-                ResultSet rs = qe.execSelect();
-                while (rs.hasNext()) {
-                    QuerySolution row = rs.next();
-                    String d1 = row.getLiteral("d1").getString();
-                    String d2 = row.getLiteral("d2").getString();
-                    bytes += d1.length() + d2.length();
-                    cnt++;
-                }
-            }
-            times[i] = System.nanoTime() - t0;
-            totalBytes = bytes;
-        }
-        Arrays.sort(times);
-        double ms = times[BENCHMARK_RUNS / 2] / 1_000_000.0;
-        TimingResult r = new TimingResult(ms, cnt);
-        r.exportBytes = totalBytes;
-        return r;
-    }
-
     /**
-     * Time Approach C with pruning enabled.
-     * Extracts {@link PruningStats} from the last run by piggy-backing on the
-     * iterator stats written to a thread-local slot via the system property gate.
-     *
-     * Because PruningStats live inside QueryIterPrunedSimilarityJoin and are not
-     * directly accessible after the query finishes, we collect them by running an
-     * extra instrumented execution after the timing loop.
+     * Time SimilarityJoin with pruning enabled; also collect pruning stats.
      */
     private static TimingResult measureWithPruning(Dataset ds, String sparql) {
         Query q = QueryFactory.create(sparql);
-        // warm-up
         for (int i = 0; i < WARMUP_RUNS; i++) execCount(ds, q);
-        // timed runs
         long[] times = new long[BENCHMARK_RUNS];
         int cnt = 0;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
@@ -356,30 +325,19 @@ public class Exp2Benchmark {
             times[i] = System.nanoTime() - t0;
         }
         Arrays.sort(times);
-        double ms = times[BENCHMARK_RUNS / 2] / 1_000_000.0;
+        double ms = times[times.length / 2] / 1_000_000.0;
 
-        // Extra run to collect pruning stats via QueryIterPrunedSimilarityJoin
-        PruningStats collected = collectPruningStats(ds, q);
+        // Extra instrumented execution to collect pruning stats
+        PruningStats ps = collectPruningStats(ds, q);
         TimingResult r = new TimingResult(ms, cnt);
-        r.pruning = collected;
+        r.pruning = ps;
         return r;
     }
 
-    /**
-     * Execute the query and extract PruningStats from the iterator.
-     * The QueryIterPrunedSimilarityJoin is materialized by the query engine before
-     * we see results, so we collect after the first row or at close.
-     */
     private static PruningStats collectPruningStats(Dataset ds, Query q) {
-        // We use a thread-local exchange: after execution, iterate fully and
-        // get stats from the last QueryIterPrunedSimilarityJoin created on this thread.
-        // Simpler approach: use the holder set by OpExecutorProbabilistic.
-        // Since we don't have a direct hook, run with a wrapped approach:
-        // execute the query, collect results, then retrieve from the Exp2PruningHolder.
-        int cnt = 0;
         try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
             ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) { rs.next(); cnt++; }
+            while (rs.hasNext()) rs.next();
         }
         PruningStats ps = Exp2PruningHolder.get();
         Exp2PruningHolder.clear();
@@ -396,75 +354,40 @@ public class Exp2Benchmark {
     }
 
     // -----------------------------------------------------------------------
-    // Export GMM pairs as JSON
+    // Sanity check
     // -----------------------------------------------------------------------
 
-    private static List<String[]> exportPairs(Dataset ds) {
-        List<String[]> pairs = new ArrayList<>();
-        Query q = QueryFactory.create(Q_FETCH);
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) {
-                QuerySolution row = rs.next();
-                String rv1 = row.getResource("rv1").getURI();
-                String rv2 = row.getResource("rv2").getURI();
-                String d1  = row.getLiteral("d1").getString();
-                String d2  = row.getLiteral("d2").getString();
-                pairs.add(new String[]{rv1, rv2, d1, d2});
-            }
-        }
-        return pairs;
-    }
+    private static void checkResultConsistency(
+            TimingResult rInEngineCheapFirst,
+            TimingResult rInEngineJsdFirst,
+            TimingResult rSimilarityJoin,
+            int nPairs, double unimodalFrac, String sel) {
+        int inCf = rInEngineCheapFirst.resultCount;
+        int inJf = rInEngineJsdFirst.resultCount;
+        int sj   = rSimilarityJoin.resultCount;
 
-    private static void writePairsJson(String path, List<String[]> pairs) throws IOException {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(path))) {
-            pw.println("[");
-            for (int i = 0; i < pairs.size(); i++) {
-                String[] p = pairs.get(i);
-                // d1 and d2 are already valid JSON objects
-                pw.printf("  {\"rv1\":\"%s\",\"rv2\":\"%s\",\"d1\":%s,\"d2\":%s}%s%n",
-                    p[0], p[1], p[2], p[3], i < pairs.size() - 1 ? "," : "");
-            }
-            pw.println("]");
+        if (!(inCf == inJf && inCf == sj)) {
+            System.out.printf(
+                "  [WARN] Result mismatch at nPairs=%d uf=%.1f sel=%s :: InEngine_CF=%d InEngine_JF=%d SimilarityJoin=%d%n",
+                nPairs, unimodalFrac, sel, inCf, inJf, sj);
         }
     }
 
     // -----------------------------------------------------------------------
-    // Dataset builder
+    // Dataset loading
     // -----------------------------------------------------------------------
 
-    private static Dataset buildDataset(int n) {
-        Model m = ModelFactory.createDefaultModel();
-        Property hasDist = m.createProperty(NS_UQ + "hasDistribution");
-        Resource rvType  = m.createResource(NS_UQ + "RandomVariable");
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
-        for (int i = 1; i <= n; i++) {
-            Resource rv = m.createResource(NS_EX + "rv2_" + i);
-            rv.addProperty(RDF.type, rvType);
-            rv.addProperty(hasDist,
-                m.createTypedLiteral(makeGmmJson(K_COMPONENTS, rng), NS_UQ + "gmmLiteral"));
+    private static Dataset loadDataset(String dataDir, int nPairs, double unimodalFrac) {
+        String ufLabel = String.format(Locale.ROOT, "%.1f", unimodalFrac).replace('.', 'p');
+        File ttlFile = new File(dataDir, "exp2_npairs_" + nPairs + "_uf_" + ufLabel + ".ttl");
+        if (!ttlFile.exists()) {
+            throw new IllegalArgumentException(
+                "Missing dataset file: " + ttlFile + " (run generate_exp2.py first)");
         }
-        return DatasetFactory.create(m);
-    }
-
-    private static String makeGmmJson(int k, ThreadLocalRandom rng) {
-        double[] w = new double[k];
-        double s = 0;
-        for (int i = 0; i < k; i++) { w[i] = rng.nextDouble(0.1, 1.0); s += w[i]; }
-        StringBuilder sb = new StringBuilder("{\"K\":").append(k)
-            .append(",\"d\":1,\"covariance_type\":\"full\",\"weights\":[");
-        for (int i = 0; i < k; i++) { if (i > 0) sb.append(','); sb.append(w[i] / s); }
-        sb.append("],\"means\":[");
-        for (int i = 0; i < k; i++) {
-            if (i > 0) sb.append(',');
-            sb.append('[').append(rng.nextDouble(5.0, 15.0)).append(']');
-        }
-        sb.append("],\"covariances\":[");
-        for (int i = 0; i < k; i++) {
-            if (i > 0) sb.append(',');
-            sb.append("[[").append(rng.nextDouble(0.1, 2.0)).append("]]");
-        }
-        return sb.append("]}").toString();
+        Dataset ds = DatasetFactory.createTxnMem();
+        RDFDataMgr.read(ds.getDefaultModel(), ttlFile.getAbsolutePath(), Lang.TTL);
+        System.out.printf("  Dataset: loaded %s%n", ttlFile.getName());
+        return ds;
     }
 
     // -----------------------------------------------------------------------
@@ -482,8 +405,17 @@ public class Exp2Benchmark {
         return Double.isNaN(v) || Double.isInfinite(v) ? "NaN" : String.format("%.6f", v);
     }
 
-    private static String str(long v)   { return String.valueOf(v); }
-    private static String str(int v)    { return String.valueOf(v); }
+    private static String str(long v) { return String.valueOf(v); }
+    private static String str(int v)  { return String.valueOf(v); }
+
+    private static int[] parseIntList(String spec) {
+        String[] parts = spec.split(",");
+        int[] vals = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            vals[i] = Integer.parseInt(parts[i].trim());
+        }
+        return vals;
+    }
 
     // -----------------------------------------------------------------------
     // Result holder
@@ -492,7 +424,6 @@ public class Exp2Benchmark {
     static class TimingResult {
         double timeMs;
         int    resultCount;
-        long   exportBytes = 0;
         PruningStats pruning = null;
 
         TimingResult(double timeMs, int resultCount) {

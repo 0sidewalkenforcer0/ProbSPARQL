@@ -48,7 +48,7 @@ public class PrunedSimJoinEvaluator {
         stats.totalPairs++;
 
         // ── Level 1: dimensionality check ──────────────────────────────────
-        if (g1.getD() != g2.getD()) {
+        if (g1.getDimensions() != g2.getDimensions()) {
             stats.prunedByDim++;
             return false;
         }

@@ -6,13 +6,13 @@ Creates two TTL files used to evaluate the sample-based cross-type JSD fallback:
 
   1. exp4_crosstype_gmm_hist.ttl  — 100 entity pairs, each pair has:
        :e_NNN cfm:hasDistA ?gmm        (uq:gmmLiteral,   K=3)
-       :e_NNN cfm:hasDistB ?hist       (uq:histLiteral,  B=100)
+       :e_NNN cfm:hasDistB ?hist       (uq:histLiteral, bins+weights)
        The histogram is derived from the same underlying GMM (same source dist),
        so the true GMM↔Hist JSD should be close to zero.
 
   2. exp4_crosstype_dir_hist.ttl  — 100 entity pairs, each pair has:
-       :e_NNN cfm:hasDistA ?dir        (uq:dirichletLiteral, k=4)
-       :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral,  B=100)
+       :e_NNN cfm:hasDistA ?dir        (uq:dirichletLiteral, alphas length = 4)
+       :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral, bins+weights)
        The histogram is built from 1-D marginal samples of the Dirichlet.
 
 The ground-truth JSD for each pair is recorded in a companion CSV:
@@ -74,9 +74,25 @@ def samples_to_hist_json(samples, B):
     g_std  = max(float(np.std(samples)), 1e-6)
     lo = g_mean - 4.0 * g_std
     hi = g_mean + 4.0 * g_std
-    counts, _ = np.histogram(samples, bins=B, range=(lo, hi))
-    return json.dumps({"B": B, "min": round(lo, 6), "max": round(hi, 6),
-                       "counts": counts.tolist()})
+    counts, edges = np.histogram(samples, bins=B, range=(lo, hi))
+    total = counts.sum()
+    if total == 0:
+        weights_out = np.full(B, 1.0 / B)
+    else:
+        weights_out = counts / total
+    rounded_weights = rounded_probabilities(weights_out)
+    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+                       "weights": rounded_weights})
+
+
+def rounded_probabilities(weights, decimals: int = 6):
+    arr = np.asarray(weights, dtype=float)
+    if arr.size == 1:
+        return [1.0]
+    rounded = np.round(arr, decimals)
+    diff = round(1.0 - float(rounded.sum()), decimals)
+    rounded[-1] = round(float(rounded[-1] + diff), decimals)
+    return [float(x) for x in rounded.tolist()]
 
 
 def sample_dirichlet(alpha, n, rng):
@@ -91,15 +107,12 @@ def hist_jsd_exact(h1_json, h2_json):
     """Exact discrete JSD between two histograms over the same bin grid."""
     h1 = json.loads(h1_json)
     h2 = json.loads(h2_json)
-    c1 = np.asarray(h1["counts"], dtype=float)
-    c2 = np.asarray(h2["counts"], dtype=float)
-    if len(c1) != len(c2):
+    p = np.asarray(h1["weights"], dtype=float)
+    q = np.asarray(h2["weights"], dtype=float)
+    bins1 = np.asarray(h1["bins"], dtype=float)
+    bins2 = np.asarray(h2["bins"], dtype=float)
+    if len(p) != len(q) or len(bins1) != len(bins2) or not np.allclose(bins1, bins2):
         return float("nan")
-    t1, t2 = c1.sum(), c2.sum()
-    if t1 == 0 or t2 == 0:
-        return float("nan")
-    p = c1 / t1
-    q = c2 / t2
     m = 0.5 * (p + q)
     def kl(a, b):
         mask = (a > 0) & (b > 0)
@@ -125,7 +138,7 @@ def generate_gmm_hist_pairs(n, B, rng, output_path, gt_rows):
         vars_   = rng.uniform(0.01, 0.5,  size=K_GMM).tolist()
         stds    = [math.sqrt(v) for v in vars_]
 
-        gmm_obj = {"K": K_GMM, "d": 1, "covariance_type": "diag",
+        gmm_obj = {"n_components": K_GMM, "dimensions": 1, "covariance_type": "diag",
                    "weights": [round(w, 6) for w in weights],
                    "means":   [[round(m, 6)] for m in means],
                    "covariances": [[round(v, 6)] for v in vars_]}
@@ -168,8 +181,7 @@ def generate_dir_hist_pairs(n, B, rng, output_path, gt_rows):
 
         # Random Dirichlet
         alpha = rng.uniform(0.5, 5.0, size=K_DIR).tolist()
-        dir_obj  = {"type": "dirichlet", "k": K_DIR,
-                    "alpha": [round(a, 6) for a in alpha]}
+        dir_obj  = {"alphas": [round(a, 6) for a in alpha]}
         dir_json = json.dumps(dir_obj)
 
         # 1-D marginal histogram of dimension 0

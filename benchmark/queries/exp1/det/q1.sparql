@@ -1,0 +1,15 @@
+# Exp1 Q1 DET: Retrieval
+# Fetches CT tooth-length point values via pure graph traversal.
+# Purpose: retrieval-only baseline for deterministic values.
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?gear ?value WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               om:hasValue ?value .
+}

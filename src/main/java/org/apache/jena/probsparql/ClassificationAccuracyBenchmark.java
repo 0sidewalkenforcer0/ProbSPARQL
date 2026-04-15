@@ -24,7 +24,7 @@ import java.util.TreeMap;
  *   M4 = V4_BOUNDS   (analytical bounds filter + stratified)
  *   M5 = V5_ADAPTIVE (full adaptive pipeline)
  *
- * Ground truth: GT_10K (10,000-sample Monte Carlo)
+ * Ground truth: simjoin_ground_truth.csv generated alongside the TTL datasets
  *
  * Output CSV: benchmark/results/exp3_1_classification.csv
  *   columns: Method, Dataset, Accuracy, Precision, Recall, F1, MAE, RMSE, Latency_ms
@@ -41,15 +41,14 @@ public class ClassificationAccuracyBenchmark {
     // Experiment configuration
     // -----------------------------------------------------------------------
     private static final double THETA = 0.3;           // classification threshold
-    private static final int    GT_SAMPLES   = 10_000; // ground-truth sample count
     private static final int    EVAL_SAMPLES = 10_000; // sample budget for V1-V5 (aligns with plan §4.3)
     private static int    repeat       = 10;     // repetitions per (method, pair); overridable via --repeat
 
     private static final String[] DATASETS = {"easy", "medium", "hard", "mixed"};
 
     /** Sampling method labels aligned with the experiment plan. */
+    private static final String GT_LABEL = "GT_CSV";
     private static final String[] METHODS = {
-        "GT_10K",
         "V1_MC",
         "V2_STRATIFIED",
         "V3_SPRT",
@@ -74,6 +73,7 @@ public class ClassificationAccuracyBenchmark {
 
         System.out.println("=== Exp 3.1: SimJoin Classification Accuracy ===");
         System.out.printf("Threshold θ = %.1f%n", THETA);
+        System.out.println("Ground truth: simjoin_ground_truth.csv");
         System.out.println("Methods     : " + Arrays.toString(METHODS));
         System.out.println("Datasets    : " + Arrays.toString(DATASETS));
         System.out.println("Repetitions : " + repeat);
@@ -82,6 +82,7 @@ public class ClassificationAccuracyBenchmark {
         // Aggregate results
         String aggCsv  = outputDir + "/exp3_1_classification.csv";
         String pairCsv = outputDir + "/exp3_1_per_pair.csv";
+        String gtCsv   = dataDir + "/simjoin_ground_truth.csv";
 
         List<String[]> aggRows  = new ArrayList<>();
         List<String[]> pairRows = new ArrayList<>();
@@ -114,6 +115,8 @@ public class ClassificationAccuracyBenchmark {
         // ----------------------------------------------------------------
         // Run over all datasets
         // ----------------------------------------------------------------
+        Map<String, double[]> groundTruth = loadGroundTruth(gtCsv);
+
         for (String dataset : DATASETS) {
             String ttlPath = dataDir + "/simjoin_" + dataset + ".ttl";
             if (!new File(ttlPath).exists()) {
@@ -134,14 +137,7 @@ public class ClassificationAccuracyBenchmark {
             int nPairs = Math.min(leftGMMs.size(), rightGMMs.size());
             System.out.printf("Dataset %-6s : %d aligned pairs%n", dataset, nPairs);
 
-            // Compute ground-truth JSD (GT_10K) — run once per aligned pair
-            double[] gtJSD = new double[nPairs];
-            for (int i = 0; i < nPairs; i++) {
-                GMMValue g1 = leftGMMs.get(i);
-                GMMValue g2 = rightGMMs.get(i);
-                if (g1.getD() != g2.getD()) continue;
-                gtJSD[i] = computeMC(g1, g2, GT_SAMPLES);
-            }
+            double[] gtJSD = requireGroundTruth(dataset, nPairs, groundTruth);
             boolean[] trueLabels = new boolean[nPairs];
             for (int i = 0; i < nPairs; i++) trueLabels[i] = (gtJSD[i] <= THETA);
 
@@ -149,7 +145,7 @@ public class ClassificationAccuracyBenchmark {
             {
                 double[] cls = classificationMetrics(trueLabels, trueLabels); // perfect
                 aggRows.add(new String[]{
-                    "GT_10K", dataset,
+                    GT_LABEL, dataset,
                     fmt(cls[0]), fmt(cls[1]), fmt(cls[2]), fmt(cls[3]),
                     "0.000000", "0.000000", "0.000"
                 });
@@ -159,8 +155,6 @@ public class ClassificationAccuracyBenchmark {
             // Evaluate each sampling method
             // ----------------------------------------------------------------
             for (String method : METHODS) {
-                if ("GT_10K".equals(method)) continue; // already added above
-
                 System.out.printf("  Method %-15s: ", method);
                 long totalNs = 0;
 
@@ -171,7 +165,7 @@ public class ClassificationAccuracyBenchmark {
                 for (int i = 0; i < nPairs; i++) {
                     GMMValue g1 = leftGMMs.get(i);
                     GMMValue g2 = rightGMMs.get(i);
-                    if (g1.getD() != g2.getD()) continue;
+                    if (g1.getDimensions() != g2.getDimensions()) continue;
 
                     double[] runs = new double[repeat];
                     for (int r = 0; r < repeat; r++) {
@@ -198,9 +192,9 @@ public class ClassificationAccuracyBenchmark {
                 aggRows.add(new String[]{
                     method, dataset,
                     fmt(cls[0]), fmt(cls[1]), fmt(cls[2]), fmt(cls[3]),
-                    String.format("%.6f", accMetrics[0]),
-                    String.format("%.6f", accMetrics[1]),
-                    String.format("%.3f", latencyMs)
+                    String.format(java.util.Locale.ROOT, "%.6f", accMetrics[0]),
+                    String.format(java.util.Locale.ROOT, "%.6f", accMetrics[1]),
+                    String.format(java.util.Locale.ROOT, "%.3f", latencyMs)
                 });
 
                 // Per-pair output (sampled 1-in-5 to keep CSV size manageable)
@@ -222,6 +216,55 @@ public class ClassificationAccuracyBenchmark {
         writeCsv(pairCsv, pairRows);
     }
 
+    private static Map<String, double[]> loadGroundTruth(String path) throws IOException {
+        File f = new File(path);
+        if (!f.exists()) {
+            throw new FileNotFoundException("Missing ground-truth CSV: " + path);
+        }
+
+        Map<String, TreeMap<Integer, Double>> byDataset = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line = br.readLine(); // header
+            if (line == null) {
+                throw new IOException("Empty ground-truth CSV: " + path);
+            }
+            while ((line = br.readLine()) != null) {
+                if (line.isBlank()) continue;
+                String[] parts = line.split(",", -1);
+                if (parts.length < 3) continue;
+                String dataset = parts[0];
+                int pairIndex = Integer.parseInt(parts[1]);
+                double jsd = Double.parseDouble(parts[2]);
+                byDataset.computeIfAbsent(dataset, k -> new TreeMap<>()).put(pairIndex, jsd);
+            }
+        }
+
+        Map<String, double[]> result = new HashMap<>();
+        for (Map.Entry<String, TreeMap<Integer, Double>> e : byDataset.entrySet()) {
+            TreeMap<Integer, Double> rows = e.getValue();
+            int n = rows.isEmpty() ? 0 : rows.lastKey();
+            double[] values = new double[n];
+            for (Map.Entry<Integer, Double> row : rows.entrySet()) {
+                values[row.getKey() - 1] = row.getValue();
+            }
+            result.put(e.getKey(), values);
+        }
+        return result;
+    }
+
+    private static double[] requireGroundTruth(String dataset, int nPairs, Map<String, double[]> groundTruth) {
+        double[] values = groundTruth.get(dataset);
+        if (values == null) {
+            throw new IllegalArgumentException("Missing ground truth for dataset: " + dataset);
+        }
+        if (values.length < nPairs) {
+            throw new IllegalArgumentException(
+                    "Ground truth for dataset " + dataset + " has only " + values.length
+                            + " rows, but benchmark loaded " + nPairs + " pairs");
+        }
+        return Arrays.copyOf(values, nPairs);
+    }
+
     // -----------------------------------------------------------------------
     // JSD dispatch — routes to the correct sampler per method
     // -----------------------------------------------------------------------
@@ -241,12 +284,10 @@ public class ClassificationAccuracyBenchmark {
         }
     }
 
-    /** Plain Monte Carlo JSD estimator (V1_MC). */
-    private static final Random RNG = new Random(42);
-
     private static double computeMC(GMMValue p, GMMValue q, int n) {
+        Random rng = new Random(42);
         // Build mixture M = 0.5 P + 0.5 Q
-        int kP = p.getK(), kQ = q.getK(), kM = kP + kQ, d = p.getD();
+        int kP = p.getNComponents(), kQ = q.getNComponents(), kM = kP + kQ, d = p.getDimensions();
         double[] wM = new double[kM];
         double[][] meansM = new double[kM][];
         double[][][] covsM = new double[kM][][];
@@ -263,56 +304,20 @@ public class ClassificationAccuracyBenchmark {
         GMMValue m = new GMMValue(kM, d, p.getCovarianceType(), wM, meansM, covsM);
 
         int half = n / 2;
-        double klPM = computeKLMC(p, m, half);
-        double klQM = computeKLMC(q, m, half);
+        double klPM = computeKLMC(p, m, half, rng);
+        double klQM = computeKLMC(q, m, half, rng);
         return Math.max(0.0, 0.5 * (klPM + klQM));
     }
 
-    private static double computeKLMC(GMMValue p, GMMValue q, int n) {
+    private static double computeKLMC(GMMValue p, GMMValue q, int n, Random rng) {
         double sum = 0;
         for (int i = 0; i < n; i++) {
-            double[] x = sampleFromGMM(p);
-            double logP = logPDF(p, x);
-            double logQ = logPDF(q, x);
+            double[] x = p.sampleOne(rng);
+            double logP = p.logPdf(x);
+            double logQ = q.logPdf(x);
             sum += logP - logQ;
         }
         return sum / n;
-    }
-
-    private static double[] sampleFromGMM(GMMValue gmm) {
-        double[] w = gmm.getWeights();
-        double r = RNG.nextDouble();
-        double cum = 0;
-        int k = 0;
-        for (; k < w.length - 1; k++) {
-            cum += w[k];
-            if (r < cum) break;
-        }
-        double[] mean = gmm.getMeans()[k];
-        double[][] cov = gmm.getCovariances()[k];
-        int d = gmm.getD();
-        double[] x = new double[d];
-        for (int j = 0; j < d; j++) {
-            x[j] = mean[j] + Math.sqrt(cov[0][0]) * RNG.nextGaussian();
-        }
-        return x;
-    }
-
-    private static double logPDF(GMMValue gmm, double[] x) {
-        double[] w = gmm.getWeights();
-        double maxLog = Double.NEGATIVE_INFINITY;
-        double[] logs = new double[w.length];
-        for (int k = 0; k < w.length; k++) {
-            double[] mean = gmm.getMeans()[k];
-            double[][] cov = gmm.getCovariances()[k];
-            double var = cov[0][0];
-            double diff = x[0] - mean[0];
-            logs[k] = Math.log(w[k]) - 0.5 * Math.log(2 * Math.PI * var) - 0.5 * diff * diff / var;
-            if (logs[k] > maxLog) maxLog = logs[k];
-        }
-        double s = 0;
-        for (double l : logs) s += Math.exp(l - maxLog);
-        return maxLog + Math.log(s);
     }
 
     // -----------------------------------------------------------------------
@@ -387,8 +392,12 @@ public class ClassificationAccuracyBenchmark {
         return Math.sqrt(s / a.length);
     }
 
-    private static String fmt(double v)  { return String.format("%.4f", v); }
-    private static String fmt6(double v) { return String.format("%.6f", v); }
+    // avoid locale-specific formatting issues (e.g. comma vs dot)
+    private static String fmt(double v)  { return String.format(java.util.Locale.ROOT, "%.4f", v); }
+    private static String fmt6(double v) { return String.format(java.util.Locale.ROOT, "%.6f", v); }
+
+    // private static String fmt(double v)  { return String.format("%.4f", v); }
+    // private static String fmt6(double v) { return String.format("%.6f", v); }
 
     // -----------------------------------------------------------------------
     // CSV output

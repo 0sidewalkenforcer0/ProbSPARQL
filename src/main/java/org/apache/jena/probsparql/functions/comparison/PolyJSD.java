@@ -19,7 +19,7 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * <table border="1" cellpadding="4">
  *   <tr><th>Type pair</th><th>Algorithm</th><th>Complexity</th></tr>
  *   <tr><td>GMM ↔ GMM</td><td>MC sampling (GT_10K)</td><td>O(N × K)</td></tr>
- *   <tr><td>Hist ↔ Hist</td><td>Exact discrete KL summation</td><td>O(B)</td></tr>
+ *   <tr><td>Hist ↔ Hist</td><td>Exact discrete KL summation</td><td>O(N)</td></tr>
  *   <tr><td>Dir ↔ Dir</td><td>MC sampling from Dirichlet</td><td>O(N × k)</td></tr>
  *   <tr><td>Cross-type</td><td>Sample-based fallback</td><td>O(N)</td></tr>
  * </table>
@@ -51,9 +51,9 @@ public class PolyJSD extends FunctionBase2 {
         if (GMMDatatype.URI.equals(type1) && GMMDatatype.URI.equals(type2)) {
             GMMValue g1 = extractGMM(d1Node, "first");
             GMMValue g2 = extractGMM(d2Node, "second");
-            if (g1.getD() != g2.getD())
+            if (g1.getDimensions() != g2.getDimensions())
                 throw new IllegalArgumentException(
-                        "prob:jsd: GMM dimensionality mismatch: d1=" + g1.getD() + " d2=" + g2.getD());
+                        "prob:jsd: GMM dimensionality mismatch: d1=" + g1.getDimensions() + " d2=" + g2.getDimensions());
             return NodeValue.makeDouble(gmmJSD(g1, g2));
         }
 
@@ -62,16 +62,17 @@ public class PolyJSD extends FunctionBase2 {
             HistogramValue h2 = extractHistogram(d2Node, "second");
             if (!h1.isCompatible(h2))
                 throw new IllegalArgumentException(
-                        "prob:jsd: histograms must have the same B, min, max");
+                        "prob:jsd: histograms must have the same bin boundaries");
             return NodeValue.makeDouble(HistogramJSD.computeJSD(h1.probabilities(), h2.probabilities()));
         }
 
         if (DirichletDatatype.URI.equals(type1) && DirichletDatatype.URI.equals(type2)) {
             DirichletValue dir1 = extractDirichlet(d1Node, "first");
             DirichletValue dir2 = extractDirichlet(d2Node, "second");
-            if (dir1.getK() != dir2.getK())
+            if (dir1.getDimensions() != dir2.getDimensions())
                 throw new IllegalArgumentException(
-                        "prob:jsd: Dirichlet dimension mismatch: k1=" + dir1.getK() + " k2=" + dir2.getK());
+                        "prob:jsd: Dirichlet dimension mismatch: dim1=" + dir1.getDimensions()
+                                + " dim2=" + dir2.getDimensions());
             return NodeValue.makeDouble(sampleBasedJSD(dir1, dir2, N_SAMPLES));
         }
 

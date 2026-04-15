@@ -48,7 +48,7 @@ public class LogPDF extends FunctionBase2 {
         GMMValue gmm = extractGMM(gmmNode);
         
         // Extract evaluation point
-        double[] point = extractPoint(pointNode, gmm.getD());
+        double[] point = extractPoint(pointNode, gmm.getDimensions());
         
         // Compute Log-PDF
         double logDensity = computeLogPDF(gmm, point);
@@ -141,8 +141,8 @@ public class LogPDF extends FunctionBase2 {
      * log(Σ exp(x_i)) = max(x_i) + log(Σ exp(x_i - max(x_i)))
      */
     private double computeLogPDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();

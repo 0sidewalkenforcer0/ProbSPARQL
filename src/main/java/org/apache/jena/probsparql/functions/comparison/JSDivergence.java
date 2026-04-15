@@ -6,6 +6,8 @@ import org.apache.jena.probsparql.utils.MatrixUtils;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
+import java.util.Random;
+
 /**
  * SPARQL function to compute the Jensen-Shannon (JS) divergence between two GMMs.
  * 
@@ -44,7 +46,6 @@ public class JSDivergence extends FunctionBase2 {
     
     // Mode configuration
     private final String mode;
-    private static final java.util.Random random = new java.util.Random(42);
     
     public JSDivergence() {
         // Read mode from live system property so benchmark mode switches take effect
@@ -76,10 +77,10 @@ public class JSDivergence extends FunctionBase2 {
         GMMValue gmm2 = extractGMM(gmm2Node, "second");
         
         // Validate compatibility
-        if (gmm1.getD() != gmm2.getD()) {
+        if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
-                "GMMs must have same dimensionality. Got d1=" + gmm1.getD() + 
-                ", d2=" + gmm2.getD());
+                "GMMs must have same dimensionality. Got d1=" + gmm1.getDimensions() +
+                ", d2=" + gmm2.getDimensions());
         }
         
         double js = computeJSDivergence(gmm1, gmm2);
@@ -126,9 +127,10 @@ public class JSDivergence extends FunctionBase2 {
      * Standard Monte Carlo computation.
      */
     private double computeMC(GMMValue p, GMMValue q, int numSamples) {
+        Random rng = new Random(pairSeed(p, q));
         GMMValue m = createMixture(p, q);
-        double klPM = computeKLDivergence(p, m, numSamples / 2);
-        double klQM = computeKLDivergence(q, m, numSamples / 2);
+        double klPM = computeKLDivergence(p, m, numSamples / 2, rng);
+        double klQM = computeKLDivergence(q, m, numSamples / 2, rng);
         return 0.5 * klPM + 0.5 * klQM;
     }
     
@@ -156,10 +158,10 @@ public class JSDivergence extends FunctionBase2 {
      * The mixture is a GMM with K_P + K_Q components.
      */
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getK();
-        int kQ = q.getK();
+        int kP = p.getNComponents();
+        int kQ = q.getNComponents();
         int kM = kP + kQ;
-        int d = p.getD();
+        int d = p.getDimensions();
         
         double[] weightsP = p.getWeights();
         double[] weightsQ = q.getWeights();
@@ -209,11 +211,9 @@ public class JSDivergence extends FunctionBase2 {
                 }
                 return fullCopy;
             case "diag":
-                // For diagonal: each row has 1 element (variance)
-                double[][] diagCopy = new double[cov.length][1];
-                for (int i = 0; i < cov.length; i++) {
-                    diagCopy[i][0] = cov[i][0];
-                }
+                // Internal diag representation is [1][d]
+                double[][] diagCopy = new double[1][cov[0].length];
+                System.arraycopy(cov[0], 0, diagCopy[0], 0, cov[0].length);
                 return diagCopy;
             case "spherical":
                 // For spherical: single variance value
@@ -226,13 +226,13 @@ public class JSDivergence extends FunctionBase2 {
     /**
      * Compute KL divergence D_KL(p||q) using Monte Carlo.
      */
-    private double computeKLDivergence(GMMValue p, GMMValue q, int numSamples) {
+    private double computeKLDivergence(GMMValue p, GMMValue q, int numSamples, Random rng) {
         double sum = 0.0;
         
         for (int i = 0; i < numSamples; i++) {
-            double[] sample = sampleFromGMM(p);
-            double logP = computeLogPDF(p, sample);
-            double logQ = computeLogPDF(q, sample);
+            double[] sample = p.sampleOne(rng);
+            double logP = p.logPdf(sample);
+            double logQ = q.logPdf(sample);
             sum += (logP - logQ);
         }
         
@@ -242,22 +242,22 @@ public class JSDivergence extends FunctionBase2 {
     /**
      * Sample from GMM.
      */
-    private double[] sampleFromGMM(GMMValue gmm) {
-        int d = gmm.getD();
+    private double[] sampleFromGMM(GMMValue gmm, Random rng) {
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
         String covType = gmm.getCovarianceType();
         
-        int component = sampleCategorical(weights);
-        return sampleGaussian(means[component], covariances[component], covType, d);
+        int component = sampleCategorical(weights, rng);
+        return sampleGaussian(means[component], covariances[component], covType, d, rng);
     }
     
     /**
      * Sample from categorical distribution.
      */
-    private int sampleCategorical(double[] weights) {
-        double u = random.nextDouble();
+    private int sampleCategorical(double[] weights, Random rng) {
+        double u = rng.nextDouble();
         double cumulative = 0.0;
         
         for (int k = 0; k < weights.length; k++) {
@@ -274,13 +274,13 @@ public class JSDivergence extends FunctionBase2 {
      * Sample from multivariate Gaussian using Cholesky decomposition.
      */
     private double[] sampleGaussian(double[] mean, double[][] covariance, 
-                                    String covType, int d) {
+                                    String covType, int d, Random rng) {
         double[] sample = new double[d];
         
         if (d == 1) {
             // Optimized 1D case
             double stddev = Math.sqrt(getVariance(covariance, covType));
-            sample[0] = mean[0] + stddev * random.nextGaussian();
+            sample[0] = mean[0] + stddev * rng.nextGaussian();
         } else {
             // Multi-dimensional: sample = mean + L * z
             double[][] fullCov = toFullCovariance(covariance, covType, d);
@@ -289,7 +289,7 @@ public class JSDivergence extends FunctionBase2 {
             // Generate standard normal samples
             double[] z = new double[d];
             for (int i = 0; i < d; i++) {
-                z[i] = random.nextGaussian();
+                z[i] = rng.nextGaussian();
             }
             
             // Compute L * z + mean
@@ -313,8 +313,8 @@ public class JSDivergence extends FunctionBase2 {
      * Compute log PDF.
      */
     private double computeLogPDF(GMMValue gmm, double[] point) {
-        int K = gmm.getK();
-        int d = gmm.getD();
+        int K = gmm.getNComponents();
+        int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
@@ -378,7 +378,7 @@ public class JSDivergence extends FunctionBase2 {
             case "diag":
                 for (int i = 0; i < d; i++) {
                     for (int j = 0; j < d; j++) {
-                        full[i][j] = (i == j) ? cov[i][0] : 0.0;
+                        full[i][j] = (i == j) ? cov[0][i] : 0.0;
                     }
                 }
                 return full;
@@ -395,6 +395,18 @@ public class JSDivergence extends FunctionBase2 {
             default:
                 throw new IllegalStateException("Unknown covariance type: " + type);
         }
+    }
+
+    /**
+     * Derive a deterministic per-pair seed so identical inputs do not depend on
+     * previous calls or evaluation order.
+     */
+    private long pairSeed(GMMValue p, GMMValue q) {
+        int h1 = p.hashCode();
+        int h2 = q.hashCode();
+        long a = Integer.toUnsignedLong(Math.min(h1, h2));
+        long b = Integer.toUnsignedLong(Math.max(h1, h2));
+        return 0x9E3779B97F4A7C15L ^ (a * 0xBF58476D1CE4E5B9L) ^ (b * 0x94D049BB133111EBL);
     }
     
     /**

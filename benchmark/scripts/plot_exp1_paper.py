@@ -12,8 +12,8 @@ Usage
 -----
   python benchmark/scripts/plot_exp1_paper.py
   python benchmark/scripts/plot_exp1_paper.py \
-      --input  benchmark/results/exp1/exp1_raw.csv \
-      --output benchmark/results/exp1
+      --input  benchmark/results/exp1/main/exp1_raw.csv \
+      --output benchmark/results/exp1/main
 """
 import argparse
 import os
@@ -55,10 +55,10 @@ GEAR_TICKS  = [SCALE_GEAR[s] for s in SCALE_ORDER]
 K_VALUES    = [1, 3, 5, 10]
 QUERIES     = ["Q1", "Q2", "Q3", "Q4"]
 QLABELS     = {
-    "Q1": "Q1: CDF Filter",
-    "Q2": "Q2: Distribution Arithmetic",
-    "Q3": "Q3: JS-Divergence Join",
-    "Q4": "Q4: Graph Traversal",
+    "Q1": "Q1: Retrieval",
+    "Q2": "Q2: CDF + Scalar Filter",
+    "Q3": "Q3: Distribution Arithmetic",
+    "Q4": "Q4: JS-Divergence Comparison",
 }
 
 # ── matplotlib global style ───────────────────────────────────────────────────
@@ -122,8 +122,8 @@ def fig1_scalability(agg: pd.DataFrame, out: str) -> None:
     axes = axes.flatten()
 
     for ax, qid in zip(axes, QUERIES):
-        # DET baseline (not applicable to Q3)
-        if qid != "Q3":
+        # DET baseline (not applicable to Q4)
+        if qid != "Q4":
             ys = [get_det(agg, s, qid) for s in SCALE_ORDER]
             ax.plot(GEAR_TICKS, ys, marker=MARKERS["DET"], color=C["DET"],
                     linestyle="--", linewidth=LINE_W, label="DET (no prob)", zorder=5)
@@ -168,10 +168,10 @@ def fig2_overhead(agg: pd.DataFrame, out: str) -> None:
     fig = plt.figure(figsize=(14, 5.5))
     gs  = GridSpec(1, 2, figure=fig, wspace=0.32)
 
-    # ---- left: overhead ratio vs scale for Q1, Q2, Q4 at K=3 ---------------
+    # ---- left: overhead ratio vs scale for Q1, Q2, Q3 at K=3 ---------------
     ax_l = fig.add_subplot(gs[0, 0])
-    q_colors = {"Q1": "#E41A1C", "Q2": "#377EB8", "Q4": "#4DAF4A"}
-    for qid in ["Q1", "Q2", "Q4"]:
+    q_colors = {"Q1": "#E41A1C", "Q2": "#377EB8", "Q3": "#4DAF4A"}
+    for qid in ["Q1", "Q2", "Q3"]:
         ratios = []
         for s in SCALE_ORDER:
             det  = get_det(agg, s, qid)
@@ -191,10 +191,10 @@ def fig2_overhead(agg: pd.DataFrame, out: str) -> None:
     ax_l.legend(loc="upper right", framealpha=0.7)
     ax_l.set_ylim(bottom=0)
 
-    # ---- right: Q3 JSD absolute latency on log-log ---------------------------
+    # ---- right: Q4 JSD absolute latency on log-log ---------------------------
     ax_r = fig.add_subplot(gs[0, 1])
     for k in K_VALUES:
-        ys = [get_prob(agg, s, "Q3", k) for s in SCALE_ORDER]
+        ys = [get_prob(agg, s, "Q4", k) for s in SCALE_ORDER]
         ax_r.plot(GEAR_TICKS, ys, marker=MARKERS[k], color=C[k],
                   linewidth=LINE_W, label=f"K={k}")
 
@@ -205,12 +205,12 @@ def fig2_overhead(agg: pd.DataFrame, out: str) -> None:
     ax_r.yaxis.set_minor_formatter(mticker.NullFormatter())
     ax_r.set_xlabel("Number of gears (log scale)")
     ax_r.set_ylabel("Absolute latency (ms, log scale)")
-    ax_r.set_title("Q3: JS-Divergence — log-log Scaling", fontweight="bold")
+    ax_r.set_title("Q4: JS-Divergence — log-log Scaling", fontweight="bold")
     ax_r.legend(loc="upper left", framealpha=0.7)
 
     # fit power-law annotation for K=1 (reference line)
     xs = np.array(GEAR_TICKS, dtype=float)
-    ys = np.array([get_prob(agg, s, "Q3", 1) for s in SCALE_ORDER])
+    ys = np.array([get_prob(agg, s, "Q4", 1) for s in SCALE_ORDER])
     valid = ~np.isnan(ys) & (ys > 0)
     if valid.sum() >= 3:
         coeffs = np.polyfit(np.log10(xs[valid]), np.log10(ys[valid]), 1)
@@ -233,8 +233,8 @@ def fig2_overhead(agg: pd.DataFrame, out: str) -> None:
 # ── Figure 3: K-sensitivity across all 7 scales ──────────────────────────────
 
 def fig3_k_sensitivity(agg: pd.DataFrame, out: str) -> None:
-    # Focus on Q1 and Q3 (the two most interesting)
-    focus_qids = ["Q1", "Q3"]
+    # Focus on Q2 and Q4 (filtering and comparison)
+    focus_qids = ["Q2", "Q4"]
     scale_colors = {
         "E1": "#a6cee3", "E2": "#1f78b4", "E3": "#b2df8a",
         "E4": "#33a02c", "E5": "#fb9a99", "E6": "#e31a1c", "E7": "#6a3d9a",
@@ -276,23 +276,24 @@ def write_latex_table(agg: pd.DataFrame, out: str) -> None:
     lines.append(r"\small")
     lines.append(r"\caption{Experiment 1 — Median query latency (ms) across scale "
                  r"and GMM complexity $K$. "
-                 r"Q1--Q4 are measured on both deterministic (DET) and probabilistic (PROB) graphs; "
-                 r"Q3 is probabilistic only (no DET baseline). "
+                 r"Q1--Q3 are measured on both deterministic (DET) and probabilistic (PROB) graphs; "
+                 r"Q4 is probabilistic only (no DET baseline). "
                  r"Values $\geq$1\,s are formatted as \textbf{bold}.}")
     lines.append(r"\label{tab:exp1_latency}")
     lines.append(r"\setlength{\tabcolsep}{4pt}")
 
     # header
-    lines.append(r"\begin{tabular}{lr|rrrr|rrrr|r|rrrr}")
+    lines.append(r"\begin{tabular}{lr|rrrr|rrrr|rrrr|r}")
     lines.append(r"\toprule")
-    lines.append(r" & & \multicolumn{4}{c|}{Q1: CDF Filter} "
-                 r"& \multicolumn{4}{c|}{Q2: Distrib.\ Arith.} "
-                 r"& Q3: JSD & \multicolumn{4}{c}{Q4: Traversal} \\")
-    lines.append(r"\cmidrule(lr){3-6}\cmidrule(lr){7-10}\cmidrule(lr){11-11}\cmidrule(lr){12-15}")
+    lines.append(r" & & \multicolumn{4}{c|}{Q1: Retrieval} "
+                 r"& \multicolumn{4}{c|}{Q2: CDF + Filter} "
+                 r"& \multicolumn{4}{c|}{Q3: Distrib.\ Arith.} "
+                 r"& Q4: JSD \\")
+    lines.append(r"\cmidrule(lr){3-6}\cmidrule(lr){7-10}\cmidrule(lr){11-14}\cmidrule(lr){15-15}")
     lines.append(r"Scale & Gears & DET & K=1 & K=3 & K=10 "
                  r"& DET & K=1 & K=3 & K=10 "
-                 r"& K=3 "
-                 r"& DET & K=1 & K=3 & K=10 \\")
+                 r"& DET & K=1 & K=3 & K=10 "
+                 r"& K=3 \\")
     lines.append(r"\midrule")
 
     def fmt(v: float) -> str:
@@ -312,12 +313,12 @@ def write_latex_table(agg: pd.DataFrame, out: str) -> None:
             cols.append(fmt(get_det(agg, s, qid)))
             for k in [1, 3, 10]:
                 cols.append(fmt(get_prob(agg, s, qid, k)))
-        # Q3 K=3 only
-        cols.append(fmt(get_prob(agg, s, "Q3", 3)))
-        for qid in ["Q4"]:
+        for qid in ["Q3"]:
             cols.append(fmt(get_det(agg, s, qid)))
             for k in [1, 3, 10]:
                 cols.append(fmt(get_prob(agg, s, qid, k)))
+        # Q4 K=3 only
+        cols.append(fmt(get_prob(agg, s, "Q4", 3)))
         lines.append(" & ".join(cols) + r" \\")
 
     lines.append(r"\bottomrule")
@@ -336,8 +337,8 @@ def fig4_table_image(agg: pd.DataFrame, out: str) -> None:
     col_labels = ["Scale", "Gears",
                   "Q1 DET", "Q1 K=1", "Q1 K=3", "Q1 K=5", "Q1 K=10",
                   "Q2 DET", "Q2 K=1", "Q2 K=3", "Q2 K=5", "Q2 K=10",
-                  "Q3 K=1", "Q3 K=3", "Q3 K=5", "Q3 K=10",
-                  "Q4 DET", "Q4 K=1", "Q4 K=3", "Q4 K=5", "Q4 K=10"]
+                  "Q3 DET", "Q3 K=1", "Q3 K=3", "Q3 K=5", "Q3 K=10",
+                  "Q4 K=1", "Q4 K=3", "Q4 K=5", "Q4 K=10"]
 
     rows = []
     for s in SCALE_ORDER:
@@ -349,16 +350,16 @@ def fig4_table_image(agg: pd.DataFrame, out: str) -> None:
             for k in K_VALUES:
                 v = get_prob(agg, s, qid, k)
                 row.append(f"{v:.1f}" if not np.isnan(v) else "—")
-        # Q3 — no DET
-        for k in K_VALUES:
-            v = get_prob(agg, s, "Q3", k)
-            row.append(f"{v:.0f}" if not np.isnan(v) else "—")
-        for qid in ["Q4"]:
+        for qid in ["Q3"]:
             v = get_det(agg, s, qid)
             row.append(f"{v:.1f}" if not np.isnan(v) else "—")
             for k in K_VALUES:
                 v = get_prob(agg, s, qid, k)
                 row.append(f"{v:.1f}" if not np.isnan(v) else "—")
+        # Q4 — no DET
+        for k in K_VALUES:
+            v = get_prob(agg, s, "Q4", k)
+            row.append(f"{v:.1f}" if not np.isnan(v) else "—")
         rows.append(row)
 
     # split into two half-tables to keep it readable
@@ -411,8 +412,8 @@ def fig4_table_image(agg: pd.DataFrame, out: str) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Exp 1 — Publication figures")
-    p.add_argument("--input",  default="benchmark/results/exp1/exp1_raw.csv")
-    p.add_argument("--output", default="benchmark/results/exp1")
+    p.add_argument("--input",  default="benchmark/results/exp1/main/exp1_raw.csv")
+    p.add_argument("--output", default="benchmark/results/exp1/main")
     args = p.parse_args()
 
     os.makedirs(args.output, exist_ok=True)

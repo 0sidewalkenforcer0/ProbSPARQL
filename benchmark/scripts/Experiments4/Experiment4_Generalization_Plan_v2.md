@@ -9,7 +9,7 @@ Does the ProbSPARQL framework generalize to distribution families beyond Gaussia
 - **RQ4.1:** Can a single polymorphic function (`prob:cdf`, `prob:jsd`, etc.) dispatch correctly across GMM, Histogram, and Dirichlet literals?
 - **RQ4.2:** What is the performance profile of each distribution type for core operations?
 - **RQ4.3:** Does the sample-based JSD fallback enable cross-type comparison?
-- **RQ4.4:** How does representation resolution (GMM components K, histogram bins B, Dirichlet dimension d) affect accuracy and speed?
+- **RQ4.4:** How does representation resolution (GMM components K, histogram bin count N, Dirichlet dimension d) affect accuracy and speed?
 
 ---
 
@@ -38,7 +38,7 @@ They span three fundamentally different representation paradigms:
 
 Additionally:
 - **GMM** on ℝᵈ: the primary type, already fully evaluated in Exp 1–3
-- **Histogram** on ℝ: non-parametric alternative with exact JSD (O(B))
+- **Histogram** on ℝ: non-parametric alternative with exact JSD (O(N))
 - **Dirichlet** on Δₖ: different domain entirely (simplex, not Euclidean), showing the framework handles non-Euclidean distributions
 
 ---
@@ -87,7 +87,7 @@ public class JSDFunction extends FunctionBase2 {
 | Type Pair | Algorithm | Complexity |
 |-----------|-----------|-----------|
 | GMM ↔ GMM | MC sampling from mixture (GT_10K) | O(N × K) |
-| Hist ↔ Hist | Exact discrete KL summation | O(B) |
+| Hist ↔ Hist | Exact discrete KL summation | O(N) |
 | Dir ↔ Dir | MC sampling from Dirichlet | O(N × d) |
 
 ### 3.4 Cross-Type JSD: Sample-Based Fallback
@@ -150,11 +150,7 @@ where B(α) = Π Γ(α_i) / Γ(Σα_i)
 ### 4.2 Literal Format
 
 ```json
-{
-  "type": "dirichlet",
-  "k": 4,
-  "alpha": [2.5, 1.0, 3.0, 0.5]
-}
+{ "alphas": [2.5, 1.0, 3.0, 0.5] }
 ```
 
 ### 4.3 Semantic Operations
@@ -254,14 +250,14 @@ SELECT ?entity ?jsd WHERE {
 
 **Distribution parameters:**
 - GMM: K=3, d=1
-- Histogram: B ∈ {20, 50, 100}
+- Histogram: N ∈ {20, 50, 100}
 - Dirichlet: k ∈ {4, 10, 20}
 
 **Output:**
 
 **Table: Per-operation latency (μs per call)**
 
-| Operation | GMM (K=3) | Hist (B=50) | Dir (k=4) | Dir (k=10) |
+| Operation | GMM (K=3) | Hist (N=50) | Dir (k=4) | Dir (k=10) |
 |-----------|----------|------------|----------|-----------|
 | prob:mean | | | | |
 | prob:std | | | | |
@@ -274,9 +270,9 @@ SELECT ?entity ?jsd WHERE {
 
 | Operation | GMM | Histogram | Dirichlet |
 |-----------|-----|-----------|-----------|
-| mean, std, map | O(K) ~μs | O(B) ~μs | O(k) ~μs |
-| cdf | O(K) ~μs | O(B) ~μs | O(1) ~μs |
-| jsd | O(N×K) ~ms | O(B) ~μs | O(N×k) ~ms |
+| mean, std, map | O(K) ~μs | O(N) ~μs | O(k) ~μs |
+| cdf | O(K) ~μs | O(N) ~μs | O(1) ~μs |
+| jsd | O(N×K) ~ms | O(N) ~μs | O(N×k) ~ms |
 
 The key finding: **Histogram JSD is orders of magnitude faster** because it's exact discrete computation, while GMM and Dirichlet require MC sampling.
 
@@ -292,7 +288,7 @@ The key finding: **Histogram JSD is orders of magnitude faster** because it's ex
 
 | Pair | Type 1 | Type 2 | How to create |
 |------|--------|--------|--------------|
-| GMM ↔ Hist | GMM (K=3) | Histogram (B=100) derived from same GMM | Sample 10K from GMM, bin |
+| GMM ↔ Hist | GMM (K=3) | Histogram (N=100) derived from same GMM | Sample 10K from GMM, bin |
 | GMM ↔ Dir | GMM on Δₖ | Dirichlet (k=4) | Fit Dirichlet to GMM samples on simplex |
 | Hist ↔ Dir | Histogram on Δₖ | Dirichlet (k=4) | Bin Dirichlet samples |
 
@@ -328,8 +324,8 @@ The key finding: **Histogram JSD is orders of magnitude faster** because it's ex
 
 **Datasets:**
 - A-gmm: from Experiment 1 (K=3)
-- A-hist-B50: derived from A-gmm (sample 10K, 50 bins)
-- A-hist-B100: derived from A-gmm (sample 10K, 100 bins)
+- A-hist-N50: derived from A-gmm (sample 10K, 50 bins)
+- A-hist-N100: derived from A-gmm (sample 10K, 100 bins)
 
 **Scales:** E3 (100 gears), E5 (1000 gears), E7 (10000 gears)
 
@@ -363,7 +359,7 @@ SELECT ?gear ?jsd WHERE {
 
 **Table: End-to-end query performance**
 
-| Query | Scale | GMM K=3 (ms) | Hist B=50 (ms) | Hist B=100 (ms) | Hist speedup |
+| Query | Scale | GMM K=3 (ms) | Hist N=50 (ms) | Hist N=100 (ms) | Hist speedup |
 |-------|-------|-------------|---------------|----------------|-------------|
 | Q1 CDF | E3 | | | | |
 | Q1 CDF | E5 | | | | |
@@ -372,7 +368,7 @@ SELECT ?gear ?jsd WHERE {
 | Q3 JSD | E5 | | | | |
 | Q3 JSD | E7 | | | | |
 
-**Expected:** Q3 (JSD) should be **dramatically faster** with histograms because histogram JSD is O(B) exact vs O(N×K) MC. Q1 (CDF) should be similar or slightly faster.
+**Expected:** Q3 (JSD) should be **dramatically faster** with histograms because histogram JSD is exact O(N) over bin weights, while GMM JSD is O(N×K) Monte Carlo. Q1 (CDF) should be similar or slightly faster.
 
 ---
 
@@ -421,7 +417,7 @@ SELECT ?component ?meanComposition WHERE {
 | Exp1 A-gmm (E3, E5, E7) | A-hist | 50, 100 | Exp 4.4 |
 | Exp3 controlled pairs (200) | pairs-hist | 50, 100 | Exp 4.3 cross-type |
 
-Generation: sample 10K from each GMM, bin into B equal-width bins.
+Generation: sample 10K from each GMM, then serialize as explicit `bins` + `weights`.
 
 ### 6.2 Dirichlet Dataset (new)
 
@@ -435,7 +431,7 @@ Generation: sample 10K from each GMM, bin into B equal-width bins.
 | Type | Count | Parameters | Purpose |
 |------|-------|-----------|---------|
 | GMM literals | 1,000 | K=3, d=1 | Exp 4.2 per-operation speed |
-| Histogram literals | 1,000 × 3 | B=20, 50, 100 | Exp 4.2 |
+| Histogram literals | 1,000 × 3 | N=20, 50, 100 | Exp 4.2 |
 | Dirichlet literals | 1,000 × 3 | k=4, 10, 20 | Exp 4.2 |
 
 ---
@@ -462,7 +458,7 @@ The same `prob:cdf`, `prob:jsd`, `prob:mean` query runs on all three distributio
 
 | Distribution | JSD cost | CDF cost | Parsing cost |
 |-------------|---------|---------|-------------|
-| Histogram B=100 | ~10 μs (exact) | ~1 μs | ~50 μs |
+| Histogram N=100 | ~10 μs (exact) | ~1 μs | ~50 μs |
 | GMM K=3 | ~5 ms (MC) | ~10 μs | ~100 μs |
 | Dirichlet k=4 | ~5 ms (MC) | ~5 μs | ~30 μs |
 
@@ -476,7 +472,7 @@ The sample-based fallback produces JSD estimates with Pearson r > 0.95 compared 
 
 At E7 (10K gears):
 - GMM Q3: ~25,000 ms (from Exp 1)
-- Histogram Q3: ~50 ms (expected, due to exact O(B) JSD)
+- Histogram Q3: ~50 ms (expected, due to exact O(N) JSD)
 - **~500× speedup** for the most expensive query
 
 ---
@@ -509,8 +505,8 @@ At E7 (10K gears):
 | Literal type | Time (ms) | vs GMM |
 |-------------|----------|--------|
 | GMM K=3 | ~25,000 | 1× |
-| Hist B=50 | ~50 | ~500× |
-| Hist B=100 | ~100 | ~250× |
+| Hist N=50 | ~50 | ~500× |
+| Hist N=100 | ~100 | ~250× |
 
 ### Charts
 
@@ -532,7 +528,7 @@ At E7 (10K gears):
 
 > **Claim 3 (Cross-type interoperability):** When distributions of different types are compared, the engine falls back to a universal sample-based JSD estimator, enabling queries over heterogeneous knowledge graphs where different sensors report uncertainty in different formats.
 
-> **Claim 4 (Performance adaptation):** The framework automatically exploits type-specific optimizations: histogram JSD is computed exactly in O(B) via discrete summation, while GMM and Dirichlet JSD use Monte Carlo sampling in O(N×K). This yields up to 500× speedup for pairwise comparison queries on histogram data.
+> **Claim 4 (Performance adaptation):** The framework automatically exploits type-specific optimizations: histogram JSD is computed exactly in O(N) via discrete summation over bin weights, while GMM and Dirichlet JSD use Monte Carlo sampling in O(N×K). This yields up to 500× speedup for pairwise comparison queries on histogram data.
 
 ---
 
@@ -555,7 +551,7 @@ At E7 (10K gears):
 | # | Task | Effort |
 |---|------|--------|
 | 8 | Implement `DirichletDatatype` + `DirichletValue` | Medium |
-| 9 | — JSON literal parsing (validate: k, alpha array) | |
+| 9 | — JSON literal parsing (validate: `alphas` array) | |
 | 10 | — `sample(n)`: Gamma sampling + normalization | |
 | 11 | — `logPdf(x)`: Dirichlet log-density | |
 | 12 | — `mean()`: α_i / α₀ | Low |

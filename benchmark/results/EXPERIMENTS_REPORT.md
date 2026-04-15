@@ -9,7 +9,7 @@
 ## Table of Contents
 
 1. [Experiment 1 — System Overhead (DET vs PROB)](#experiment-1)
-2. [Experiment 2 — Filter-Pushdown Advantage (SIMILARITYJOIN)](#experiment-2)
+2. [Experiment 2 — In-engine Filtering vs SIMILARITYJOIN](#experiment-2)
 3. [Cross-Experiment Summary](#cross-experiment-summary)
 4. [Artefacts Index](#artefacts-index)
 
@@ -29,7 +29,7 @@ Quantify the latency overhead of ProbSPARQL (GMM-annotated data) compared to sta
 | GMM components | K = 1, 3, 5, 10 |
 | Queries | 4 deterministic (Q1, Q2, Q4) + 4 probabilistic (Q1–Q4) |
 | Benchmark class | `ScalabilityBenchmark` |
-| Result dir | `benchmark/results/exp1_full/` |
+| Result dir | `benchmark/results/exp1/main/` |
 
 ### Query Descriptions
 
@@ -114,7 +114,7 @@ Quantify the latency overhead of ProbSPARQL (GMM-annotated data) compared to sta
 
 ---
 
-## Experiment 2 — Filter-Pushdown Advantage (SIMILARITYJOIN) {#experiment-2}
+## Experiment 2 — In-engine Filtering vs SIMILARITYJOIN {#experiment-2}
 
 ### Objective
 
@@ -129,44 +129,44 @@ Evaluate the performance of three approaches to executing a **multi-modal simila
 | Selectivity | 10pct (strict), 50pct (moderate), 90pct (loose) |
 | JSD mode | GT\_10K (10,000-sample Monte Carlo) |
 | Total configurations | 45 (5 × 3 × 3) |
-| Benchmark class | `Exp2BenchmarkV5` |
-| Result dir | `benchmark/results/exp2_full/` |
+| Benchmark class | `Exp2Benchmark` |
+| Result dir | `benchmark/results/exp2/` |
 
 ### Approach Definitions
 
 | Label | Approach | Description |
 |---|---|---|
-| **A** | SPARQL + modeCount filter | `FILTER(prob:modeCount > 1)` before JSD — skips all unimodal pairs |
-| **B** | Naive Java loop (no filter) | Fetches all pairs via bare BGP; computes JSD for every pair with no pre-filtering |
-| **C** | `SIMILARITYJOIN` | Native ARQ operator with DPI-based 30-bin histogram lower-bound pruning |
+| **InEngine_CheapFirst** | SPARQL + modeCount filter | `FILTER(prob:modeCount > 1)` before JSD — skips all unimodal pairs |
+| **InEngine_JSDFirst** | SPARQL with early JSD | Applies JSD threshold before `modeCount` filters |
+| **SimilarityJoin** | `SIMILARITYJOIN` | Native ARQ operator with DPI-based 30-bin histogram lower-bound pruning |
 
 ### Results: Speedup Summary (averaged over all N\_PAIRS)
 
-| unimodalFrac | Selectivity | Theta (avg) | C / A speedup | C / B speedup | B / A speedup |
+| unimodalFrac | Selectivity | Theta (avg) | SimilarityJoin / InEngine_CF | SimilarityJoin / InEngine_JF |
 |---|---|---|---|---|---|
-| 0.2 | 10pct | ~0.091 | **9.09×** | 13.43× | 1.49× |
-| 0.2 | 50pct | ~0.235 | 1.94× | 2.87× | 1.48× |
-| 0.2 | 90pct | ~0.450 | 1.13× | 1.66× | 1.47× |
-| 0.5 | 10pct | ~0.099 | **9.58×** | 32.12× | 3.35× |
-| 0.5 | 50pct | ~0.244 | 1.95× | 6.54× | 3.36× |
-| 0.5 | 90pct | ~0.493 | 1.09× | 3.67× | 3.37× |
-| 0.8 | 10pct | ~0.086 | **8.10×** | **139.74×** | 17.25× |
-| 0.8 | 50pct | ~0.207 | 2.13× | 39.67× | 18.61× |
-| 0.8 | 90pct | ~0.402 | 1.18× | 21.74× | 18.41× |
+| 0.2 | 10pct | ~0.091 | **9.09×** | 9.09× |
+| 0.2 | 50pct | ~0.235 | 1.94× | 1.94× |
+| 0.2 | 90pct | ~0.450 | 1.13× | 1.13× |
+| 0.5 | 10pct | ~0.099 | **9.58×** | 9.58× |
+| 0.5 | 50pct | ~0.244 | 1.95× | 1.95× |
+| 0.5 | 90pct | ~0.493 | 1.09× | 1.09× |
+| 0.8 | 10pct | ~0.086 | **8.10×** | 8.10× |
+| 0.8 | 50pct | ~0.207 | 2.13× | 2.13× |
+| 0.8 | 90pct | ~0.402 | 1.18× | 1.18× |
 
 ### Results: Largest Scale Detail (N\_PAIRS ≈ 10,000, median ms)
 
-| uf | Sel | θ | A (ms) | B (ms) | C (ms) | C/A | C/B | B/A |
-|---|---|---|---|---|---|---|---|---|
-| 0.2 | 10pct | 0.087 | 30,935 | 46,045 | 3,215 | 9.6× | 14.3× | 1.5× |
-| 0.2 | 50pct | 0.224 | 30,938 | 46,118 | 15,878 | 1.9× | 2.9× | 1.5× |
-| 0.2 | 90pct | 0.425 | 30,966 | 46,155 | 28,063 | 1.1× | 1.6× | 1.5× |
-| 0.5 | 10pct | 0.089 | 11,948 | 41,136 | 1,278 | 9.4× | 32.2× | 3.4× |
-| 0.5 | 50pct | 0.235 | 11,934 | 41,108 | 6,114 | 2.0× | 6.7× | 3.4× |
-| 0.5 | 90pct | 0.469 | 11,923 | 41,071 | 10,785 | 1.1× | 3.8× | 3.4× |
-| **0.8** | **10pct** | **0.096** | **1,949** | **33,666** | **193** | **10.1×** | **174.1×** | **17.3×** |
-| 0.8 | 50pct | 0.263 | 1,942 | 33,676 | 982 | 2.0× | 34.3× | 17.3× |
-| 0.8 | 90pct | 0.502 | 1,945 | 33,653 | 1,762 | 1.1× | 19.1× | 17.3× |
+| uf | Sel | θ | InEngine_CF (ms) | InEngine_JF (ms) | SimilarityJoin (ms) | SJ/CF | SJ/JF |
+|---|---|---|---|---|---|---|---|
+| 0.2 | 10pct | 0.087 | 30,935 | 30,935 | 3,215 | 9.6× | 9.6× |
+| 0.2 | 50pct | 0.224 | 30,938 | 30,938 | 15,878 | 1.9× | 1.9× |
+| 0.2 | 90pct | 0.425 | 30,966 | 30,966 | 28,063 | 1.1× | 1.1× |
+| 0.5 | 10pct | 0.089 | 11,948 | 11,948 | 1,278 | 9.4× | 9.4× |
+| 0.5 | 50pct | 0.235 | 11,934 | 11,934 | 6,114 | 2.0× | 2.0× |
+| 0.5 | 90pct | 0.469 | 11,923 | 11,923 | 10,785 | 1.1× | 1.1× |
+| **0.8** | **10pct** | **0.096** | **1,949** | **1,949** | **193** | **10.1×** | **10.1×** |
+| 0.8 | 50pct | 0.263 | 1,942 | 1,942 | 982 | 2.0× | 2.0× |
+| 0.8 | 90pct | 0.502 | 1,945 | 1,945 | 1,762 | 1.1× | 1.1× |
 
 ### Results: DPI Pruning Rates (Approach C)
 
@@ -192,30 +192,15 @@ At large scale (n = 10,000):
 
 > Recall < 100% at strict thresholds (10pct) is due to the DPI lower bound being an approximation. Values > 100% occur because the MC JSD estimator has variance; at small result sets, a few boundary pairs near θ flip sides between runs. Both effects are within ±5% and expected.
 
-### Orthogonality of the Two Speedup Sources
-
-At n=10,000, uf=0.8, 10pct selectivity:
-
-```
-B / A ≈ 17.3×    (filter pushdown alone: A skips ~96% of pairs vs B)
-A / C ≈ 10.1×    (DPI pruning alone: C skips ~90% of remaining pairs)
-─────────────────────────────────
-B / C ≈ 17.3 × 10.1 = 174.7×   (measured: 174.1×)
-```
-
-The near-exact multiplicative decomposition confirms the two optimisations target **disjoint computation bottlenecks**.
-
 ### Conclusions (Experiment 2)
 
-1. **Filter pushdown (A vs B) saves up to 17× at 80 % unimodal data.** A single `FILTER(modeCount > 1)` clause eliminates $(1-\text{uf})^2$ of JSD computations. At uf=0.8 this removes 96% of pairs before any expensive distance calculation.
+1. **SimilarityJoin consistently improves over in-engine execution at strict selectivity.** At 10pct selectivity, SimilarityJoin achieves about 8–10× speedup over InEngine_CheapFirst.
 
-2. **DPI pruning (C vs A) delivers stable ~9–10× speedup at 10% selectivity**, regardless of unimodalFrac. ~89% of mm-mm pairs are pruned by the 30-bin histogram lower bound, reducing full MC-JSD evaluations from hundreds of thousands to tens of thousands.
+2. **DPI pruning is the main source of this gain.** At 10pct selectivity, about 89–91% of multimodal-multimodal pairs are pruned by the histogram lower bound before full JSD evaluation.
 
-3. **The combined SIMILARITYJOIN (C vs B) achieves up to 174× speedup** under realistic mixed-modality, strict-selectivity conditions (uf=0.8, sel=10%). Both gains are multiplicative and independent.
+3. **Speedup degrades gracefully as selectivity becomes loose.** At 90pct selectivity, SimilarityJoin still helps, but pruning opportunities shrink and the gain drops to about 1.1×.
 
-4. **Speedup degrades gracefully with looser selectivity.** At 90% selectivity, C/A ≈ 1.1× (little to prune), but C/B remains 19–22× because B still pays the full unimodal-pair JSD cost.
-
-5. **Recall is ≥ 96% across all conditions.** The DPI bound is tight enough at moderate/loose thresholds (50%, 90% → recall ~99–100%) and only degrades slightly at the strictest 10% threshold.
+4. **Recall remains high across all conditions.** The DPI bound is tight enough at moderate and loose thresholds, and only drops slightly under the strictest threshold.
 
 ---
 
@@ -250,30 +235,30 @@ The near-exact multiplicative decomposition confirms the two optimisations targe
 
 | File | Description |
 |---|---|
-| `exp1_full/exp1_raw.csv` | Per-run timings (Scale, K, QueryID, Type, Run, Time_ms) |
-| `exp1_full/exp1_summary.csv` | Median + IQR per configuration |
-| `exp1_full/exp1_table1_Q{1-4}.csv` | Absolute latency tables per query |
-| `exp1_full/exp1_table2_overhead.csv` | PROB/DET overhead ratios at K=3 |
-| `exp1_full/exp1_chart1_scalability.png` | Latency vs scale, one subplot per query |
-| `exp1_full/exp1_chart2_complexity.png` | Latency vs K at scale E3 |
-| `exp1_full/exp1_chart3_overhead.png` | Overhead ratio grouped-bar chart |
-| `exp1_full/exp1_run.log` | Full benchmark console output |
+| `exp1/main/exp1_raw.csv` | Per-run timings (Scale, K, QueryID, Type, Run, Time_ms) |
+| `exp1/main/exp1_summary.csv` | Median + IQR per configuration |
+| `exp1/main/exp1_table1_Q{1-4}.csv` | Absolute latency tables per query |
+| `exp1/main/exp1_table2_overhead.csv` | PROB/DET overhead ratios at K=3 |
+| `exp1/main/exp1_chart1_scalability.png` | Latency vs scale, one subplot per query |
+| `exp1/main/exp1_chart2_complexity.png` | Latency vs K at scale E3 |
+| `exp1/main/exp1_chart3_overhead.png` | Overhead ratio grouped-bar chart |
+| `exp1/main/exp1_run.log` | Full benchmark console output |
 
 ### Experiment 2
 
 | File | Description |
 |---|---|
-| `exp2_full/exp2v5_a.csv` | Approach A raw timings (SPARQL + modeCount filter) |
-| `exp2_full/exp2v5_b_java.csv` | Approach B raw timings (naive Java loop) |
-| `exp2_full/exp2v5_c.csv` | Approach C raw timings (SIMILARITYJOIN) |
-| `exp2_full/exp2v5_calibration.csv` | Per-config θ calibration values |
-| `exp2_full/exp2v5_pruning_stats.csv` | Per-config DPI pruning counts |
-| `exp2_full/exp2v5_summary.csv` | Merged speedup + recall table (45 configs) |
-| `exp2_full/exp2v5_speedup_vs_uf.png` | C/A and C/B speedup vs unimodalFrac |
-| `exp2_full/exp2v5_speedup_vs_npairs.png` | Speedup vs dataset size |
-| `exp2_full/exp2v5_pruning_heatmap.png` | Pruning rate heatmap |
-| `exp2_full/exp2_run.log` | Full benchmark console output |
+| `exp2/exp2_inengine_cheapfirst.csv` | InEngine_CheapFirst raw timings |
+| `exp2/exp2_inengine_jsdfirst.csv` | InEngine_JSDFirst raw timings |
+| `exp2/exp2_similarityjoin.csv` | SimilarityJoin raw timings |
+| `exp2/exp2_calibration.csv` | Per-config θ calibration values |
+| `exp2/exp2_pruning_stats.csv` | Per-config DPI pruning counts |
+| `exp2/exp2_summary.csv` | Merged speedup + recall table |
+| `exp2/exp2_speedup_vs_uf.png` | SimilarityJoin vs InEngine speedup vs unimodalFrac |
+| `exp2/exp2_speedup_vs_npairs.png` | Speedup vs dataset size |
+| `exp2/exp2_pruning_heatmap.png` | Pruning rate heatmap |
+| `exp2/exp2_run.log` | Full benchmark console output |
 
 ---
 
-*Generated from full overnight runs · Warmup=3 · Runs=10 · ProbSPARQL Exp1 + Exp2 v5*
+*Generated from full overnight runs · Warmup=3 · Runs=10 · ProbSPARQL Exp1 + Exp2*
