@@ -19,7 +19,7 @@ Reads the five CSVs produced by the Exp4 Java benchmark classes and generates:
 
 Usage:
     python analyze_exp4.py
-    python analyze_exp4.py --input benchmark/results/exp4_full --output benchmark/results/exp4_full
+    python analyze_exp4.py --input benchmark/results/exp4 --output benchmark/results/exp4
 """
 import argparse
 import os
@@ -324,7 +324,7 @@ def main() -> None:
     args = parser.parse_args()
 
     script_dir     = os.path.dirname(os.path.realpath(__file__))
-    default_results = os.path.join(script_dir, "../results/exp4_full")
+    default_results = os.path.join(script_dir, "../results/exp4")
     if not os.path.isdir(default_results):
         default_results = os.path.join(script_dir, "../results")
     input_dir  = os.path.realpath(args.input  or default_results)

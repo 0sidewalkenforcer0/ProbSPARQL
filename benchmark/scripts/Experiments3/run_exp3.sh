@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 # =============================================================================
-# run_exp3_1.sh — Experiment 3.1: SimJoin Classification Accuracy
+# run_exp3.sh — Exp3: classification accuracy
 #
 # Evaluates the 5 sampling methods (V1_MC, V2_STRATIFIED, V3_SPRT,
-# V4_BOUNDS, V5_ADAPTIVE) plus GT_10K reference on 4 difficulty-stratified
+# V4_BOUNDS, V5_ADAPTIVE) against CSV ground truth on 4 difficulty-stratified
 # datasets (easy / medium / hard / mixed), each with 200 aligned GMM pairs.
+# Current official dataset version corresponds to the former exp3_1_k5_n300_new
+# configuration (K=5, N=300).
 #
-# Configuration (from ClassificationAccuracyBenchmark.java):
-#   GT_SAMPLES   = 10,000  (ground-truth MC references per pair)
+# Configuration (from Exp3Benchmark.java):
+#   Ground truth = simjoin_ground_truth.csv
 #   EVAL_SAMPLES = 10,000  (budget for V1–V5 per pair)
 #   REPEAT       = 10      (repetitions per method × pair)
 #
 # Estimated runtime: 30–90 min
 #
 # Usage (from project root):
-#   bash benchmark/scripts/Experiments3/run_exp3_1.sh
+#   bash benchmark/scripts/Experiments3/run_exp3.sh
 #
 # Optional env vars:
 #   OUTPUT_DIR   — override output directory
@@ -26,8 +28,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp3_full/exp3_1}"
-DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp3}"
+DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data/exp3}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 
 # ── Java 21 resolution ──────────────────────────────────────────────────────
@@ -40,10 +42,10 @@ if [[ -z "${JAVA_HOME:-}" ]]; then
     export JAVA_HOME
 fi
 export PATH="$JAVA_HOME/bin:$PATH"
-export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" \
+export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US"
 
 echo "=================================================================="
-echo "  Experiment 3.1 — SimJoin Classification Accuracy"
+echo "  Experiment 3 — Classification Accuracy"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
 echo "  Output dir   : $OUTPUT_DIR"
@@ -82,35 +84,35 @@ for D in easy medium hard mixed; do
 done
 if [[ $MISSING -eq 1 ]]; then
     echo ""
-    echo "  Run generate_sim_join_data.py first:"
-    echo "    python3 benchmark/scripts/Experiments3/generate_sim_join_data.py --output-dir $DATA_DIR"
+    echo "  Run generate_exp3.py first:"
+    echo "    python3 benchmark/scripts/Experiments3/generate_exp3.py --output-dir $DATA_DIR"
     exit 1
 fi
 
 # ── Step 3: Run benchmark ────────────────────────────────────────────────────
 echo
-echo "[3/3] Running ClassificationAccuracyBenchmark..."
+echo "[3/3] Running Exp3Benchmark..."
 START_TS=$SECONDS
 
 
 REPEAT="${REPEAT:-10}"
 mvn -q exec:java \
-    -Dexec.mainClass="org.apache.jena.probsparql.ClassificationAccuracyBenchmark" \
-    "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR} --repeat ${REPEAT}"
-    2>&1 | tee "${OUTPUT_DIR}/exp3_1_run.log"
+    -Dexec.mainClass="org.apache.jena.probsparql.Exp3Benchmark" \
+    "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR} --repeat ${REPEAT}" \
+    2>&1 | tee "${OUTPUT_DIR}/exp3_run.log"
 
-# Original command without REPEAT override: 
+# Original command without REPEAT override:
 # mvn -q exec:java \
-#     -Dexec.mainClass="org.apache.jena.probsparql.ClassificationAccuracyBenchmark" \
+#     -Dexec.mainClass="org.apache.jena.probsparql.Exp3Benchmark" \
 #     "-Dexec.args=--data-dir ${DATA_DIR} --output-dir ${OUTPUT_DIR}" \
-#     2>&1 | tee "${OUTPUT_DIR}/exp3_1_run.log"
+#     2>&1 | tee "${OUTPUT_DIR}/exp3_run.log"
 
 ELAPSED=$(( SECONDS - START_TS ))
 echo
 echo "------------------------------------------------------------------"
-echo "  Exp 3.1 finished in ${ELAPSED}s  ($(date))"
+echo "  Exp 3 finished in ${ELAPSED}s  ($(date))"
 echo "  Results:"
-for F in exp3_1_classification.csv exp3_1_per_pair.csv; do
+for F in exp3_classification.csv exp3_per_pair.csv; do
     if [[ -f "${OUTPUT_DIR}/${F}" ]]; then
         N=$(( $(wc -l < "${OUTPUT_DIR}/${F}") - 1 ))
         echo "    ${OUTPUT_DIR}/${F}  (${N} data rows)"

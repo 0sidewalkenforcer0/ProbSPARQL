@@ -10,8 +10,8 @@ Generates:
 
 Usage
 -----
-  python benchmark/scripts/plot_exp1_paper.py
-  python benchmark/scripts/plot_exp1_paper.py \
+  python benchmark/scripts/Experiments1/plot_exp1_paper.py
+  python benchmark/scripts/Experiments1/plot_exp1_paper.py \
       --input  benchmark/results/exp1/main/exp1_raw.csv \
       --output benchmark/results/exp1/main
 """

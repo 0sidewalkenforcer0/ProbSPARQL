@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-SimilarityJoin Benchmark Data Generator
-========================================
+Exp3 Data Generator
+===================
 Generates 4 TTL datasets (easy/medium/hard/mixed) with controlled JSD values
-for benchmarking SIMILARITYJOIN with threshold θ=0.3.
+for the Exp3 classification benchmark with threshold θ=0.3.
+Current official dataset version corresponds to the former exp3_1_k5_n300_new
+configuration (K=5, N=300).
 
 Each dataset contains N LeftEntity + N RightEntity pairs.
 JSD is controlled via rejection sampling with high-precision MC (50k samples).
@@ -16,7 +18,7 @@ JSD ranges (θ=0.3):
 
 Usage:
   pip install numpy
-  python generate_sim_join_data.py [--n 100] [--k 2] [--output-dir ../data] [--seed 42]
+  python generate_exp3.py [--n 100] [--k 2] [--output-dir benchmark/data/exp3] [--seed 42]
 """
 
 import argparse
@@ -255,7 +257,7 @@ def write_ttl(pairs, output_path, dataset_label):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate SimilarityJoin benchmark data"
+        description="Generate Exp3 benchmark data"
     )
     parser.add_argument(
         "--n", type=int, default=100, help="Number of pairs per dataset"
@@ -269,7 +271,7 @@ def main():
 
     if args.output_dir is None:
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        args.output_dir = os.path.join(script_dir, "..", "data")
+        args.output_dir = os.path.join(script_dir, "..", "..", "data", "exp3")
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -277,7 +279,7 @@ def main():
     K = args.k
     rng = np.random.default_rng(args.seed)
 
-    print(f"Generating SimilarityJoin benchmark data (N={N}, K={K}, seed={args.seed})")
+    print(f"Generating Exp3 benchmark data (N={N}, K={K}, seed={args.seed})")
     print(f"Output directory: {args.output_dir}")
     print()
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Exp 3.1 Analysis: SimJoin Classification Accuracy
-==================================================
-Reads: benchmark/results/exp3_1_classification.csv
-           benchmark/results/exp3_1_per_pair.csv (optional)
+Exp3 Analysis: Classification Accuracy
+======================================
+Reads: benchmark/results/exp3/exp3_classification.csv
+       benchmark/results/exp3/exp3_per_pair.csv (optional)
 
 Produces:
   - Table  : accuracy / precision / recall / F1  per (method × difficulty)
@@ -11,9 +11,9 @@ Produces:
   - Figure : heatmap             (method × difficulty, cell = F1 score)
 
 Usage:
-  python3 benchmark/scripts/Experiments3/analyze_exp3_1_accuracy.py \
-      --input   benchmark/results/exp3_full/exp3_1_classification.csv \
-      --output  benchmark/results/exp3_full
+  python3 benchmark/scripts/Experiments3/analyze_exp3.py \
+      --input   benchmark/results/exp3/exp3_classification.csv \
+      --output  benchmark/results/exp3
 """
 
 import argparse
@@ -33,11 +33,11 @@ matplotlib.rcParams.update({
 })
 
 # ─────────────────────────────────────────────────────────────────────────────
-METHODS = ["GT_10K", "V1_MC", "V2_STRATIFIED", "V3_SPRT", "V4_BOUNDS", "V5_ADAPTIVE"]
+METHODS = ["GT_CSV", "V1_MC", "V2_STRATIFIED", "V3_SPRT", "V4_BOUNDS", "V5_ADAPTIVE"]
 DATASETS = ["easy", "medium", "hard", "mixed"]
 
 METHOD_LABELS = {
-    "GT_10K":        "GT (N=10k)",
+    "GT_CSV":        "GT (CSV)",
     "V1_MC":         "M1: Monte Carlo",
     "V2_STRATIFIED": "M2: Stratified",
     "V3_SPRT":       "M3: SPRT",
@@ -123,7 +123,7 @@ def plot_grouped_bar(data: dict, out_dir: Path) -> None:
 
     ax.set_xlabel("Dataset Difficulty")
     ax.set_ylabel("Accuracy (%)")
-    ax.set_title("Exp 3.1 — SimJoin Classification Accuracy by Method × Difficulty")
+    ax.set_title("Exp3 — Classification Accuracy by Method × Difficulty")
     ax.set_xticks(x)
     ax.set_xticklabels([DATASET_LABELS[d] for d in DATASETS])
     ax.set_ylim(0, 110)
@@ -131,7 +131,7 @@ def plot_grouped_bar(data: dict, out_dir: Path) -> None:
     ax.legend(loc="lower left", ncol=3)
     ax.grid(axis="y", alpha=0.3)
 
-    out = out_dir / "exp3_1_grouped_bar.png"
+    out = out_dir / "exp3_grouped_bar.png"
     fig.tight_layout()
     fig.savefig(out)
     print(f"Saved: {out}")
@@ -155,7 +155,7 @@ def plot_f1_heatmap(data: dict, out_dir: Path) -> None:
     ax.set_xticklabels([DATASET_LABELS[d] for d in DATASETS])
     ax.set_yticks(range(len(methods)))
     ax.set_yticklabels([METHOD_LABELS.get(m, m) for m in methods])
-    ax.set_title("Exp 3.1 — F1 Score Heatmap (Method × Difficulty)")
+    ax.set_title("Exp3 — F1 Score Heatmap (Method × Difficulty)")
 
     for i in range(len(methods)):
         for j in range(len(DATASETS)):
@@ -164,7 +164,7 @@ def plot_f1_heatmap(data: dict, out_dir: Path) -> None:
 
     plt.colorbar(im, ax=ax, label="F1 Score")
     fig.tight_layout()
-    out = out_dir / "exp3_1_f1_heatmap.png"
+    out = out_dir / "exp3_f1_heatmap.png"
     fig.savefig(out)
     print(f"Saved: {out}")
     plt.close(fig)
@@ -174,7 +174,7 @@ def plot_f1_heatmap(data: dict, out_dir: Path) -> None:
 # Figure 3 — Latency comparison (bar chart)
 # ─────────────────────────────────────────────────────────────────────────────
 def plot_latency(data: dict, out_dir: Path) -> None:
-    methods  = [m for m in METHODS if m != "GT_10K" and m in data]
+    methods  = [m for m in METHODS if m != "GT_CSV" and m in data]
     n_m      = len(methods)
     x        = np.arange(len(DATASETS))
     width    = 0.15
@@ -190,13 +190,13 @@ def plot_latency(data: dict, out_dir: Path) -> None:
 
     ax.set_xlabel("Dataset Difficulty")
     ax.set_ylabel("Latency per Pair (ms)")
-    ax.set_title("Exp 3.1 — Per-Pair Latency by Method × Difficulty")
+    ax.set_title("Exp3 — Per-Pair Latency by Method × Difficulty")
     ax.set_xticks(x)
     ax.set_xticklabels([DATASET_LABELS[d] for d in DATASETS])
     ax.legend(ncol=2)
     ax.grid(axis="y", alpha=0.3)
 
-    out = out_dir / "exp3_1_latency.png"
+    out = out_dir / "exp3_latency.png"
     fig.tight_layout()
     fig.savefig(out)
     print(f"Saved: {out}")
@@ -206,8 +206,8 @@ def plot_latency(data: dict, out_dir: Path) -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--input",  default="benchmark/results/exp3_1_classification.csv")
-    ap.add_argument("--output", default="benchmark/results")
+    ap.add_argument("--input",  default="benchmark/results/exp3/exp3_classification.csv")
+    ap.add_argument("--output", default="benchmark/results/exp3")
     args = ap.parse_args()
 
     csv_path = Path(args.input)

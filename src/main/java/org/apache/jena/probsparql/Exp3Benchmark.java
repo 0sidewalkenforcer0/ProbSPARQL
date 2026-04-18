@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.TreeMap;
 
 /**
- * Exp 3.1: Similarity Join — Accuracy across Difficulty Levels
+ * Exp 3 main benchmark: similarity classification accuracy across difficulty levels.
  *
  * Evaluates each sampling method on classification accuracy when deciding
  * whether JSD(P, Q) ≤ θ=0.3 (similar) or JSD(P, Q) > 0.3 (dissimilar).
@@ -24,18 +24,20 @@ import java.util.TreeMap;
  *   M4 = V4_BOUNDS   (analytical bounds filter + stratified)
  *   M5 = V5_ADAPTIVE (full adaptive pipeline)
  *
- * Ground truth: simjoin_ground_truth.csv generated alongside the TTL datasets
+ * Ground truth: simjoin_ground_truth.csv generated alongside the TTL datasets.
  *
- * Output CSV: benchmark/results/exp3_1_classification.csv
+ * Current official dataset version corresponds to the former exp3_1_k5_n300_new run.
+ *
+ * Output CSV: benchmark/results/exp3/exp3_classification.csv
  *   columns: Method, Dataset, Accuracy, Precision, Recall, F1, MAE, RMSE, Latency_ms
  *
- * Per-pair CSV: benchmark/results/exp3_1_per_pair.csv
+ * Per-pair CSV: benchmark/results/exp3/exp3_per_pair.csv
  *   columns: Method, Dataset, PairIdx, TrueJSD, EstJSD, TrueLabel, PredLabel
  *
  * Usage:
- *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.ClassificationAccuracyBenchmark"
+ *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.Exp3Benchmark"
  */
-public class ClassificationAccuracyBenchmark {
+public class Exp3Benchmark {
 
     // -----------------------------------------------------------------------
     // Experiment configuration
@@ -61,8 +63,8 @@ public class ClassificationAccuracyBenchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String dataDir   = "benchmark/data";
-        String outputDir = "benchmark/results";
+        String dataDir   = "benchmark/data/exp3";
+        String outputDir = "benchmark/results/exp3";
 
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--data-dir"))       dataDir   = args[++i];
@@ -71,7 +73,7 @@ public class ClassificationAccuracyBenchmark {
         }
         new File(outputDir).mkdirs();
 
-        System.out.println("=== Exp 3.1: SimJoin Classification Accuracy ===");
+        System.out.println("=== Exp 3: Classification Accuracy ===");
         System.out.printf("Threshold θ = %.1f%n", THETA);
         System.out.println("Ground truth: simjoin_ground_truth.csv");
         System.out.println("Methods     : " + Arrays.toString(METHODS));
@@ -80,8 +82,8 @@ public class ClassificationAccuracyBenchmark {
         System.out.println();
 
         // Aggregate results
-        String aggCsv  = outputDir + "/exp3_1_classification.csv";
-        String pairCsv = outputDir + "/exp3_1_per_pair.csv";
+        String aggCsv  = outputDir + "/exp3_classification.csv";
+        String pairCsv = outputDir + "/exp3_per_pair.csv";
         String gtCsv   = dataDir + "/simjoin_ground_truth.csv";
 
         List<String[]> aggRows  = new ArrayList<>();
@@ -141,7 +143,7 @@ public class ClassificationAccuracyBenchmark {
             boolean[] trueLabels = new boolean[nPairs];
             for (int i = 0; i < nPairs; i++) trueLabels[i] = (gtJSD[i] <= THETA);
 
-            // Aggregate row for GT_10K
+            // Aggregate row for CSV ground truth
             {
                 double[] cls = classificationMetrics(trueLabels, trueLabels); // perfect
                 aggRows.add(new String[]{

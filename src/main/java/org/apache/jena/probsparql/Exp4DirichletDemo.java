@@ -73,7 +73,7 @@ public class Exp4DirichletDemo {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String outputDir = "benchmark/results/exp4_full";
+        String outputDir = "benchmark/results/exp4";
         String dataDir   = "benchmark/data";
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--output-dir")) outputDir = args[++i];

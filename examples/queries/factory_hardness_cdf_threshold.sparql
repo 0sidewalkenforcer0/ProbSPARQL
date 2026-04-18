@@ -1,0 +1,30 @@
+# Factory demo query:
+# Return bevel gears and their temperatures when the hardness CDF at 450 exceeds 0.9.
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag: <http://example.org/anglegrinder#>
+PREFIX cfm: <http://example.org/circularfactorymeasure#>
+PREFIX uq: <http://example.org/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?bevel ?bevelLabel ?temp ?hardnessCdf
+WHERE {
+  ?bevel a ag:BevelGear ;
+         rdfs:label ?bevelLabel ;
+         ag:hasHardnessCharacteristic ?hardnessChar ;
+         ag:hasTemperatureCharacteristic ?tempChar .
+
+  ?hardnessMeasurement a cfm:Measurement ;
+                       cfm:measuresCharacteristic ?hardnessChar ;
+                       cfm:hasProbabilisticValue ?hardnessRv .
+  ?hardnessRv uq:hasDistribution ?hardnessDist .
+
+  ?tempMeasurement a cfm:Measurement ;
+                   cfm:measuresCharacteristic ?tempChar ;
+                   cfm:hasValue ?temp .
+
+  BIND(prob:cdf(?hardnessDist, 450) AS ?hardnessCdf)
+  FILTER(?hardnessCdf > 0.9)
+}
+ORDER BY ?bevelLabel

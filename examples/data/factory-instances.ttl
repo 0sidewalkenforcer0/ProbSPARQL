@@ -1,0 +1,530 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix ag:   <http://example.org/anglegrinder#> .
+@prefix cfm:  <http://example.org/circularfactorymeasure#> .
+@prefix uq:   <http://example.org/uncertainty#> .
+@prefix ns:   <http://example.org/materialscience#> .
+@prefix ex:   <http://example.org/data/circular-factory/> .
+
+ag:hasCarbonContentCharacteristic a rdf:Property ;
+    rdfs:label "has carbon content characteristic" .
+
+ag:hasTemperatureCharacteristic a rdf:Property ;
+    rdfs:label "has temperature characteristic" .
+
+ag:hasBarkhausenRmsCharacteristic a rdf:Property ;
+    rdfs:label "has Barkhausen RMS characteristic" .
+
+ag:hasHardnessCharacteristic a rdf:Property ;
+    rdfs:label "has hardness characteristic" .
+
+ag:hasResidualStressCharacteristic a rdf:Property ;
+    rdfs:label "has residual stress characteristic" .
+
+# One product instance and one part instance.
+ex:angle_grinder_001 a ag:AngleGrinder ;
+    rdfs:label "Angle Grinder 001" ;
+    ag:hasPart ex:bevel_gear_001 .
+
+ex:bevel_gear_001 a ag:BevelGear ;
+    rdfs:label "Bevel Gear 001 for B02-B03-A03 demonstration" ;
+    ag:hasCarbonContentCharacteristic ex:carbon_content_char_001 ;
+    ag:hasTemperatureCharacteristic ex:temperature_char_001 ;
+    ag:hasBarkhausenRmsCharacteristic ex:barkhausen_rms_char_001 ;
+    ag:hasHardnessCharacteristic ex:hardness_char_001 ;
+    ag:hasResidualStressCharacteristic ex:residual_stress_char_001 .
+
+# Five characteristics defined from the domain description.
+ex:carbon_content_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Carbon Content" .
+
+ex:temperature_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Test Temperature" .
+
+ex:barkhausen_rms_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Barkhausen Noise RMS" .
+
+ex:hardness_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness" .
+
+ex:residual_stress_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Residual Stress" .
+
+# Deterministic measurements.
+ex:measurement_cc_001 a cfm:Measurement ;
+    rdfs:label "Carbon content measurement for Bevel Gear 001" ;
+    cfm:measuresCharacteristic ex:carbon_content_char_001 ;
+    cfm:hasValue "25"^^xsd:decimal .
+
+ex:measurement_temp_001 a cfm:Measurement ;
+    rdfs:label "Temperature measurement for Bevel Gear 001" ;
+    cfm:measuresCharacteristic ex:temperature_char_001 ;
+    cfm:hasValue "30"^^xsd:decimal .
+
+# Probabilistic measurements kept as three independent random variables.
+ex:measurement_rms_001 a cfm:Measurement ;
+    rdfs:label "Barkhausen RMS distribution for Bevel Gear 001" ;
+    cfm:measuresCharacteristic ex:barkhausen_rms_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_rms_001 .
+
+ex:measurement_hardness_001 a cfm:Measurement ;
+    rdfs:label "Hardness distribution for Bevel Gear 001" ;
+    cfm:measuresCharacteristic ex:hardness_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_hardness_001 .
+
+ex:measurement_rs_001 a cfm:Measurement ;
+    rdfs:label "Residual stress distribution for Bevel Gear 001" ;
+    cfm:measuresCharacteristic ex:residual_stress_char_001 ;
+    cfm:hasProbabilisticValue ex:rv_rs_001 .
+
+# Independent 1D distributions, intentionally not fused into one joint model.
+ex:rv_rms_001 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.58, 0.42],
+        "means": [
+            [268.4],
+            [272.1]
+        ],
+        "covariances": [
+            [[8.2]],
+            [[5.6]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_hardness_001 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.61, 0.39],
+        "means": [
+            [478.0],
+            [483.7]
+        ],
+        "covariances": [
+            [[16.0]],
+            [[9.0]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_rs_001 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.54, 0.46],
+        "means": [
+            [21.9],
+            [22.8]
+        ],
+        "covariances": [
+            [[1.44]],
+            [[0.81]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+# Additional instances derived from the four provided rows.
+ex:angle_grinder_002 a ag:AngleGrinder ;
+    rdfs:label "Angle Grinder 002" ;
+    ag:hasPart ex:bevel_gear_002 .
+
+ex:bevel_gear_002 a ag:BevelGear ;
+    rdfs:label "Bevel Gear 002 for B02-B03-A03 demonstration" ;
+    ag:hasCarbonContentCharacteristic ex:carbon_content_char_002 ;
+    ag:hasTemperatureCharacteristic ex:temperature_char_002 ;
+    ag:hasBarkhausenRmsCharacteristic ex:barkhausen_rms_char_002 ;
+    ag:hasHardnessCharacteristic ex:hardness_char_002 ;
+    ag:hasResidualStressCharacteristic ex:residual_stress_char_002 .
+
+ex:carbon_content_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Carbon Content" .
+
+ex:temperature_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Test Temperature" .
+
+ex:barkhausen_rms_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Barkhausen Noise RMS" .
+
+ex:hardness_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness" .
+
+ex:residual_stress_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Residual Stress" .
+
+ex:measurement_cc_002 a cfm:Measurement ;
+    rdfs:label "Carbon content measurement for Bevel Gear 002" ;
+    cfm:measuresCharacteristic ex:carbon_content_char_002 ;
+    cfm:hasValue "25"^^xsd:decimal .
+
+ex:measurement_temp_002 a cfm:Measurement ;
+    rdfs:label "Temperature measurement for Bevel Gear 002" ;
+    cfm:measuresCharacteristic ex:temperature_char_002 ;
+    cfm:hasValue "30"^^xsd:decimal .
+
+ex:measurement_rms_002 a cfm:Measurement ;
+    rdfs:label "Barkhausen RMS distribution for Bevel Gear 002" ;
+    cfm:measuresCharacteristic ex:barkhausen_rms_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_rms_002 .
+
+ex:measurement_hardness_002 a cfm:Measurement ;
+    rdfs:label "Hardness distribution for Bevel Gear 002" ;
+    cfm:measuresCharacteristic ex:hardness_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_hardness_002 .
+
+ex:measurement_rs_002 a cfm:Measurement ;
+    rdfs:label "Residual stress distribution for Bevel Gear 002" ;
+    cfm:measuresCharacteristic ex:residual_stress_char_002 ;
+    cfm:hasProbabilisticValue ex:rv_rs_002 .
+
+ex:rv_rms_002 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.57, 0.43],
+        "means": [
+            [223.6],
+            [226.7]
+        ],
+        "covariances": [
+            [[7.2]],
+            [[4.8]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_hardness_002 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.62, 0.38],
+        "means": [
+            [478.0],
+            [482.5]
+        ],
+        "covariances": [
+            [[12.0]],
+            [[6.25]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_rs_002 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.55, 0.45],
+        "means": [
+            [25.9],
+            [27.5]
+        ],
+        "covariances": [
+            [[1.21]],
+            [[0.64]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:angle_grinder_003 a ag:AngleGrinder ;
+    rdfs:label "Angle Grinder 003" ;
+    ag:hasPart ex:bevel_gear_003 .
+
+ex:bevel_gear_003 a ag:BevelGear ;
+    rdfs:label "Bevel Gear 003 for B02-B03-A03 demonstration" ;
+    ag:hasCarbonContentCharacteristic ex:carbon_content_char_003 ;
+    ag:hasTemperatureCharacteristic ex:temperature_char_003 ;
+    ag:hasBarkhausenRmsCharacteristic ex:barkhausen_rms_char_003 ;
+    ag:hasHardnessCharacteristic ex:hardness_char_003 ;
+    ag:hasResidualStressCharacteristic ex:residual_stress_char_003 .
+
+ex:carbon_content_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Carbon Content" .
+
+ex:temperature_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Test Temperature" .
+
+ex:barkhausen_rms_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Barkhausen Noise RMS" .
+
+ex:hardness_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness" .
+
+ex:residual_stress_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Residual Stress" .
+
+ex:measurement_cc_003 a cfm:Measurement ;
+    rdfs:label "Carbon content measurement for Bevel Gear 003" ;
+    cfm:measuresCharacteristic ex:carbon_content_char_003 ;
+    cfm:hasValue "25"^^xsd:decimal .
+
+ex:measurement_temp_003 a cfm:Measurement ;
+    rdfs:label "Temperature measurement for Bevel Gear 003" ;
+    cfm:measuresCharacteristic ex:temperature_char_003 ;
+    cfm:hasValue "250"^^xsd:decimal .
+
+ex:measurement_rms_003 a cfm:Measurement ;
+    rdfs:label "Barkhausen RMS distribution for Bevel Gear 003" ;
+    cfm:measuresCharacteristic ex:barkhausen_rms_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_rms_003 .
+
+ex:measurement_hardness_003 a cfm:Measurement ;
+    rdfs:label "Hardness distribution for Bevel Gear 003" ;
+    cfm:measuresCharacteristic ex:hardness_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_hardness_003 .
+
+ex:measurement_rs_003 a cfm:Measurement ;
+    rdfs:label "Residual stress distribution for Bevel Gear 003" ;
+    cfm:measuresCharacteristic ex:residual_stress_char_003 ;
+    cfm:hasProbabilisticValue ex:rv_rs_003 .
+
+ex:rv_rms_003 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.58, 0.42],
+        "means": [
+            [236.9],
+            [239.8]
+        ],
+        "covariances": [
+            [[8.0]],
+            [[5.4]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_hardness_003 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.60, 0.40],
+        "means": [
+            [437.5],
+            [442.2]
+        ],
+        "covariances": [
+            [[14.0]],
+            [[8.0]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_rs_003 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.56, 0.44],
+        "means": [
+            [31.1],
+            [33.0]
+        ],
+        "covariances": [
+            [[1.44]],
+            [[0.81]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:angle_grinder_004 a ag:AngleGrinder ;
+    rdfs:label "Angle Grinder 004" ;
+    ag:hasPart ex:bevel_gear_004 .
+
+ex:bevel_gear_004 a ag:BevelGear ;
+    rdfs:label "Bevel Gear 004 for B02-B03-A03 demonstration" ;
+    ag:hasCarbonContentCharacteristic ex:carbon_content_char_004 ;
+    ag:hasTemperatureCharacteristic ex:temperature_char_004 ;
+    ag:hasBarkhausenRmsCharacteristic ex:barkhausen_rms_char_004 ;
+    ag:hasHardnessCharacteristic ex:hardness_char_004 ;
+    ag:hasResidualStressCharacteristic ex:residual_stress_char_004 .
+
+ex:carbon_content_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Carbon Content" .
+
+ex:temperature_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Test Temperature" .
+
+ex:barkhausen_rms_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Barkhausen Noise RMS" .
+
+ex:hardness_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness" .
+
+ex:residual_stress_char_004 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Residual Stress" .
+
+ex:measurement_cc_004 a cfm:Measurement ;
+    rdfs:label "Carbon content measurement for Bevel Gear 004" ;
+    cfm:measuresCharacteristic ex:carbon_content_char_004 ;
+    cfm:hasValue "25"^^xsd:decimal .
+
+ex:measurement_temp_004 a cfm:Measurement ;
+    rdfs:label "Temperature measurement for Bevel Gear 004" ;
+    cfm:measuresCharacteristic ex:temperature_char_004 ;
+    cfm:hasValue "250"^^xsd:decimal .
+
+ex:measurement_rms_004 a cfm:Measurement ;
+    rdfs:label "Barkhausen RMS distribution for Bevel Gear 004" ;
+    cfm:measuresCharacteristic ex:barkhausen_rms_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_rms_004 .
+
+ex:measurement_hardness_004 a cfm:Measurement ;
+    rdfs:label "Hardness distribution for Bevel Gear 004" ;
+    cfm:measuresCharacteristic ex:hardness_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_hardness_004 .
+
+ex:measurement_rs_004 a cfm:Measurement ;
+    rdfs:label "Residual stress distribution for Bevel Gear 004" ;
+    cfm:measuresCharacteristic ex:residual_stress_char_004 ;
+    cfm:hasProbabilisticValue ex:rv_rs_004 .
+
+ex:rv_rms_004 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.59, 0.41],
+        "means": [
+            [278.2],
+            [281.8]
+        ],
+        "covariances": [
+            [[8.6]],
+            [[5.9]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_hardness_004 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.61, 0.39],
+        "means": [
+            [438.0],
+            [441.6]
+        ],
+        "covariances": [
+            [[13.0]],
+            [[7.2]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_rs_004 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.57, 0.43],
+        "means": [
+            [29.2],
+            [31.2]
+        ],
+        "covariances": [
+            [[1.21]],
+            [[0.72]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:angle_grinder_005 a ag:AngleGrinder ;
+    rdfs:label "Angle Grinder 005" ;
+    ag:hasPart ex:bevel_gear_005 .
+
+ex:bevel_gear_005 a ag:BevelGear ;
+    rdfs:label "Bevel Gear 005 for B02-B03-A03 demonstration" ;
+    ag:hasCarbonContentCharacteristic ex:carbon_content_char_005 ;
+    ag:hasTemperatureCharacteristic ex:temperature_char_005 ;
+    ag:hasBarkhausenRmsCharacteristic ex:barkhausen_rms_char_005 ;
+    ag:hasHardnessCharacteristic ex:hardness_char_005 ;
+    ag:hasResidualStressCharacteristic ex:residual_stress_char_005 .
+
+ex:carbon_content_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Carbon Content" .
+
+ex:temperature_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Test Temperature" .
+
+ex:barkhausen_rms_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Barkhausen Noise RMS" .
+
+ex:hardness_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness" .
+
+ex:residual_stress_char_005 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Residual Stress" .
+
+ex:measurement_cc_005 a cfm:Measurement ;
+    rdfs:label "Carbon content measurement for Bevel Gear 005" ;
+    cfm:measuresCharacteristic ex:carbon_content_char_005 ;
+    cfm:hasValue "25"^^xsd:decimal .
+
+ex:measurement_temp_005 a cfm:Measurement ;
+    rdfs:label "Temperature measurement for Bevel Gear 005" ;
+    cfm:measuresCharacteristic ex:temperature_char_005 ;
+    cfm:hasValue "375"^^xsd:decimal .
+
+ex:measurement_rms_005 a cfm:Measurement ;
+    rdfs:label "Barkhausen RMS distribution for Bevel Gear 005" ;
+    cfm:measuresCharacteristic ex:barkhausen_rms_char_005 ;
+    cfm:hasProbabilisticValue ex:rv_rms_005 .
+
+ex:measurement_hardness_005 a cfm:Measurement ;
+    rdfs:label "Hardness distribution for Bevel Gear 005" ;
+    cfm:measuresCharacteristic ex:hardness_char_005 ;
+    cfm:hasProbabilisticValue ex:rv_hardness_005 .
+
+ex:measurement_rs_005 a cfm:Measurement ;
+    rdfs:label "Residual stress distribution for Bevel Gear 005" ;
+    cfm:measuresCharacteristic ex:residual_stress_char_005 ;
+    cfm:hasProbabilisticValue ex:rv_rs_005 .
+
+ex:rv_rms_005 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.58, 0.42],
+        "means": [
+            [281.4],
+            [284.9]
+        ],
+        "covariances": [
+            [[8.8]],
+            [[6.0]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_hardness_005 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.60, 0.40],
+        "means": [
+            [357.8],
+            [362.6]
+        ],
+        "covariances": [
+            [[12.5]],
+            [[7.0]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .
+
+ex:rv_rs_005 a cfm:RandomVariable ;
+    uq:hasDistribution """{
+        "n_components": 2,
+        "dimensions": 1,
+        "covariance_type": "full",
+        "weights": [0.56, 0.44],
+        "means": [
+            [39.8],
+            [41.9]
+        ],
+        "covariances": [
+            [[1.69]],
+            [[0.90]]
+        ]
+    }"""^^<http://example.org/ontology/uncertainty#gmmLiteral> .

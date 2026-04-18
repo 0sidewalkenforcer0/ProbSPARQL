@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# run_exp4_full.sh — Full Overnight Pipeline for Experiment 4 (Generalization)
+# run_exp4.sh — Full Pipeline for Experiment 4 (Generalization)
 #
 # Runs all five sub-experiments sequentially:
 #
@@ -13,13 +13,13 @@
 #   Phase 6 — Exp 4.5  Exp4DirichletDemo    (Dirichlet qualitative demo)
 #   Phase 7 — Analysis  analyze_exp4.py     (charts + console tables)
 #
-# All results → benchmark/results/exp4_full/
+# All results → benchmark/results/exp4/
 #
 # Usage (from project root):
-#   bash benchmark/scripts/Experiments4/run_exp4_full.sh
+#   bash benchmark/scripts/Experiments4/run_exp4.sh
 #
 # Optional env vars:
-#   OUTPUT_DIR  — override result directory  (default: benchmark/results/exp4_full)
+#   OUTPUT_DIR  — override result directory  (default: benchmark/results/exp4)
 #   DATA_DIR    — override data directory    (default: benchmark/data)
 #   SKIP_BUILD  — set to 1 to skip Maven compile
 #   SKIP_DATA   — set to 1 to skip Python dataset generation
@@ -31,7 +31,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4_full_new}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4}"
 DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SKIP_DATA="${SKIP_DATA:-0}"

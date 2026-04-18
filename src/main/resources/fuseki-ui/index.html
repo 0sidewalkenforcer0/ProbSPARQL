@@ -56,7 +56,6 @@
       overflow-x: hidden;
     }
 
-    /* --- Dynamic Header --- */
     header {
       padding: 30px 60px;
       background: var(--bg-header);
@@ -125,14 +124,12 @@
       100% { opacity: 1; transform: scale(1); }
     }
 
-    /* --- Main Layout --- */
     main {
       max-width: 1440px;
       margin: 0 auto;
       padding: 40px;
     }
 
-    /* --- Bolder Navigation --- */
     .tabbar {
       display: flex;
       gap: 16px;
@@ -173,7 +170,6 @@
       box-shadow: 0 0 20px rgba(237, 183, 14, 0.1);
     }
 
-    /* --- Panels --- */
     .tab-panel {
       display: none;
       animation: fadeIn 0.4s ease-out;
@@ -188,7 +184,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* --- Toolbars & Controls --- */
     .toolbar, .dataset-toolbar, .graph-toolbar {
       display: flex;
       align-items: center;
@@ -237,7 +232,6 @@
       box-shadow: 0 0 0 3px var(--primary-soft);
     }
 
-    /* --- Custom File Upload (Data Induction Slot) --- */
     .file-upload-container {
       position: relative;
       display: flex;
@@ -297,7 +291,6 @@
       cursor: pointer;
     }
 
-    /* Override the import-row to accommodate the new slot */
     .import-row {
       display: flex;
       align-items: center;
@@ -305,7 +298,6 @@
       flex-wrap: wrap;
     }
 
-    /* --- Cyber Buttons --- */
     button {
       padding: 12px 30px;
       border-radius: 8px;
@@ -352,11 +344,17 @@
       transform: none !important;
     }
 
-    /* --- Sci-Fi Panels --- */
     .workbench {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 24px;
+    }
+
+    .dataset-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 24px;
     }
 
     .pane {
@@ -439,7 +437,6 @@
       line-height: 1.6;
     }
 
-    /* --- Stats Grid --- */
     .stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -486,7 +483,6 @@
       opacity: 0.6;
     }
 
-    /* --- Tables --- */
     .table-wrap {
       overflow: auto;
     }
@@ -524,7 +520,6 @@
       color: #fff;
     }
 
-    /* --- Graph Visualization Optimized --- */
     .graph-shell {
       display: grid;
       grid-template-columns: 1fr 340px;
@@ -546,17 +541,21 @@
       height: 100%;
       background: radial-gradient(circle at center, #0a0f1a 0%, #000 100%);
       cursor: crosshair;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .graph-link {
       stroke: rgba(237, 183, 14, 0.15);
       stroke-width: 1.5;
       stroke-dasharray: 4;
+      pointer-events: none;
     }
 
     .graph-node circle {
       stroke-width: 0;
       filter: drop-shadow(0 0 10px currentColor);
+      cursor: pointer;
     }
 
     .node-instance { color: var(--primary); fill: var(--primary); }
@@ -566,6 +565,7 @@
     .node-om { color: #22d3ee; fill: #22d3ee; }
     .node-resource { color: #94a3b8; fill: #94a3b8; }
     .node-literal { color: #475569; fill: #475569; }
+    .node-science { color: #10b981; fill: #10b981; }
 
     .graph-node-label {
       font-size: 10px;
@@ -574,6 +574,9 @@
       paint-order: stroke;
       stroke: #000;
       stroke-width: 3px;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .expand-dot {
@@ -581,11 +584,39 @@
       stroke: var(--primary);
       stroke-width: 2px;
       filter: drop-shadow(0 0 8px var(--primary));
+      pointer-events: auto;
+      cursor: pointer;
     }
 
     .expand-dot.expanded {
       fill: var(--primary);
       stroke: #fff;
+    }
+
+    .expand-dot.loading {
+      fill: #f59e0b;
+      stroke: #fff;
+      filter: drop-shadow(0 0 10px #f59e0b);
+    }
+
+    .graph-node.expandable circle {
+      stroke: var(--primary);
+      stroke-width: 2px;
+    }
+
+    .graph-node.expanded circle {
+      stroke: rgba(255, 255, 255, 0.7);
+      stroke-width: 2px;
+    }
+
+    .graph-node.loading circle {
+      stroke: #f59e0b;
+      stroke-width: 2px;
+      filter: drop-shadow(0 0 16px #f59e0b);
+    }
+
+    .graph-node.not-expandable circle {
+      opacity: 0.72;
     }
 
     .graph-node.selected circle {
@@ -665,6 +696,7 @@
       font-size: 13px;
       color: #fff;
       word-break: break-all;
+      overflow-wrap: anywhere;
       background: rgba(255,255,255,0.03);
       padding: 12px 16px;
       border-radius: 8px;
@@ -715,6 +747,32 @@
       letter-spacing: 0.1em;
     }
 
+    .gmm-info {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(237, 183, 14, 0.05);
+      border: 1px solid var(--primary-glow);
+      border-radius: 8px;
+    }
+
+    .gmm-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .gmm-component {
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: #fff;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
     .graph-link-label {
       fill: #64748b;
       font-size: 9px;
@@ -723,15 +781,16 @@
       stroke: #000;
       stroke-width: 4px;
       stroke-linejoin: round;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    /* --- Custom Scrollbar --- */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-    /* --- Responsive --- */
     @media (max-width: 1200px) {
       .workbench, .dataset-grid { grid-template-columns: 1fr; }
       .graph-shell { grid-template-columns: 1fr; height: auto; }
@@ -790,7 +849,7 @@
         </div>
         <button id="run" type="button">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Execute Analysis
+          Query
         </button>
       </div>
 
@@ -918,279 +977,60 @@
 
   <script>
     const endpoint = "/probsparql/query";
+    const angleGrinderClassUri = "http://example.org/anglegrinder#AngleGrinder";
+    const rdfTypeUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
     const exampleQueries = [
       {
-        id: "u1",
-        label: "U1 Probabilistic Thresholding",
-        source: "examples/queries/U1_probabilistic_thresholding.sparql",
-        query: `# U1: Probabilistic Thresholding
-# "Give me all gears whose tooth length is below 9.8mm with probability at least 0.9."
+        id: "factory-hardness-cdf",
+        label: "Hardness CDF > 0.9 at 450",
+        source: "examples/queries/factory_hardness_cdf_threshold.sparql",
+        query: `# Factory demo query:
+# Return bevel gears and their temperatures when the hardness CDF at 450 exceeds 0.9.
 
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX ag: <http://example.org/anglegrinder#>
+PREFIX cfm: <http://example.org/circularfactorymeasure#>
+PREFIX uq: <http://example.org/uncertainty#>
 PREFIX prob: <http://probsparql.org/function#>
-PREFIX ex: <http://example.org/data/>
 
-SELECT ?gear ?gearLabel ?pointEstimate ?probability
+SELECT ?bevel ?bevelLabel ?temp ?hardnessCdf
 WHERE {
-  # Crown gears with tooth length measurement
-  ?gear a ag:CrownGear ;
-        rdfs:label ?gearLabel ;
-        cfm:hasCharacteristic ?characteristic .
-  
-  ?measurement cfm:measuresCharacteristic ?characteristic ;
-               cfm:hasInputPointCloud ?pointCloud ;
-               cfm:hasProbabilisticValue ?rv ;
-               om:hasValue ?pointEstimate .
-  
-  ?rv uq:hasDistribution ?distribution .
-  
-  # CDF(9.8) = P(X <= 9.8)
-  BIND(prob:cdf(?distribution, 9.8) AS ?probability)
-  
-  # Filter: P(X < 9.8mm) >= 0.9
-  FILTER(?probability >= 0.9)
+  ?bevel a ag:BevelGear ;
+         rdfs:label ?bevelLabel ;
+         ag:hasHardnessCharacteristic ?hardnessChar ;
+         ag:hasTemperatureCharacteristic ?tempChar .
+
+  ?hardnessMeasurement a cfm:Measurement ;
+                       cfm:measuresCharacteristic ?hardnessChar ;
+                       cfm:hasProbabilisticValue ?hardnessRv .
+  ?hardnessRv uq:hasDistribution ?hardnessDist .
+
+  ?tempMeasurement a cfm:Measurement ;
+                   cfm:measuresCharacteristic ?tempChar ;
+                   cfm:hasValue ?temp .
+
+  BIND(prob:cdf(?hardnessDist, 450) AS ?hardnessCdf)
+  FILTER(?hardnessCdf > 0.9)
 }
-ORDER BY DESC(?probability)`
-      },
-      {
-        id: "u2",
-        label: "U2 Probabilistic Comparison",
-        source: "examples/queries/U2_probabilistic_comparison.sparql",
-        query: `# U2: Probabilistic Comparison and Matching
-# "Find all gears where the JS divergence between CT and SL tooth-length distributions exceeds 0.2."
-
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX core: <http://example.org/ontology/core#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-
-SELECT ?gear ?gearLabel ?ct_mean ?sl_mean ?jsDivergence
-WHERE {
-  # Crown gears with measurements
-  ?gear a ag:CrownGear ;
-        rdfs:label ?gearLabel ;
-        cfm:hasCharacteristic ?characteristic .
-  
-  # CT Scanner measurement
-  ?measurement_ct cfm:measuresCharacteristic ?characteristic ;
-                  cfm:hasInputVoxelGrid ?voxelGrid ;
-                  cfm:hasProbabilisticValue ?rv_ct ;
-                  om:hasValue ?ct_mean .
-  ?rv_ct uq:hasDistribution ?gmm_ct .
-  
-  # Structured-Light measurement
-  ?measurement_sl cfm:measuresCharacteristic ?characteristic ;
-                  cfm:hasInputPointCloud ?pointCloud ;
-                  cfm:hasProbabilisticValue ?rv_sl ;
-                  om:hasValue ?sl_mean .
-  ?rv_sl uq:hasDistribution ?gmm_sl .
-  
-  # Jensen-Shannon divergence
-  BIND(prob:jsdivergence(?gmm_ct, ?gmm_sl) AS ?jsDivergence)
-  
-  # Filter: JS divergence > 0.2
-  FILTER(?jsDivergence > 0.2)
-}
-ORDER BY DESC(?jsDivergence)`
-      },
-      {
-        id: "u3",
-        label: "U3 Distribution Transformation",
-        source: "examples/queries/U3_distribution_transformation.sparql",
-        query: `# U3: Distribution Transformation and Propagation
-# "Retrieve all motors with their speed, torque, and computed power with uncertainty propagation."
-# Formula: P (watts) = omega (rad/s) * tau (Nm)
-
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-
-SELECT ?motor ?gmmSpeed ?gmmTorque ?powerDist
-WHERE {
-  # Motors with performance characteristics
-  ?motor a ag:Motor ;
-         rdfs:label ?motorLabel ;
-         ag:hasSpeedCharacteristic ?speedChar ;
-         ag:hasTorqueCharacteristic ?torqueChar .
-  
-  # Speed measurement (rad/s)
-  ?speedMeasure cfm:measuresCharacteristic ?speedChar ;
-                cfm:hasProbabilisticValue ?rvSpeed ;
-                om:hasValue ?speedRadPerSec .
-  ?rvSpeed uq:hasDistribution ?gmmSpeed .
-  
-  # Torque measurement (Nm)
-  ?torqueMeasure cfm:measuresCharacteristic ?torqueChar ;
-                 cfm:hasProbabilisticValue ?rvTorque ;
-                 om:hasValue ?torqueNm .
-  ?rvTorque uq:hasDistribution ?gmmTorque .
-  
-  # Power distribution: P = omega * tau
-  BIND(prob:multiply(?gmmSpeed, ?gmmTorque) AS ?powerDist)
-}
-ORDER BY DESC(?speedRadPerSec)`
-      },
-      {
-        id: "u4",
-        label: "U4 Distribution Manipulation",
-        source: "examples/queries/U4_distribution_manipulation.sparql",
-        query: `# U4: Distribution Manipulation
-# "For spindles, fuse caliper and laser measurements, then extract MAP diameter for robot control."
-#
-# The data has one caliper distribution and one laser distribution per spindle diameter.
-# This query first pairs measurements by the shared diameter characteristic, then applies
-# the ProbSPARQL functions directly:
-# - prob:jsdivergence checks whether the two distributions are close enough.
-# - prob:fuse creates the fused posterior distribution.
-# - prob:map, prob:mean, and prob:std extract actionable summaries.
-
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-
-SELECT ?spindle ?spindleLabel ?caliperValue ?laserValue ?jsDivergence
-       ?fusedDist ?mapDiameter ?meanDiameter ?stdDev
-WHERE {
-  ?spindle a ag:Spindle ;
-           rdfs:label ?spindleLabel ;
-           ag:hasDiameterCharacteristic ?diameterChar .
-
-  ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ;
-                  rdfs:label ?caliperLabel ;
-                  cfm:hasProbabilisticValue ?rvCaliper ;
-                  om:hasValue ?caliperValue .
-  FILTER(CONTAINS(?caliperLabel, "Caliper"))
-  ?rvCaliper uq:hasDistribution ?caliperDist .
-
-  ?laserMeasure cfm:measuresCharacteristic ?diameterChar ;
-                rdfs:label ?laserLabel ;
-                cfm:hasProbabilisticValue ?rvLaser ;
-                om:hasValue ?laserValue .
-  FILTER(CONTAINS(?laserLabel, "Laser"))
-  ?rvLaser uq:hasDistribution ?laserDist .
-
-  BIND(prob:jsdivergence(?caliperDist, ?laserDist) AS ?jsDivergence)
-  FILTER(?jsDivergence <= 0.3)
-
-  BIND(prob:fuse(?caliperDist, ?laserDist) AS ?fusedDist)
-  BIND(prob:map(?fusedDist) AS ?mapDiameter)
-  BIND(prob:mean(?fusedDist) AS ?meanDiameter)
-  BIND(prob:std(?fusedDist) AS ?stdDev)
-}
-ORDER BY ?spindleLabel`
-      },
-      {
-        id: "u5",
-        label: "U5 Similarity Join",
-        source: "examples/queries/U5_similarityjoin_test.sparql",
-        query: `# U5: Probabilistic Similarity Search (New Relational SIMILARITYJOIN Syntax)
-# "For the current gear, retrieve all historical gears whose CT tooth-length distributions are similar."
-#
-# New Syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance) { rightPattern }
-# - Left table: Current gears with CT measurements
-# - Right table: Historical gears with CT measurements
-# - Join condition: JS(?currentDist, ?historicalDist) <= 0.3
-
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX ex: <http://example.org/data/>
-PREFIX prob: <http://probsparql.org/function#>
-
-SELECT ?currentGear ?historicalGear ?currentDist ?historicalDist
-WHERE {
-  # Left table: Current gears with CT measurements
-  {
-    ?currentGear a ag:CrownGear ;
-                 cfm:hasCharacteristic ?currentChar .
-    ?currentMeasure cfm:hasInputVoxelGrid ?vg ;
-                    cfm:measuresCharacteristic ?currentChar ;
-                    cfm:hasProbabilisticValue ?rvCurrent .
-    ?rvCurrent uq:hasDistribution ?currentDist .
-  }
-  # SIMILARITYJOIN: Find similar historical cases (JS divergence <= 0.3)
-  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3)
-  {
-    # Right table: Historical gears with CT measurements
-    ?historicalGear a ag:HistoricalGear ;
-                    cfm:hasCharacteristic ?histChar .
-    ?histMeasure cfm:hasInputVoxelGrid ?hvg ;
-                 cfm:measuresCharacteristic ?histChar ;
-                 cfm:hasProbabilisticValue ?rvHist .
-    ?rvHist uq:hasDistribution ?historicalDist .
-  }
-}`
-      },
-      {
-        id: "u6",
-        label: "U6 Fuse Join Comparison",
-        source: "examples/queries/U6_fusejoin_comparison.sparql",
-        query: `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX ag: <http://example.org/ontology/anglegrinder#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-PREFIX ex: <http://example.org/data/>
-
-# Comparison: FUSEJOIN vs SIMILARITYJOIN
-# FUSEJOIN creates a fused distribution when JS divergence <= tolerance
-# SIMILARITYJOIN keeps original distributions when JS divergence <= tolerance
-
-SELECT ?spindle ?caliperDist ?laserDist ?fusedDist
-WHERE {
-  ?spindle a ag:Spindle ; 
-           ag:hasDiameterCharacteristic ?diameterChar .
-  
-  ?caliperMeasure cfm:measuresCharacteristic ?diameterChar ; 
-                  cfm:hasProbabilisticValue ?rvCaliper .
-  
-  ?rvCaliper uq:hasDistribution ?caliperDist .
-  
-  ?laserMeasure cfm:measuresCharacteristic ?diameterChar ; 
-                cfm:hasProbabilisticValue ?rvLaser .
-  
-  ?rvLaser uq:hasDistribution ?laserDist .
-  
-  # FUSEJOIN: Creates ?fusedDist from ?caliperDist and ?laserDist
-  FUSEJOIN(?caliperDist, ?laserDist, 0.3, ?fusedDist) { }
-}`
+ORDER BY ?bevelLabel`
       }
     ];
 
     const datasetQueries = {
-      stats: `PREFIX uq: <http://example.org/ontology/uncertainty#>
+      stats: `PREFIX uq: <http://example.org/uncertainty#>
+PREFIX cfm: <http://example.org/circularfactorymeasure#>
 SELECT ?triples ?types ?predicates ?randomVariables
 WHERE {
   { SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o } }
   { SELECT (COUNT(DISTINCT ?type) AS ?types) WHERE { ?s a ?type } }
   { SELECT (COUNT(DISTINCT ?p) AS ?predicates) WHERE { ?s ?p ?o } }
-  { SELECT (COUNT(?rv) AS ?randomVariables) WHERE { ?rv uq:hasDistribution ?dist } }
+  { SELECT (COUNT(?rv) AS ?randomVariables) WHERE { 
+      ?rv a ?rvType . 
+      FILTER(?rvType = cfm:RandomVariable || ?rvType = <http://example.org/ontology/uncertainty#RandomVariable>)
+    } 
+  }
 }`,
       types: `SELECT ?type (COUNT(?s) AS ?count)
 WHERE {
@@ -1250,6 +1090,8 @@ LIMIT 60`
     let activeTab = "query";
     let graphLoaded = false;
     let graphNeedsRefresh = true;
+
+    // Optimized Graph State
     const graphState = {
       nodes: [],
       links: [],
@@ -1264,10 +1106,8 @@ LIMIT 60`
       draggingNode: null,
       panning: false,
       lastPointer: null,
-      pointerStart: null,
-      pointerMoved: false,
-      keepInView: false,
-      selectedNode: null
+      selectedNode: null,
+      detailRequestId: 0
     };
 
     function selectedExample() {
@@ -1304,50 +1144,46 @@ LIMIT 60`
         body: query
       });
       const text = await response.text();
-      if (!response.ok) {
-        throw new Error(text || `HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
       return JSON.parse(text);
     }
 
-    async function uploadTtl() {
-      const file = ttlFileInput.files && ttlFileInput.files[0];
-      if (!file) {
-        setStatus(tripleStatusNode, "Choose a TTL file first", true);
-        return;
-      }
-
-      uploadTtlButton.disabled = true;
-      setStatus(tripleStatusNode, `Uploading ${file.name}...`);
-
+    async function refreshDataset() {
+      refreshDatasetButton.disabled = true;
       try {
-        const response = await fetch("/probsparql", {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/turtle",
-            "Accept": "application/json"
-          },
-          body: file
-        });
-        const text = await response.text();
-        if (!response.ok) {
-          throw new Error(text || `HTTP ${response.status}`);
-        }
-        setStatus(tripleStatusNode, `Uploaded ${file.name}`);
-        ttlFileInput.value = "";
-        await refreshDataset();
-        graphNeedsRefresh = true;
-        if (activeTab === "graph") {
-          await refreshGraph();
-        } else {
-          setStatus(graphStatusNode, "Dataset changed. Open KG Visualization to load the latest graph.");
-        }
+        const statsJson = await sparql(datasetQueries.stats);
+        const stats = statsJson.results.bindings[0] || {};
+        tripleCountNode.textContent = valueOf(stats, "triples");
+        classCountNode.textContent = valueOf(stats, "types");
+        predicateCountNode.textContent = valueOf(stats, "predicates");
+        rvCountNode.textContent = valueOf(stats, "randomVariables");
+
+        const typeJson = await sparql(datasetQueries.types);
+        renderTable(typeResultNode, typeJson);
+
+        const tripleJson = await sparql(datasetQueries.triples);
+        renderTable(tripleResultNode, tripleJson);
       } catch (error) {
-        renderFallback(tripleResultNode, error.message);
-        setStatus(tripleStatusNode, "TTL upload failed", true);
+        console.error(error);
       } finally {
-        uploadTtlButton.disabled = false;
+        graphNeedsRefresh = true;
+        refreshDatasetButton.disabled = false;
       }
+    }
+
+    function graphLimit() {
+      const parsed = Number.parseInt(graphLimitInput.value, 10);
+      return Number.isFinite(parsed) ? Math.max(5, Math.min(120, parsed)) : 25;
+    }
+
+    function svgEl(tag, attrs = {}) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([key, value]) => el.setAttribute(key, value));
+      return el;
+    }
+
+    function valueOf(binding, name) {
+      return binding && binding[name] ? binding[name].value : "-";
     }
 
     function renderFallback(target, value) {
@@ -1358,27 +1194,22 @@ LIMIT 60`
     }
 
     function renderTable(target, json) {
-      const bindings = json.results && Array.isArray(json.results.bindings)
-        ? json.results.bindings
-        : [];
       const vars = json.head && Array.isArray(json.head.vars) ? json.head.vars : [];
-
+      const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
       if (!vars.length) {
         renderFallback(target, json);
-        return bindings.length;
+        return 0;
       }
 
       target.innerHTML = "";
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       const headerRow = document.createElement("tr");
-
       vars.forEach((name) => {
         const th = document.createElement("th");
         th.textContent = name;
         headerRow.appendChild(th);
       });
-
       thead.appendChild(headerRow);
       table.appendChild(thead);
 
@@ -1392,20 +1223,55 @@ LIMIT 60`
         });
         tbody.appendChild(tr);
       });
-
       table.appendChild(tbody);
       target.appendChild(table);
       return bindings.length;
     }
 
-    function valueOf(binding, name) {
-      return binding && binding[name] ? binding[name].value : "-";
+    async function uploadTtl() {
+      const file = ttlFileInput.files && ttlFileInput.files[0];
+      if (!file) {
+        setStatus(tripleStatusNode, "Choose a TTL file first", true);
+        return;
+      }
+
+      uploadTtlButton.disabled = true;
+      setStatus(tripleStatusNode, `Uploading ${file.name}...`);
+      try {
+        const response = await fetch("/probsparql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/turtle",
+            "Accept": "application/json"
+          },
+          body: file
+        });
+        const text = await response.text();
+        if (!response.ok) {
+          throw new Error(text || `HTTP ${response.status}`);
+        }
+        fileNameLabel.textContent = "Initialize Data Stream (.TTL)";
+        fileNameLabel.style.color = "var(--text-muted)";
+        ttlFileInput.value = "";
+        await refreshDataset();
+        graphNeedsRefresh = true;
+        if (activeTab === "graph") {
+          await refreshGraph();
+        } else {
+          setStatus(graphStatusNode, "Dataset updated. Open Knowledge Graph to reload topology.");
+        }
+        setStatus(tripleStatusNode, `Uploaded ${file.name}`);
+      } catch (error) {
+        renderFallback(tripleResultNode, error.message);
+        setStatus(tripleStatusNode, "TTL upload failed", true);
+      } finally {
+        uploadTtlButton.disabled = false;
+      }
     }
 
     async function runQuery() {
       runButton.disabled = true;
       setStatus(statusNode, "Running...");
-
       try {
         const json = await sparql(queryInput.value);
         const count = renderTable(resultNode, json);
@@ -1418,118 +1284,24 @@ LIMIT 60`
       }
     }
 
-    async function refreshDataset() {
-      refreshDatasetButton.disabled = true;
-      setStatus(typeStatusNode, "Loading...");
-      setStatus(tripleStatusNode, "Loading...");
-
-      try {
-        const statsJson = await sparql(datasetQueries.stats);
-        const stats = statsJson.results.bindings[0] || {};
-        tripleCountNode.textContent = valueOf(stats, "triples");
-        classCountNode.textContent = valueOf(stats, "types");
-        predicateCountNode.textContent = valueOf(stats, "predicates");
-        rvCountNode.textContent = valueOf(stats, "randomVariables");
-      } catch (error) {
-        tripleCountNode.textContent = "-";
-        classCountNode.textContent = "-";
-        predicateCountNode.textContent = "-";
-        rvCountNode.textContent = "-";
-        setStatus(typeStatusNode, "Stats failed", true);
+    function clearGraphState() {
+      if (graphState.frame) {
+        cancelAnimationFrame(graphState.frame);
       }
-
-      try {
-        const typeJson = await sparql(datasetQueries.types);
-        const typeCount = renderTable(typeResultNode, typeJson);
-        setStatus(typeStatusNode, `${typeCount} type row${typeCount === 1 ? "" : "s"}`);
-      } catch (error) {
-        renderFallback(typeResultNode, error.message);
-        setStatus(typeStatusNode, "Type query failed", true);
-      }
-
-      try {
-        const tripleJson = await sparql(datasetQueries.triples);
-        const tripleCount = renderTable(tripleResultNode, tripleJson);
-        setStatus(tripleStatusNode, `${tripleCount} triple row${tripleCount === 1 ? "" : "s"}`);
-      } catch (error) {
-        renderFallback(tripleResultNode, error.message);
-        setStatus(tripleStatusNode, "Triple query failed", true);
-      } finally {
-        graphNeedsRefresh = true;
-        refreshDatasetButton.disabled = false;
-      }
-    }
-
-    function graphLimit() {
-      const parsed = Number.parseInt(graphLimitInput.value, 10);
-      if (!Number.isFinite(parsed)) {
-        return 25;
-      }
-      return Math.max(5, Math.min(80, parsed));
-    }
-
-    function graphRootQuery(dataOnly = true) {
-      const dataFilter = dataOnly ? 'FILTER(CONTAINS(STR(?s), "/data/"))' : "";
-      const rootFilter = dataOnly
-        ? `FILTER NOT EXISTS {
-  ?parent ?parentPred ?s .
-  FILTER(CONTAINS(STR(?parent), "/data/"))
-  FILTER(?parent != ?s)
-}`
-        : "";
-      return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX cfm: <http://example.org/ontology/cfm#>
-PREFIX om: <http://example.org/ontology/om#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(DISTINCT ?o) AS ?relationCount)
-WHERE {
-  ?s ?p ?o .
-  FILTER(isIRI(?s) || isBlank(?s))
-  ${dataFilter}
-  ${rootFilter}
-  FILTER NOT EXISTS { ?s rdf:type om:Measure }
-  FILTER NOT EXISTS { ?s rdf:type uq:RandomVariable }
-  FILTER NOT EXISTS { ?s rdf:type cfm:PointCloud }
-  FILTER NOT EXISTS { ?s rdf:type cfm:VoxelGrid }
-  FILTER NOT EXISTS { ?s rdf:type cfm:MeasurableCharacteristics }
-  OPTIONAL { ?s rdf:type ?type }
-}
-GROUP BY ?s
-ORDER BY DESC(?relationCount)
-LIMIT ${graphLimit()}`;
-    }
-
-    function sparqlTerm(term) {
-      if (term.type === "uri") {
-        return `<${term.value.replace(/[<>]/g, "")}>`;
-      }
-      if (term.type === "bnode") {
-        return `_:${term.value.replace(/[^A-Za-z0-9_]/g, "_")}`;
-      }
-      return null;
-    }
-
-    function graphExpandQuery(node) {
-      const focus = sparqlTerm(node.term);
-      if (!focus) {
-        return "";
-      }
-      const outgoingObjectFilter = graphLiteralsInput.checked ? "" : "FILTER(!isLiteral(?o))";
-      return `SELECT ?s ?p ?o
-WHERE {
-  {
-    BIND(${focus} AS ?s)
-    ?s ?p ?o .
-    ${outgoingObjectFilter}
-  }
-  UNION
-  {
-    ?s ?p ${focus} .
-    BIND(${focus} AS ?o)
-    FILTER(isIRI(?s) || isBlank(?s))
-  }
-}
-LIMIT ${graphLimit()}`;
+      graphState.nodes = [];
+      graphState.links = [];
+      graphState.nodeMap = new Map();
+      graphState.linkMap = new Map();
+      graphState.linkGroup = null;
+      graphState.labelGroup = null;
+      graphState.nodeGroup = null;
+      graphState.frame = null;
+      graphState.alpha = 0;
+      graphState.draggingNode = null;
+      graphState.panning = false;
+      graphState.lastPointer = null;
+      graphState.selectedNode = null;
+      kgViewport.innerHTML = "";
     }
 
     function termFromBinding(row, name) {
@@ -1542,131 +1314,202 @@ LIMIT ${graphLimit()}`;
       };
     }
 
+    function sparqlTerm(term) {
+      if (term.type === "uri") {
+        return `<${term.value.replace(/[<>]/g, "")}>`;
+      }
+      if (term.type === "bnode") {
+        return `_:${term.value.replace(/[^A-Za-z0-9_]/g, "_")}`;
+      }
+      return null;
+    }
+
     function compactLabel(value) {
       if (!value) {
         return "";
       }
-      if (value === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type") {
-        return "type";
-      }
       if (!value.startsWith("http://") && !value.startsWith("https://")) {
         return value;
       }
-      const trimmed = value.endsWith("/") || value.endsWith("#") ? value.slice(0, -1) : value;
-      const lastHash = trimmed.lastIndexOf("#");
-      const lastSlash = trimmed.lastIndexOf("/");
-      const cut = Math.max(lastHash, lastSlash);
-      const label = cut >= 0 ? trimmed.slice(cut + 1) : trimmed;
+      const cut = Math.max(value.lastIndexOf("#"), value.lastIndexOf("/"));
       try {
-        return decodeURIComponent(label).replace(/[_-]+/g, " ");
+        return decodeURIComponent(value.slice(cut + 1)).replace(/[_-]+/g, " ");
       } catch (error) {
-        return label.replace(/[_-]+/g, " ");
+        return value.slice(cut + 1).replace(/[_-]+/g, " ");
       }
     }
 
     function shorten(value, maxLength) {
-      if (value.length <= maxLength) {
+      return value.length > maxLength ? `${value.slice(0, maxLength - 3)}...` : value;
+    }
+
+    function isNumericLiteral(term) {
+      if (!term || term.type !== "literal" || !term.datatype) {
+        return false;
+      }
+      return /#(decimal|integer|double|float|int|long|short|byte)$/.test(term.datatype);
+    }
+
+    function formatNumericValue(value) {
+      const numeric = Number.parseFloat(value);
+      if (!Number.isFinite(numeric)) {
         return value;
       }
-      return `${value.slice(0, Math.max(1, maxLength - 3))}...`;
+      return numeric.toLocaleString(undefined, { maximumFractionDigits: 6 });
+    }
+
+    function renderGmmSummary(literalValue) {
+      try {
+        const json = JSON.parse(literalValue);
+        const componentCount = json.K || json.n_components || 0;
+        if (!componentCount) {
+          return "";
+        }
+        let html = `<div class="gmm-info"><span class="gmm-title">GMM DISTRIBUTION</span>`;
+        for (let index = 0; index < componentCount; index += 1) {
+          const mean = Array.isArray(json.means[index]) ? json.means[index][0] : json.means[index];
+          const weight = json.weights[index];
+          html += `<div class="gmm-component">C${index + 1}: w=${(weight * 100).toFixed(0)}%, μ=${formatNumericValue(String(mean))}</div>`;
+        }
+        return `${html}</div>`;
+      } catch (error) {
+        return "";
+      }
+    }
+
+    function summarizeTermValue(term) {
+      if (!term || !term.value) {
+        return "-";
+      }
+      if (term.type === "uri") {
+        const label = compactLabel(term.value);
+        return label && label !== term.value
+          ? `${label} (${shorten(term.value, 64)})`
+          : shorten(term.value, 64);
+      }
+      return shorten(term.value, 64);
     }
 
     function nodeKind(term) {
       if (term.type === "literal") {
         return "literal";
       }
-      if (term.type === "bnode") {
-        return "blank";
-      }
-      if (term.value.includes("/data/")) {
-        return "instance";
-      }
-      if (term.value.includes("anglegrinder")) {
+      const value = term.value.toLowerCase();
+      if (value.includes("anglegrinder")) {
         return "anglegrinder";
       }
-      if (term.value.includes("/cfm#") || term.value.includes("/cfm/")) {
+      if (value.includes("circularfactorymeasure") || value.includes("/cfm#")) {
         return "cfm";
       }
-      if (term.value.includes("uncertainty")) {
+      if (value.includes("uncertainty")) {
         return "uncertainty";
       }
-      if (term.value.includes("/om#") || term.value.includes("/om/")) {
-        return "om";
+      if (value.includes("materialscience")) {
+        return "science";
+      }
+      if (value.includes("/data/")) {
+        return "instance";
       }
       return "resource";
     }
 
-    function termKey(term) {
-      return `${term.type}:${term.value}`;
+    function graphRootQuery() {
+      return `PREFIX ag: <http://example.org/anglegrinder#>
+SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(DISTINCT ?o) AS ?relationCount)
+WHERE {
+  ?s a ag:AngleGrinder .
+  OPTIONAL { ?s a ?type }
+  OPTIONAL { ?s ?p ?o }
+}
+GROUP BY ?s
+ORDER BY DESC(?relationCount)
+LIMIT ${graphLimit()}`;
     }
 
-    function isExpandableTerm(term) {
-      return term.type === "uri";
+    function graphFallbackRootQuery() {
+      return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX cfm: <http://example.org/circularfactorymeasure#>
+SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(DISTINCT ?o) AS ?relationCount)
+WHERE {
+  ?s ?p ?o .
+  FILTER(isIRI(?s))
+  FILTER(CONTAINS(STR(?s), "/data/"))
+  FILTER NOT EXISTS { ?s rdf:type cfm:Measurement }
+  FILTER NOT EXISTS { ?s rdf:type cfm:RandomVariable }
+  FILTER NOT EXISTS { ?parent ?parentPred ?s . FILTER(CONTAINS(STR(?parent), "/data/")) FILTER(?parent != ?s) }
+  OPTIONAL { ?s a ?type }
+}
+GROUP BY ?s
+ORDER BY DESC(?relationCount)
+LIMIT ${graphLimit()}`;
     }
 
-    function numericBinding(row, name) {
-      const raw = row && row[name] ? Number.parseInt(row[name].value, 10) : 0;
-      return Number.isFinite(raw) ? raw : 0;
+    function graphExpandQuery(node) {
+      const focus = sparqlTerm(node.term);
+      if (!focus) {
+        return "";
+      }
+      const outgoingFilter = graphLiteralsInput.checked ? "" : "FILTER(!isLiteral(?o))";
+      return `SELECT ?s ?p ?o
+WHERE {
+  {
+    BIND(${focus} AS ?s)
+    ?s ?p ?o .
+    ${outgoingFilter}
+  }
+  UNION
+  {
+    ?s ?p ${focus} .
+    BIND(${focus} AS ?o)
+    FILTER(isIRI(?s) || isBlank(?s))
+  }
+}
+LIMIT ${graphLimit()}`;
     }
 
-    function makeGraphNode(term) {
-      return {
-        id: termKey(term),
-        term,
-        kind: nodeKind(term),
-        label: shorten(compactLabel(term.value), term.type === "literal" ? 24 : 28),
-        degree: 0,
-        inDegree: 0,
-        outDegree: 0,
-        relationCount: 0,
-        expanded: false,
-        loading: false,
-        x: 0,
-        y: 0,
-        vx: 0,
-        vy: 0,
-        element: null,
-        circle: null,
-        labelElement: null,
-        knownLinks: new Set()
-      };
+    function isExpandable(node) {
+      return Boolean(node && node.term && (node.term.type === "uri" || node.term.type === "bnode") && !node.expanded);
     }
 
     function getGraphNode(term) {
-      const key = termKey(term);
+      const key = `${term.type}:${term.value}`;
       let node = graphState.nodeMap.get(key);
       if (!node) {
-        node = makeGraphNode(term);
+        node = {
+          id: key,
+          term,
+          kind: nodeKind(term),
+          label: shorten(compactLabel(term.value || term.datatype || term.type || key), term.type === "literal" ? 24 : 28),
+          x: (Math.random() - 0.5) * 140,
+          y: (Math.random() - 0.5) * 140,
+          vx: 0,
+          vy: 0,
+          relationCount: 0,
+          expanded: false,
+          loading: false,
+          element: null,
+          dot: null,
+          labelElement: null,
+          knownLinks: new Set()
+        };
         graphState.nodeMap.set(key, node);
         graphState.nodes.push(node);
       }
       return node;
     }
 
-    function hasHiddenRelations(node) {
-      if (!isExpandableTerm(node.term)) {
-        return false;
-      }
-      if (node.loading) {
-        return true;
-      }
-      if (!node.expanded) {
-        return true;
-      }
-      return false;
-    }
-
-    function addGraphLink(subjectTerm, predicateTerm, objectTerm) {
-      const source = getGraphNode(subjectTerm);
-      const target = getGraphNode(objectTerm);
+    function addGraphLink(sourceTerm, predicateTerm, targetTerm) {
+      const source = getGraphNode(sourceTerm);
+      const target = getGraphNode(targetTerm);
       const linkKey = `${source.id}|${predicateTerm.value}|${target.id}`;
       let link = graphState.linkMap.get(linkKey);
       if (!link) {
         link = {
+          key: linkKey,
           source,
           target,
           predicate: predicateTerm,
-          label: shorten(compactLabel(predicateTerm.value), 22),
+          label: shorten(compactLabel(predicateTerm.value), 20),
           count: 0,
           line: null,
           labelElement: null
@@ -1680,86 +1523,23 @@ LIMIT ${graphLimit()}`;
       return link;
     }
 
-    function recalculateGraphDegrees() {
-      graphState.nodes.forEach((node) => {
-        node.degree = 0;
-        node.inDegree = 0;
-        node.outDegree = 0;
-      });
-      graphState.links.forEach((link) => {
-        link.source.degree += link.count;
-        link.source.outDegree += link.count;
-        link.target.degree += link.count;
-        link.target.inDegree += link.count;
-      });
-    }
-
-    function rootNodesFromJson(json) {
-      const bindings = json.results && Array.isArray(json.results.bindings)
-        ? json.results.bindings
-        : [];
-      return bindings.map((row) => {
-        const node = makeGraphNode(termFromBinding(row, "s"));
-        node.relationCount = numericBinding(row, "relationCount");
-        return node;
-      });
-    }
-
-    function svgEl(name, attrs = {}) {
-      const element = document.createElementNS("http://www.w3.org/2000/svg", name);
-      Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
-      return element;
-    }
-
-    function clearGraph() {
-      if (graphState.frame) {
-        cancelAnimationFrame(graphState.frame);
-      }
-      graphState.frame = null;
-      graphState.alpha = 0;
-      graphState.nodes = [];
-      graphState.links = [];
-      graphState.nodeMap = new Map();
-      graphState.linkMap = new Map();
-      graphState.linkGroup = null;
-      graphState.labelGroup = null;
-      graphState.nodeGroup = null;
-      graphState.keepInView = false;
-      graphState.selectedNode = null;
-      kgViewport.innerHTML = "";
-      kgViewport.setAttribute("transform", "translate(0 0) scale(1)");
-    }
-
-    function setGraphTransform() {
-      const transform = graphState.transform;
-      kgViewport.setAttribute("transform", `translate(${transform.x} ${transform.y}) scale(${transform.k})`);
-    }
-
-    function resetGraphView() {
-      const rect = kgGraph.getBoundingClientRect();
-      graphState.transform = {
-        x: rect.width / 2,
-        y: rect.height / 2,
-        k: 1
-      };
-      setGraphTransform();
-    }
-
     function graphBounds() {
       if (!graphState.nodes.length) {
         return null;
       }
       return graphState.nodes.reduce((bounds, node) => ({
         minX: Math.min(bounds.minX, node.x),
-        maxX: Math.max(bounds.maxX, node.x),
         minY: Math.min(bounds.minY, node.y),
+        maxX: Math.max(bounds.maxX, node.x),
         maxY: Math.max(bounds.maxY, node.y)
-      }), {
-        minX: Infinity,
-        maxX: -Infinity,
-        minY: Infinity,
-        maxY: -Infinity
-      });
+      }), { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity });
+    }
+
+    function setGraphTransform() {
+      kgViewport.setAttribute(
+        "transform",
+        `translate(${graphState.transform.x} ${graphState.transform.y}) scale(${graphState.transform.k})`
+      );
     }
 
     function fitGraphToViewport(padding = 70) {
@@ -1768,15 +1548,14 @@ LIMIT ${graphLimit()}`;
       if (!bounds || rect.width <= 0 || rect.height <= 0) {
         return;
       }
-
-      const graphWidth = Math.max(80, bounds.maxX - bounds.minX);
-      const graphHeight = Math.max(80, bounds.maxY - bounds.minY);
-      const availableWidth = Math.max(160, rect.width - padding * 2);
-      const availableHeight = Math.max(160, rect.height - padding * 2);
-      const scale = Math.max(0.28, Math.min(1.35, availableWidth / graphWidth, availableHeight / graphHeight));
+      const width = Math.max(80, bounds.maxX - bounds.minX);
+      const height = Math.max(80, bounds.maxY - bounds.minY);
+      const scale = Math.max(
+        0.35,
+        Math.min(1.4, (rect.width - padding * 2) / width, (rect.height - padding * 2) / height)
+      );
       const centerX = (bounds.minX + bounds.maxX) / 2;
       const centerY = (bounds.minY + bounds.maxY) / 2;
-
       graphState.transform = {
         x: rect.width / 2 - centerX * scale,
         y: rect.height / 2 - centerY * scale,
@@ -1785,86 +1564,103 @@ LIMIT ${graphLimit()}`;
       setGraphTransform();
     }
 
-    function showGraphMessage(message) {
-      clearGraph();
-      graphState.transform = { x: 0, y: 0, k: 1 };
-      const text = svgEl("text", { x: "24", y: "42", class: "graph-empty" });
-      text.textContent = message;
-      kgViewport.appendChild(text);
-    }
+    function layoutRootNodes(nodes) {
+      const classNode = nodes.find((node) => node.term && node.term.type === "uri" && node.term.value === angleGrinderClassUri);
+      if (classNode) {
+        classNode.x = 0;
+        classNode.y = 0;
+        classNode.vx = 0;
+        classNode.vy = 0;
 
-    function renderGraphDetail(node) {
-      graphDetailNode.innerHTML = "";
-      const title = document.createElement("h3");
-      title.textContent = "Node Detail";
-      graphDetailNode.appendChild(title);
-
-      if (!node) {
-        const row = document.createElement("div");
-        row.className = "detail-row";
-        const label = document.createElement("div");
-        label.className = "detail-label";
-        label.textContent = "Selection";
-        const value = document.createElement("div");
-        value.className = "detail-value";
-        value.textContent = "Select an expandable node to reveal its direct relations.";
-        row.append(label, value);
-        graphDetailNode.appendChild(row);
+        const instanceNodes = nodes.filter((node) => node !== classNode);
+        const rect = kgGraph.getBoundingClientRect();
+        const radius = Math.max(170, Math.min(rect.width, rect.height) * 0.24);
+        instanceNodes.forEach((node, index) => {
+          const angle = (-Math.PI / 2) + (Math.PI * 2 * index) / Math.max(1, instanceNodes.length);
+          node.x = Math.cos(angle) * radius;
+          node.y = Math.sin(angle) * radius;
+          node.vx = 0;
+          node.vy = 0;
+        });
         return;
       }
 
-      const metricWrap = document.createElement("div");
-      metricWrap.className = "detail-metrics";
-      [
-        ["Degree", node.degree],
-        ["Out", node.outDegree],
-        ["In", node.inDegree]
-      ].forEach(([label, value]) => {
-        const metric = document.createElement("div");
-        metric.className = "detail-metric";
-        const strong = document.createElement("strong");
-        strong.textContent = value;
-        const span = document.createElement("span");
-        span.textContent = label;
-        metric.append(strong, span);
-        metricWrap.appendChild(metric);
-      });
-      graphDetailNode.appendChild(metricWrap);
-
-      [
-        ["Label", node.label],
-        ["Kind", node.kind],
-        ["State", node.loading ? "loading" : node.expanded ? "expanded" : hasHiddenRelations(node) ? "expandable" : "not expandable"],
-        ["Visible links", String(node.knownLinks ? node.knownLinks.size : node.degree)],
-        ["Term type", node.term.type || "-"],
-        ["Value", node.term.value || "-"],
-        ["Datatype", node.term.datatype || "-"]
-      ].forEach(([labelText, valueText]) => {
-        const row = document.createElement("div");
-        row.className = "detail-row";
-        const label = document.createElement("div");
-        label.className = "detail-label";
-        label.textContent = labelText;
-        const value = document.createElement("div");
-        value.className = "detail-value";
-        value.textContent = valueText;
-        row.append(label, value);
-        graphDetailNode.appendChild(row);
+      const rect = kgGraph.getBoundingClientRect();
+      const radius = Math.max(150, Math.min(rect.width, rect.height) * 0.22);
+      nodes.forEach((node, index) => {
+        const angle = (-Math.PI / 2) + (Math.PI * 2 * index) / Math.max(1, nodes.length);
+        node.x = Math.cos(angle) * radius;
+        node.y = Math.sin(angle) * radius;
+        node.vx = 0;
+        node.vy = 0;
       });
     }
 
-    function selectGraphNode(node) {
-      graphState.selectedNode = node;
-      graphState.nodes.forEach((entry) => {
-        if (entry.element) {
-          entry.element.classList.toggle("selected", entry === node);
+    function positionNewNodes(nodes, anchor = null) {
+      if (!nodes.length) {
+        return;
+      }
+      const rect = kgGraph.getBoundingClientRect();
+      const baseRadius = anchor ? 155 : Math.max(140, Math.min(rect.width, rect.height) * 0.24);
+      const seed = anchor
+        ? Array.from(anchor.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+        : 0;
+      const startAngle = anchor ? ((seed % 360) * Math.PI) / 180 : -Math.PI / 2;
+
+      nodes.forEach((node, index) => {
+        if (node.element) {
+          return;
         }
+        const ringIndex = Math.floor(index / 6);
+        const ringOffset = index % 6;
+        const ringSize = Math.min(6, nodes.length - ringIndex * 6);
+        const angle = startAngle + (Math.PI * 2 * ringOffset) / Math.max(1, ringSize);
+        const radius = baseRadius + ringIndex * 70;
+        node.x = (anchor ? anchor.x : 0) + Math.cos(angle) * radius;
+        node.y = (anchor ? anchor.y : 0) + Math.sin(angle) * radius;
+        node.vx = 0;
+        node.vy = 0;
       });
-      renderGraphDetail(node);
+    }
+
+    function resolveNodeCollisions(iterations = 30) {
+      for (let step = 0; step < iterations; step += 1) {
+        for (let i = 0; i < graphState.nodes.length; i += 1) {
+          const a = graphState.nodes[i];
+          for (let j = i + 1; j < graphState.nodes.length; j += 1) {
+            const b = graphState.nodes[j];
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = (a.kind === "literal" || b.kind === "literal") ? 42 : 58;
+            if (dist === 0) {
+              dx = Math.random() - 0.5;
+              dy = Math.random() - 0.5;
+              dist = Math.sqrt(dx * dx + dy * dy);
+            }
+            if (dist < minDistance) {
+              const overlap = (minDistance - dist) * 0.5;
+              const ux = dx / dist;
+              const uy = dy / dist;
+              if (a !== graphState.draggingNode) {
+                a.x -= ux * overlap;
+                a.y -= uy * overlap;
+              }
+              if (b !== graphState.draggingNode) {
+                b.x += ux * overlap;
+                b.y += uy * overlap;
+              }
+            }
+          }
+        }
+      }
     }
 
     function updateGraphPositions() {
       graphState.links.forEach((link) => {
+        if (!link.line) {
+          return;
+        }
         link.line.setAttribute("x1", link.source.x);
         link.line.setAttribute("y1", link.source.y);
         link.line.setAttribute("x2", link.target.x);
@@ -1874,35 +1670,223 @@ LIMIT ${graphLimit()}`;
           link.labelElement.setAttribute("y", (link.source.y + link.target.y) / 2);
         }
       });
-
       graphState.nodes.forEach((node) => {
-        node.element.setAttribute("transform", `translate(${node.x} ${node.y})`);
+        if (node.element) {
+          node.element.setAttribute("transform", `translate(${node.x} ${node.y})`);
+        }
       });
     }
 
-    function tickGraph() {
-      const nodes = graphState.nodes;
-      const links = graphState.links;
-      const alpha = graphState.alpha;
+    function syncGraphDOM() {
+      kgViewport.innerHTML = "";
 
-      links.forEach((link) => {
-        const dx = link.target.x - link.source.x;
-        const dy = link.target.y - link.source.y;
-        const distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
-        const desired = link.target.kind === "literal" ? 60 : 120;
-        const force = (distance - desired) * 0.025 * alpha;
-        const fx = (dx / distance) * force;
-        const fy = (dy / distance) * force;
-        link.source.vx += fx;
-        link.source.vy += fy;
-        link.target.vx -= fx;
-        link.target.vy -= fy;
+      const defs = svgEl("defs");
+      const marker = svgEl("marker", {
+        id: "graphArrow",
+        viewBox: "0 0 10 10",
+        refX: "14",
+        refY: "5",
+        markerWidth: "4",
+        markerHeight: "4",
+        orient: "auto-start-reverse"
+      });
+      marker.appendChild(svgEl("path", { d: "M0 0 L10 5 L0 10 z", fill: "#4b5563" }));
+      defs.appendChild(marker);
+      kgViewport.appendChild(defs);
+
+      graphState.linkGroup = svgEl("g", { class: "graph-links" });
+      graphState.labelGroup = svgEl("g", { class: "graph-link-labels" });
+      graphState.nodeGroup = svgEl("g", { class: "graph-nodes" });
+      kgViewport.append(graphState.linkGroup, graphState.labelGroup, graphState.nodeGroup);
+
+      graphState.links.forEach((link) => {
+        link.line = svgEl("line", {
+          class: "graph-link",
+          "marker-end": "url(#graphArrow)"
+        });
+        graphState.linkGroup.appendChild(link.line);
+        if (graphState.links.length <= 80) {
+          link.labelElement = svgEl("text", {
+            class: "graph-link-label",
+            "text-anchor": "middle"
+          });
+          link.labelElement.textContent = link.label;
+          graphState.labelGroup.appendChild(link.labelElement);
+        } else {
+          link.labelElement = null;
+        }
       });
 
-      for (let i = 0; i < nodes.length; i += 1) {
-        for (let j = i + 1; j < nodes.length; j += 1) {
-          const a = nodes[i];
-          const b = nodes[j];
+      graphState.nodes.forEach((node) => {
+        const stateClass = node.loading ? "loading" : node.expanded ? "expanded" : isExpandable(node) ? "expandable" : "not-expandable";
+        const group = svgEl("g", { class: `graph-node node-${node.kind} ${stateClass}` });
+        const radius = node.kind === "literal" ? 8 : 11;
+        const circle = svgEl("circle", { r: String(radius) });
+        const label = svgEl("text", {
+          class: "graph-node-label",
+          y: node.kind === "literal" ? "20" : "24",
+          "text-anchor": "middle"
+        });
+        label.textContent = node.label;
+        group.append(circle, label);
+
+        if (node.term.type !== "literal") {
+          const dotClass = node.loading ? "loading" : node.expanded ? "expanded" : "";
+          const dot = svgEl("circle", {
+            class: `expand-dot ${dotClass}`.trim(),
+            cx: "10",
+            cy: "-10",
+            r: "4.5"
+          });
+          group.appendChild(dot);
+          node.dot = dot;
+          dot.addEventListener("pointerdown", (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+          });
+          dot.addEventListener("click", (event) => {
+            event.stopPropagation();
+            selectNode(node);
+            expandNode(node);
+          });
+        } else {
+          node.dot = null;
+        }
+
+        group.addEventListener("pointerdown", (event) => {
+          event.stopPropagation();
+          const point = graphClientPoint(event);
+          graphState.draggingNode = node;
+          graphState.lastPointer = point;
+          kgGraph.setPointerCapture(event.pointerId);
+          selectNode(node);
+        });
+        group.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectNode(node);
+          expandNode(node);
+        });
+
+        node.element = group;
+        node.labelElement = label;
+        graphState.nodeGroup.appendChild(group);
+      });
+
+      updateGraphPositions();
+      setGraphTransform();
+    }
+
+    function renderGraphDetail(node) {
+      const requestId = ++graphState.detailRequestId;
+      graphDetailNode.innerHTML = "<h3>Node Detail</h3>";
+      if (!node) {
+        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Selection</div><div class="detail-value">Select a node in the graph.</div></div>`;
+        return;
+      }
+
+      const rows = [
+        ["Label", node.label],
+        ["Kind", node.kind],
+        ["State", node.loading ? "loading" : node.expanded ? "expanded" : isExpandable(node) ? "expandable" : "not expandable"],
+        ["URI", node.term.value]
+      ];
+      rows.forEach(([label, value]) => {
+        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>`;
+      });
+
+      if (isNumericLiteral(node.term)) {
+        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Numeric Value</div><div class="detail-value">${formatNumericValue(node.term.value)}</div></div>`;
+      }
+
+      if (node.term.type === "literal" && (node.term.datatype || "").includes("gmmLiteral")) {
+        graphDetailNode.innerHTML += renderGmmSummary(node.term.value);
+      }
+
+      if (node.term.type === "uri" && node.term.value.toLowerCase().includes("rv_")) {
+        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution</div><div class="detail-value">Loading distribution details...</div></div>`;
+        const query = `SELECT ?p ?o
+WHERE {
+  <${node.term.value}> ?p ?o .
+}
+LIMIT 20`;
+        sparql(query).then((json) => {
+          if (graphState.detailRequestId !== requestId) {
+            return;
+          }
+          const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+          const distribution = bindings.find((row) => {
+            const predicate = row.p ? row.p.value : "";
+            return predicate.endsWith("hasDistribution");
+          });
+          const predicateValues = bindings
+            .filter((row) => row.o)
+            .slice(0, 8)
+            .map((row) => `<div class="gmm-component">${compactLabel(row.p.value)}: ${summarizeTermValue(row.o)}</div>`)
+            .join("");
+
+          if (distribution && distribution.o) {
+            const datatype = distribution.o.datatype || "";
+            if (datatype.includes("gmmLiteral")) {
+              graphDetailNode.innerHTML += renderGmmSummary(distribution.o.value);
+            } else {
+              graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution Value</div><div class="detail-value">${distribution.o.value}</div></div>`;
+            }
+          }
+
+          if (predicateValues) {
+            graphDetailNode.innerHTML += `<div class="gmm-info"><span class="gmm-title">Outgoing Properties</span>${predicateValues}</div>`;
+          }
+        }).catch(() => {
+          if (graphState.detailRequestId !== requestId) {
+            return;
+          }
+          graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution</div><div class="detail-value">Failed to load distribution details.</div></div>`;
+        });
+      }
+    }
+
+    function selectNode(node) {
+      graphState.selectedNode = node;
+      graphState.nodes.forEach((entry) => {
+        if (entry.element) {
+          entry.element.classList.toggle("selected", entry === node);
+        }
+      });
+      renderGraphDetail(node);
+    }
+
+    function tickGraph() {
+      if (graphState.alpha < 0.015) {
+        graphState.alpha = 0;
+        graphState.frame = null;
+        resolveNodeCollisions(2);
+        updateGraphPositions();
+        return;
+      }
+
+      const alpha = graphState.alpha;
+      graphState.links.forEach((link) => {
+        const dx = link.target.x - link.source.x;
+        const dy = link.target.y - link.source.y;
+        const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        const desired = link.target.kind === "literal" ? 72 : 110;
+        const spring = (dist - desired) * 0.012 * alpha;
+        const fx = (dx / dist) * spring;
+        const fy = (dy / dist) * spring;
+        if (link.source !== graphState.draggingNode) {
+          link.source.vx += fx;
+          link.source.vy += fy;
+        }
+        if (link.target !== graphState.draggingNode) {
+          link.target.vx -= fx;
+          link.target.vy -= fy;
+        }
+      });
+
+      for (let i = 0; i < graphState.nodes.length; i += 1) {
+        const a = graphState.nodes[i];
+        for (let j = i + 1; j < graphState.nodes.length; j += 1) {
+          const b = graphState.nodes[j];
           let dx = b.x - a.x;
           let dy = b.y - a.y;
           let distSq = dx * dx + dy * dy;
@@ -1911,23 +1895,24 @@ LIMIT ${graphLimit()}`;
             dy = (Math.random() - 0.5) * 2;
             distSq = dx * dx + dy * dy;
           }
-          const minDistance = (a.kind === "literal" || b.kind === "literal") ? 100 : 180;
-          if (distSq < minDistance * minDistance) {
+          if (distSq < 24000) {
             const distance = Math.sqrt(distSq);
-            const strength = (minDistance - distance) * 0.1 * alpha;
-            const fx = (dx / distance) * strength;
-            const fy = (dy / distance) * strength;
-            a.vx -= fx;
-            a.vy -= fy;
-            b.vx += fx;
-            b.vy += fy;
+            const repulsion = 260 * alpha / distSq;
+            const fx = (dx / distance) * repulsion;
+            const fy = (dy / distance) * repulsion;
+            if (a !== graphState.draggingNode) {
+              a.vx -= fx;
+              a.vy -= fy;
+            }
+            if (b !== graphState.draggingNode) {
+              b.vx += fx;
+              b.vy += fy;
+            }
           }
         }
       }
 
-      nodes.forEach((node) => {
-        node.vx += -node.x * 0.01 * alpha;
-        node.vy += -node.y * 0.01 * alpha;
+      graphState.nodes.forEach((node) => {
         node.vx *= 0.82;
         node.vy *= 0.82;
         if (node !== graphState.draggingNode) {
@@ -1936,183 +1921,122 @@ LIMIT ${graphLimit()}`;
         }
       });
 
+      resolveNodeCollisions(2);
       updateGraphPositions();
-      if (graphState.alpha > 0.01) {
-        graphState.frame = requestAnimationFrame(tickGraph);
-      } else {
-        graphState.frame = null;
-        if (graphState.keepInView) {
-           fitGraphToViewport();
-        }
-      }
-      graphState.alpha *= 0.985;
-    }
-
-    function startGraphSimulation(keepInView = false) {
-      if (graphState.frame) {
-        cancelAnimationFrame(graphState.frame);
-      }
-      graphState.keepInView = keepInView;
-      graphState.alpha = Math.max(graphState.alpha, 1);
+      graphState.alpha *= 0.93;
       graphState.frame = requestAnimationFrame(tickGraph);
     }
 
-    function appendGraphDefs() {
-      const defs = svgEl("defs");
-      const marker = svgEl("marker", {
-        id: "graphArrow",
-        viewBox: "0 0 10 10",
-        refX: "14",
-        refY: "5",
-        markerWidth: "5",
-        markerHeight: "5",
-        orient: "auto-start-reverse"
-      });
-      const markerPath = svgEl("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: "#a6b2c0" });
-      marker.appendChild(markerPath);
-      defs.appendChild(marker);
-      kgViewport.appendChild(defs);
-    }
-
-    function positionNewNodes(nodes, anchorNode = null) {
-      const rect = kgGraph.getBoundingClientRect();
-      const baseRadius = anchorNode ? 95 : Math.max(120, Math.min(rect.width, rect.height) * 0.26);
-      nodes.forEach((node, index) => {
-        if (node.x || node.y) {
-          return;
-        }
-        const angle = (Math.PI * 2 * index) / Math.max(1, nodes.length);
-        const radius = baseRadius + (index % 5) * 12;
-        node.x = (anchorNode ? anchorNode.x : 0) + Math.cos(angle) * radius;
-        node.y = (anchorNode ? anchorNode.y : 0) + Math.sin(angle) * radius;
-        node.vx = 0;
-        node.vy = 0;
-      });
-    }
-
-    function renderGraphSnapshot() {
-      kgViewport.innerHTML = "";
-      appendGraphDefs();
-
-      graphState.linkGroup = svgEl("g", { class: "graph-links" });
-      graphState.labelGroup = svgEl("g", { class: "graph-link-labels" });
-      graphState.nodeGroup = svgEl("g", { class: "graph-nodes" });
-      kgViewport.append(graphState.linkGroup, graphState.labelGroup, graphState.nodeGroup);
-
-      graphState.links.forEach((link) => {
-        const line = svgEl("line", {
-          class: "graph-link",
-          "marker-end": "url(#graphArrow)"
-        });
-        link.line = line;
-        graphState.linkGroup.appendChild(line);
-
-        if (graphState.links.length <= 90) {
-          const label = svgEl("text", { class: "graph-link-label" });
-          label.textContent = link.count > 1 ? `${link.label} (${link.count})` : link.label;
-          link.labelElement = label;
-          graphState.labelGroup.appendChild(label);
-        }
-      });
-
-      graphState.nodes.forEach((node) => {
-        const stateClass = node.expanded ? "expanded" : hasHiddenRelations(node) ? "expandable" : "not-expandable";
-        const group = svgEl("g", { class: `graph-node node-${node.kind} ${stateClass}` });
-        const radius = node.kind === "literal" ? 7 : node.expanded ? 12 : 11;
-        const circle = svgEl("circle", { r: String(radius) });
-        const label = svgEl("text", {
-          class: "graph-node-label",
-          x: "0",
-          y: node.kind === "literal" ? "20" : "26"
-        });
-        label.textContent = node.label;
-        group.append(circle, label);
-        if (hasHiddenRelations(node) || node.expanded || node.loading) {
-          const dotClass = node.loading ? "loading" : node.expanded ? "expanded" : "";
-          const dot = svgEl("circle", {
-            class: `expand-dot ${dotClass}`,
-            cx: "11",
-            cy: "-11",
-            r: "5"
-          });
-          group.appendChild(dot);
-        }
-        group.addEventListener("pointerdown", (event) => {
-          event.stopPropagation();
-          event.preventDefault();
-          const point = graphClientPoint(event);
-          graphState.draggingNode = node;
-          graphState.pointerStart = point;
-          graphState.lastPointer = point;
-          graphState.pointerMoved = false;
-          kgGraph.classList.add("dragging");
-          kgGraph.setPointerCapture(event.pointerId);
-          selectGraphNode(node);
-        });
-        node.element = group;
-        node.circle = circle;
-        node.labelElement = label;
-        graphState.nodeGroup.appendChild(group);
-      });
-
-      updateGraphPositions();
-      if (graphState.selectedNode) {
-        selectGraphNode(graphState.selectedNode);
+    function startGraphSimulation(alpha = 0.6) {
+      if (graphState.frame) {
+        cancelAnimationFrame(graphState.frame);
       }
+      graphState.alpha = Math.max(graphState.alpha, alpha);
+      graphState.frame = requestAnimationFrame(tickGraph);
     }
 
-    function renderRootGraph(nodes) {
-      clearGraph();
-      graphState.nodes = nodes;
-      graphState.nodeMap = new Map(nodes.map((node) => [node.id, node]));
-      positionNewNodes(nodes);
-      renderGraphDetail(null);
-      renderGraphSnapshot();
-      fitGraphToViewport();
-      startGraphSimulation(true);
-    }
-
-    async function expandGraphNode(node) {
-      if (!node || node.loading || node.expanded || !isExpandableTerm(node.term)) {
+    async function expandNode(node) {
+      if (!isExpandable(node) || node.loading) {
         return;
       }
       const query = graphExpandQuery(node);
       if (!query) {
-        node.expanded = true;
-        renderGraphSnapshot();
         return;
       }
 
       node.loading = true;
-      renderGraphSnapshot();
+      syncGraphDOM();
+      selectNode(node);
       setStatus(graphStatusNode, `Expanding ${node.label}...`);
 
       try {
         const json = await sparql(query);
-        const bindings = json.results && Array.isArray(json.results.bindings)
-          ? json.results.bindings
-          : [];
-        const beforeNodeCount = graphState.nodes.length;
+        const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+        const newNodes = [];
+
         bindings.forEach((row) => {
-          addGraphLink(termFromBinding(row, "s"), termFromBinding(row, "p"), termFromBinding(row, "o"));
+          const sourceTerm = termFromBinding(row, "s");
+          const predicateTerm = termFromBinding(row, "p");
+          const targetTerm = termFromBinding(row, "o");
+          const sourceKnown = graphState.nodeMap.has(`${sourceTerm.type}:${sourceTerm.value}`);
+          const targetKnown = graphState.nodeMap.has(`${targetTerm.type}:${targetTerm.value}`);
+          const link = addGraphLink(sourceTerm, predicateTerm, targetTerm);
+          if (!sourceKnown) {
+            newNodes.push(link.source);
+          }
+          if (!targetKnown) {
+            newNodes.push(link.target);
+          }
         });
+
         node.expanded = true;
-        node.relationCount = Math.max(node.relationCount, bindings.length);
         node.loading = false;
-        recalculateGraphDegrees();
-        positionNewNodes(graphState.nodes.slice(beforeNodeCount), node);
-        renderGraphSnapshot();
-        fitGraphToViewport();
-        startGraphSimulation(true);
-        selectGraphNode(node);
-        setStatus(
-          graphStatusNode,
-          `${graphState.nodes.length} visible nodes, ${graphState.links.length} visible edges. Click expandable nodes to continue.`
-        );
+        positionNewNodes(newNodes, node);
+        resolveNodeCollisions(60);
+        syncGraphDOM();
+        selectNode(node);
+        updateGraphPositions();
+        startGraphSimulation(0.7);
+        setStatus(graphStatusNode, `${graphState.nodes.length} nodes, ${graphState.links.length} edges visible`);
       } catch (error) {
         node.loading = false;
-        renderGraphSnapshot();
+        syncGraphDOM();
+        selectNode(node);
         setStatus(graphStatusNode, `Expand failed: ${error.message}`, true);
+      }
+    }
+
+    async function refreshGraph() {
+      refreshGraphButton.disabled = true;
+      setStatus(graphStatusNode, "Loading Top-Level Nodes...");
+
+      try {
+        clearGraphState();
+        let json = await sparql(graphRootQuery());
+        let bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+        if (!bindings.length) {
+          json = await sparql(graphFallbackRootQuery());
+          bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+        }
+        if (!bindings.length) {
+          renderFallback(graphDetailNode, "No graph roots found in the current dataset.");
+          setStatus(graphStatusNode, "No graph roots found", true);
+          return;
+        }
+
+        bindings.forEach((row) => {
+          const node = getGraphNode(termFromBinding(row, "s"));
+          node.relationCount = Number.parseInt(valueOf(row, "relationCount"), 10) || 0;
+        });
+        const angleGrinderRoots = bindings
+          .map((row) => termFromBinding(row, "s"))
+          .filter((term) => term && term.type === "uri");
+        if (angleGrinderRoots.length) {
+          const classNode = getGraphNode({ type: "uri", value: angleGrinderClassUri });
+          classNode.relationCount = angleGrinderRoots.length;
+          angleGrinderRoots.forEach((term) => {
+            addGraphLink(
+              term,
+              { type: "uri", value: rdfTypeUri },
+              { type: "uri", value: angleGrinderClassUri }
+            );
+          });
+        }
+        layoutRootNodes(graphState.nodes);
+        resolveNodeCollisions(30);
+        syncGraphDOM();
+        fitGraphToViewport();
+        renderGraphDetail(null);
+        startGraphSimulation(0.45);
+        graphLoaded = true;
+        graphNeedsRefresh = false;
+        setStatus(graphStatusNode, `${graphState.nodes.length} top-level nodes loaded`);
+      } catch (error) {
+        clearGraphState();
+        renderGraphDetail(null);
+        setStatus(graphStatusNode, `Failed to load graph: ${error.message}`, true);
+      } finally {
+        refreshGraphButton.disabled = false;
       }
     }
 
@@ -2125,111 +2049,23 @@ LIMIT ${graphLimit()}`;
     }
 
     function graphWorldPoint(point) {
-      const transform = graphState.transform;
       return {
-        x: (point.x - transform.x) / transform.k,
-        y: (point.y - transform.y) / transform.k
+        x: (point.x - graphState.transform.x) / graphState.transform.k,
+        y: (point.y - graphState.transform.y) / graphState.transform.k
       };
     }
-
-    async function refreshGraph() {
-      refreshGraphButton.disabled = true;
-      setStatus(graphStatusNode, "Generating Knowledge Map...");
-
-      try {
-        let json = await sparql(graphRootQuery(true));
-        let roots = rootNodesFromJson(json);
-        if (!roots.length) {
-          json = await sparql(graphRootQuery(false));
-          roots = rootNodesFromJson(json);
-        }
-        if (!roots.length) {
-          showGraphMessage("No top-level nodes found. Upload a TTL dataset first.");
-          renderGraphDetail(null);
-          graphLoaded = true;
-          graphNeedsRefresh = false;
-          setStatus(graphStatusNode, "No graph nodes");
-          return;
-        }
-        renderRootGraph(roots);
-        graphLoaded = true;
-        graphNeedsRefresh = false;
-
-        // Auto-expand the top 3 nodes to make it look "full" for the report
-        setStatus(graphStatusNode, "Deep scanning relations...");
-        const toExpand = roots.slice(0, 3);
-        for (const node of toExpand) {
-          await expandGraphNode(node);
-        }
-
-        setStatus(
-          graphStatusNode,
-          `Knowledge Map Ready: ${graphState.nodes.length} nodes, ${graphState.links.length} edges.`
-        );
-      } catch (error) {
-        showGraphMessage(error.message);
-        renderGraphDetail(null);
-        setStatus(graphStatusNode, "Map Generation Failed", true);
-      } finally {
-        refreshGraphButton.disabled = false;
-      }
-    }
-
-    function activateTab(tabName) {
-      activeTab = tabName;
-      tabButtons.forEach((button) => {
-        const isActive = button.dataset.tab === tabName;
-        button.classList.toggle("active", isActive);
-        button.setAttribute("aria-selected", String(isActive));
-      });
-      tabPanels.forEach((panel) => {
-        panel.classList.toggle("active", panel.id === `tab-${tabName}`);
-      });
-
-      if (tabName === "graph") {
-        if (!graphLoaded || graphNeedsRefresh) {
-          refreshGraph();
-        }
-      }
-    }
-
-    kgGraph.addEventListener("pointerdown", (event) => {
-      graphState.panning = true;
-      const point = graphClientPoint(event);
-      graphState.lastPointer = point;
-      graphState.pointerStart = point;
-      graphState.pointerMoved = false;
-      kgGraph.classList.add("dragging");
-      kgGraph.setPointerCapture(event.pointerId);
-    });
 
     kgGraph.addEventListener("pointermove", (event) => {
       const point = graphClientPoint(event);
       if (graphState.draggingNode) {
-        if (graphState.pointerStart) {
-          const dx = point.x - graphState.pointerStart.x;
-          const dy = point.y - graphState.pointerStart.y;
-          graphState.pointerMoved = graphState.pointerMoved || Math.sqrt(dx * dx + dy * dy) > 5;
-        }
         const world = graphWorldPoint(point);
         graphState.draggingNode.x = world.x;
         graphState.draggingNode.y = world.y;
-        graphState.draggingNode.vx = 0;
-        graphState.draggingNode.vy = 0;
+        resolveNodeCollisions(6);
         updateGraphPositions();
-        graphState.alpha = Math.max(graphState.alpha, 0.22);
-        if (!graphState.frame) {
-          graphState.frame = requestAnimationFrame(tickGraph);
-        }
         return;
       }
-
       if (graphState.panning && graphState.lastPointer) {
-        if (graphState.pointerStart) {
-          const dx = point.x - graphState.pointerStart.x;
-          const dy = point.y - graphState.pointerStart.y;
-          graphState.pointerMoved = graphState.pointerMoved || Math.sqrt(dx * dx + dy * dy) > 5;
-        }
         graphState.transform.x += point.x - graphState.lastPointer.x;
         graphState.transform.y += point.y - graphState.lastPointer.y;
         graphState.lastPointer = point;
@@ -2237,42 +2073,51 @@ LIMIT ${graphLimit()}`;
       }
     });
 
-    function endGraphPointer(event) {
-      const clickedNode = graphState.draggingNode && !graphState.pointerMoved
-        ? graphState.draggingNode
-        : null;
-      if (graphState.draggingNode || graphState.panning) {
-        try {
-          kgGraph.releasePointerCapture(event.pointerId);
-        } catch (error) {
-          // Pointer capture may already be released by the browser.
-        }
+    kgGraph.addEventListener("pointerdown", (event) => {
+      if (event.target === kgGraph || event.target === kgViewport) {
+        graphState.panning = true;
+        graphState.lastPointer = graphClientPoint(event);
+        kgGraph.setPointerCapture(event.pointerId);
       }
+    });
+
+    window.addEventListener("pointerup", () => {
       graphState.draggingNode = null;
       graphState.panning = false;
       graphState.lastPointer = null;
-      graphState.pointerStart = null;
-      graphState.pointerMoved = false;
-      kgGraph.classList.remove("dragging");
-      if (clickedNode) {
-        selectGraphNode(clickedNode);
-        expandGraphNode(clickedNode);
-      }
-    }
+    });
 
-    kgGraph.addEventListener("pointerup", endGraphPointer);
-    kgGraph.addEventListener("pointercancel", endGraphPointer);
     kgGraph.addEventListener("wheel", (event) => {
       event.preventDefault();
       const point = graphClientPoint(event);
       const world = graphWorldPoint(point);
-      const scale = event.deltaY < 0 ? 1.12 : 0.9;
-      const nextK = Math.max(0.25, Math.min(4, graphState.transform.k * scale));
-      graphState.transform.x = point.x - world.x * nextK;
-      graphState.transform.y = point.y - world.y * nextK;
-      graphState.transform.k = nextK;
+      const intensity = event.deltaMode === 1 ? 0.045 : 0.0018;
+      const scale = Math.exp(-event.deltaY * intensity);
+      const nextScale = Math.max(0.25, Math.min(4, graphState.transform.k * scale));
+      graphState.transform.k = nextScale;
+      graphState.transform.x = point.x - world.x * nextScale;
+      graphState.transform.y = point.y - world.y * nextScale;
       setGraphTransform();
     }, { passive: false });
+
+    kgGraph.addEventListener("selectstart", (event) => {
+      event.preventDefault();
+    });
+
+    function activateTab(tab) {
+      activeTab = tab;
+      tabButtons.forEach((button) => {
+        const active = button.dataset.tab === tab;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-selected", String(active));
+      });
+      tabPanels.forEach((panel) => {
+        panel.classList.toggle("active", panel.id === `tab-${tab}`);
+      });
+      if (tab === "graph" && (!graphLoaded || graphNeedsRefresh)) {
+        refreshGraph();
+      }
+    }
 
     querySelect.addEventListener("change", () => setQuery(selectedExample()));
     resetButton.addEventListener("click", () => setQuery(selectedExample()));
@@ -2280,13 +2125,26 @@ LIMIT ${graphLimit()}`;
     uploadTtlButton.addEventListener("click", uploadTtl);
     refreshDatasetButton.addEventListener("click", refreshDataset);
     refreshGraphButton.addEventListener("click", refreshGraph);
-    resetGraphButton.addEventListener("click", () => fitGraphToViewport());
+    resetGraphButton.addEventListener("click", fitGraphToViewport);
+    graphLimitInput.addEventListener("change", () => {
+      graphNeedsRefresh = true;
+      if (activeTab === "graph") {
+        refreshGraph();
+      }
+    });
+    graphLiteralsInput.addEventListener("change", () => {
+      graphNeedsRefresh = true;
+      if (activeTab === "graph") {
+        refreshGraph();
+      }
+    });
     tabButtons.forEach((button) => {
       button.addEventListener("click", () => activateTab(button.dataset.tab));
     });
 
     populateQuerySelect();
     refreshDataset();
+    graphState.transform = { x: 0, y: 0, k: 1 };
   </script>
 </body>
 </html>

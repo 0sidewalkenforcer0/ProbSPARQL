@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * Usage:
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.Exp4DispatchTest"
- *   Optional: --output-dir benchmark/results/exp4_full
+ *   Optional: --output-dir benchmark/results/exp4
  */
 public class Exp4DispatchTest {
 
@@ -96,7 +96,7 @@ public class Exp4DispatchTest {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String outputDir = "benchmark/results/exp4_full";
+        String outputDir = "benchmark/results/exp4";
         for (int i = 0; i < args.length; i++)
             if (args[i].equals("--output-dir")) outputDir = args[++i];
         new File(outputDir).mkdirs();

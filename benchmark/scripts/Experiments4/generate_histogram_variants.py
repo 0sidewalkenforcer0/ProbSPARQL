@@ -15,9 +15,9 @@ For each GMM:
   3. Build a uniform-width histogram with ``B`` bins.
 
 Usage:
-    python generate_histogram_variants.py
-    python generate_histogram_variants.py --scales S1 S2 --bins 50
-    python generate_histogram_variants.py --bins 20 50 100  # multiple B values
+    python benchmark/scripts/Experiments4/generate_histogram_variants.py
+    python benchmark/scripts/Experiments4/generate_histogram_variants.py --scales S1 S2 --bins 50
+    python benchmark/scripts/Experiments4/generate_histogram_variants.py --bins 20 50 100  # multiple B values
 """
 import argparse
 import json

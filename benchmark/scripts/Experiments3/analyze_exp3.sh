@@ -1,47 +1,27 @@
 #!/usr/bin/env bash
 # =============================================================================
-# analyze_exp3.sh — Analysis and visualization for Experiment 3
+# analyze_exp3.sh — Analysis and visualization for Exp3
 #
-# Reads CSVs produced by run_exp3_1/2/3.sh (or run_exp3_full.sh) and generates
-# all charts and summary tables for all three sub-experiments.
-#
-# Sub-experiment 3.1 — Classification Accuracy:
-#   Input:  exp3_1_classification.csv
-#   Charts: exp3_1_accuracy_grouped_bar.png
-#           exp3_1_f1_heatmap.png
-#           exp3_1_latency.png
-#
-# Sub-experiment 3.2 — Convergence Analysis:
-#   Input:  exp3_2_convergence_multimethod.csv
-#   Charts: exp3_2_jsd_convergence.png
-#           exp3_2_abs_error.png
-#           exp3_2_time.png
-#
-# Sub-experiment 3.3 — Selectivity Sensitivity:
-#   Input:  exp3_3_selectivity.csv
-#   Charts: exp3_3_time_vs_theta.png
-#           exp3_3_count_vs_theta.png
-#           exp3_3_accuracy_vs_theta.png
+# Reads exp3_classification.csv and generates the Exp3 charts.
+# Current official dataset version corresponds to the former exp3_1_k5_n300_new
+# configuration (K=5, N=300).
 #
 # Usage (from project root):
 #   bash benchmark/scripts/Experiments3/analyze_exp3.sh
-#   bash benchmark/scripts/Experiments3/analyze_exp3.sh --results-dir benchmark/results/exp3_full
-#   bash benchmark/scripts/Experiments3/analyze_exp3.sh --only 3.2
+#   bash benchmark/scripts/Experiments3/analyze_exp3.sh --results-dir benchmark/results/exp3
 # =============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-RESULTS_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp3_full}"
-ONLY=""   # if set to "3.1", "3.2", or "3.3" — run only that sub-experiment
+RESULTS_DIR="${RESULTS_DIR:-${PROJECT_ROOT}/benchmark/results/exp3}"
 
 # ── Argument parsing ─────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --results-dir) RESULTS_DIR="$2"; shift 2 ;;
         --output-dir)  RESULTS_DIR="$2"; shift 2 ;;   # alias
-        --only)        ONLY="$2";        shift 2 ;;
         *) echo "[ERROR] Unknown argument: $1" >&2; exit 1 ;;
     esac
 done
@@ -65,11 +45,10 @@ fi
 cd "$PROJECT_ROOT"
 
 echo "=================================================================="
-echo "  Experiment 3 — Analysis"
+echo "  Exp3 — Analysis"
 echo "=================================================================="
 echo "  Results dir  : $RESULTS_DIR"
 echo "  Python       : $PYTHON_BIN"
-echo "  Filter       : ${ONLY:-all sub-experiments}"
 echo
 
 SCRIPTS="${PROJECT_ROOT}/benchmark/scripts/Experiments3"
@@ -95,29 +74,10 @@ run_analysis() {
     echo
 }
 
-# ── Exp 3.1 ──────────────────────────────────────────────────────────────────
-if [[ -z "$ONLY" ]] || [[ "$ONLY" == "3.1" ]]; then
-    run_analysis \
-        "Exp 3.1: Classification Accuracy" \
-        "${SCRIPTS}/analyze_exp3_1_accuracy.py" \
-        "${RESULTS_DIR}/exp3_1_classification.csv"
-fi
-
-# ── Exp 3.2 ──────────────────────────────────────────────────────────────────
-if [[ -z "$ONLY" ]] || [[ "$ONLY" == "3.2" ]]; then
-    run_analysis \
-        "Exp 3.2: Convergence Analysis" \
-        "${SCRIPTS}/analyze_exp3_2_convergence.py" \
-        "${RESULTS_DIR}/exp3_2_convergence_multimethod.csv"
-fi
-
-# ── Exp 3.3 ──────────────────────────────────────────────────────────────────
-if [[ -z "$ONLY" ]] || [[ "$ONLY" == "3.3" ]]; then
-    run_analysis \
-        "Exp 3.3: Selectivity Sensitivity" \
-        "${SCRIPTS}/analyze_exp3_3_selectivity.py" \
-        "${RESULTS_DIR}/exp3_3_selectivity.csv"
-fi
+run_analysis \
+    "Exp3: Classification Accuracy" \
+    "${SCRIPTS}/analyze_exp3.py" \
+    "${RESULTS_DIR}/exp3_classification.csv"
 
 # ── Chart summary ─────────────────────────────────────────────────────────────
 echo "=================================================================="
