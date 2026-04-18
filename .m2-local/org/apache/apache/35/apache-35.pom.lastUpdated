@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sat Apr 18 16:22:33 CEST 2026
+@default-central-https\://repo.maven.apache.org/maven2/.lastUpdated=1776522153994
+https\://repo.maven.apache.org/maven2/.error=Could not transfer artifact org.apache\:apache\:pom\:35 from/to central (https\://repo.maven.apache.org/maven2)\: repo.maven.apache.org\: nodename nor servname provided, or not known

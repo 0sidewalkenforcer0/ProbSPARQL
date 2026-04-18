@@ -45,6 +45,17 @@ public interface RDFDatatype {
     public Object parse(String lexicalForm) throws DatatypeFormatException;
 
     /**
+     * Normalize a lexical form before a literal term is created.
+     * <p>
+     * The default behavior is identity. Datatypes with a canonical lexical form
+     * may override this so that term-level equality and hashing operate on a
+     * stable representation even in lazy literal mode.
+     */
+    public default String canonicalizeLexicalForm(String lexicalForm) {
+        return lexicalForm;
+    }
+
+    /**
      * Test whether the given string is a legal lexical form
      * of this datatype.
      */

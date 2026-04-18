@@ -123,14 +123,14 @@ final public class LiteralLabel {
      * @param datatype     the type of the literal
      */
     /*package*/ LiteralLabel(String lex, String lang, TextDirection textDir, RDFDatatype datatype) {
-        this.lexicalForm = lex;
         this.dtype = Objects.requireNonNull(datatype);
+        this.lexicalForm = canonicalizeLexicalForm(lex, this.dtype);
         this.lang = lang;
         this.textDir = textDir;
         this.hash = calcHashCode();
         switch(valueMode) {
             case EAGER -> {
-                this.wellformed = setValue(lex, this.dtype);
+                this.wellformed = setValue(this.lexicalForm, this.dtype);
                 this.dtype = normalize(value, this.dtype);
             }
             case LAZY ->
@@ -162,9 +162,8 @@ final public class LiteralLabel {
         this.textDir = null;
         if (value instanceof String) {
             // Treat as "lex ^^ datatype"
-            String lex = (String)value;
-            this.lexicalForm = lex;
-            this.wellformed = setValue(lex, datatype);
+            this.lexicalForm = canonicalizeLexicalForm((String)value, datatype);
+            this.wellformed = setValue(this.lexicalForm, datatype);
             this.dtype = normalize(value, datatype);
             hash = calcHashCode();
             return;
@@ -198,7 +197,7 @@ final public class LiteralLabel {
      */
     /*package*/ LiteralLabel(String lex, Object value, RDFDatatype dtype) throws DatatypeFormatException {
         this.dtype = Objects.requireNonNull(dtype);
-        this.lexicalForm = Objects.requireNonNull(lex);
+        this.lexicalForm = canonicalizeLexicalForm(Objects.requireNonNull(lex), this.dtype);
         this.value = Objects.requireNonNull(value);
         this.lang = "";
         this.textDir = null;
@@ -221,6 +220,17 @@ final public class LiteralLabel {
             if (JenaParameters.enableEagerLiteralValidation)
                 throw e;
             return false;
+        }
+    }
+
+    private static String canonicalizeLexicalForm(String lex, RDFDatatype dtype) {
+        if (dtype == null || lex == null) {
+            return lex;
+        }
+        try {
+            return dtype.canonicalizeLexicalForm(lex);
+        } catch (RuntimeException ex) {
+            return lex;
         }
     }
 

@@ -1,6 +1,7 @@
 package org.apache.jena.probsparql.datatypes;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -89,12 +90,24 @@ public class GMMValue implements Sampleable {
         // Validate covariances based on covariance_type
         validateCovariances(nComponents, dimensions, covarianceType, covariances);
         
+        Component[] components = new Component[nComponents];
+        for (int i = 0; i < nComponents; i++) {
+            components[i] = new Component(weights[i], means[i], covariances[i]);
+        }
+        Arrays.sort(components, COMPONENT_COMPARATOR);
+
         this.nComponents = nComponents;
         this.dimensions = dimensions;
         this.covarianceType = covarianceType;
-        this.weights = Arrays.copyOf(weights, weights.length);
-        this.means = deepCopy2D(means);
-        this.covariances = deepCopy3D(covariances);
+        this.weights = new double[nComponents];
+        this.means = new double[nComponents][];
+        this.covariances = new double[nComponents][][];
+
+        for (int i = 0; i < nComponents; i++) {
+            this.weights[i] = components[i].weight;
+            this.means[i] = Arrays.copyOf(components[i].mean, components[i].mean.length);
+            this.covariances[i] = deepCopy2D(components[i].covariance);
+        }
     }
     
     // Getters
@@ -207,6 +220,60 @@ public class GMMValue implements Sampleable {
             copy[i] = deepCopy2D(original[i]);
         }
         return copy;
+    }
+
+    private static final class Component {
+        private final double weight;
+        private final double[] mean;
+        private final double[][] covariance;
+
+        private Component(double weight, double[] mean, double[][] covariance) {
+            this.weight = weight;
+            this.mean = mean;
+            this.covariance = covariance;
+        }
+    }
+
+    private static final Comparator<Component> COMPONENT_COMPARATOR = (left, right) -> {
+        int cmp = compareDoubleArrays(left.mean, right.mean);
+        if (cmp != 0) {
+            return cmp;
+        }
+
+        cmp = compareDoubleMatrix(left.covariance, right.covariance);
+        if (cmp != 0) {
+            return cmp;
+        }
+
+        return Double.compare(left.weight, right.weight);
+    };
+
+    private static int compareDoubleArrays(double[] left, double[] right) {
+        int cmp = Integer.compare(left.length, right.length);
+        if (cmp != 0) {
+            return cmp;
+        }
+        for (int i = 0; i < left.length; i++) {
+            cmp = Double.compare(left[i], right[i]);
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return 0;
+    }
+
+    private static int compareDoubleMatrix(double[][] left, double[][] right) {
+        int cmp = Integer.compare(left.length, right.length);
+        if (cmp != 0) {
+            return cmp;
+        }
+        for (int i = 0; i < left.length; i++) {
+            cmp = compareDoubleArrays(left[i], right[i]);
+            if (cmp != 0) {
+                return cmp;
+            }
+        }
+        return 0;
     }
     
     /**
