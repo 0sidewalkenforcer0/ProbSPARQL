@@ -125,7 +125,7 @@ final public class LiteralLabel {
     /*package*/ LiteralLabel(String lex, String lang, TextDirection textDir, RDFDatatype datatype) {
         this.dtype = Objects.requireNonNull(datatype);
         this.lexicalForm = canonicalizeLexicalForm(lex, this.dtype);
-        this.lang = lang;
+        this.lang = lang;  
         this.textDir = textDir;
         this.hash = calcHashCode();
         switch(valueMode) {

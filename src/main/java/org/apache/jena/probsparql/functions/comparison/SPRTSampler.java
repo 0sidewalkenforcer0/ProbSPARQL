@@ -6,17 +6,72 @@ import org.apache.jena.probsparql.utils.MatrixUtils;
 import java.util.Random;
 
 /**
- * V3: SPRT (Sequential Probability Ratio Test) Sampler
+ * V3: Sequential hypothesis-test sampler with early stopping.
  * 
- * SPRT provides early termination by testing whether we have sufficient confidence
- * to accept or reject the hypothesis that JSD > epsilon.
+ * <p>The public mode name remains {@code V3_SPRT} for compatibility, but the
+ * implementation is closer to a sequential confidence-bound test than a
+ * textbook Wald likelihood-ratio SPRT.  We repeatedly estimate
+ * {@code JSD(P, Q)} with Monte Carlo, normalize the distance to the threshold
+ * by the estimated standard error, and stop once one of two one-sided decisions
+ * becomes conclusive:</p>
  * 
- * This significantly reduces computation for easy cases where distributions are
- * clearly similar or clearly different.
+ * <ul>
+ *   <li>reject similarity when the lower confidence bound is above
+ *       {@code epsilon}</li>
+ *   <li>accept similarity when the upper confidence bound is below
+ *       {@code epsilon}</li>
+ * </ul>
+ * 
+ * <p>This keeps the existing early-stop behavior while making the statistical
+ * intent explicit in the code.</p>
  * 
  * @author ProbSPARQL Team
  */
 public class SPRTSampler {
+    private static final int CHECK_INTERVAL_PAIRED_SAMPLES = 50;
+
+    private enum SequentialDecision {
+        CONTINUE,
+        ACCEPT_SIMILAR,
+        REJECT_DISSIMILAR
+    }
+
+    /**
+     * Running moments for one Monte Carlo quantity such as log p(x) - log m(x).
+     */
+    private static final class RunningMoments {
+        private double sum = 0.0;
+        private double sumSquares = 0.0;
+
+        void add(double value) {
+            sum += value;
+            sumSquares += value * value;
+        }
+
+        double mean(int sampleCount) {
+            return sum / sampleCount;
+        }
+
+        double variance(int sampleCount) {
+            double mean = mean(sampleCount);
+            return Math.max(0.0, sumSquares / sampleCount - mean * mean);
+        }
+    }
+
+    /**
+     * Snapshot of the current sequential test state after {@code n} paired samples.
+     */
+    private static final class TestSnapshot {
+        private final int pairedSamples;
+        private final double jsdEstimate;
+        private final double standardError;
+
+        TestSnapshot(int pairedSamples, double jsdEstimate, double standardError) {
+            this.pairedSamples = pairedSamples;
+            this.jsdEstimate = jsdEstimate;
+            this.standardError = standardError;
+        }
+    }
     
     private final Random random;
     private final double alpha;   // False positive rate
@@ -37,11 +92,13 @@ public class SPRTSampler {
     }
     
     /**
-     * Compute JSD using sequential MC with confidence-interval-based early termination.
+     * Compute JSD using sequential MC with hypothesis-test-style early stopping.
      *
-     * Alternates sampling from p and q to build running estimates of
-     * KL(p||m) and KL(q||m), then stops early when the JSD CI
-     * lies entirely above or below epsilon (the decision threshold).
+     * <p>Each round draws one sample from {@code p} and one from {@code q},
+     * builds running estimates of {@code KL(p||m)} and {@code KL(q||m)}, and
+     * every {@value #CHECK_INTERVAL_PAIRED_SAMPLES} paired samples checks whether
+     * the current JSD confidence bounds lie entirely above or below
+     * {@code epsilon}.</p>
      *
      * Returns pair: {jsdValue, actualSamplesUsed}
      */
@@ -50,59 +107,47 @@ public class SPRTSampler {
         double zReject = inverseStandardNormalCDF(1.0 - alpha);
         double zAccept = inverseStandardNormalCDF(1.0 - beta);
 
-        int halfMax = maxSamples / 2;
-        int n = 0;
-        double sumLogPM = 0.0, sumSqLogPM = 0.0;
-        double sumLogQM = 0.0, sumSqLogQM = 0.0;
+        int maxPairedSamples = maxSamples / 2;
+        int pairedSamples = 0;
+        RunningMoments klPmMoments = new RunningMoments();
+        RunningMoments klQmMoments = new RunningMoments();
 
-        // Check CI every checkInterval paired samples (avoid per-sample overhead)
-        int checkInterval = 50;
-
-        while (n < halfMax) {
-            // Estimate KL(p||m): sample from p, accumulate log(p(x)/m(x))
+        while (pairedSamples < maxPairedSamples) {
+            // For X ~ P, E[log p(X) - log m(X)] = KL(P || M).
             double[] xp = p.sampleOne(random);
             double vp = p.logPdf(xp) - m.logPdf(xp);
-            sumLogPM += vp;
-            sumSqLogPM += vp * vp;
+            klPmMoments.add(vp);
 
-            // Estimate KL(q||m): sample from q, accumulate log(q(x)/m(x))
+            // For Y ~ Q, E[log q(Y) - log m(Y)] = KL(Q || M).
             double[] xq = q.sampleOne(random);
             double vq = q.logPdf(xq) - m.logPdf(xq);
-            sumLogQM += vq;
-            sumSqLogQM += vq * vq;
+            klQmMoments.add(vq);
 
-            n++;
+            pairedSamples++;
 
-            // Periodically check whether CI is entirely above or below epsilon
-            if (n >= checkInterval && n % checkInterval == 0) {
-                double jsdEst = Math.max(0.0, 0.5 * (sumLogPM + sumLogQM) / n);
-                double varP = Math.max(0.0, sumSqLogPM / n - (sumLogPM / n) * (sumLogPM / n));
-                double varQ = Math.max(0.0, sumSqLogQM / n - (sumLogQM / n) * (sumLogQM / n));
-                // SE of JSD estimate = 0.5 * sqrt((varP + varQ) / n)
-                double se = 0.5 * Math.sqrt((varP + varQ) / n);
+            if (!shouldCheckDecision(pairedSamples)) {
+                continue;
+            }
 
-                if (se > 0) {
-                    if (jsdEst - zReject * se > epsilon) {
-                        // CI entirely above epsilon → confidently dissimilar
-                        earlyRejected++;
-                        totalSamples += n * 2;
-                        return new double[] {jsdEst, n * 2};
-                    }
-                    if (jsdEst + zAccept * se < epsilon) {
-                        // CI entirely below epsilon → confidently similar
-                        earlyAccepted++;
-                        totalSamples += n * 2;
-                        return new double[] {jsdEst, n * 2};
-                    }
-                }
+            TestSnapshot snapshot = buildSnapshot(pairedSamples, klPmMoments, klQmMoments);
+            SequentialDecision decision = evaluateDecision(snapshot, zReject, zAccept);
+            if (decision == SequentialDecision.REJECT_DISSIMILAR) {
+                earlyRejected++;
+                totalSamples += pairedSamples * 2;
+                return new double[] {snapshot.jsdEstimate, pairedSamples * 2};
+            }
+            if (decision == SequentialDecision.ACCEPT_SIMILAR) {
+                earlyAccepted++;
+                totalSamples += pairedSamples * 2;
+                return new double[] {snapshot.jsdEstimate, pairedSamples * 2};
             }
         }
 
         // Ran to budget without convergence — return best estimate
         fullSamples++;
         totalSamples += maxSamples;
-        double jsd = Math.max(0.0, 0.5 * (sumLogPM + sumLogQM) / halfMax);
-        return new double[] {jsd, maxSamples};
+        TestSnapshot finalSnapshot = buildSnapshot(maxPairedSamples, klPmMoments, klQmMoments);
+        return new double[] {finalSnapshot.jsdEstimate, maxSamples};
     }
     
     /**
@@ -110,6 +155,50 @@ public class SPRTSampler {
      */
     public double computeJSD(GMMValue p, GMMValue q, int maxSamples) {
         return computeJSDWithStats(p, q, maxSamples)[0];
+    }
+
+    private boolean shouldCheckDecision(int pairedSamples) {
+        return pairedSamples >= CHECK_INTERVAL_PAIRED_SAMPLES
+            && pairedSamples % CHECK_INTERVAL_PAIRED_SAMPLES == 0;
+    }
+
+    private TestSnapshot buildSnapshot(int pairedSamples,
+                                       RunningMoments klPmMoments,
+                                       RunningMoments klQmMoments) {
+        double klPmEstimate = klPmMoments.mean(pairedSamples);
+        double klQmEstimate = klQmMoments.mean(pairedSamples);
+        double jsdEstimate = Math.max(0.0, 0.5 * (klPmEstimate + klQmEstimate));
+
+        double varP = klPmMoments.variance(pairedSamples);
+        double varQ = klQmMoments.variance(pairedSamples);
+        double standardError = 0.5 * Math.sqrt((varP + varQ) / pairedSamples);
+
+        return new TestSnapshot(pairedSamples, jsdEstimate, standardError);
+    }
+
+    /**
+     * Decide whether the current estimate already supports one of the two
+     * one-sided conclusions relative to the threshold epsilon.
+     *
+     * <p>Written in confidence-bound form:
+     * {@code jsdHat - z * se > epsilon} is equivalent to a large positive
+     * normalized test statistic {@code (jsdHat - epsilon) / se}, and
+     * {@code jsdHat + z * se < epsilon} is the symmetric lower-tail decision.</p>
+     */
+    private SequentialDecision evaluateDecision(TestSnapshot snapshot,
+                                                double zReject,
+                                                double zAccept) {
+        if (snapshot.standardError <= 0.0) {
+            return SequentialDecision.CONTINUE;
+        }
+
+        if (snapshot.jsdEstimate - zReject * snapshot.standardError > epsilon) {
+            return SequentialDecision.REJECT_DISSIMILAR;
+        }
+        if (snapshot.jsdEstimate + zAccept * snapshot.standardError < epsilon) {
+            return SequentialDecision.ACCEPT_SIMILAR;
+        }
+        return SequentialDecision.CONTINUE;
     }
     
     /**
