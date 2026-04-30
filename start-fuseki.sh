@@ -63,6 +63,17 @@ echo ""
 echo "Starting Fuseki server..."
 echo ""
 
+# JVM tuning: G1GC with bounded pause, 1 GB heap, biased locking disabled (Java 21)
+JVM_OPTS="-Xms256m -Xmx1g"
+JVM_OPTS="$JVM_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
+JVM_OPTS="$JVM_OPTS -XX:+OptimizeStringConcat -XX:+UseStringDeduplication"
+JVM_OPTS="$JVM_OPTS -Dfile.encoding=UTF-8"
+# Increase max threads if PROBSPARQL_MAX_THREADS is set in environment
+if [ -n "$PROBSPARQL_MAX_THREADS" ]; then
+    JVM_OPTS="$JVM_OPTS -DPROBSPARQL_MAX_THREADS=$PROBSPARQL_MAX_THREADS"
+fi
+
 mvn exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
-    -Dexec.args="$PORT $DATA_FILES"
+    -Dexec.args="$PORT $DATA_FILES" \
+    -Dexec.jvmArgs="$JVM_OPTS"

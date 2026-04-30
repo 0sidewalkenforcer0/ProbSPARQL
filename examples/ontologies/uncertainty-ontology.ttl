@@ -27,6 +27,16 @@ uq:gmmLiteral a rdfs:Datatype ;
     rdfs:comment "A custom datatype representing a Gaussian Mixture Model (GMM) with components, weights, means, and covariances"@en ;
     rdfs:subClassOf rdfs:Literal .
 
+uq:double a rdfs:Datatype ;
+    rdfs:label "double-valued real domain"@en ;
+    rdfs:comment "Domain marker for unconstrained real-valued random variables"@en ;
+    rdfs:seeAlso <./uncertainty-datatypes.xsd> .
+
+uq:nonNegativeDouble a rdfs:Datatype ;
+    rdfs:label "non-negative double-valued real domain"@en ;
+    rdfs:comment "Domain marker for random variables constrained to values >= 0"@en ;
+    rdfs:seeAlso <./uncertainty-datatypes.xsd> .
+
 # Example format for uq:gmmLiteral:
 # "{\"k\": 2, \"d\": 1, \"weights\": [0.4, 0.6], \"means\": [[5.01], [8.01]], \"covariances\": [[[4.01]], [[3.21]]]}"^^uq:gmmLiteral
 

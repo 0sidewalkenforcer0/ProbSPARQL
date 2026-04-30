@@ -84,8 +84,16 @@ public class ProbSPARQLFuseki {
         
         // Build and start Fuseki server
         logger.info("Starting Fuseki server...");
+
+        // Thread pool: scale with CPU cores; override via -DPROBSPARQL_MAX_THREADS=N
+        int cores = Runtime.getRuntime().availableProcessors();
+        int minThreads = Math.max(4, cores);
+        int maxThreads = Integer.getInteger("PROBSPARQL_MAX_THREADS", Math.max(50, cores * 8));
+        logger.info("Jetty thread pool: min={}, max={} (cores={})", minThreads, maxThreads, cores);
+
         server = FusekiServer.create()
             .port(port)
+            .numServerThreads(minThreads, maxThreads)
             .staticFileBase(STATIC_UI_DIR)
             .add("/" + DATASET_NAME, dataset)
             .build();

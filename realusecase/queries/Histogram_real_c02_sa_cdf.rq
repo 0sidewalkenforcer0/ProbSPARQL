@@ -1,0 +1,15 @@
+PREFIX ex: <https://w3id.org/probsparql/examples/real-manufacturing/>
+PREFIX cfc: <https://w3id.org/circular-factory/ontology/product-structure#>
+PREFIX im: <https://w3id.org/circular-factory/ontology/inspection-measurement#>
+PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# Histogram-real: CDF evaluation over a non-parametric empirical distribution.
+# The empirical Sa distribution is constructed from real C02 roughness measurements.
+SELECT ?rv ?pBelow40 WHERE {
+  ex:c02_Sa_empiricalRV uq:hasDistribution ?dist .
+  BIND(prob:cdf(?dist, 40.0) AS ?pBelow40)
+  BIND(ex:c02_Sa_empiricalRV AS ?rv)
+}

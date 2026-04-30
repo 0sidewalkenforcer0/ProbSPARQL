@@ -1,0 +1,27 @@
+PREFIX ex: <https://w3id.org/probsparql/examples/real-manufacturing/>
+PREFIX cfc: <https://w3id.org/circular-factory/ontology/product-structure#>
+PREFIX im: <https://w3id.org/circular-factory/ontology/inspection-measurement#>
+PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# R1-real: probabilistic thresholding on real RMS measurements.
+# Retrieves samples for which P(RMS > 700) >= 0.9.
+SELECT ?sample ?cc ?temp ?rms ?std ?pExceed WHERE {
+  ?sample a ex:HardnessRmsSample ;
+          ex:hasProcessCondition ?condition ;
+          ex:hasRMSCharacteristic ?char .
+  ?condition ex:carbonContent ?cc ;
+             ex:temperature ?temp .
+  ?char im:isMeasuredBy ?measurement .
+  ?measurement om:hasValue ?rms ;
+               ex:standardDeviation ?std ;
+               om:hasUnit ex:rmsDatasetUnit ;
+               uq:representedBy ?rv .
+  ?rv uq:hasDomain uq:nonNegativeDouble ;
+      uq:hasDistribution ?dist .
+  BIND(1.0 - prob:cdf(?dist, 700.0) AS ?pExceed)
+  FILTER(?pExceed >= 0.9)
+}
+ORDER BY DESC(?pExceed)

@@ -1,0 +1,3013 @@
+@prefix ex: <https://w3id.org/probsparql/examples/real-manufacturing/> .
+@prefix cfc: <https://w3id.org/circular-factory/ontology/product-structure#> .
+@prefix ag: <https://w3id.org/circular-factory/ontology/angle-grinder#> .
+@prefix im: <https://w3id.org/circular-factory/ontology/inspection-measurement#> .
+@prefix om: <http://www.ontology-of-units-of-measure.org/resource/om-2/> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# Real manufacturing measurement data for ProbSPARQL validation
+# Generated from:
+# - Data_Hardness_Temp_RMS_reduced.xlsx
+# - Data C02.xlsx
+#
+# The file follows the same modelling pattern used in the paper:
+# sample/component -> measurable characteristic -> measurement
+# measurement -> uq:representedBy -> uq:RandomVariable
+# random variable -> uq:hasDomain / uq:hasDistribution
+#################################################################
+
+ex:DataHardnessTempRMSReduced a ex:RealMeasurementDataset ;
+    rdfs:label "Hardness, temperature, RMS, and residual-stress measurement dataset"@en ;
+    ex:rowCount "40"^^xsd:integer .
+
+ex:DataC02Roughness a ex:RealMeasurementDataset ;
+    rdfs:label "C02 process-parameter and surface-roughness measurement dataset"@en ;
+    ex:rowCount "17"^^xsd:integer .
+
+ex:HardnessRmsSample rdfs:subClassOf cfc:Part .
+ex:C02SurfaceSample rdfs:subClassOf cfc:Part .
+ex:ProcessCondition a rdfs:Class .
+ex:RMSMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+ex:ResidualStressMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+ex:HardnessMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+ex:SurfaceRoughnessMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+ex:EmpiricalSurfaceRoughnessMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+
+ex:hasProcessCondition a rdf:Property .
+ex:hasReplicate a rdf:Property .
+ex:carbonContent a rdf:Property .
+ex:temperature a rdf:Property .
+ex:laserPower a rdf:Property .
+ex:processingSpeed a rdf:Property .
+ex:lineEnergy a rdf:Property .
+ex:standardDeviation a rdf:Property .
+ex:hasRMSCharacteristic a rdf:Property .
+ex:hasResidualStressCharacteristic a rdf:Property .
+ex:hasHardnessCharacteristic a rdf:Property .
+ex:hasSaCharacteristic a rdf:Property .
+ex:hasSqCharacteristic a rdf:Property .
+ex:hasRaCharacteristic a rdf:Property .
+ex:hasRqCharacteristic a rdf:Property .
+ex:hasRzCharacteristic a rdf:Property .
+ex:hasRelativeDensityCharacteristic a rdf:Property .
+ex:hasEmpiricalCharacteristic a rdf:Property .
+
+ex:rmsDatasetUnit a om:Unit ;
+    rdfs:label "dataset unit for RMS values"@en .
+
+ex:residualStressDatasetUnit a om:Unit ;
+    rdfs:label "dataset unit for residual-stress values"@en .
+
+ex:hardnessHV a om:Unit ;
+    rdfs:label "Vickers hardness unit"@en .
+
+uq:double a rdfs:Datatype ;
+    rdfs:label "double-valued real domain"@en .
+
+uq:nonNegativeDouble a rdfs:Datatype ;
+    rdfs:label "non-negative double-valued real domain"@en ;
+    rdfs:seeAlso <../examples/ontologies/uncertainty-datatypes.xsd> .
+
+ex:hardCond_CC25_T30 a ex:ProcessCondition ;
+    ex:carbonContent "25"^^xsd:double ;
+    ex:temperature "30"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=25, Temp=30"@en ;
+    ex:hasReplicate ex:hardSample_001, ex:hardSample_002 .
+
+ex:hardCond_CC25_T250 a ex:ProcessCondition ;
+    ex:carbonContent "25"^^xsd:double ;
+    ex:temperature "250"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=25, Temp=250"@en ;
+    ex:hasReplicate ex:hardSample_003, ex:hardSample_004 .
+
+ex:hardCond_CC25_T375 a ex:ProcessCondition ;
+    ex:carbonContent "25"^^xsd:double ;
+    ex:temperature "375"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=25, Temp=375"@en ;
+    ex:hasReplicate ex:hardSample_005, ex:hardSample_006 .
+
+ex:hardCond_CC25_T550 a ex:ProcessCondition ;
+    ex:carbonContent "25"^^xsd:double ;
+    ex:temperature "550"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=25, Temp=550"@en ;
+    ex:hasReplicate ex:hardSample_007, ex:hardSample_008 .
+
+ex:hardCond_CC25_T625 a ex:ProcessCondition ;
+    ex:carbonContent "25"^^xsd:double ;
+    ex:temperature "625"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=25, Temp=625"@en ;
+    ex:hasReplicate ex:hardSample_009, ex:hardSample_010 .
+
+ex:hardCond_CC34_T30 a ex:ProcessCondition ;
+    ex:carbonContent "34"^^xsd:double ;
+    ex:temperature "30"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=34, Temp=30"@en ;
+    ex:hasReplicate ex:hardSample_011, ex:hardSample_012 .
+
+ex:hardCond_CC34_T250 a ex:ProcessCondition ;
+    ex:carbonContent "34"^^xsd:double ;
+    ex:temperature "250"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=34, Temp=250"@en ;
+    ex:hasReplicate ex:hardSample_013, ex:hardSample_014 .
+
+ex:hardCond_CC34_T375 a ex:ProcessCondition ;
+    ex:carbonContent "34"^^xsd:double ;
+    ex:temperature "375"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=34, Temp=375"@en ;
+    ex:hasReplicate ex:hardSample_015, ex:hardSample_016 .
+
+ex:hardCond_CC34_T550 a ex:ProcessCondition ;
+    ex:carbonContent "34"^^xsd:double ;
+    ex:temperature "550"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=34, Temp=550"@en ;
+    ex:hasReplicate ex:hardSample_017, ex:hardSample_018 .
+
+ex:hardCond_CC34_T625 a ex:ProcessCondition ;
+    ex:carbonContent "34"^^xsd:double ;
+    ex:temperature "625"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=34, Temp=625"@en ;
+    ex:hasReplicate ex:hardSample_019, ex:hardSample_020 .
+
+ex:hardCond_CC42_T30 a ex:ProcessCondition ;
+    ex:carbonContent "42"^^xsd:double ;
+    ex:temperature "30"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=42, Temp=30"@en ;
+    ex:hasReplicate ex:hardSample_021, ex:hardSample_022 .
+
+ex:hardCond_CC42_T250 a ex:ProcessCondition ;
+    ex:carbonContent "42"^^xsd:double ;
+    ex:temperature "250"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=42, Temp=250"@en ;
+    ex:hasReplicate ex:hardSample_023, ex:hardSample_024 .
+
+ex:hardCond_CC42_T375 a ex:ProcessCondition ;
+    ex:carbonContent "42"^^xsd:double ;
+    ex:temperature "375"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=42, Temp=375"@en ;
+    ex:hasReplicate ex:hardSample_025, ex:hardSample_026 .
+
+ex:hardCond_CC42_T550 a ex:ProcessCondition ;
+    ex:carbonContent "42"^^xsd:double ;
+    ex:temperature "550"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=42, Temp=550"@en ;
+    ex:hasReplicate ex:hardSample_027, ex:hardSample_028 .
+
+ex:hardCond_CC42_T625 a ex:ProcessCondition ;
+    ex:carbonContent "42"^^xsd:double ;
+    ex:temperature "625"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=42, Temp=625"@en ;
+    ex:hasReplicate ex:hardSample_029, ex:hardSample_030 .
+
+ex:hardCond_CC50_T30 a ex:ProcessCondition ;
+    ex:carbonContent "50"^^xsd:double ;
+    ex:temperature "30"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=50, Temp=30"@en ;
+    ex:hasReplicate ex:hardSample_031, ex:hardSample_032 .
+
+ex:hardCond_CC50_T250 a ex:ProcessCondition ;
+    ex:carbonContent "50"^^xsd:double ;
+    ex:temperature "250"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=50, Temp=250"@en ;
+    ex:hasReplicate ex:hardSample_033, ex:hardSample_034 .
+
+ex:hardCond_CC50_T375 a ex:ProcessCondition ;
+    ex:carbonContent "50"^^xsd:double ;
+    ex:temperature "375"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=50, Temp=375"@en ;
+    ex:hasReplicate ex:hardSample_035, ex:hardSample_036 .
+
+ex:hardCond_CC50_T550 a ex:ProcessCondition ;
+    ex:carbonContent "50"^^xsd:double ;
+    ex:temperature "550"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=50, Temp=550"@en ;
+    ex:hasReplicate ex:hardSample_037, ex:hardSample_038 .
+
+ex:hardCond_CC50_T625 a ex:ProcessCondition ;
+    ex:carbonContent "50"^^xsd:double ;
+    ex:temperature "625"^^xsd:double ;
+    om:hasUnit om:degreeCelsius ;
+    rdfs:label "CC=50, Temp=625"@en ;
+    ex:hasReplicate ex:hardSample_039, ex:hardSample_040 .
+
+ex:hardSample_001 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_001_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_001_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_001_hardnessCharacteristic .
+
+ex:hardSample_001_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_001"@en ;
+    im:isMeasuredBy ex:hardSample_001_rmsMeasurement .
+
+ex:hardSample_001_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "270.11889"^^xsd:double ;
+    ex:standardDeviation "19.99221"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_001_rmsRV .
+
+ex:hardSample_001_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[270.11889]],"covariances":[[399.688461]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_001_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_001"@en ;
+    im:isMeasuredBy ex:hardSample_001_residualStressMeasurement .
+
+ex:hardSample_001_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "22.28333"^^xsd:double ;
+    ex:standardDeviation "33.73767"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_001_residualStressRV .
+
+ex:hardSample_001_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[22.28333]],"covariances":[[1138.230377]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_001_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_001"@en ;
+    im:isMeasuredBy ex:hardSample_001_hardnessMeasurement .
+
+ex:hardSample_001_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "480"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_002 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_002_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_002_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_002_hardnessCharacteristic .
+
+ex:hardSample_002_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_002"@en ;
+    im:isMeasuredBy ex:hardSample_002_rmsMeasurement .
+
+ex:hardSample_002_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "225.03361"^^xsd:double ;
+    ex:standardDeviation "21.15115"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_002_rmsRV .
+
+ex:hardSample_002_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[225.03361]],"covariances":[[447.371146]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_002_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_002"@en ;
+    im:isMeasuredBy ex:hardSample_002_residualStressMeasurement .
+
+ex:hardSample_002_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "26.83333"^^xsd:double ;
+    ex:standardDeviation "18.30685"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_002_residualStressRV .
+
+ex:hardSample_002_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[26.83333]],"covariances":[[335.140757]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_002_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_002"@en ;
+    im:isMeasuredBy ex:hardSample_002_hardnessMeasurement .
+
+ex:hardSample_002_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "480"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_003 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_003_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_003_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_003_hardnessCharacteristic .
+
+ex:hardSample_003_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_003"@en ;
+    im:isMeasuredBy ex:hardSample_003_rmsMeasurement .
+
+ex:hardSample_003_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "238.51833"^^xsd:double ;
+    ex:standardDeviation "28.44906"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_003_rmsRV .
+
+ex:hardSample_003_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[238.51833]],"covariances":[[809.349015]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_003_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_003"@en ;
+    im:isMeasuredBy ex:hardSample_003_residualStressMeasurement .
+
+ex:hardSample_003_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "32.26667"^^xsd:double ;
+    ex:standardDeviation "11.95159"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_003_residualStressRV .
+
+ex:hardSample_003_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[32.26667]],"covariances":[[142.840504]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_003_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_003"@en ;
+    im:isMeasuredBy ex:hardSample_003_hardnessMeasurement .
+
+ex:hardSample_003_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "440"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_004 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_004_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_004_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_004_hardnessCharacteristic .
+
+ex:hardSample_004_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_004"@en ;
+    im:isMeasuredBy ex:hardSample_004_rmsMeasurement .
+
+ex:hardSample_004_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "280.35778"^^xsd:double ;
+    ex:standardDeviation "26.06351"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_004_rmsRV .
+
+ex:hardSample_004_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.35778]],"covariances":[[679.306554]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_004_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_004"@en ;
+    im:isMeasuredBy ex:hardSample_004_residualStressMeasurement .
+
+ex:hardSample_004_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "30.35"^^xsd:double ;
+    ex:standardDeviation "27.67465"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_004_residualStressRV .
+
+ex:hardSample_004_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[30.35]],"covariances":[[765.886253]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_004_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_004"@en ;
+    im:isMeasuredBy ex:hardSample_004_hardnessMeasurement .
+
+ex:hardSample_004_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "440"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_005 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_005_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_005_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_005_hardnessCharacteristic .
+
+ex:hardSample_005_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_005"@en ;
+    im:isMeasuredBy ex:hardSample_005_rmsMeasurement .
+
+ex:hardSample_005_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "683.24167"^^xsd:double ;
+    ex:standardDeviation "26.30516"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_005_rmsRV .
+
+ex:hardSample_005_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[683.24167]],"covariances":[[691.961443]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_005_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_005"@en ;
+    im:isMeasuredBy ex:hardSample_005_residualStressMeasurement .
+
+ex:hardSample_005_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "41.075"^^xsd:double ;
+    ex:standardDeviation "12.21632"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_005_residualStressRV .
+
+ex:hardSample_005_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[41.075]],"covariances":[[149.238474]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_005_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_005"@en ;
+    im:isMeasuredBy ex:hardSample_005_hardnessMeasurement .
+
+ex:hardSample_005_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "380"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_006 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_006_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_006_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_006_hardnessCharacteristic .
+
+ex:hardSample_006_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_006"@en ;
+    im:isMeasuredBy ex:hardSample_006_rmsMeasurement .
+
+ex:hardSample_006_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "689.50833"^^xsd:double ;
+    ex:standardDeviation "35.80222"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_006_rmsRV .
+
+ex:hardSample_006_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[689.50833]],"covariances":[[1281.798957]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_006_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_006"@en ;
+    im:isMeasuredBy ex:hardSample_006_residualStressMeasurement .
+
+ex:hardSample_006_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "32.96667"^^xsd:double ;
+    ex:standardDeviation "12.35273"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_006_residualStressRV .
+
+ex:hardSample_006_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[32.96667]],"covariances":[[152.589938]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_006_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_006"@en ;
+    im:isMeasuredBy ex:hardSample_006_hardnessMeasurement .
+
+ex:hardSample_006_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "380"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_007 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_007_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_007_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_007_hardnessCharacteristic .
+
+ex:hardSample_007_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_007"@en ;
+    im:isMeasuredBy ex:hardSample_007_rmsMeasurement .
+
+ex:hardSample_007_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "849.53861"^^xsd:double ;
+    ex:standardDeviation "29.28214"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_007_rmsRV .
+
+ex:hardSample_007_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[849.53861]],"covariances":[[857.443723]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_007_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_007"@en ;
+    im:isMeasuredBy ex:hardSample_007_residualStressMeasurement .
+
+ex:hardSample_007_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "7.99167"^^xsd:double ;
+    ex:standardDeviation "8.29726"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_007_residualStressRV .
+
+ex:hardSample_007_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[7.99167]],"covariances":[[68.844524]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_007_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_007"@en ;
+    im:isMeasuredBy ex:hardSample_007_hardnessMeasurement .
+
+ex:hardSample_007_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_008 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_008_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_008_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_008_hardnessCharacteristic .
+
+ex:hardSample_008_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_008"@en ;
+    im:isMeasuredBy ex:hardSample_008_rmsMeasurement .
+
+ex:hardSample_008_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "859.35333"^^xsd:double ;
+    ex:standardDeviation "32.50889"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_008_rmsRV .
+
+ex:hardSample_008_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[859.35333]],"covariances":[[1056.827929]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_008_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_008"@en ;
+    im:isMeasuredBy ex:hardSample_008_residualStressMeasurement .
+
+ex:hardSample_008_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "6.6"^^xsd:double ;
+    ex:standardDeviation "10.03467"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_008_residualStressRV .
+
+ex:hardSample_008_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[6.6]],"covariances":[[100.694602]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_008_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_008"@en ;
+    im:isMeasuredBy ex:hardSample_008_hardnessMeasurement .
+
+ex:hardSample_008_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_009 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_009_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_009_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_009_hardnessCharacteristic .
+
+ex:hardSample_009_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_009"@en ;
+    im:isMeasuredBy ex:hardSample_009_rmsMeasurement .
+
+ex:hardSample_009_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "1125.32"^^xsd:double ;
+    ex:standardDeviation "25.89053"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_009_rmsRV .
+
+ex:hardSample_009_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1125.31556]],"covariances":[[670.319544]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_009_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_009"@en ;
+    im:isMeasuredBy ex:hardSample_009_residualStressMeasurement .
+
+ex:hardSample_009_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "20.7"^^xsd:double ;
+    ex:standardDeviation "5.51345"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_009_residualStressRV .
+
+ex:hardSample_009_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[20.7]],"covariances":[[30.398131]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_009_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_009"@en ;
+    im:isMeasuredBy ex:hardSample_009_hardnessMeasurement .
+
+ex:hardSample_009_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "260"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_010 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC25_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_010_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_010_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_010_hardnessCharacteristic .
+
+ex:hardSample_010_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_010"@en ;
+    im:isMeasuredBy ex:hardSample_010_rmsMeasurement .
+
+ex:hardSample_010_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "1104.72"^^xsd:double ;
+    ex:standardDeviation "27.09922"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_010_rmsRV .
+
+ex:hardSample_010_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1104.71556]],"covariances":[[734.367725]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_010_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_010"@en ;
+    im:isMeasuredBy ex:hardSample_010_residualStressMeasurement .
+
+ex:hardSample_010_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "19.86667"^^xsd:double ;
+    ex:standardDeviation "3.96217"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_010_residualStressRV .
+
+ex:hardSample_010_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[19.86667]],"covariances":[[15.698791]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_010_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_010"@en ;
+    im:isMeasuredBy ex:hardSample_010_hardnessMeasurement .
+
+ex:hardSample_010_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "260"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_011 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_011_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_011_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_011_hardnessCharacteristic .
+
+ex:hardSample_011_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_011"@en ;
+    im:isMeasuredBy ex:hardSample_011_rmsMeasurement .
+
+ex:hardSample_011_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "59.13417"^^xsd:double ;
+    ex:standardDeviation "3.85743"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_011_rmsRV .
+
+ex:hardSample_011_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[59.13417]],"covariances":[[14.879766]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_011_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_011"@en ;
+    im:isMeasuredBy ex:hardSample_011_residualStressMeasurement .
+
+ex:hardSample_011_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "6.59167"^^xsd:double ;
+    ex:standardDeviation "25.0402"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_011_residualStressRV .
+
+ex:hardSample_011_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[6.59167]],"covariances":[[627.011616]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_011_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_011"@en ;
+    im:isMeasuredBy ex:hardSample_011_hardnessMeasurement .
+
+ex:hardSample_011_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "550"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_012 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_012_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_012_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_012_hardnessCharacteristic .
+
+ex:hardSample_012_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_012"@en ;
+    im:isMeasuredBy ex:hardSample_012_rmsMeasurement .
+
+ex:hardSample_012_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "58.885"^^xsd:double ;
+    ex:standardDeviation "4.64832"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_012_rmsRV .
+
+ex:hardSample_012_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[58.885]],"covariances":[[21.606879]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_012_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_012"@en ;
+    im:isMeasuredBy ex:hardSample_012_residualStressMeasurement .
+
+ex:hardSample_012_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "12.2"^^xsd:double ;
+    ex:standardDeviation "31.7795"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_012_residualStressRV .
+
+ex:hardSample_012_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[12.2]],"covariances":[[1009.93662]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_012_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_012"@en ;
+    im:isMeasuredBy ex:hardSample_012_hardnessMeasurement .
+
+ex:hardSample_012_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "550"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_013 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_013_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_013_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_013_hardnessCharacteristic .
+
+ex:hardSample_013_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_013"@en ;
+    im:isMeasuredBy ex:hardSample_013_rmsMeasurement .
+
+ex:hardSample_013_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "93.81667"^^xsd:double ;
+    ex:standardDeviation "10.07869"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_013_rmsRV .
+
+ex:hardSample_013_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[93.81667]],"covariances":[[101.579992]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_013_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_013"@en ;
+    im:isMeasuredBy ex:hardSample_013_residualStressMeasurement .
+
+ex:hardSample_013_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "15.99167"^^xsd:double ;
+    ex:standardDeviation "18.19328"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_013_residualStressRV .
+
+ex:hardSample_013_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[15.99167]],"covariances":[[330.995437]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_013_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_013"@en ;
+    im:isMeasuredBy ex:hardSample_013_hardnessMeasurement .
+
+ex:hardSample_013_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_014 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_014_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_014_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_014_hardnessCharacteristic .
+
+ex:hardSample_014_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_014"@en ;
+    im:isMeasuredBy ex:hardSample_014_rmsMeasurement .
+
+ex:hardSample_014_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "93.96"^^xsd:double ;
+    ex:standardDeviation "7.24078"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_014_rmsRV .
+
+ex:hardSample_014_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[93.96]],"covariances":[[52.428895]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_014_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_014"@en ;
+    im:isMeasuredBy ex:hardSample_014_residualStressMeasurement .
+
+ex:hardSample_014_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-7.375"^^xsd:double ;
+    ex:standardDeviation "30.61206"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_014_residualStressRV .
+
+ex:hardSample_014_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-7.375]],"covariances":[[937.098217]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_014_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_014"@en ;
+    im:isMeasuredBy ex:hardSample_014_hardnessMeasurement .
+
+ex:hardSample_014_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_015 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_015_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_015_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_015_hardnessCharacteristic .
+
+ex:hardSample_015_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_015"@en ;
+    im:isMeasuredBy ex:hardSample_015_rmsMeasurement .
+
+ex:hardSample_015_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "525.88528"^^xsd:double ;
+    ex:standardDeviation "30.45549"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_015_rmsRV .
+
+ex:hardSample_015_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[525.88528]],"covariances":[[927.536871]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_015_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_015"@en ;
+    im:isMeasuredBy ex:hardSample_015_residualStressMeasurement .
+
+ex:hardSample_015_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-0.70833"^^xsd:double ;
+    ex:standardDeviation "7.75951"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_015_residualStressRV .
+
+ex:hardSample_015_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-0.70833]],"covariances":[[60.209995]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_015_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_015"@en ;
+    im:isMeasuredBy ex:hardSample_015_hardnessMeasurement .
+
+ex:hardSample_015_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "420"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_016 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_016_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_016_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_016_hardnessCharacteristic .
+
+ex:hardSample_016_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_016"@en ;
+    im:isMeasuredBy ex:hardSample_016_rmsMeasurement .
+
+ex:hardSample_016_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "492.87278"^^xsd:double ;
+    ex:standardDeviation "27.11496"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_016_rmsRV .
+
+ex:hardSample_016_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[492.87278]],"covariances":[[735.221056]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_016_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_016"@en ;
+    im:isMeasuredBy ex:hardSample_016_residualStressMeasurement .
+
+ex:hardSample_016_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-9.26667"^^xsd:double ;
+    ex:standardDeviation "13.08068"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_016_residualStressRV .
+
+ex:hardSample_016_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-9.26667]],"covariances":[[171.104189]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_016_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_016"@en ;
+    im:isMeasuredBy ex:hardSample_016_hardnessMeasurement .
+
+ex:hardSample_016_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "420"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_017 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_017_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_017_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_017_hardnessCharacteristic .
+
+ex:hardSample_017_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_017"@en ;
+    im:isMeasuredBy ex:hardSample_017_rmsMeasurement .
+
+ex:hardSample_017_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "685.03556"^^xsd:double ;
+    ex:standardDeviation "26.33103"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_017_rmsRV .
+
+ex:hardSample_017_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[685.03556]],"covariances":[[693.323141]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_017_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_017"@en ;
+    im:isMeasuredBy ex:hardSample_017_residualStressMeasurement .
+
+ex:hardSample_017_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "3.075"^^xsd:double ;
+    ex:standardDeviation "5.691"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_017_residualStressRV .
+
+ex:hardSample_017_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[3.075]],"covariances":[[32.387481]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_017_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_017"@en ;
+    im:isMeasuredBy ex:hardSample_017_hardnessMeasurement .
+
+ex:hardSample_017_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "350"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_018 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_018_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_018_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_018_hardnessCharacteristic .
+
+ex:hardSample_018_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_018"@en ;
+    im:isMeasuredBy ex:hardSample_018_rmsMeasurement .
+
+ex:hardSample_018_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "652.50667"^^xsd:double ;
+    ex:standardDeviation "37.6972"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_018_rmsRV .
+
+ex:hardSample_018_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[652.50667]],"covariances":[[1421.078888]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_018_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_018"@en ;
+    im:isMeasuredBy ex:hardSample_018_residualStressMeasurement .
+
+ex:hardSample_018_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "3.6"^^xsd:double ;
+    ex:standardDeviation "2.09415"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_018_residualStressRV .
+
+ex:hardSample_018_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[3.6]],"covariances":[[4.385464]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_018_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_018"@en ;
+    im:isMeasuredBy ex:hardSample_018_hardnessMeasurement .
+
+ex:hardSample_018_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "350"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_019 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_019_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_019_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_019_hardnessCharacteristic .
+
+ex:hardSample_019_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_019"@en ;
+    im:isMeasuredBy ex:hardSample_019_rmsMeasurement .
+
+ex:hardSample_019_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "792.49472"^^xsd:double ;
+    ex:standardDeviation "42.57292"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_019_rmsRV .
+
+ex:hardSample_019_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[792.49472]],"covariances":[[1812.453517]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_019_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_019"@en ;
+    im:isMeasuredBy ex:hardSample_019_residualStressMeasurement .
+
+ex:hardSample_019_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "25.475"^^xsd:double ;
+    ex:standardDeviation "4.09881"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_019_residualStressRV .
+
+ex:hardSample_019_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[25.475]],"covariances":[[16.800243]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_019_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_019"@en ;
+    im:isMeasuredBy ex:hardSample_019_hardnessMeasurement .
+
+ex:hardSample_019_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_020 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC34_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_020_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_020_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_020_hardnessCharacteristic .
+
+ex:hardSample_020_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_020"@en ;
+    im:isMeasuredBy ex:hardSample_020_rmsMeasurement .
+
+ex:hardSample_020_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "751.54028"^^xsd:double ;
+    ex:standardDeviation "54.28908"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_020_rmsRV .
+
+ex:hardSample_020_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[751.54028]],"covariances":[[2947.304207]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_020_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_020"@en ;
+    im:isMeasuredBy ex:hardSample_020_residualStressMeasurement .
+
+ex:hardSample_020_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "13.61667"^^xsd:double ;
+    ex:standardDeviation "4.59304"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_020_residualStressRV .
+
+ex:hardSample_020_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[13.61667]],"covariances":[[21.096016]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_020_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_020"@en ;
+    im:isMeasuredBy ex:hardSample_020_hardnessMeasurement .
+
+ex:hardSample_020_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_021 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_021_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_021_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_021_hardnessCharacteristic .
+
+ex:hardSample_021_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_021"@en ;
+    im:isMeasuredBy ex:hardSample_021_rmsMeasurement .
+
+ex:hardSample_021_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "66.63528"^^xsd:double ;
+    ex:standardDeviation "2.34627"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_021_rmsRV .
+
+ex:hardSample_021_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[66.63528]],"covariances":[[5.504983]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_021_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_021"@en ;
+    im:isMeasuredBy ex:hardSample_021_residualStressMeasurement .
+
+ex:hardSample_021_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-6.1"^^xsd:double ;
+    ex:standardDeviation "23.88834"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_021_residualStressRV .
+
+ex:hardSample_021_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-6.1]],"covariances":[[570.652788]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_021_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_021"@en ;
+    im:isMeasuredBy ex:hardSample_021_hardnessMeasurement .
+
+ex:hardSample_021_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "600"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_022 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_022_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_022_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_022_hardnessCharacteristic .
+
+ex:hardSample_022_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_022"@en ;
+    im:isMeasuredBy ex:hardSample_022_rmsMeasurement .
+
+ex:hardSample_022_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "61.54444"^^xsd:double ;
+    ex:standardDeviation "8.81437"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_022_rmsRV .
+
+ex:hardSample_022_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[61.54444]],"covariances":[[77.693118]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_022_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_022"@en ;
+    im:isMeasuredBy ex:hardSample_022_residualStressMeasurement .
+
+ex:hardSample_022_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "0.9"^^xsd:double ;
+    ex:standardDeviation "15.10858"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_022_residualStressRV .
+
+ex:hardSample_022_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[0.9]],"covariances":[[228.26919]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_022_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_022"@en ;
+    im:isMeasuredBy ex:hardSample_022_hardnessMeasurement .
+
+ex:hardSample_022_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "600"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_023 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_023_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_023_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_023_hardnessCharacteristic .
+
+ex:hardSample_023_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_023"@en ;
+    im:isMeasuredBy ex:hardSample_023_rmsMeasurement .
+
+ex:hardSample_023_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "99.10417"^^xsd:double ;
+    ex:standardDeviation "5.2306"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_023_rmsRV .
+
+ex:hardSample_023_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[99.10417]],"covariances":[[27.359176]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_023_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_023"@en ;
+    im:isMeasuredBy ex:hardSample_023_residualStressMeasurement .
+
+ex:hardSample_023_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "12.3"^^xsd:double ;
+    ex:standardDeviation "9.08675"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_023_residualStressRV .
+
+ex:hardSample_023_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[12.3]],"covariances":[[82.569026]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_023_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_023"@en ;
+    im:isMeasuredBy ex:hardSample_023_hardnessMeasurement .
+
+ex:hardSample_023_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "470"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_024 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_024_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_024_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_024_hardnessCharacteristic .
+
+ex:hardSample_024_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_024"@en ;
+    im:isMeasuredBy ex:hardSample_024_rmsMeasurement .
+
+ex:hardSample_024_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "96.16861"^^xsd:double ;
+    ex:standardDeviation "5.687"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_024_rmsRV .
+
+ex:hardSample_024_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[96.16861]],"covariances":[[32.341969]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_024_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_024"@en ;
+    im:isMeasuredBy ex:hardSample_024_residualStressMeasurement .
+
+ex:hardSample_024_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-11.66667"^^xsd:double ;
+    ex:standardDeviation "23.85697"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_024_residualStressRV .
+
+ex:hardSample_024_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-11.66667]],"covariances":[[569.155018]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_024_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_024"@en ;
+    im:isMeasuredBy ex:hardSample_024_hardnessMeasurement .
+
+ex:hardSample_024_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "470"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_025 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_025_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_025_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_025_hardnessCharacteristic .
+
+ex:hardSample_025_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_025"@en ;
+    im:isMeasuredBy ex:hardSample_025_rmsMeasurement .
+
+ex:hardSample_025_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "496.42556"^^xsd:double ;
+    ex:standardDeviation "25.33569"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_025_rmsRV .
+
+ex:hardSample_025_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[496.42556]],"covariances":[[641.897188]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_025_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_025"@en ;
+    im:isMeasuredBy ex:hardSample_025_residualStressMeasurement .
+
+ex:hardSample_025_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "12.84167"^^xsd:double ;
+    ex:standardDeviation "8.97202"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_025_residualStressRV .
+
+ex:hardSample_025_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[12.84167]],"covariances":[[80.497143]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_025_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_025"@en ;
+    im:isMeasuredBy ex:hardSample_025_hardnessMeasurement .
+
+ex:hardSample_025_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_026 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_026_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_026_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_026_hardnessCharacteristic .
+
+ex:hardSample_026_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_026"@en ;
+    im:isMeasuredBy ex:hardSample_026_rmsMeasurement .
+
+ex:hardSample_026_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "526.7375"^^xsd:double ;
+    ex:standardDeviation "24.84474"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_026_rmsRV .
+
+ex:hardSample_026_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[526.7375]],"covariances":[[617.261106]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_026_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_026"@en ;
+    im:isMeasuredBy ex:hardSample_026_residualStressMeasurement .
+
+ex:hardSample_026_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "7.075"^^xsd:double ;
+    ex:standardDeviation "11.41483"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_026_residualStressRV .
+
+ex:hardSample_026_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[7.075]],"covariances":[[130.298344]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_026_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_026"@en ;
+    im:isMeasuredBy ex:hardSample_026_hardnessMeasurement .
+
+ex:hardSample_026_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_027 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_027_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_027_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_027_hardnessCharacteristic .
+
+ex:hardSample_027_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_027"@en ;
+    im:isMeasuredBy ex:hardSample_027_rmsMeasurement .
+
+ex:hardSample_027_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "635.89333"^^xsd:double ;
+    ex:standardDeviation "19.16387"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_027_rmsRV .
+
+ex:hardSample_027_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[635.89333]],"covariances":[[367.253913]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_027_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_027"@en ;
+    im:isMeasuredBy ex:hardSample_027_residualStressMeasurement .
+
+ex:hardSample_027_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "5.85833"^^xsd:double ;
+    ex:standardDeviation "5.00953"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_027_residualStressRV .
+
+ex:hardSample_027_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[5.85833]],"covariances":[[25.095391]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_027_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_027"@en ;
+    im:isMeasuredBy ex:hardSample_027_hardnessMeasurement .
+
+ex:hardSample_027_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "360"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_028 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_028_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_028_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_028_hardnessCharacteristic .
+
+ex:hardSample_028_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_028"@en ;
+    im:isMeasuredBy ex:hardSample_028_rmsMeasurement .
+
+ex:hardSample_028_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "627.52111"^^xsd:double ;
+    ex:standardDeviation "25.9248"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_028_rmsRV .
+
+ex:hardSample_028_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[627.52111]],"covariances":[[672.095255]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_028_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_028"@en ;
+    im:isMeasuredBy ex:hardSample_028_residualStressMeasurement .
+
+ex:hardSample_028_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "2.75833"^^xsd:double ;
+    ex:standardDeviation "4.99044"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_028_residualStressRV .
+
+ex:hardSample_028_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[2.75833]],"covariances":[[24.904491]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_028_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_028"@en ;
+    im:isMeasuredBy ex:hardSample_028_hardnessMeasurement .
+
+ex:hardSample_028_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "360"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_029 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_029_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_029_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_029_hardnessCharacteristic .
+
+ex:hardSample_029_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_029"@en ;
+    im:isMeasuredBy ex:hardSample_029_rmsMeasurement .
+
+ex:hardSample_029_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "744.915"^^xsd:double ;
+    ex:standardDeviation "30.87143"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_029_rmsRV .
+
+ex:hardSample_029_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[744.915]],"covariances":[[953.04519]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_029_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_029"@en ;
+    im:isMeasuredBy ex:hardSample_029_residualStressMeasurement .
+
+ex:hardSample_029_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "26.58333"^^xsd:double ;
+    ex:standardDeviation "2.73424"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_029_residualStressRV .
+
+ex:hardSample_029_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[26.58333]],"covariances":[[7.476068]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_029_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_029"@en ;
+    im:isMeasuredBy ex:hardSample_029_hardnessMeasurement .
+
+ex:hardSample_029_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_030 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC42_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_030_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_030_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_030_hardnessCharacteristic .
+
+ex:hardSample_030_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_030"@en ;
+    im:isMeasuredBy ex:hardSample_030_rmsMeasurement .
+
+ex:hardSample_030_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "738.23694"^^xsd:double ;
+    ex:standardDeviation "52.28928"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_030_rmsRV .
+
+ex:hardSample_030_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[738.23694]],"covariances":[[2734.168803]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_030_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_030"@en ;
+    im:isMeasuredBy ex:hardSample_030_residualStressMeasurement .
+
+ex:hardSample_030_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "24.76667"^^xsd:double ;
+    ex:standardDeviation "4.44345"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_030_residualStressRV .
+
+ex:hardSample_030_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[24.76667]],"covariances":[[19.744248]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_030_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_030"@en ;
+    im:isMeasuredBy ex:hardSample_030_hardnessMeasurement .
+
+ex:hardSample_030_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_031 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_031_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_031_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_031_hardnessCharacteristic .
+
+ex:hardSample_031_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_031"@en ;
+    im:isMeasuredBy ex:hardSample_031_rmsMeasurement .
+
+ex:hardSample_031_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "70.34361"^^xsd:double ;
+    ex:standardDeviation "4.6859"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_031_rmsRV .
+
+ex:hardSample_031_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[70.34361]],"covariances":[[21.957659]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_031_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_031"@en ;
+    im:isMeasuredBy ex:hardSample_031_residualStressMeasurement .
+
+ex:hardSample_031_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "78.79167"^^xsd:double ;
+    ex:standardDeviation "23.38937"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_031_residualStressRV .
+
+ex:hardSample_031_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[78.79167]],"covariances":[[547.062629]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_031_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_031"@en ;
+    im:isMeasuredBy ex:hardSample_031_hardnessMeasurement .
+
+ex:hardSample_031_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "660"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_032 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T30 ;
+    ex:hasRMSCharacteristic ex:hardSample_032_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_032_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_032_hardnessCharacteristic .
+
+ex:hardSample_032_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_032"@en ;
+    im:isMeasuredBy ex:hardSample_032_rmsMeasurement .
+
+ex:hardSample_032_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "69.62139"^^xsd:double ;
+    ex:standardDeviation "3.92493"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_032_rmsRV .
+
+ex:hardSample_032_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[69.62139]],"covariances":[[15.405076]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_032_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_032"@en ;
+    im:isMeasuredBy ex:hardSample_032_residualStressMeasurement .
+
+ex:hardSample_032_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "83.78333"^^xsd:double ;
+    ex:standardDeviation "22.99568"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_032_residualStressRV .
+
+ex:hardSample_032_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[83.78333]],"covariances":[[528.801299]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_032_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_032"@en ;
+    im:isMeasuredBy ex:hardSample_032_hardnessMeasurement .
+
+ex:hardSample_032_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "660"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_033 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_033_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_033_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_033_hardnessCharacteristic .
+
+ex:hardSample_033_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_033"@en ;
+    im:isMeasuredBy ex:hardSample_033_rmsMeasurement .
+
+ex:hardSample_033_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "93.86194"^^xsd:double ;
+    ex:standardDeviation "6.71735"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_033_rmsRV .
+
+ex:hardSample_033_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[93.86194]],"covariances":[[45.122791]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_033_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_033"@en ;
+    im:isMeasuredBy ex:hardSample_033_residualStressMeasurement .
+
+ex:hardSample_033_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "41.09167"^^xsd:double ;
+    ex:standardDeviation "18.43817"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_033_residualStressRV .
+
+ex:hardSample_033_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[41.09167]],"covariances":[[339.966113]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_033_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_033"@en ;
+    im:isMeasuredBy ex:hardSample_033_hardnessMeasurement .
+
+ex:hardSample_033_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "600"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_034 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T250 ;
+    ex:hasRMSCharacteristic ex:hardSample_034_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_034_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_034_hardnessCharacteristic .
+
+ex:hardSample_034_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_034"@en ;
+    im:isMeasuredBy ex:hardSample_034_rmsMeasurement .
+
+ex:hardSample_034_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "84.95389"^^xsd:double ;
+    ex:standardDeviation "8.94298"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_034_rmsRV .
+
+ex:hardSample_034_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[84.95389]],"covariances":[[79.976891]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_034_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_034"@en ;
+    im:isMeasuredBy ex:hardSample_034_residualStressMeasurement .
+
+ex:hardSample_034_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "67.64167"^^xsd:double ;
+    ex:standardDeviation "14.5766"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_034_residualStressRV .
+
+ex:hardSample_034_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[67.64167]],"covariances":[[212.477268]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_034_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_034"@en ;
+    im:isMeasuredBy ex:hardSample_034_hardnessMeasurement .
+
+ex:hardSample_034_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "600"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_035 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_035_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_035_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_035_hardnessCharacteristic .
+
+ex:hardSample_035_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_035"@en ;
+    im:isMeasuredBy ex:hardSample_035_rmsMeasurement .
+
+ex:hardSample_035_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "443.97111"^^xsd:double ;
+    ex:standardDeviation "17.68168"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_035_rmsRV .
+
+ex:hardSample_035_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[443.97111]],"covariances":[[312.641808]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_035_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_035"@en ;
+    im:isMeasuredBy ex:hardSample_035_residualStressMeasurement .
+
+ex:hardSample_035_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "47.00833"^^xsd:double ;
+    ex:standardDeviation "9.22688"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_035_residualStressRV .
+
+ex:hardSample_035_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[47.00833]],"covariances":[[85.135315]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_035_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_035"@en ;
+    im:isMeasuredBy ex:hardSample_035_hardnessMeasurement .
+
+ex:hardSample_035_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "510"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_036 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T375 ;
+    ex:hasRMSCharacteristic ex:hardSample_036_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_036_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_036_hardnessCharacteristic .
+
+ex:hardSample_036_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_036"@en ;
+    im:isMeasuredBy ex:hardSample_036_rmsMeasurement .
+
+ex:hardSample_036_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "420.17611"^^xsd:double ;
+    ex:standardDeviation "40.4775"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_036_rmsRV .
+
+ex:hardSample_036_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[420.17611]],"covariances":[[1638.428006]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_036_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_036"@en ;
+    im:isMeasuredBy ex:hardSample_036_residualStressMeasurement .
+
+ex:hardSample_036_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "45.95833"^^xsd:double ;
+    ex:standardDeviation "8.06682"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_036_residualStressRV .
+
+ex:hardSample_036_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[45.95833]],"covariances":[[65.073585]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_036_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_036"@en ;
+    im:isMeasuredBy ex:hardSample_036_hardnessMeasurement .
+
+ex:hardSample_036_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "510"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_037 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_037_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_037_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_037_hardnessCharacteristic .
+
+ex:hardSample_037_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_037"@en ;
+    im:isMeasuredBy ex:hardSample_037_rmsMeasurement .
+
+ex:hardSample_037_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "534.06667"^^xsd:double ;
+    ex:standardDeviation "31.71513"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_037_rmsRV .
+
+ex:hardSample_037_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[534.06667]],"covariances":[[1005.849471]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_037_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_037"@en ;
+    im:isMeasuredBy ex:hardSample_037_residualStressMeasurement .
+
+ex:hardSample_037_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "6.6"^^xsd:double ;
+    ex:standardDeviation "6.39346"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_037_residualStressRV .
+
+ex:hardSample_037_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[6.6]],"covariances":[[40.876331]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_037_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_037"@en ;
+    im:isMeasuredBy ex:hardSample_037_hardnessMeasurement .
+
+ex:hardSample_037_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_038 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T550 ;
+    ex:hasRMSCharacteristic ex:hardSample_038_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_038_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_038_hardnessCharacteristic .
+
+ex:hardSample_038_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_038"@en ;
+    im:isMeasuredBy ex:hardSample_038_rmsMeasurement .
+
+ex:hardSample_038_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "523.17944"^^xsd:double ;
+    ex:standardDeviation "29.37695"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_038_rmsRV .
+
+ex:hardSample_038_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[523.17944]],"covariances":[[863.005191]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_038_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_038"@en ;
+    im:isMeasuredBy ex:hardSample_038_residualStressMeasurement .
+
+ex:hardSample_038_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "6.975"^^xsd:double ;
+    ex:standardDeviation "9.10026"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_038_residualStressRV .
+
+ex:hardSample_038_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[6.975]],"covariances":[[82.814732]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_038_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_038"@en ;
+    im:isMeasuredBy ex:hardSample_038_hardnessMeasurement .
+
+ex:hardSample_038_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_039 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_039_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_039_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_039_hardnessCharacteristic .
+
+ex:hardSample_039_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_039"@en ;
+    im:isMeasuredBy ex:hardSample_039_rmsMeasurement .
+
+ex:hardSample_039_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "729.31389"^^xsd:double ;
+    ex:standardDeviation "31.3857"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_039_rmsRV .
+
+ex:hardSample_039_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[729.31389]],"covariances":[[985.062164]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_039_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_039"@en ;
+    im:isMeasuredBy ex:hardSample_039_residualStressMeasurement .
+
+ex:hardSample_039_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "22.325"^^xsd:double ;
+    ex:standardDeviation "3.3347"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_039_residualStressRV .
+
+ex:hardSample_039_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[22.325]],"covariances":[[11.120224]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_039_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_039"@en ;
+    im:isMeasuredBy ex:hardSample_039_hardnessMeasurement .
+
+ex:hardSample_039_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:hardSample_040 a ex:HardnessRmsSample ;
+    ex:sourceDataset ex:DataHardnessTempRMSReduced ;
+    ex:hasProcessCondition ex:hardCond_CC50_T625 ;
+    ex:hasRMSCharacteristic ex:hardSample_040_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:hardSample_040_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:hardSample_040_hardnessCharacteristic .
+
+ex:hardSample_040_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for hardSample_040"@en ;
+    im:isMeasuredBy ex:hardSample_040_rmsMeasurement .
+
+ex:hardSample_040_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "644.09889"^^xsd:double ;
+    ex:standardDeviation "33.87685"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:hardSample_040_rmsRV .
+
+ex:hardSample_040_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[644.09889]],"covariances":[[1147.640966]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_040_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for hardSample_040"@en ;
+    im:isMeasuredBy ex:hardSample_040_residualStressMeasurement .
+
+ex:hardSample_040_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "23.30833"^^xsd:double ;
+    ex:standardDeviation "4.16161"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:hardSample_040_residualStressRV .
+
+ex:hardSample_040_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[23.30833]],"covariances":[[17.318998]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_040_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for hardSample_040"@en ;
+    im:isMeasuredBy ex:hardSample_040_hardnessMeasurement .
+
+ex:hardSample_040_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:c02Sample_001 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "1"^^xsd:integer ;
+    ex:laserPower "2350"^^xsd:double ;
+    ex:processingSpeed "40"^^xsd:double ;
+    ex:lineEnergy "58.75"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_001_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_001_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_001_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_001_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_001_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_001_RelativeDensityCharacteristic .
+
+ex:c02Sample_001_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_SaMeasurement .
+
+ex:c02Sample_001_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "37.549"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_001_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_SqMeasurement .
+
+ex:c02Sample_001_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "50.675333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_001_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_RaMeasurement .
+
+ex:c02Sample_001_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.277444"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_001_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_RqMeasurement .
+
+ex:c02Sample_001_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "51.163"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_001_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_RzMeasurement .
+
+ex:c02Sample_001_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "404.320444"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_001_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_001"@en ;
+    im:isMeasuredBy ex:c02Sample_001_RelativeDensityMeasurement .
+
+ex:c02Sample_001_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.513333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_003 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "3"^^xsd:integer ;
+    ex:laserPower "2350"^^xsd:double ;
+    ex:processingSpeed "50"^^xsd:double ;
+    ex:lineEnergy "47"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_003_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_003_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_003_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_003_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_003_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_003_RelativeDensityCharacteristic .
+
+ex:c02Sample_003_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_SaMeasurement .
+
+ex:c02Sample_003_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.966"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_003_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_SqMeasurement .
+
+ex:c02Sample_003_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "50.950333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_003_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_RaMeasurement .
+
+ex:c02Sample_003_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "36.716111"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_003_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_RqMeasurement .
+
+ex:c02Sample_003_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "48.676444"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_003_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_RzMeasurement .
+
+ex:c02Sample_003_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "376.815"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_003_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_003"@en ;
+    im:isMeasuredBy ex:c02Sample_003_RelativeDensityMeasurement .
+
+ex:c02Sample_003_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.167"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_005 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "5"^^xsd:integer ;
+    ex:laserPower "2350"^^xsd:double ;
+    ex:processingSpeed "60"^^xsd:double ;
+    ex:lineEnergy "39.166667"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_005_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_005_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_005_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_005_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_005_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_005_RelativeDensityCharacteristic .
+
+ex:c02Sample_005_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_SaMeasurement .
+
+ex:c02Sample_005_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "34.671"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_005_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_SqMeasurement .
+
+ex:c02Sample_005_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "47.353333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_005_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_RaMeasurement .
+
+ex:c02Sample_005_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "32.893889"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_005_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_RqMeasurement .
+
+ex:c02Sample_005_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "44.959222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_005_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_RzMeasurement .
+
+ex:c02Sample_005_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "393.171"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_005_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_005"@en ;
+    im:isMeasuredBy ex:c02Sample_005_RelativeDensityMeasurement .
+
+ex:c02Sample_005_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.304667"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_007 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "7"^^xsd:integer ;
+    ex:laserPower "2425"^^xsd:double ;
+    ex:processingSpeed "45"^^xsd:double ;
+    ex:lineEnergy "53.888889"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_007_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_007_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_007_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_007_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_007_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_007_RelativeDensityCharacteristic .
+
+ex:c02Sample_007_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_SaMeasurement .
+
+ex:c02Sample_007_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "35.318667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_007_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_SqMeasurement .
+
+ex:c02Sample_007_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "48.504667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_007_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_RaMeasurement .
+
+ex:c02Sample_007_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "34.873778"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_007_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_RqMeasurement .
+
+ex:c02Sample_007_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "49.068667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_007_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_RzMeasurement .
+
+ex:c02Sample_007_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "448.546222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_007_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_007"@en ;
+    im:isMeasuredBy ex:c02Sample_007_RelativeDensityMeasurement .
+
+ex:c02Sample_007_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.530333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_008 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "8"^^xsd:integer ;
+    ex:laserPower "2425"^^xsd:double ;
+    ex:processingSpeed "50"^^xsd:double ;
+    ex:lineEnergy "48.5"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_008_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_008_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_008_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_008_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_008_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_008_RelativeDensityCharacteristic .
+
+ex:c02Sample_008_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_SaMeasurement .
+
+ex:c02Sample_008_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.054333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_008_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_SqMeasurement .
+
+ex:c02Sample_008_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "50.209333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_008_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_RaMeasurement .
+
+ex:c02Sample_008_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "37.090889"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_008_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_RqMeasurement .
+
+ex:c02Sample_008_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "48.106556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_008_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_RzMeasurement .
+
+ex:c02Sample_008_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "383.612"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_008_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_008"@en ;
+    im:isMeasuredBy ex:c02Sample_008_RelativeDensityMeasurement .
+
+ex:c02Sample_008_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.738667"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_009 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "9"^^xsd:integer ;
+    ex:laserPower "2425"^^xsd:double ;
+    ex:processingSpeed "55"^^xsd:double ;
+    ex:lineEnergy "44.090909"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_009_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_009_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_009_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_009_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_009_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_009_RelativeDensityCharacteristic .
+
+ex:c02Sample_009_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_SaMeasurement .
+
+ex:c02Sample_009_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "35.033667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_009_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_SqMeasurement .
+
+ex:c02Sample_009_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "47.275"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_009_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_RaMeasurement .
+
+ex:c02Sample_009_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "33.187222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_009_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_RqMeasurement .
+
+ex:c02Sample_009_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "44.758556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_009_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_RzMeasurement .
+
+ex:c02Sample_009_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "413.293222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_009_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_009"@en ;
+    im:isMeasuredBy ex:c02Sample_009_RelativeDensityMeasurement .
+
+ex:c02Sample_009_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.341333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_011 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "11"^^xsd:integer ;
+    ex:laserPower "2500"^^xsd:double ;
+    ex:processingSpeed "40"^^xsd:double ;
+    ex:lineEnergy "62.5"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_011_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_011_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_011_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_011_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_011_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_011_RelativeDensityCharacteristic .
+
+ex:c02Sample_011_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_SaMeasurement .
+
+ex:c02Sample_011_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.580667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_011_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_SqMeasurement .
+
+ex:c02Sample_011_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "51.867"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_011_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_RaMeasurement .
+
+ex:c02Sample_011_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.49"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_011_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_RqMeasurement .
+
+ex:c02Sample_011_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "52.923222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_011_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_RzMeasurement .
+
+ex:c02Sample_011_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "432.655667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_011_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_011"@en ;
+    im:isMeasuredBy ex:c02Sample_011_RelativeDensityMeasurement .
+
+ex:c02Sample_011_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.187333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_012 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "12"^^xsd:integer ;
+    ex:laserPower "2500"^^xsd:double ;
+    ex:processingSpeed "45"^^xsd:double ;
+    ex:lineEnergy "55.555556"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_012_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_012_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_012_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_012_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_012_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_012_RelativeDensityCharacteristic .
+
+ex:c02Sample_012_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_SaMeasurement .
+
+ex:c02Sample_012_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.789667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_012_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_SqMeasurement .
+
+ex:c02Sample_012_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "52.075667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_012_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_RaMeasurement .
+
+ex:c02Sample_012_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "36.288333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_012_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_RqMeasurement .
+
+ex:c02Sample_012_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "48.453111"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_012_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_RzMeasurement .
+
+ex:c02Sample_012_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "368.866"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_012_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_012"@en ;
+    im:isMeasuredBy ex:c02Sample_012_RelativeDensityMeasurement .
+
+ex:c02Sample_012_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.137333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_013 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "13"^^xsd:integer ;
+    ex:laserPower "2500"^^xsd:double ;
+    ex:processingSpeed "50"^^xsd:double ;
+    ex:lineEnergy "50"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_013_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_013_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_013_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_013_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_013_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_013_RelativeDensityCharacteristic .
+
+ex:c02Sample_013_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_SaMeasurement .
+
+ex:c02Sample_013_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "42.710333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_013_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_SqMeasurement .
+
+ex:c02Sample_013_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "56.449333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_013_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_RaMeasurement .
+
+ex:c02Sample_013_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "44.134"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_013_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_RqMeasurement .
+
+ex:c02Sample_013_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "59.187778"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_013_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_RzMeasurement .
+
+ex:c02Sample_013_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "476.321889"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_013_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_013"@en ;
+    im:isMeasuredBy ex:c02Sample_013_RelativeDensityMeasurement .
+
+ex:c02Sample_013_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.255"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_014 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "14"^^xsd:integer ;
+    ex:laserPower "2500"^^xsd:double ;
+    ex:processingSpeed "55"^^xsd:double ;
+    ex:lineEnergy "45.454545"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_014_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_014_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_014_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_014_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_014_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_014_RelativeDensityCharacteristic .
+
+ex:c02Sample_014_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_SaMeasurement .
+
+ex:c02Sample_014_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.291333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_014_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_SqMeasurement .
+
+ex:c02Sample_014_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "51.808"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_014_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_RaMeasurement .
+
+ex:c02Sample_014_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "35.627222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_014_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_RqMeasurement .
+
+ex:c02Sample_014_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "46.686222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_014_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_RzMeasurement .
+
+ex:c02Sample_014_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "360.068667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_014_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_014"@en ;
+    im:isMeasuredBy ex:c02Sample_014_RelativeDensityMeasurement .
+
+ex:c02Sample_014_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.037333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_015 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "15"^^xsd:integer ;
+    ex:laserPower "2500"^^xsd:double ;
+    ex:processingSpeed "60"^^xsd:double ;
+    ex:lineEnergy "41.666667"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_015_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_015_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_015_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_015_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_015_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_015_RelativeDensityCharacteristic .
+
+ex:c02Sample_015_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_SaMeasurement .
+
+ex:c02Sample_015_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "33.648"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_015_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_SqMeasurement .
+
+ex:c02Sample_015_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "46.677"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_015_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_RaMeasurement .
+
+ex:c02Sample_015_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "31.175778"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_015_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_RqMeasurement .
+
+ex:c02Sample_015_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "42.458"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_015_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_RzMeasurement .
+
+ex:c02Sample_015_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "375.290222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_015_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_015"@en ;
+    im:isMeasuredBy ex:c02Sample_015_RelativeDensityMeasurement .
+
+ex:c02Sample_015_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.040333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_017 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "17"^^xsd:integer ;
+    ex:laserPower "2575"^^xsd:double ;
+    ex:processingSpeed "45"^^xsd:double ;
+    ex:lineEnergy "57.222222"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_017_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_017_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_017_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_017_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_017_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_017_RelativeDensityCharacteristic .
+
+ex:c02Sample_017_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_SaMeasurement .
+
+ex:c02Sample_017_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "38.163667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_017_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_SqMeasurement .
+
+ex:c02Sample_017_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "52.136333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_017_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_RaMeasurement .
+
+ex:c02Sample_017_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "36.825111"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_017_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_RqMeasurement .
+
+ex:c02Sample_017_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "49.411333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_017_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_RzMeasurement .
+
+ex:c02Sample_017_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "406.188667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_017_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_017"@en ;
+    im:isMeasuredBy ex:c02Sample_017_RelativeDensityMeasurement .
+
+ex:c02Sample_017_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.106"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_018 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "18"^^xsd:integer ;
+    ex:laserPower "2575"^^xsd:double ;
+    ex:processingSpeed "50"^^xsd:double ;
+    ex:lineEnergy "51.5"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_018_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_018_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_018_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_018_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_018_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_018_RelativeDensityCharacteristic .
+
+ex:c02Sample_018_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_SaMeasurement .
+
+ex:c02Sample_018_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "40.566333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_018_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_SqMeasurement .
+
+ex:c02Sample_018_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "53.378667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_018_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_RaMeasurement .
+
+ex:c02Sample_018_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "36.030667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_018_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_RqMeasurement .
+
+ex:c02Sample_018_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "47.104667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_018_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_RzMeasurement .
+
+ex:c02Sample_018_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "390.383556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_018_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_018"@en ;
+    im:isMeasuredBy ex:c02Sample_018_RelativeDensityMeasurement .
+
+ex:c02Sample_018_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.078667"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_019 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "19"^^xsd:integer ;
+    ex:laserPower "2575"^^xsd:double ;
+    ex:processingSpeed "55"^^xsd:double ;
+    ex:lineEnergy "46.818182"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_019_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_019_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_019_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_019_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_019_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_019_RelativeDensityCharacteristic .
+
+ex:c02Sample_019_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_SaMeasurement .
+
+ex:c02Sample_019_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "35.281"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_019_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_SqMeasurement .
+
+ex:c02Sample_019_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "46.15"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_019_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_RaMeasurement .
+
+ex:c02Sample_019_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "34.429556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_019_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_RqMeasurement .
+
+ex:c02Sample_019_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "45.004556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_019_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_RzMeasurement .
+
+ex:c02Sample_019_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "380.019444"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_019_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_019"@en ;
+    im:isMeasuredBy ex:c02Sample_019_RelativeDensityMeasurement .
+
+ex:c02Sample_019_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.108"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_021 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "21"^^xsd:integer ;
+    ex:laserPower "2650"^^xsd:double ;
+    ex:processingSpeed "40"^^xsd:double ;
+    ex:lineEnergy "66.25"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_021_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_021_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_021_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_021_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_021_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_021_RelativeDensityCharacteristic .
+
+ex:c02Sample_021_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_SaMeasurement .
+
+ex:c02Sample_021_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "33.571"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_021_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_SqMeasurement .
+
+ex:c02Sample_021_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "45.495"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_021_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_RaMeasurement .
+
+ex:c02Sample_021_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "32.7"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_021_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_RqMeasurement .
+
+ex:c02Sample_021_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "43.661556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_021_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_RzMeasurement .
+
+ex:c02Sample_021_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "354.557556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_021_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_021"@en ;
+    im:isMeasuredBy ex:c02Sample_021_RelativeDensityMeasurement .
+
+ex:c02Sample_021_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.122333"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_023 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "23"^^xsd:integer ;
+    ex:laserPower "2650"^^xsd:double ;
+    ex:processingSpeed "50"^^xsd:double ;
+    ex:lineEnergy "53"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_023_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_023_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_023_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_023_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_023_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_023_RelativeDensityCharacteristic .
+
+ex:c02Sample_023_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_SaMeasurement .
+
+ex:c02Sample_023_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "33.479333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_023_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_SqMeasurement .
+
+ex:c02Sample_023_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "45.133333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_023_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_RaMeasurement .
+
+ex:c02Sample_023_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "32.913778"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_023_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_RqMeasurement .
+
+ex:c02Sample_023_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "44.095222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_023_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_RzMeasurement .
+
+ex:c02Sample_023_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "353.563"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_023_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_023"@en ;
+    im:isMeasuredBy ex:c02Sample_023_RelativeDensityMeasurement .
+
+ex:c02Sample_023_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.172667"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:c02Sample_025 a ex:C02SurfaceSample ;
+    ex:sourceDataset ex:DataC02Roughness ;
+    ex:sampleNumber "25"^^xsd:integer ;
+    ex:laserPower "2650"^^xsd:double ;
+    ex:processingSpeed "60"^^xsd:double ;
+    ex:lineEnergy "44.166667"^^xsd:double ;
+    ex:hasSaCharacteristic ex:c02Sample_025_SaCharacteristic ;
+    ex:hasSqCharacteristic ex:c02Sample_025_SqCharacteristic ;
+    ex:hasRaCharacteristic ex:c02Sample_025_RaCharacteristic ;
+    ex:hasRqCharacteristic ex:c02Sample_025_RqCharacteristic ;
+    ex:hasRzCharacteristic ex:c02Sample_025_RzCharacteristic ;
+    ex:hasRelativeDensityCharacteristic ex:c02Sample_025_RelativeDensityCharacteristic .
+
+ex:c02Sample_025_SaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sa characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_SaMeasurement .
+
+ex:c02Sample_025_SaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "34.333667"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_025_SqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Sq characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_SqMeasurement .
+
+ex:c02Sample_025_SqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "46.553"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_025_RaCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Ra characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_RaMeasurement .
+
+ex:c02Sample_025_RaMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "34.695333"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_025_RqCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rq characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_RqMeasurement .
+
+ex:c02Sample_025_RqMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "46.851556"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_025_RzCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Rz characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_RzMeasurement .
+
+ex:c02Sample_025_RzMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "406.062222"^^xsd:double ;
+    om:hasUnit om:micrometre .
+
+ex:c02Sample_025_RelativeDensityCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RelativeDensity characteristic for c02Sample_025"@en ;
+    im:isMeasuredBy ex:c02Sample_025_RelativeDensityMeasurement .
+
+ex:c02Sample_025_RelativeDensityMeasurement a ex:SurfaceRoughnessMeasurement ;
+    om:hasValue "0.058667"^^xsd:double ;
+    om:hasUnit om:percent .
+
+ex:DataC02Roughness ex:hasEmpiricalCharacteristic ex:c02_Sa_empiricalCharacteristic .
+
+ex:c02_Sa_empiricalCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Empirical Sa distribution over C02 samples"@en ;
+    im:isMeasuredBy ex:c02_Sa_empiricalMeasurement .
+
+ex:c02_Sa_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasurement ;
+    om:hasUnit om:micrometre ;
+    uq:representedBy ex:c02_Sa_empiricalRV .
+
+ex:c02_Sa_empiricalRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"bins":[33.479333,35.325533,37.171733,39.017933,40.864133,42.710333],"weights":[0.470588,0.0,0.411765,0.058824,0.058824]}"""^^uq:histLiteral .
+
+ex:DataC02Roughness ex:hasEmpiricalCharacteristic ex:c02_Rq_empiricalCharacteristic .
+
+ex:c02_Rq_empiricalCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Empirical Rq distribution over C02 samples"@en ;
+    im:isMeasuredBy ex:c02_Rq_empiricalMeasurement .
+
+ex:c02_Rq_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasurement ;
+    om:hasUnit om:micrometre ;
+    uq:representedBy ex:c02_Rq_empiricalRV .
+
+ex:c02_Rq_empiricalRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"bins":[42.458,45.803956,49.149911,52.495867,55.841822,59.187778],"weights":[0.352941,0.411765,0.117647,0.058824,0.058824]}"""^^uq:histLiteral .
+
+ex:DataC02Roughness ex:hasEmpiricalCharacteristic ex:c02_RelativeDensity_empiricalCharacteristic .
+
+ex:c02_RelativeDensity_empiricalCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Empirical RelativeDensity distribution over C02 samples"@en ;
+    im:isMeasuredBy ex:c02_RelativeDensity_empiricalMeasurement .
+
+ex:c02_RelativeDensity_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasurement ;
+    om:hasUnit om:percent ;
+    uq:representedBy ex:c02_RelativeDensity_empiricalRV .
+
+ex:c02_RelativeDensity_empiricalRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"bins":[0.037333,0.1776,0.317867,0.458133,0.5984,0.738667],"weights":[0.588235,0.176471,0.058824,0.117647,0.058824]}"""^^uq:histLiteral .
+

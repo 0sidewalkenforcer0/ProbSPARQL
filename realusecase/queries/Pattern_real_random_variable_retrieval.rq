@@ -1,0 +1,22 @@
+PREFIX ex: <https://w3id.org/probsparql/examples/real-manufacturing/>
+PREFIX cfc: <https://w3id.org/circular-factory/ontology/product-structure#>
+PREFIX im: <https://w3id.org/circular-factory/ontology/inspection-measurement#>
+PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# Real-data retrieval query following the current ontology pattern:
+# sample -> measurable characteristic -> measurement -> represented random variable.
+SELECT ?sample ?measurement ?rv ?dist ?unit WHERE {
+  ?sample a ex:HardnessRmsSample ;
+          ex:hasRMSCharacteristic ?char .
+  ?char a im:MeasurableCharacteristic ;
+        im:isMeasuredBy ?measurement .
+  ?measurement om:hasUnit ?unit ;
+               uq:representedBy ?rv .
+  ?rv a uq:RandomVariable ;
+      uq:hasDomain uq:nonNegativeDouble ;
+      uq:hasDistribution ?dist .
+}
+LIMIT 10

@@ -9,6 +9,7 @@ ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data wi
 ## Table of Contents
 
 - [Requirements](#requirements)
+- [Health Check (Recommended)](#health-check-recommended)
 - [Installation](#installation)
 - [Quick Verification](#quick-verification)
 - [Running the SPARQL Endpoint](#running-the-sparql-endpoint)
@@ -42,6 +43,26 @@ sudo apt install openjdk-21-jdk
 
 **Windows:**
 Download from [Adoptium](https://adoptium.net/temurin/releases/?version=21)
+
+---
+
+## Health Check (Recommended)
+
+Before building, run the one-command environment doctor:
+
+```bash
+./doctor.sh
+```
+
+What it checks:
+
+- Java version (must be 21+)
+- Maven version (must be 3.6+)
+- `pom.xml` compatibility settings (Java/Jena versions)
+- Local Jena snapshot artifacts in `~/.m2`
+- API consistency check for `RDFDatatype.canonicalizeLexicalForm(String)`
+
+If any check fails, the script prints copy-paste repair commands.
 
 ---
 
