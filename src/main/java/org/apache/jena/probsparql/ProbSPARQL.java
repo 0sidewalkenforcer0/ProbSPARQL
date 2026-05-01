@@ -2,8 +2,11 @@ package org.apache.jena.probsparql;
 
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.probsparql.datatypes.DirichletDatatype;
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
+import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.probsparql.functions.comparison.PolyJSD;
 import org.apache.jena.probsparql.functions.comparison.SameDistribution;
@@ -57,6 +60,12 @@ import org.slf4j.LoggerFactory;
  * @version 1.0.0-SNAPSHOT
  */
 public class ProbSPARQL {
+
+    private enum DistributionKind {
+        GMM,
+        HISTOGRAM,
+        DIRICHLET
+    }
     
     private static final Logger logger = LoggerFactory.getLogger(ProbSPARQL.class);
     
@@ -200,7 +209,7 @@ public class ProbSPARQL {
     public static double evaluateSimilarity(org.apache.jena.graph.Node leftNode,
                                             org.apache.jena.graph.Node rightNode,
                                             double tolerance) {
-        return new SimilarityEvaluator(tolerance).evaluate(extractGMM(leftNode), extractGMM(rightNode));
+        return evaluateSimilarityInternal(leftNode, rightNode, tolerance, null);
     }
 
     /**
@@ -212,8 +221,7 @@ public class ProbSPARQL {
                                             org.apache.jena.graph.Node rightNode,
                                             double tolerance,
                                             double tailProbability) {
-        return new SimilarityEvaluator(tolerance, tailProbability, tailProbability)
-            .evaluate(extractGMM(leftNode), extractGMM(rightNode));
+        return evaluateSimilarityInternal(leftNode, rightNode, tolerance, tailProbability);
     }
 
     /**
@@ -223,6 +231,16 @@ public class ProbSPARQL {
     public static double legacyJSDivergence(org.apache.jena.graph.Node leftNode,
                                             org.apache.jena.graph.Node rightNode) {
         return SimilarityEvaluator.legacy().evaluate(extractGMM(leftNode), extractGMM(rightNode));
+    }
+
+    public static boolean supportsSimilarityLiteral(org.apache.jena.graph.Node node) {
+        if (node == null || !node.isLiteral()) {
+            return false;
+        }
+        Object value = node.getLiteralValue();
+        return value instanceof GMMValue
+            || value instanceof HistogramValue
+            || value instanceof DirichletValue;
     }
 
     /**
@@ -236,12 +254,82 @@ public class ProbSPARQL {
         return legacyJSDivergence(leftNode, rightNode);
     }
 
-    private static org.apache.jena.probsparql.datatypes.GMMValue extractGMM(org.apache.jena.graph.Node node) {
+    private static double evaluateSimilarityInternal(org.apache.jena.graph.Node leftNode,
+                                                     org.apache.jena.graph.Node rightNode,
+                                                     double tolerance,
+                                                     Double tailProbability) {
+        validateSupportedDistribution(leftNode, "left");
+        validateSupportedDistribution(rightNode, "right");
+        validateDimensionalCompatibility(leftNode, rightNode);
+
+        DistributionKind leftKind = distributionKind(leftNode.getLiteralValue());
+        DistributionKind rightKind = distributionKind(rightNode.getLiteralValue());
+
+        if (leftKind == DistributionKind.GMM && rightKind == DistributionKind.GMM) {
+            GMMValue leftGmm = extractGMM(leftNode);
+            GMMValue rightGmm = extractGMM(rightNode);
+            if (tailProbability == null) {
+                return new SimilarityEvaluator(tolerance).evaluate(leftGmm, rightGmm);
+            }
+            return new SimilarityEvaluator(tolerance, tailProbability, tailProbability)
+                .evaluate(leftGmm, rightGmm);
+        }
+
+        return new PolyJSD().exec(
+            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
+            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
+        ).getDouble();
+    }
+
+    private static GMMValue extractGMM(org.apache.jena.graph.Node node) {
         if (node == null || !node.isLiteral()
-            || !(node.getLiteralValue() instanceof org.apache.jena.probsparql.datatypes.GMMValue gmm)) {
+            || !(node.getLiteralValue() instanceof GMMValue gmm)) {
             throw new IllegalArgumentException("Similarity evaluation requires a GMM literal");
         }
         return gmm;
+    }
+
+    private static void validateSupportedDistribution(org.apache.jena.graph.Node node, String side) {
+        if (!supportsSimilarityLiteral(node)) {
+            String datatype = node == null || !node.isLiteral() ? "<non-literal>" : node.getLiteralDatatypeURI();
+            throw new IllegalArgumentException(
+                "Similarity evaluation requires a supported probabilistic literal on the "
+                    + side + " side, got: " + datatype);
+        }
+    }
+
+    private static void validateDimensionalCompatibility(org.apache.jena.graph.Node leftNode,
+                                                         org.apache.jena.graph.Node rightNode) {
+        int leftDim = distributionDimensions(leftNode.getLiteralValue());
+        int rightDim = distributionDimensions(rightNode.getLiteralValue());
+        if (leftDim != rightDim) {
+            throw new IllegalArgumentException(
+                "Similarity evaluation requires matching dimensionality. Got left="
+                    + leftDim + ", right=" + rightDim);
+        }
+    }
+
+    private static int distributionDimensions(Object value) {
+        return switch (distributionKind(value)) {
+            case GMM -> ((GMMValue) value).getDimensions();
+            case HISTOGRAM -> 1;
+            case DIRICHLET -> ((DirichletValue) value).getDimensions();
+        };
+    }
+
+    private static DistributionKind distributionKind(Object value) {
+        if (value instanceof GMMValue) {
+            return DistributionKind.GMM;
+        }
+        if (value instanceof HistogramValue) {
+            return DistributionKind.HISTOGRAM;
+        }
+        if (value instanceof DirichletValue) {
+            return DistributionKind.DIRICHLET;
+        }
+        throw new IllegalArgumentException(
+            "Unsupported probabilistic literal value type: "
+                + (value == null ? "null" : value.getClass().getName()));
     }
     
     /**

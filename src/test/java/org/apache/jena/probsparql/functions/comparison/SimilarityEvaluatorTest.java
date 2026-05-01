@@ -3,8 +3,12 @@ package org.apache.jena.probsparql.functions.comparison;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.probsparql.ProbSPARQL;
+import org.apache.jena.probsparql.datatypes.DirichletDatatype;
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -136,6 +140,50 @@ class SimilarityEvaluatorTest {
 
         assertEquals(evaluatorScore, helperScore, 1e-12,
             "Tail-aware helper should delegate to the per-query SimilarityEvaluator");
+    }
+
+    @Test
+    void testHistogramHelperUsesPolymorphicJsdPath() {
+        HistogramValue h1 = new HistogramValue(
+            new double[]{0.0, 1.0, 2.0},
+            new double[]{0.5, 0.5}
+        );
+        HistogramValue h2 = new HistogramValue(
+            new double[]{0.0, 1.0, 2.0},
+            new double[]{0.4, 0.6}
+        );
+
+        Node leftNode = NodeFactory.createLiteralDT(h1.toString(), HistogramDatatype.INSTANCE);
+        Node rightNode = NodeFactory.createLiteralDT(h2.toString(), HistogramDatatype.INSTANCE);
+
+        double helperScore = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, 0.3, 0.05);
+        double polyScore = new PolyJSD().exec(
+            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
+            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
+        ).getDouble();
+
+        assertEquals(polyScore, helperScore, 1e-12,
+            "Histogram similarity should use the polymorphic prob:jsd path");
+    }
+
+    @Test
+    void testDirichletHelperUsesPolymorphicJsdPath() {
+        DirichletValue d1 = new DirichletValue(new double[]{4.0, 3.0, 2.0});
+        DirichletValue d2 = new DirichletValue(new double[]{4.2, 2.8, 2.0});
+
+        Node leftNode = NodeFactory.createLiteralDT(d1.toJSON(), DirichletDatatype.INSTANCE);
+        Node rightNode = NodeFactory.createLiteralDT(d2.toJSON(), DirichletDatatype.INSTANCE);
+
+        double helperScore = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, 0.3, 0.05);
+        double polyScore = new PolyJSD().exec(
+            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
+            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
+        ).getDouble();
+
+        assertEquals(polyScore, helperScore, 5e-3,
+            "Dirichlet similarity should stay close to the polymorphic prob:jsd path");
+        assertEquals(polyScore <= 0.3, helperScore <= 0.3,
+            "Dirichlet helper and prob:jsd should induce the same similarity decision");
     }
 
     private GMMValue create1DGaussian(double mean, double std) {

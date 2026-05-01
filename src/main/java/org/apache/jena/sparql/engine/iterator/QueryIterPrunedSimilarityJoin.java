@@ -2,6 +2,7 @@ package org.apache.jena.sparql.engine.iterator;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.graph.Node;
+import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.exp2.Exp2PruningHolder;
 import org.apache.jena.probsparql.exp2.PrunedSimJoinEvaluator;
@@ -29,6 +30,9 @@ import java.util.List;
  * <p>Semantics are identical to {@link QueryIterSimilarityJoin}: all pairs from
  * the cross product of the left and right tables that pass the JSD threshold are
  * yielded.  The only difference is the evaluation strategy for the JSD predicate.
+ *
+ * <p>The pruning cascade itself remains GMM-specific. Non-GMM distribution
+ * pairs fall back to the polymorphic similarity evaluator without pruning.</p>
  */
 public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
@@ -137,7 +141,8 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
                 Node leftNode  = merged.get(leftVar);
                 Node rightNode = merged.get(rightVar);
                 if (leftNode == null || rightNode == null) continue;
-                if (!isGMM(leftNode) || !isGMM(rightNode))  continue;
+                if (!ProbSPARQL.supportsSimilarityLiteral(leftNode)
+                    || !ProbSPARQL.supportsSimilarityLiteral(rightNode)) continue;
 
                 // Deduplication: only emit canonical (leftTableIdx < rightTableIdx) pairs
                 // to match Approach A's n*(n-1)/2 semantics and avoid self-pairs.
@@ -173,10 +178,6 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
             }
         }
         return builder.build();
-    }
-
-    private static boolean isGMM(Node n) {
-        return n != null && n.isLiteral() && n.getLiteralValue() instanceof GMMValue;
     }
 
     private static List<Binding> materializeList(QueryIterator iter) {

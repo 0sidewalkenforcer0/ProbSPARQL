@@ -7,11 +7,15 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.probsparql.datatypes.DirichletDatatype;
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.functions.comparison.JSDivergenceConfig;
 import org.apache.jena.sparql.algebra.AlgebraGeneratorProbabilistic;
 import org.apache.jena.sparql.algebra.Op;
@@ -92,6 +96,125 @@ class SimilarityJoinSyntaxTest {
             }
         } finally {
             System.clearProperty("probsparql.mode");
+        }
+    }
+
+    @Test
+    void testHistogramSimilarityJoinExecutesThroughProbabilisticEngine() {
+        Model model = ModelFactory.createDefaultModel();
+        Resource left = model.createResource(EX_NS + "histLeft");
+        Resource right = model.createResource(EX_NS + "histRight");
+
+        HistogramValue leftHist = new HistogramValue(
+            new double[]{0.0, 1.0, 2.0},
+            new double[]{0.5, 0.5}
+        );
+        HistogramValue rightHist = new HistogramValue(
+            new double[]{0.0, 1.0, 2.0},
+            new double[]{0.55, 0.45}
+        );
+
+        left.addProperty(
+            model.createProperty(EX_NS + "dist"),
+            model.asRDFNode(NodeFactory.createLiteralDT(leftHist.toString(), HistogramDatatype.INSTANCE))
+        );
+        right.addProperty(
+            model.createProperty(EX_NS + "dist"),
+            model.asRDFNode(NodeFactory.createLiteralDT(rightHist.toString(), HistogramDatatype.INSTANCE))
+        );
+
+        Query query = QueryFactory.create("""
+            PREFIX ex: <http://example.org/>
+            SELECT * WHERE {
+              { ex:histLeft ex:dist ?d1 . }
+              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              { ex:histRight ex:dist ?d2 . }
+            }
+            """, Syntax.syntaxARQ);
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+            assertTrue(results.hasNext(),
+                "Histogram SIMILARITYJOIN should use the polymorphic similarity path");
+        }
+    }
+
+    @Test
+    void testDirichletSimilarityJoinExecutesThroughProbabilisticEngine() {
+        Model model = ModelFactory.createDefaultModel();
+        Resource left = model.createResource(EX_NS + "dirLeft");
+        Resource right = model.createResource(EX_NS + "dirRight");
+
+        DirichletValue leftDir = new DirichletValue(new double[]{4.0, 3.0, 2.0});
+        DirichletValue rightDir = new DirichletValue(new double[]{4.1, 2.9, 2.0});
+
+        left.addProperty(
+            model.createProperty(EX_NS + "dist"),
+            model.asRDFNode(NodeFactory.createLiteralDT(leftDir.toJSON(), DirichletDatatype.INSTANCE))
+        );
+        right.addProperty(
+            model.createProperty(EX_NS + "dist"),
+            model.asRDFNode(NodeFactory.createLiteralDT(rightDir.toJSON(), DirichletDatatype.INSTANCE))
+        );
+
+        Query query = QueryFactory.create("""
+            PREFIX ex: <http://example.org/>
+            SELECT * WHERE {
+              { ex:dirLeft ex:dist ?d1 . }
+              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              { ex:dirRight ex:dist ?d2 . }
+            }
+            """, Syntax.syntaxARQ);
+
+        try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+            ResultSet results = qexec.execSelect();
+            assertTrue(results.hasNext(),
+                "Dirichlet SIMILARITYJOIN should use the polymorphic similarity path");
+        }
+    }
+
+    @Test
+    void testHistogramSimilarityJoinFallsBackWhenPruningIsEnabled() {
+        System.setProperty("probsparql.simjoin.pruning", "true");
+        try {
+            Model model = ModelFactory.createDefaultModel();
+            Resource left = model.createResource(EX_NS + "histPrunedLeft");
+            Resource right = model.createResource(EX_NS + "histPrunedRight");
+
+            HistogramValue leftHist = new HistogramValue(
+                new double[]{0.0, 1.0, 2.0},
+                new double[]{0.6, 0.4}
+            );
+            HistogramValue rightHist = new HistogramValue(
+                new double[]{0.0, 1.0, 2.0},
+                new double[]{0.58, 0.42}
+            );
+
+            left.addProperty(
+                model.createProperty(EX_NS + "dist"),
+                model.asRDFNode(NodeFactory.createLiteralDT(leftHist.toString(), HistogramDatatype.INSTANCE))
+            );
+            right.addProperty(
+                model.createProperty(EX_NS + "dist"),
+                model.asRDFNode(NodeFactory.createLiteralDT(rightHist.toString(), HistogramDatatype.INSTANCE))
+            );
+
+            Query query = QueryFactory.create("""
+                PREFIX ex: <http://example.org/>
+                SELECT * WHERE {
+                  { ex:histPrunedLeft ex:dist ?d1 . }
+                  SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+                  { ex:histPrunedRight ex:dist ?d2 . }
+                }
+                """, Syntax.syntaxARQ);
+
+            try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
+                ResultSet results = qexec.execSelect();
+                assertTrue(results.hasNext(),
+                    "When pruning is enabled, non-GMM pairs should fall back to polymorphic similarity evaluation");
+            }
+        } finally {
+            System.clearProperty("probsparql.simjoin.pruning");
         }
     }
 

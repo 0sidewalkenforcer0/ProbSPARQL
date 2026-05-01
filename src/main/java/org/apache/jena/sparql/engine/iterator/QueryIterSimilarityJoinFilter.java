@@ -8,7 +8,6 @@ import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.graph.Node;
 import org.apache.jena.probsparql.ProbSPARQL;
-import org.apache.jena.probsparql.datatypes.GMMValue;
 
 /**
  * QueryIterSimilarityJoinFilter: Filter iterator for legacy SIMILARITYJOIN syntax.
@@ -18,7 +17,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
  * - This iterator filters bindings based on JS divergence
  * 
  * For each input binding:
- * 1. Extract GMM values from leftVar and rightVar
+ * 1. Extract supported probabilistic literals from leftVar and rightVar
  * 2. Compute JS divergence
  * 3. If JS <= tolerance, pass the binding through
  * 
@@ -39,8 +38,8 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
      * Constructor for filter-mode SimilarityJoin.
      * 
      * @param input     Iterator over bindings that already contain both distribution variables
-     * @param leftVar   Variable containing GMM
-     * @param rightVar  Variable containing GMM
+     * @param leftVar   Variable containing a supported distribution
+     * @param rightVar  Variable containing a supported distribution
      * @param tolerance JS divergence threshold
      * @param tailProbability One-sided tail probability for V3/V5 sequential bounds
      * @param execCxt   Execution context
@@ -93,19 +92,11 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
                 continue;
             }
             
-            // Validate GMM types
-            if (!isValidGMM(leftNode) || !isValidGMM(rightNode)) {
+            if (!ProbSPARQL.supportsSimilarityLiteral(leftNode)
+                || !ProbSPARQL.supportsSimilarityLiteral(rightNode)) {
                 continue;
             }
-            
-            GMMValue leftGMM = (GMMValue) leftNode.getLiteralValue();
-            GMMValue rightGMM = (GMMValue) rightNode.getLiteralValue();
-            
-            // Check dimensionality compatibility
-            if (leftGMM.getDimensions() != rightGMM.getDimensions()) {
-                continue;
-            }
-            
+
             // Compute JS divergence
             try {
                 double jsDiv = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
@@ -121,17 +112,6 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
         return null;
     }
     
-    /**
-     * Check if a node is a valid GMM literal.
-     */
-    private boolean isValidGMM(Node node) {
-        if (node == null || !node.isLiteral()) {
-            return false;
-        }
-        Object value = node.getLiteralValue();
-        return value instanceof GMMValue;
-    }
-
     @Override
     protected void closeIterator() {
         if (input != null) {

@@ -35,20 +35,26 @@ public class PrunedSimJoinEvaluator {
     /**
      * Evaluate whether the pair (g1, g2) satisfies JSD(g1, g2) &lt;= tolerance.
      *
-     * @param leftNode  RDF Node carrying the left GMMValue literal
-     * @param rightNode RDF Node carrying the right GMMValue literal
+     * <p>GMM pairs use the pruning cascade. Other supported distribution
+     * datatypes fall back to full polymorphic similarity evaluation.</p>
+     *
+     * @param leftNode  RDF Node carrying the left supported distribution literal
+     * @param rightNode RDF Node carrying the right supported distribution literal
      * @return true iff the pair should be kept (JSD &lt;= tolerance)
      */
     public boolean evaluate(Node leftNode, Node rightNode) {
-        GMMValue g1 = (GMMValue) leftNode.getLiteralValue();
-        GMMValue g2 = (GMMValue) rightNode.getLiteralValue();
-        return evaluateGMMs(g1, g2, leftNode, rightNode);
+        stats.totalPairs++;
+
+        Object leftValue = leftNode.getLiteralValue();
+        Object rightValue = rightNode.getLiteralValue();
+        if (leftValue instanceof GMMValue g1 && rightValue instanceof GMMValue g2) {
+            return evaluateGMMs(g1, g2, leftNode, rightNode);
+        }
+        return evaluateWithoutPruning(leftNode, rightNode);
     }
 
     private boolean evaluateGMMs(GMMValue g1, GMMValue g2,
                                   Node leftNode, Node rightNode) {
-        stats.totalPairs++;
-
         // ── Level 1: dimensionality check ──────────────────────────────────
         if (g1.getDimensions() != g2.getDimensions()) {
             stats.prunedByDim++;
@@ -82,6 +88,20 @@ public class PrunedSimJoinEvaluator {
             return passes;
         } catch (Exception e) {
             // If computation fails, conservatively exclude the pair
+            return false;
+        }
+    }
+
+    private boolean evaluateWithoutPruning(Node leftNode, Node rightNode) {
+        stats.computedFullJSD++;
+        try {
+            double jsd = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
+            boolean passes = jsd <= tolerance;
+            if (passes) {
+                stats.resultCount++;
+            }
+            return passes;
+        } catch (Exception e) {
             return false;
         }
     }
