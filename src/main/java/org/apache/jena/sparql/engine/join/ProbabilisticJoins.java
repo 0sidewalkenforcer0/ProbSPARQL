@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.jena.graph.Node;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.probsparql.functions.manipulation.Fuse;
 import org.apache.jena.sparql.expr.NodeValue;
 
@@ -85,7 +85,7 @@ public class ProbabilisticJoins {
             @Override
             public boolean isCompatible(GMMValue gmm1, GMMValue gmm2, double tolerance) {
                 // For exact join, ignore tolerance parameter
-                double js = computeJSDivergence(gmm1, gmm2);
+                double js = computeLegacyJSDivergence(gmm1, gmm2);
                 return js < EXACT_EPSILON;
             }
             
@@ -126,7 +126,7 @@ public class ProbabilisticJoins {
                     throw new IllegalArgumentException(
                         "Tolerance must be in [0, 1], got: " + tolerance);
                 }
-                double js = computeJSDivergence(gmm1, gmm2);
+                double js = computeSimilarityScore(gmm1, gmm2, tolerance);
                 return js < tolerance;
             }
             
@@ -169,7 +169,7 @@ public class ProbabilisticJoins {
                     throw new IllegalArgumentException(
                         "Tolerance must be in [0, 1], got: " + tolerance);
                 }
-                double js = computeJSDivergence(gmm1, gmm2);
+                double js = computeSimilarityScore(gmm1, gmm2, tolerance);
                 return js < tolerance;
             }
             
@@ -291,21 +291,23 @@ public class ProbabilisticJoins {
      * @param gmm2 Second GMM
      * @return JS divergence value in [0, 1]
      */
-    private static double computeJSDivergence(GMMValue gmm1, GMMValue gmm2) {
+    private static double computeLegacyJSDivergence(GMMValue gmm1, GMMValue gmm2) {
         // Create NodeValues for JSDivergence function
         Node node1 = org.apache.jena.graph.NodeFactory.createLiteralDT(
             gmm1.toJSON(), GMMDatatype.INSTANCE);
         Node node2 = org.apache.jena.graph.NodeFactory.createLiteralDT(
             gmm2.toJSON(), GMMDatatype.INSTANCE);
-        
-        NodeValue nv1 = NodeValue.makeNode(node1);
-        NodeValue nv2 = NodeValue.makeNode(node2);
-        
-        // Use JSDivergence function
-        JSDivergence jsFunc = new JSDivergence();
-        NodeValue result = jsFunc.exec(nv1, nv2);
-        
-        return result.getDouble();
+
+        return ProbSPARQL.legacyJSDivergence(node1, node2);
+    }
+
+    private static double computeSimilarityScore(GMMValue gmm1, GMMValue gmm2, double tolerance) {
+        Node node1 = org.apache.jena.graph.NodeFactory.createLiteralDT(
+            gmm1.toJSON(), GMMDatatype.INSTANCE);
+        Node node2 = org.apache.jena.graph.NodeFactory.createLiteralDT(
+            gmm2.toJSON(), GMMDatatype.INSTANCE);
+
+        return ProbSPARQL.evaluateSimilarity(node1, node2, tolerance);
     }
     
     /**

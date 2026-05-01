@@ -1050,6 +1050,7 @@ Element RelationalSimilarityJoinGraphPattern() : {
   Element leftPattern = null ; Element rightPattern = null ;
   Var leftVar ; Var rightVar ; 
   Node toleranceNode ; double tolerance ;
+  Node tailProbabilityNode ; double tailProbability ;
 }
 {
   // Lookahead to check if we have { pattern } SIMILARITYJOIN(...) { pattern }
@@ -1060,12 +1061,15 @@ Element RelationalSimilarityJoinGraphPattern() : {
   rightVar = Var() <COMMA>
   toleranceNode = NumericLiteral()
   { tolerance = Double.parseDouble(toleranceNode.getLiteralLexicalForm()); }
+  <COMMA>
+  tailProbabilityNode = NumericLiteral()
+  { tailProbability = Double.parseDouble(tailProbabilityNode.getLiteralLexicalForm()); }
   <RPAREN>
   rightPattern = GroupGraphPattern()
   { 
     return new ElementSimilarityJoin(leftPattern, rightPattern, 
                                      leftVar.getName(), rightVar.getName(), 
-                                     tolerance) ; 
+                                     tolerance, tailProbability) ; 
   }
 }
 
@@ -1094,12 +1098,13 @@ Element FuseJoinGraphPattern() : {
 }
 
 // SIMILARITYJOIN: Similarity-based join based on JS divergence
-// Syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
+// Syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
 // The join condition is: JS(?leftVar, ?rightVar) <= tolerance
 // Unlike FUSEJOIN, no fusion is performed - just filtering based on similarity
 Element SimilarityJoinGraphPattern() : { 
   Var leftVar ; Var rightVar ; 
   Node toleranceNode ; double tolerance ;
+  Node tailProbabilityNode ; double tailProbability ;
   Element pattern ; 
 }
 {
@@ -1108,11 +1113,14 @@ Element SimilarityJoinGraphPattern() : {
   rightVar = Var() <COMMA>
   toleranceNode = NumericLiteral()
   { tolerance = Double.parseDouble(toleranceNode.getLiteralLexicalForm()); }
+  <COMMA>
+  tailProbabilityNode = NumericLiteral()
+  { tailProbability = Double.parseDouble(tailProbabilityNode.getLiteralLexicalForm()); }
   <RPAREN>
   pattern = GroupGraphPattern()
   { 
     return new ElementSimilarityJoin(pattern, leftVar.getName(), rightVar.getName(), 
-                                     tolerance) ; 
+                                     tolerance, tailProbability) ; 
   }
 }
 

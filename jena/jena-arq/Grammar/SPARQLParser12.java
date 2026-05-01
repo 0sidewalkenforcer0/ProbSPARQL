@@ -2165,11 +2165,11 @@ finishInlineData(beginLine, beginColumn) ;
  * SimilarityJoinGraphPattern: Parses SIMILARITYJOIN syntax
  * 
  * Syntax options:
- * 1. New relational semantics (binary join):
- *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * 1. Relational semantics (binary join):
+ *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * 2. Legacy filter semantics (unary filter):
- *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
+ *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
  */
   final public Element SimilarityJoinGraphPattern() throws ParseException {Element leftPattern = null;
     Element rightPattern = null;

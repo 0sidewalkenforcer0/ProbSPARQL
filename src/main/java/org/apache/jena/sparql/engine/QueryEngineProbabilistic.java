@@ -19,8 +19,8 @@ import org.apache.jena.sparql.syntax.*;
  * 2. Registers OpExecutorProbabilistic to execute these custom operators
  * 
  * Supports both relational and legacy semantics:
- * - Relational: { leftPattern } SIMILARITYJOIN(?v1, ?v2, tol) { rightPattern }
- * - Legacy: SIMILARITYJOIN(?v1, ?v2, tol) { pattern }
+ * - Relational: { leftPattern } SIMILARITYJOIN(?v1, ?v2, tolerance, tailProbability) { rightPattern }
+ * - Legacy: SIMILARITYJOIN(?v1, ?v2, tolerance, tailProbability) { pattern }
  */
 public class QueryEngineProbabilistic extends QueryEngineMain {
     

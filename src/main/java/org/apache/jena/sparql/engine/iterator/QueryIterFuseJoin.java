@@ -2,7 +2,7 @@ package org.apache.jena.sparql.engine.iterator;
 
 import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.probsparql.functions.manipulation.Fuse;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Var;
@@ -53,7 +53,6 @@ public class QueryIterFuseJoin extends QueryIter {
     private int rightIndex = 0;
     private Binding nextBinding = null;
     
-    private final JSDivergence jsDivergence;
     private final Fuse fuse;
     
     /**
@@ -85,7 +84,6 @@ public class QueryIterFuseJoin extends QueryIter {
         this.resultVar = resultVar;
         this.execCxt = execCxt;
         
-        this.jsDivergence = new JSDivergence();
         this.fuse = new Fuse();
         
         // Materialize left table
@@ -173,8 +171,7 @@ public class QueryIterFuseJoin extends QueryIter {
                 try {
                     NodeValue leftNV = NodeValue.makeNode(leftNode);
                     NodeValue rightNV = NodeValue.makeNode(rightNode);
-                    NodeValue jsNV = jsDivergence.exec(leftNV, rightNV);
-                    double js = jsNV.getDouble();
+                    double js = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance);
                     
                     if (js <= tolerance) {
                         // Perform fusion

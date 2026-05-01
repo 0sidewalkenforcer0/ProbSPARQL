@@ -6,6 +6,7 @@ import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.probsparql.functions.comparison.PolyJSD;
+import org.apache.jena.probsparql.functions.comparison.SimilarityEvaluator;
 import org.apache.jena.probsparql.functions.thresholding.HistogramCDF;
 import org.apache.jena.probsparql.functions.manipulation.HistogramMean;
 import org.apache.jena.probsparql.functions.thresholding.PDF;
@@ -186,21 +187,57 @@ public class ProbSPARQL {
     }
     
     /**
-     * Helper method: Calculate JS divergence between two GMM distributions.
-     * Used by QueryIterSimilarityJoin and QueryIterFuseJoin.
-     * 
-     * @param leftNode  First GMM distribution node
-     * @param rightNode Second GMM distribution node
-     * @return JS divergence value
+     * Internal similarity-evaluation entry point used by join operators that
+     * already know the query tolerance.
+     *
+     * <p>For V3/V4/V5 this tolerance is threaded into the sequential decision
+     * logic instead of relying on the global default threshold.</p>
      */
+    public static double evaluateSimilarity(org.apache.jena.graph.Node leftNode,
+                                            org.apache.jena.graph.Node rightNode,
+                                            double tolerance) {
+        return new SimilarityEvaluator(tolerance).evaluate(extractGMM(leftNode), extractGMM(rightNode));
+    }
+
+    /**
+     * Internal similarity-evaluation entry point for query operators that
+     * supply both a JSD threshold and a one-sided tail probability for the
+     * sequential confidence bounds used by V3/V5.
+     */
+    public static double evaluateSimilarity(org.apache.jena.graph.Node leftNode,
+                                            org.apache.jena.graph.Node rightNode,
+                                            double tolerance,
+                                            double tailProbability) {
+        return new SimilarityEvaluator(tolerance, tailProbability, tailProbability)
+            .evaluate(extractGMM(leftNode), extractGMM(rightNode));
+    }
+
+    /**
+     * Legacy helper that preserves the historical {@code JSDivergence()} naming
+     * and configuration semantics for callers that truly want the old behavior.
+     */
+    public static double legacyJSDivergence(org.apache.jena.graph.Node leftNode,
+                                            org.apache.jena.graph.Node rightNode) {
+        return SimilarityEvaluator.legacy().evaluate(extractGMM(leftNode), extractGMM(rightNode));
+    }
+
+    /**
+     * @deprecated Use {@link #evaluateSimilarity(org.apache.jena.graph.Node, org.apache.jena.graph.Node, double)}
+     *             for threshold-aware similarity evaluation or
+     *             {@link #legacyJSDivergence(org.apache.jena.graph.Node, org.apache.jena.graph.Node)}
+     *             when explicitly preserving the old scalar-function behavior.
+     */
+    @Deprecated
     public static double JSDivergence(org.apache.jena.graph.Node leftNode, org.apache.jena.graph.Node rightNode) {
-        org.apache.jena.probsparql.functions.comparison.JSDivergence jsFunc = 
-            new org.apache.jena.probsparql.functions.comparison.JSDivergence();
-        org.apache.jena.sparql.expr.NodeValue result = jsFunc.exec(
-            org.apache.jena.sparql.expr.NodeValue.makeNode(leftNode),
-            org.apache.jena.sparql.expr.NodeValue.makeNode(rightNode)
-        );
-        return result.getDouble();
+        return legacyJSDivergence(leftNode, rightNode);
+    }
+
+    private static org.apache.jena.probsparql.datatypes.GMMValue extractGMM(org.apache.jena.graph.Node node) {
+        if (node == null || !node.isLiteral()
+            || !(node.getLiteralValue() instanceof org.apache.jena.probsparql.datatypes.GMMValue gmm)) {
+            throw new IllegalArgumentException("Similarity evaluation requires a GMM literal");
+        }
+        return gmm;
     }
     
     /**

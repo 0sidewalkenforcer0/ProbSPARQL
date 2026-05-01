@@ -20,8 +20,8 @@ import java.util.List;
 /**
  * QueryIterSimilarityJoin: Iterator for SimilarityJoin operation with nested loop join semantics.
  * 
- * New relational semantics:
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * Relational semantics:
+ * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * Algorithm (Nested Loop Join):
  * 1. Materialize left table bindings
@@ -39,6 +39,7 @@ public class QueryIterSimilarityJoin extends QueryIter {
     private final Var leftVar;
     private final Var rightVar;
     private final double tolerance;
+    private final double tailProbability;
     private final ExecutionContext execCxt;
     
     // Materialized tables
@@ -58,10 +59,12 @@ public class QueryIterSimilarityJoin extends QueryIter {
      * @param leftVar     Variable containing GMM in left table
      * @param rightVar    Variable containing GMM in right table
      * @param tolerance   JS divergence threshold
+     * @param tailProbability One-sided tail probability for V3/V5 sequential bounds
      * @param execCxt     Execution context
      */
     public QueryIterSimilarityJoin(QueryIterator leftInput, Op rightOp,
                                    Var leftVar, Var rightVar, double tolerance,
+                                   double tailProbability,
                                    ExecutionContext execCxt) {
         super(execCxt);
         
@@ -74,6 +77,7 @@ public class QueryIterSimilarityJoin extends QueryIter {
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
         this.execCxt = execCxt;
         
         // Materialize left table
@@ -159,7 +163,7 @@ public class QueryIterSimilarityJoin extends QueryIter {
                 
                 // Compute JS divergence
                 try {
-                    double jsDiv = ProbSPARQL.JSDivergence(leftNode, rightNode);
+                    double jsDiv = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
                     
                     if (jsDiv <= tolerance) {
                         // Return the merged binding (no fusion)

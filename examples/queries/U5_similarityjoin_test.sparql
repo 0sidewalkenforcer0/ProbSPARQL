@@ -1,10 +1,11 @@
 # U5: Probabilistic Similarity Search (New Relational SIMILARITYJOIN Syntax)
 # "For the current gear, retrieve all historical gears whose CT tooth-length distributions are similar."
 #
-# New Syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance) { rightPattern }
+# Current syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance, tailProbability) { rightPattern }
 # - Left table: Current gears with CT measurements
 # - Right table: Historical gears with CT measurements
 # - Join condition: JS(?currentDist, ?historicalDist) <= 0.3
+# - Tail probability: 0.05 for the one-sided sequential confidence bounds
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -26,7 +27,7 @@ WHERE {
     ?rvCurrent uq:hasDistribution ?currentDist .
   }
   # SIMILARITYJOIN: Find similar historical cases (JS divergence <= 0.3)
-  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3)
+  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3, 0.05)
   {
     # Right table: Historical gears with CT measurements
     ?historicalGear a ag:HistoricalGear ;

@@ -50,8 +50,8 @@ Two new keyword tokens are declared and two syntax forms are supported for each 
 
 | Form | Syntax | Mode |
 |------|--------|------|
-| Relational | `{ leftPat } SIMILARITYJOIN(?v1,?v2,θ) { rightPat }` | `legacyMode = false` |
-| Legacy filter | `SIMILARITYJOIN(?v1,?v2,θ) { pat }` | `legacyMode = true` |
+| Relational | `{ leftPat } SIMILARITYJOIN(?v1,?v2,θ,α) { rightPat }` | `legacyMode = false` |
+| Legacy filter | `SIMILARITYJOIN(?v1,?v2,θ,α) { pat }` | `legacyMode = true` |
 
 The grammar defines four production rules:
 
@@ -60,9 +60,9 @@ The grammar defines four production rules:
 Element RelationalSimilarityJoinGraphPattern() {
   LOOKAHEAD(GroupGraphPattern() <SIMILARITYJOIN>)
   leftPattern = GroupGraphPattern()
-  <SIMILARITYJOIN> <LPAREN> leftVar <COMMA> rightVar <COMMA> tolerance <RPAREN>
+  <SIMILARITYJOIN> <LPAREN> leftVar <COMMA> rightVar <COMMA> tolerance <COMMA> tailProbability <RPAREN>
   rightPattern = GroupGraphPattern()
-  → new ElementSimilarityJoin(leftPattern, rightPattern, leftVar, rightVar, tolerance)
+  → new ElementSimilarityJoin(leftPattern, rightPattern, leftVar, rightVar, tolerance, tailProbability)
 }
 
 Element RelationalFuseJoinGraphPattern() {
@@ -74,9 +74,11 @@ Element RelationalFuseJoinGraphPattern() {
 }
 
 // ── Legacy forms (filter semantics) ─────────────────────────────────────
-Element SimilarityJoinGraphPattern() { … → new ElementSimilarityJoin(pattern, …) }
+Element SimilarityJoinGraphPattern() { … → new ElementSimilarityJoin(pattern, …, tolerance, tailProbability) }
 Element FuseJoinGraphPattern()       { … → new ElementFuseJoin(pattern, …)       }
 ```
+
+For `SIMILARITYJOIN`, `θ` is the similarity threshold and `α` is the one-sided tail probability passed into the sequential confidence bounds used by `V3_SPRT` and the SPRT phase of `V5_ADAPTIVE`.
 
 All four rules are incorporated in `GraphPatternNotTriples()` and in the outer `GroupGraphPatternSub()` loop (see §2.2).
 
@@ -293,7 +295,7 @@ Pruning statistics (pairs pruned per level, total pairs, result count) are accum
 | Registration | `TypeMapper.getInstance().registerDatatype(GMMDatatype.INSTANCE)` called in `ProbSPARQL.init()` |
 | Validation | Checked on parse: weight sum ∈ [1 ± 1e-6], all arrays dimensionally consistent |
 
-A `GMMValue` node is serialised and recovered transparently by Jena's literal machinery. When Jena evaluates a `BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)` expression, the function implementation directly casts the `NodeValue`'s underlying Java object to `GMMValue` without re-parsing the JSON string.
+A `GMMValue` node is serialised and recovered transparently by Jena's literal machinery. When Jena evaluates a `BIND(prob:jsd(?d1, ?d2) AS ?jsd)` or legacy `BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)` expression, the function implementation directly casts the `NodeValue`'s underlying Java object to the underlying distribution value without re-parsing the JSON string.
 
 ### 5.2 Registered SPARQL Functions
 
@@ -309,15 +311,18 @@ All functions are registered via `FunctionRegistry.get().put(URI, Class)` during
 | `prob:logcdf` | 2 | Log-CDF |
 | `prob:histcdf` | 2 | CDF for histogram-typed distributions |
 
-#### Category 2 — Divergence / Comparison (3 functions)
+#### Category 2 — Divergence / Comparison (4 functions)
 
 | URI | Arity | Description |
 |-----|-------|-------------|
-| `prob:jsdivergence` | 2 | Jensen-Shannon divergence, JSD ∈ [0, ln 2] |
+| `prob:jsd` | 2 | Preferred numerical Jensen-Shannon divergence interface |
+| `prob:jsdivergence` | 2 | Legacy GMM-only compatibility wrapper for the V1-V5 similarity-evaluator stack |
 | `prob:kldivergence` | 2 | KL divergence (asymmetric) |
 | `prob:histjsd` | 2 | JSD for histogram-typed distributions |
 
-`prob:jsdivergence` supports nine configurable computation modes (via the `probsparql.mode` JVM property): fixed MC sample counts (`GT_100`, `GT_1K`, `GT_5K`, `GT_10K`), SPRT-based sequential testing (`V3_SPRT`), analytic bounds filtering (`V4_BOUNDS`), and a five-level adaptive cascade (`V5_ADAPTIVE`, the default). The SPRT mode terminates early once statistical confidence in the binary H₀: JSD ≤ ε decision is reached, trading exactness for speed.
+`prob:jsd` is the stable numerical interface. For GMM paths it uses a fixed MC-10K estimator; other supported distribution types use their own type-specific numerical implementations or a sample-based fallback.
+
+The legacy `prob:jsdivergence` wrapper still supports nine configurable V1-V5 / GT modes (via the `probsparql.mode` JVM property): fixed MC sample counts (`GT_100`, `GT_1K`, `GT_5K`, `GT_10K`), SPRT-based sequential testing (`V3_SPRT`), analytic bounds filtering (`V4_BOUNDS`), and a five-level adaptive cascade (`V5_ADAPTIVE`, the default). In V3/V4/V5, the returned score may be the by-product of a threshold-oriented similarity decision pipeline rather than a uniformly precise JSD estimator.
 
 #### Category 3 — Transformations (7 functions)
 
@@ -362,7 +367,7 @@ Experiment 1 measures the **execution-time overhead** that ProbSPARQL introduces
 |-------|----------------------|
 | Q1 — Threshold Filtering | BGP + `BIND(prob:cdf(…) AS ?p)` + `FILTER` |
 | Q2 — Statistical Summary | BGP + `BIND(prob:multiply(…))` + `BIND(prob:mean(…))` |
-| Q3 — Distribution Comparison | BGP + `BIND(prob:jsdivergence(…))` + `FILTER` |
+| Q3 — Distribution Comparison | BGP + `BIND(prob:jsd(…))` or legacy `BIND(prob:jsdivergence(…))` + `FILTER` |
 | Q4 — Pure Graph Traversal | BGP only (no `prob:` functions) |
 
 **None of the four queries use `SIMILARITYJOIN` or `FUSEJOIN` syntax.** All probabilistic computations are expressed via `BIND` + standard SPARQL `FILTER`.
@@ -379,7 +384,7 @@ For a query containing only `BIND` and `FILTER`:
 
 4. **Execution** — `OpExecutorProbabilistic.exec()` is registered only inside `QueryEngineProbabilistic`'s context (step 2 of §4.1). Since `QueryEngineMain` is used, `OpExecutorProbabilistic` is **never registered** and the standard `OpExecutor` runs the plan.
 
-5. **Function evaluation** — `prob:cdf`, `prob:mean`, `prob:jsdivergence`, etc., are SPARQL scalar functions evaluated by Jena's standard expression evaluator when it encounters `OpExtend`. Their implementations are unmodified by the recent bug fixes.
+5. **Function evaluation** — `prob:cdf`, `prob:mean`, `prob:jsd`, `prob:jsdivergence`, etc., are SPARQL scalar functions evaluated by Jena's standard expression evaluator when it encounters `OpExtend`. Their execution still stays on the scalar-function path; only the internal semantics of the legacy `prob:jsdivergence` wrapper differ from the newer numerical `prob:jsd` interface.
 
 ### 6.3 Analysis of Each Bug Fix
 

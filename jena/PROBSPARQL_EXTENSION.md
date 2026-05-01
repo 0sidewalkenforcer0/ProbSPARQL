@@ -43,12 +43,16 @@ Filters results based on JS divergence between distributions being within tolera
 
 ```sparql
 SELECT ?s1 ?s2 WHERE {
-  SIMILARITYJOIN(?dist1, ?dist2, 0.1) {
+  SIMILARITYJOIN(?dist1, ?dist2, 0.1, 0.05) {
     ?s1 :hasDist ?dist1 .
     ?s2 :hasDist ?dist2 .
   }
 }
 ```
+
+The four arguments are the left distribution, the right distribution, the JSD
+threshold, and the one-sided tail probability used by the sequential confidence
+bounds in `V3_SPRT` and `V5_ADAPTIVE`.
 
 ## Building
 
@@ -75,4 +79,3 @@ This will install the modified Jena JARs to your local Maven repository.
 
 The main ProbSPARQL project (in the parent directory) uses these modified Jena sources.
 Make sure to build this modified Jena first before building the main project.
-

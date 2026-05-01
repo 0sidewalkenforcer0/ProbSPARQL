@@ -41,7 +41,7 @@ public class QueryRunner {
     
     /**
      * Holds FUSEJOIN metadata extracted from query.
-     * New relational semantics: { leftPattern } FUSEJOIN(...) { rightPattern }
+     * Relational form: { leftPattern } FUSEJOIN(...) { rightPattern }
      * 
      * @deprecated This class is no longer used since we now use formal JavaCC extension.
      *             The JavaCC parser directly creates ElementFuseJoin objects.
@@ -71,7 +71,7 @@ public class QueryRunner {
     
     /**
      * Holds SIMILARITYJOIN metadata extracted from query.
-     * New relational semantics: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
+     * Relational form: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
      * 
      * @deprecated This class is no longer used since we now use formal JavaCC extension.
      *             The JavaCC parser directly creates ElementSimilarityJoin objects.
@@ -300,10 +300,10 @@ public class QueryRunner {
     */
     
     /**
-     * Detect and parse SIMILARITYJOIN with new relational semantics.
-     * New pattern: { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+     * Detect and parse SIMILARITYJOIN syntax.
+     * Relational form: { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
      * 
-     * Also supports old pattern: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { }
+     * Legacy filter form: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
      * 
      * @return SimilarityJoinInfo if SIMILARITYJOIN detected, null otherwise
      * 

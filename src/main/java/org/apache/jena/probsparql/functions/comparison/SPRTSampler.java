@@ -9,8 +9,7 @@ import java.util.Random;
  * V3: Sequential hypothesis-test sampler with early stopping.
  * 
  * <p>The public mode name remains {@code V3_SPRT} for compatibility, but the
- * implementation is closer to a sequential confidence-bound test than a
- * textbook Wald likelihood-ratio SPRT.  We repeatedly estimate
+ * implementation is closer to a sequential confidence-bound test.  We repeatedly estimate
  * {@code JSD(P, Q)} with Monte Carlo, normalize the distance to the threshold
  * by the estimated standard error, and stop once one of two one-sided decisions
  * becomes conclusive:</p>

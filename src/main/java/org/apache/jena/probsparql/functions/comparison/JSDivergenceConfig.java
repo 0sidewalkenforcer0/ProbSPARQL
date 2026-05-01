@@ -1,21 +1,25 @@
 package org.apache.jena.probsparql.functions.comparison;
 
 /**
- * Configuration for JSDivergence computation.
- * All parameters are configurable via Java System Properties.
- * 
- * System Properties:
- * - probsparql.mode: GT_100, GT_1K, GT_5K, GT_10K, V1_MC, V2_STRATIFIED, V3_SPRT, V4_BOUNDS, V5_ADAPTIVE
- * - probsparql.sprt.alpha: SPRT false positive rate (default: 0.05)
- * - probsparql.sprt.beta: SPRT false negative rate (default: 0.05)
- * - probsparql.sprt.epsilon: SPRT decision threshold (default: 0.05)
- * - probsparql.samples: Default sample count (default: 1000)
- * 
- * @author ProbSPARQL Team
+ * Legacy configuration for the V1-V5 GMM similarity-evaluator stack.
+ *
+ * <p>This class is still used by {@link SimilarityEvaluator} and by the
+ * legacy SPARQL wrapper {@link JSDivergence}. It is not used by the newer
+ * polymorphic {@code prob:jsd} function, which follows its own fixed-sample
+ * numerical path.</p>
+ *
+ * <p>All parameters are configurable via Java System Properties:</p>
+ * <ul>
+ *   <li>{@code probsparql.mode}: GT_100, GT_1K, GT_5K, GT_10K, V1_MC, V2_STRATIFIED, V3_SPRT, V4_BOUNDS, V5_ADAPTIVE</li>
+ *   <li>{@code probsparql.sprt.alpha}: sequential decision false-positive rate (default: 0.05)</li>
+ *   <li>{@code probsparql.sprt.beta}: sequential decision false-negative rate (default: 0.05)</li>
+ *   <li>{@code probsparql.sprt.epsilon}: legacy default similarity threshold when no per-query tolerance is supplied (default: 0.3)</li>
+ *   <li>{@code probsparql.samples}: default sample count (default: 1000)</li>
+ * </ul>
  */
 public class JSDivergenceConfig {
     
-    // Sampling modes
+    // Legacy evaluator modes
     public static final String MODE_GT_100 = "GT_100";
     public static final String MODE_GT_1K = "GT_1K";
     public static final String MODE_GT_5K = "GT_5K";
@@ -53,7 +57,7 @@ public class JSDivergenceConfig {
     public static final int GT_5K_SAMPLES = 5000;
     public static final int GT_10K_SAMPLES = 10000;
     
-    // V1-V5 configuration — unified sample budget = 5000
+    // V1-V5 legacy evaluator configuration — unified sample budget = 5000
     public static final int V1_DEFAULT_SAMPLES = 5000;
     public static final int V2_STRATIFIED_SAMPLES = 5000;
     public static final int V3_SPRT_MAX_SAMPLES = 5000;
@@ -132,10 +136,10 @@ public class JSDivergenceConfig {
     }
     
     /**
-     * Print current configuration (useful for debugging).
+     * Print current legacy similarity-evaluator configuration (useful for debugging).
      */
     public static void printConfig() {
-        System.out.println("=== JSDivergence Configuration ===");
+        System.out.println("=== Legacy Similarity Evaluator Configuration ===");
         System.out.println("Mode: " + MODE);
         System.out.println("Sample Count: " + getSampleCount());
         if (usesSPRT()) {

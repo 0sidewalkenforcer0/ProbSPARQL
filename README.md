@@ -250,7 +250,8 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 | Function | Description | Example |
 |----------|-------------|---------|
 | `prob:kldivergence(?gmm1, ?gmm2)` | KL divergence between distributions | `prob:kldivergence(?d1, ?d2)` |
-| `prob:jsdivergence(?gmm1, ?gmm2)` | Jensen-Shannon divergence | `prob:jsdivergence(?d1, ?d2)` |
+| `prob:jsd(?dist1, ?dist2)` | Preferred JSD interface. Returns a numerical Jensen-Shannon divergence for supported distribution types; MC paths use a fixed 10K sample budget | `prob:jsd(?d1, ?d2)` |
+<!-- | `prob:jsdivergence(?gmm1, ?gmm2)` | Legacy GMM-only compatibility wrapper. Internally routed through the threshold-aware similarity evaluator used by the old V1-V5 modes | `prob:jsdivergence(?d1, ?d2)` | -->
 
 ### Transformation Functions
 | Function | Description | Example |
@@ -295,10 +296,16 @@ PREFIX uq: <http://example.org/ontology/uncertainty#>
 
 SELECT ?sensor1 ?sensor2 WHERE {
   { ?sensor1 uq:hasDistribution ?dist1 . }
-  SIMILARITYJOIN(?dist1, ?dist2, 0.1)
+  SIMILARITYJOIN(?dist1, ?dist2, 0.1, 0.05)
   { ?sensor2 uq:hasDistribution ?dist2 . }
 }
 ```
+
+`SIMILARITYJOIN` takes four arguments:
+
+- `?dist1`, `?dist2`: the distribution variables to compare
+- `0.1`: the similarity threshold, interpreted as `JSD(?dist1, ?dist2) <= 0.1`
+- `0.05`: the one-sided tail probability used by the sequential confidence bounds in `V3_SPRT` and the SPRT stage inside `V5_ADAPTIVE`
 
 ---
 

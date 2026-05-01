@@ -13,7 +13,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 /**
  * QueryIterSimilarityJoinFilter: Filter iterator for legacy SIMILARITYJOIN syntax.
  * 
- * Legacy syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { }
+ * Legacy syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
  * - Both distribution variables are already bound in the input bindings
  * - This iterator filters bindings based on JS divergence
  * 
@@ -29,6 +29,7 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
     private final Var leftVar;
     private final Var rightVar;
     private final double tolerance;
+    private final double tailProbability;
     
     private Binding nextBinding = null;
     private int checkedCount = 0;
@@ -41,10 +42,11 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
      * @param leftVar   Variable containing GMM
      * @param rightVar  Variable containing GMM
      * @param tolerance JS divergence threshold
+     * @param tailProbability One-sided tail probability for V3/V5 sequential bounds
      * @param execCxt   Execution context
      */
     public QueryIterSimilarityJoinFilter(QueryIterator input, Var leftVar, Var rightVar,
-                                          double tolerance, ExecutionContext execCxt) {
+                                          double tolerance, double tailProbability, ExecutionContext execCxt) {
         super(execCxt);
         
         if (tolerance < 0) {
@@ -55,6 +57,7 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
             
             // Compute JS divergence
             try {
-                double jsDiv = ProbSPARQL.JSDivergence(leftNode, rightNode);
+                double jsDiv = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
                 if (jsDiv <= tolerance) {
                     passedCount++;
                     return binding;
@@ -150,9 +153,9 @@ public class QueryIterSimilarityJoinFilter extends QueryIter {
         out.println("Left Var: " + leftVar);
         out.println("Right Var: " + rightVar);
         out.println("Tolerance: " + tolerance);
+        out.println("Tail Probability: " + tailProbability);
         out.println("Checked: " + checkedCount);
         out.println("Passed: " + passedCount);
         out.decIndent();
     }
 }
-

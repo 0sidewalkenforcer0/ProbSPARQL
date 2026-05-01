@@ -2,6 +2,6 @@ PREFIX uq:   <http://example.org/ontology/uncertainty#>
 PREFIX prob: <http://probsparql.org/function#>
 SELECT ?rv1 ?rv2 WHERE {
   { ?rv1 uq:hasDistribution ?d1 . FILTER(prob:modeCount(?d1) > 1) . }
-  SIMILARITYJOIN(?d1, ?d2, __THETA__)
+  SIMILARITYJOIN(?d1, ?d2, __THETA__, 0.05)
   { ?rv2 uq:hasDistribution ?d2 . FILTER(prob:modeCount(?d2) > 1) . }
 }

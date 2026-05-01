@@ -5,13 +5,14 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
 /**
  * Syntax element representing SIMILARITYJOIN pattern in SPARQL query.
  * 
- * New relational semantics syntax:
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * Relational syntax:
+ * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * This represents a true binary join operation where:
  * - leftPattern generates the left table
  * - rightPattern generates the right table
  * - The join condition is JS(?leftVar, ?rightVar) <= tolerance
+ * - tailProbability configures the one-sided confidence-bound tail used by V3/V5
  * - Unlike FUSEJOIN, no fusion is performed - just filtering based on similarity
  */
 public class ElementSimilarityJoin extends Element {
@@ -20,30 +21,34 @@ public class ElementSimilarityJoin extends Element {
     private final String leftVar;
     private final String rightVar;
     private final double tolerance;
+    private final double tailProbability;
 
     /**
-     * Constructor for new relational semantics with left and right patterns.
+     * Constructor for relational semantics with left and right patterns.
      */
-    public ElementSimilarityJoin(Element leftPattern, Element rightPattern, 
-                                  String leftVar, String rightVar, double tolerance) {
+    public ElementSimilarityJoin(Element leftPattern, Element rightPattern,
+                                  String leftVar, String rightVar,
+                                  double tolerance, double tailProbability) {
         this.leftPattern = leftPattern;
         this.rightPattern = rightPattern;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
     }
     
     /**
      * Legacy constructor for backward compatibility (single pattern mode).
      * In this mode, leftPattern is null and rightPattern contains the single pattern.
      */
-    public ElementSimilarityJoin(Element pattern, String leftVar, String rightVar, 
-                                  double tolerance) {
+    public ElementSimilarityJoin(Element pattern, String leftVar, String rightVar,
+                                  double tolerance, double tailProbability) {
         this.leftPattern = null;
         this.rightPattern = pattern;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
     }
 
     @Override
@@ -80,6 +85,7 @@ public class ElementSimilarityJoin extends Element {
         return leftVar.equals(other.leftVar) &&
                rightVar.equals(other.rightVar) &&
                Math.abs(tolerance - other.tolerance) < 1e-10 &&
+               Math.abs(tailProbability - other.tailProbability) < 1e-10 &&
                leftEqual && rightEqual;
     }
 
@@ -88,7 +94,8 @@ public class ElementSimilarityJoin extends Element {
         int hash = "ElementSimilarityJoin".hashCode() ^
                leftVar.hashCode() ^
                rightVar.hashCode() ^
-               Double.hashCode(tolerance);
+               Double.hashCode(tolerance) ^
+               Double.hashCode(tailProbability);
         if (leftPattern != null) {
             hash ^= leftPattern.hashCode();
         }
@@ -134,5 +141,8 @@ public class ElementSimilarityJoin extends Element {
     public double getTolerance() {
         return tolerance;
     }
-}
 
+    public double getTailProbability() {
+        return tailProbability;
+    }
+}

@@ -3,7 +3,7 @@ package org.apache.jena.probsparql.propertyfunctions;
 import org.apache.jena.graph.Node;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.probsparql.functions.manipulation.Fuse;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
@@ -155,7 +155,7 @@ public class FuzzyJoinPF extends PropertyFunctionBase {
         }
         
         // Compute JS divergence
-        double js = computeJSDivergence(gmm1, gmm2);
+        double js = computeSimilarityScore(gmm1, gmm2, tolerance);
         
         // Check if distributions are similar enough
         if (js >= tolerance) {
@@ -232,21 +232,14 @@ public class FuzzyJoinPF extends PropertyFunctionBase {
     /**
      * Compute JS divergence between two GMMs.
      */
-    private double computeJSDivergence(GMMValue gmm1, GMMValue gmm2) {
+    private double computeSimilarityScore(GMMValue gmm1, GMMValue gmm2, double tolerance) {
         // Create NodeValues for JSDivergence function
         Node node1 = org.apache.jena.graph.NodeFactory.createLiteralDT(
             gmm1.toJSON(), GMMDatatype.INSTANCE);
         Node node2 = org.apache.jena.graph.NodeFactory.createLiteralDT(
             gmm2.toJSON(), GMMDatatype.INSTANCE);
-        
-        NodeValue nv1 = NodeValue.makeNode(node1);
-        NodeValue nv2 = NodeValue.makeNode(node2);
-        
-        // Use JSDivergence function
-        JSDivergence jsFunc = new JSDivergence();
-        NodeValue result = jsFunc.exec(nv1, nv2);
-        
-        return result.getDouble();
+
+        return ProbSPARQL.evaluateSimilarity(node1, node2, tolerance);
     }
     
     /**

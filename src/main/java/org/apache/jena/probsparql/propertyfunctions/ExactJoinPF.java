@@ -3,7 +3,7 @@ package org.apache.jena.probsparql.propertyfunctions;
 import org.apache.jena.graph.Node;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
-import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.ProbSPARQL;
 import org.apache.jena.probsparql.functions.manipulation.Fuse;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.ExecutionContext;
@@ -182,11 +182,7 @@ public class ExactJoinPF extends PropertyFunctionBase {
         NodeValue nv1 = NodeValue.makeNode(node1);
         NodeValue nv2 = NodeValue.makeNode(node2);
         
-        // Use JSDivergence function
-        JSDivergence jsFunc = new JSDivergence();
-        NodeValue result = jsFunc.exec(nv1, nv2);
-        
-        return result.getDouble();
+        return ProbSPARQL.legacyJSDivergence(node1, node2);
     }
     
     /**

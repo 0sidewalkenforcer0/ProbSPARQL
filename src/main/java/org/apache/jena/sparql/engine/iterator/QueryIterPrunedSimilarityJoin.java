@@ -43,6 +43,7 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
     private final Var leftVar;
     private final Var rightVar;
+    private final double tailProbability;
     private final ExecutionContext execCxt;
 
     private final List<Binding> leftTable;
@@ -57,6 +58,7 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
     public QueryIterPrunedSimilarityJoin(QueryIterator leftInput, Op rightOp,
                                          Var leftVar, Var rightVar, double tolerance,
+                                         double tailProbability,
                                          ExecutionContext execCxt) {
         super(execCxt);
 
@@ -66,10 +68,11 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
         this.leftVar  = leftVar;
         this.rightVar = rightVar;
+        this.tailProbability = tailProbability;
         this.execCxt  = execCxt;
 
         this.pruningStats = new PruningStats();
-        this.evaluator    = new PrunedSimJoinEvaluator(tolerance, pruningStats);
+        this.evaluator    = new PrunedSimJoinEvaluator(tolerance, tailProbability, pruningStats);
 
         this.leftTable  = materializeList(leftInput);
         QueryIterator rightInput = QC.execute(rightOp, QueryIterRoot.create(execCxt), execCxt);
@@ -111,6 +114,7 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
         out.incIndent();
         out.println("Left Var:  " + leftVar);
         out.println("Right Var: " + rightVar);
+        out.println("Tail Probability: " + tailProbability);
         out.println("Left  rows: " + leftTable.size());
         out.println("Right rows: " + rightTable.size());
         out.println(pruningStats.toString());

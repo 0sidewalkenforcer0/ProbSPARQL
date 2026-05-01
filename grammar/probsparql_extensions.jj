@@ -39,14 +39,16 @@ TOKEN [IGNORE_CASE] :
  * SimilarityJoinGraphPattern: Parses SIMILARITYJOIN syntax
  * 
  * Syntax options:
- * 1. New relational semantics (binary join):
- *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * 1. Relational semantics (binary join):
+ *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * 2. Legacy filter semantics (unary filter):
- *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
+ *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
  * 
  * The join condition is: JS(?leftVar, ?rightVar) <= tolerance
- * where JS is the Jensen-Shannon divergence.
+ * where JS is the Jensen-Shannon divergence. The tailProbability argument is
+ * the one-sided tail probability used by the sequential confidence bounds in
+ * V3_SPRT and the SPRT stage of V5_ADAPTIVE.
  */
 Element SimilarityJoinGraphPattern() :
 {
@@ -229,4 +231,3 @@ Element FuseJoinGraphPattern() :
  * 
  * 6. Rebuild jena-arq: mvn install -DskipTests
  */
-

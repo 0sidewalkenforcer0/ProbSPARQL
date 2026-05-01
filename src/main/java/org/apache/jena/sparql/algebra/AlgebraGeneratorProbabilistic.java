@@ -17,18 +17,18 @@ import java.util.Deque;
  * This generator integrates seamlessly with Jena's compilation process:
  * - When JavaCC parser produces ElementSimilarityJoin/ElementFuseJoin nodes,
  *   this generator compiles them into OpSimilarityJoin/OpFuseJoin operators.
- * - Supports both new relational semantics (binary join) and legacy filter semantics.
+ * - Supports both relational semantics (binary join) and legacy filter semantics.
  * 
- * New relational semantics:
+ * Relational semantics:
  * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
  *   -> OpFuseJoin(leftOp, rightOp, leftVar, rightVar, tolerance, resultVar)
  * 
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
- *   -> OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance)
+ * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ *   -> OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability)
  * 
  * Legacy filter semantics (single pattern):
- * SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
- *   -> OpSimilarityJoin(patternOp, patternOp, leftVar, rightVar, tolerance, legacyMode=true)
+ * SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
+ *   -> OpSimilarityJoin(patternOp, patternOp, leftVar, rightVar, tolerance, tailProbability, legacyMode=true)
  */
 public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
     
@@ -202,9 +202,10 @@ public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
         Var leftVar = Var.alloc(simJoin.getLeftVar());
         Var rightVar = Var.alloc(simJoin.getRightVar());
         double tolerance = simJoin.getTolerance();
+        double tailProbability = simJoin.getTailProbability();
         
         // Create OpSimilarityJoin
-        return new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, legacyMode);
+        return new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability, legacyMode);
     }
     
     /**
@@ -240,9 +241,10 @@ public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
         Var leftVar = Var.alloc(simJoin.getLeftVar());
         Var rightVar = Var.alloc(simJoin.getRightVar());
         double tolerance = simJoin.getTolerance();
+        double tailProbability = simJoin.getTailProbability();
         
         // Create OpSimilarityJoin
-        Op simJoinOp = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, legacyMode);
+        Op simJoinOp = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability, legacyMode);
         
         // If there's a current accumulator, join it with the result
         if (current != null && !isUnit(current)) {

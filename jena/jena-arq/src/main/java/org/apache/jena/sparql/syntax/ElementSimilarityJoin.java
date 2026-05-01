@@ -25,7 +25,7 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
  * 
  * ProbSPARQL Extension for similarity-based join using JS divergence.
  * 
- * Syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { pattern }
+ * Syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
  * 
  * This represents a join operation where:
  * - pattern contains both leftVar and rightVar bindings
@@ -38,30 +38,34 @@ public class ElementSimilarityJoin extends Element {
     private final String leftVar;
     private final String rightVar;
     private final double tolerance;
+    private final double tailProbability;
 
     /**
      * Constructor for new relational semantics with left and right patterns.
      */
-    public ElementSimilarityJoin(Element leftPattern, Element rightPattern, 
-                                  String leftVar, String rightVar, double tolerance) {
+    public ElementSimilarityJoin(Element leftPattern, Element rightPattern,
+                                  String leftVar, String rightVar,
+                                  double tolerance, double tailProbability) {
         this.leftPattern = leftPattern;
         this.rightPattern = rightPattern;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
     }
     
     /**
      * Legacy constructor for backward compatibility (single pattern mode).
      * In this mode, leftPattern is null and rightPattern contains the single pattern.
      */
-    public ElementSimilarityJoin(Element pattern, String leftVar, String rightVar, 
-                                  double tolerance) {
+    public ElementSimilarityJoin(Element pattern, String leftVar, String rightVar,
+                                  double tolerance, double tailProbability) {
         this.leftPattern = null;
         this.rightPattern = pattern;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
     }
 
     @Override
@@ -93,6 +97,7 @@ public class ElementSimilarityJoin extends Element {
         return leftVar.equals(other.leftVar) &&
                rightVar.equals(other.rightVar) &&
                Math.abs(tolerance - other.tolerance) < 1e-10 &&
+               Math.abs(tailProbability - other.tailProbability) < 1e-10 &&
                leftEqual && rightEqual;
     }
 
@@ -101,7 +106,8 @@ public class ElementSimilarityJoin extends Element {
         int hash = "ElementSimilarityJoin".hashCode() ^
                leftVar.hashCode() ^
                rightVar.hashCode() ^
-               Double.hashCode(tolerance);
+               Double.hashCode(tolerance) ^
+               Double.hashCode(tailProbability);
         if (leftPattern != null) {
             hash ^= leftPattern.hashCode();
         }
@@ -147,5 +153,8 @@ public class ElementSimilarityJoin extends Element {
     public double getTolerance() {
         return tolerance;
     }
-}
 
+    public double getTailProbability() {
+        return tailProbability;
+    }
+}

@@ -2,7 +2,8 @@
 # Finds all (left, right) pairs where JSD(left_gmm, right_gmm) <= 0.3
 #
 # Uses the relational SIMILARITYJOIN syntax:
-#   { leftPattern } SIMILARITYJOIN(?g1, ?g2, 0.3) { rightPattern }
+#   { leftPattern } SIMILARITYJOIN(?g1, ?g2, 0.3, 0.05) { rightPattern }
+# where 0.05 is the one-sided tail probability for the sequential confidence bounds.
 
 PREFIX prob: <http://example.org/prob#>
 PREFIX uq:   <http://example.org/ontology/uncertainty#>
@@ -10,6 +11,6 @@ PREFIX uq:   <http://example.org/ontology/uncertainty#>
 SELECT ?s1 ?s2
 WHERE {
   { ?s1 a prob:LeftEntity  ; prob:hasGMM ?g1 . }
-  SIMILARITYJOIN(?g1, ?g2, 0.3)
+  SIMILARITYJOIN(?g1, ?g2, 0.3, 0.05)
   { ?s2 a prob:RightEntity ; prob:hasGMM ?g2 . }
 }

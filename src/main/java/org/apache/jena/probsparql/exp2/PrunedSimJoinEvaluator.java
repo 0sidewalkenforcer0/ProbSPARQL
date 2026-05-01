@@ -21,11 +21,13 @@ import org.apache.jena.probsparql.functions.comparison.BoundsFilterSampler;
 public class PrunedSimJoinEvaluator {
 
     private final double tolerance;
+    private final double tailProbability;
     private final BoundsFilterSampler boundsChecker;
     private final PruningStats stats;
 
-    public PrunedSimJoinEvaluator(double tolerance, PruningStats stats) {
+    public PrunedSimJoinEvaluator(double tolerance, double tailProbability, PruningStats stats) {
         this.tolerance    = tolerance;
+        this.tailProbability = tailProbability;
         this.boundsChecker = new BoundsFilterSampler(tolerance);
         this.stats        = stats;
     }
@@ -72,7 +74,7 @@ public class PrunedSimJoinEvaluator {
         // ── Level 5: full JSD computation (MC sampling) ────────────────────
         stats.computedFullJSD++;
         try {
-            double jsd = ProbSPARQL.JSDivergence(leftNode, rightNode);
+            double jsd = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
             boolean passes = jsd <= tolerance;
             if (passes) {
                 stats.resultCount++;

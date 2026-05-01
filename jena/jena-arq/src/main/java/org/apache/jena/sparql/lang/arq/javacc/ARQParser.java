@@ -3097,6 +3097,8 @@ if ( acc == null )
     Token rightVarToken;
     Node toleranceNode;
     double tolerance;
+    Node tailProbabilityNode;
+    double tailProbability;
     String leftVarName;
     String rightVarName;
     if (jj_2_4(2147483647)) {
@@ -3122,6 +3124,15 @@ Object value = toleranceNode.getLiteralValue();
         } else {
             {if (true) throw new ParseException("Tolerance must be a numeric value");}
         }
+    jj_consume_token(COMMA);
+    // One-sided tail probability for the sequential confidence bounds
+        tailProbabilityNode = NumericLiteral();
+Object tailValue = tailProbabilityNode.getLiteralValue();
+        if (tailValue instanceof Number) {
+            tailProbability = ((Number) tailValue).doubleValue();
+        } else {
+            {if (true) throw new ParseException("Tail probability must be a numeric value");}
+        }
     jj_consume_token(RPAREN);
     // Right pattern (required)
         rightPattern = GroupGraphPattern();
@@ -3129,10 +3140,10 @@ Object value = toleranceNode.getLiteralValue();
         if (leftPattern != null) {
             // New relational semantics: binary join
             {if ("" != null) return new ElementSimilarityJoin(leftPattern, rightPattern,
-                                              leftVarName, rightVarName, tolerance);}
+                                              leftVarName, rightVarName, tolerance, tailProbability);}
         } else {
             // Legacy filter semantics: unary filter
-            {if ("" != null) return new ElementSimilarityJoin(rightPattern, leftVarName, rightVarName, tolerance);}
+            {if ("" != null) return new ElementSimilarityJoin(rightPattern, leftVarName, rightVarName, tolerance, tailProbability);}
         }
     throw new Error("Missing return statement in function");
 }

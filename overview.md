@@ -121,10 +121,14 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 
 | 函数 | URI 后缀 | 数学定义 | 范围 |
 |---|---|---|---|
-| JSDivergence | `jsdivergence` | $JS(P\|Q) = \frac{1}{2}KL(P\|M) + \frac{1}{2}KL(Q\|M)$ | $[0, \ln 2]$ |
+| PolyJSD | `jsd` | $JS(P\|Q) = \frac{1}{2}KL(P\|M) + \frac{1}{2}KL(Q\|M)$ | $[0, \ln 2]$ |
+| JSDivergence | `jsdivergence` | legacy GMM-only similarity-evaluator compatibility wrapper | score depends on mode |
 | KLDivergence | `kldivergence` | $KL(P\|Q) = \mathbb{E}_P[\ln P/Q]$ | $[0, +\infty)$ |
 
-**JSD 的 9 种计算模式（JSDivergence.java，JSDivergenceConfig.java）：**
+`prob:jsd` 是新的数值接口：多态分布比较，GMM 路径固定使用 MC 10K。  
+`prob:jsdivergence` 保留为 legacy GMM-only 接口；其内部现在对应 similarity evaluator，主要服务旧的 V1-V5 模式和 join 场景。
+
+**legacy `prob:jsdivergence` / similarity evaluator 的 9 种模式（SimilarityEvaluator.java，JSDivergenceConfig.java）：**
 
 | 模式 | 策略 | 样本数 | 用途 |
 |---|---|---|---|
@@ -132,11 +136,11 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 | `GT_1K` | 简单 Monte Carlo | 1,000 | 中等 GT |
 | `GT_5K` | 简单 Monte Carlo | 5,000 | 精确 GT |
 | `GT_10K` | 简单 Monte Carlo | 10,000 | 最精确 GT（对照基准） |
-| `V1_MC` | 简单 Monte Carlo（可配置） | 可配 | 基线方案 |
-| `V2_STRATIFIED` | 分层采样 | 可配 | 改进精度 |
-| `V3_SPRT` | 顺序概率比检验（自适应停止） | ≤ 最大值 | 节省样本 |
-| `V4_BOUNDS` | 解析边界过滤 + MC | ≤ 最大值 | 快速拒绝明显不同对 |
-| `V5_ADAPTIVE` | V4+V3+V2 组合 | 自适应 | **默认，最优综合** |
+| `V1_MC` | 简单 Monte Carlo（数值估计器） | 可配 | 基线 JSD 估计 |
+| `V2_STRATIFIED` | 分层采样（数值估计器） | 可配 | 改进精度 |
+| `V3_SPRT` | 顺序假设检验 / 置信边界早停 | ≤ 最大值 | 面向 threshold 的快速判定 |
+| `V4_BOUNDS` | 下界过滤 | ≤ 最大值 | 快速拒绝明显不同对 |
+| `V5_ADAPTIVE` | V4+V3+V2 流水线 | 自适应 | **默认 legacy similarity pipeline** |
 
 ### 4.3 变换算子（Transformation）7 个
 
@@ -206,11 +210,11 @@ FUSEJOIN(?distCT, ?distLaser, 0.3, ?fused)
 
 ```sparql
 { ?s uq:hasDistL ?gl . }
-SIMILARITYJOIN(?gl, ?gr, 0.3)
+SIMILARITYJOIN(?gl, ?gr, 0.3, 0.05)
 { ?t uq:hasDistR ?gr . }
 ```
 
-**语义：** 与 FUSEJOIN 相同，但不进行融合，只返回满足相似度阈值的匹配对。
+**语义：** 返回满足 `JSD(?gl, ?gr) <= 0.3` 的匹配对。第 4 个参数 `0.05` 是单侧置信边界的 tail probability，用于 `V3_SPRT` 以及 `V5_ADAPTIVE` 内部的 sequential confidence-bound decision。
 
 ### 6.3 实现栈（完整流水线）
 

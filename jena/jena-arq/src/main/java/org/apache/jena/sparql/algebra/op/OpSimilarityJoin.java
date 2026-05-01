@@ -40,18 +40,20 @@ public class OpSimilarityJoin extends Op1 {
     private final Var leftVar;       // Left distribution variable
     private final Var rightVar;      // Right distribution variable  
     private final double tolerance;  // JS divergence threshold
+    private final double tailProbability; // One-sided tail probability for V3/V5
     private final boolean legacyMode; // True if using single-pattern (legacy) semantics
 
     /**
      * Constructor for legacy single-pattern mode.
      */
     public OpSimilarityJoin(Op subOp, Var leftVar, Var rightVar, 
-                            double tolerance, boolean legacyMode) {
+                            double tolerance, double tailProbability, boolean legacyMode) {
         super(subOp);
         this.rightOp = null;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
         this.legacyMode = legacyMode;
     }
 
@@ -59,12 +61,13 @@ public class OpSimilarityJoin extends Op1 {
      * Constructor for new relational semantics with left and right sub-operations.
      */
     public OpSimilarityJoin(Op leftOp, Op rightOp, Var leftVar, Var rightVar,
-                            double tolerance) {
+                            double tolerance, double tailProbability) {
         super(leftOp);
         this.rightOp = rightOp;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
         this.legacyMode = false;
     }
 
@@ -87,10 +90,10 @@ public class OpSimilarityJoin extends Op1 {
     @Override
     public Op1 copy(Op subOp) {
         if (legacyMode) {
-            return new OpSimilarityJoin(subOp, leftVar, rightVar, tolerance, true);
+            return new OpSimilarityJoin(subOp, leftVar, rightVar, tolerance, tailProbability, true);
         } else {
             // In relational semantics, subOp is the leftOp, and we use the current rightOp
-            return new OpSimilarityJoin(subOp, this.rightOp, leftVar, rightVar, tolerance);
+            return new OpSimilarityJoin(subOp, this.rightOp, leftVar, rightVar, tolerance, tailProbability);
         }
     }
 
@@ -105,6 +108,7 @@ public class OpSimilarityJoin extends Op1 {
         hash ^= leftVar.hashCode();
         hash ^= rightVar.hashCode();
         hash ^= Double.hashCode(tolerance);
+        hash ^= Double.hashCode(tailProbability);
         if (getSubOp() != null) hash ^= getSubOp().hashCode();
         if (rightOp != null) hash ^= rightOp.hashCode();
         return hash;
@@ -118,6 +122,7 @@ public class OpSimilarityJoin extends Op1 {
         if (!leftVar.equals(otherSim.leftVar)) return false;
         if (!rightVar.equals(otherSim.rightVar)) return false;
         if (Math.abs(tolerance - otherSim.tolerance) > 1e-10) return false;
+        if (Math.abs(tailProbability - otherSim.tailProbability) > 1e-10) return false;
         if (legacyMode != otherSim.legacyMode) return false;
         
         if (getSubOp() == null && otherSim.getSubOp() != null) return false;
@@ -150,8 +155,11 @@ public class OpSimilarityJoin extends Op1 {
         return tolerance;
     }
 
+    public double getTailProbability() {
+        return tailProbability;
+    }
+
     public boolean isLegacyMode() {
         return legacyMode;
     }
 }
-

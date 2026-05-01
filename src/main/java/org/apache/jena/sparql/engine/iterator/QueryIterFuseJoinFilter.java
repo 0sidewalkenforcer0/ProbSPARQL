@@ -114,7 +114,7 @@ public class QueryIterFuseJoinFilter extends QueryIter {
             
             // Compute JS divergence
             try {
-                double jsDiv = ProbSPARQL.JSDivergence(leftNode, rightNode);
+                double jsDiv = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance);
                 
                 if (jsDiv <= tolerance) {
                     passedCount++;
@@ -196,4 +196,3 @@ public class QueryIterFuseJoinFilter extends QueryIter {
         out.decIndent();
     }
 }
-

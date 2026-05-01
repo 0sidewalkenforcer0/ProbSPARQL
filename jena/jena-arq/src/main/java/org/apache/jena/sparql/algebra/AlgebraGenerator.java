@@ -664,6 +664,7 @@ public class AlgebraGenerator
         Var leftVar = Var.alloc(simJoin.getLeftVar());
         Var rightVar = Var.alloc(simJoin.getRightVar());
         double tolerance = simJoin.getTolerance();
+        double tailProbability = simJoin.getTailProbability();
         
         Op opSimJoin;
         
@@ -671,11 +672,11 @@ public class AlgebraGenerator
             // Relational semantics: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
             Op leftOp = compileElement(simJoin.getLeftPattern());
             Op rightOp = compileElement(simJoin.getRightPattern());
-            opSimJoin = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance);
+            opSimJoin = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability);
         } else {
             // Legacy semantics: SIMILARITYJOIN(...) { pattern }
             Op patternOp = compileElement(simJoin.getRightPattern());
-            opSimJoin = new OpSimilarityJoin(patternOp, leftVar, rightVar, tolerance, true);
+            opSimJoin = new OpSimilarityJoin(patternOp, leftVar, rightVar, tolerance, tailProbability, true);
         }
         
         return join(current, opSimJoin);

@@ -28,20 +28,23 @@ public class OpSimilarityJoin extends OpExt {
     private final Var leftVar;
     private final Var rightVar;
     private final double tolerance;
+    private final double tailProbability;
     private final boolean legacyMode;
 
-    public OpSimilarityJoin(Op leftOp, Op rightOp, Var leftVar, Var rightVar, double tolerance) {
-        this(leftOp, rightOp, leftVar, rightVar, tolerance, false);
+    public OpSimilarityJoin(Op leftOp, Op rightOp, Var leftVar, Var rightVar,
+                            double tolerance, double tailProbability) {
+        this(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability, false);
     }
 
     public OpSimilarityJoin(Op leftOp, Op rightOp, Var leftVar, Var rightVar,
-                            double tolerance, boolean legacyMode) {
+                            double tolerance, double tailProbability, boolean legacyMode) {
         super("SimilarityJoin");
         this.leftOp = leftOp;
         this.rightOp = rightOp;
         this.leftVar = leftVar;
         this.rightVar = rightVar;
         this.tolerance = tolerance;
+        this.tailProbability = tailProbability;
         this.legacyMode = legacyMode;
     }
 
@@ -52,6 +55,7 @@ public class OpSimilarityJoin extends OpExt {
     public Var getLeftVar()       { return leftVar; }
     public Var getRightVar()      { return rightVar; }
     public double getTolerance()  { return tolerance; }
+    public double getTailProbability() { return tailProbability; }
     public boolean isLegacyMode() { return legacyMode; }
 
     // ── OpExt abstract methods ────────────────────────────────────────────
@@ -79,6 +83,7 @@ public class OpSimilarityJoin extends OpExt {
         out.print("(leftVar=" + leftVar.getVarName()
                 + " rightVar=" + rightVar.getVarName()
                 + " tolerance=" + tolerance
+                + " tailProbability=" + tailProbability
                 + " legacy=" + legacyMode + ")");
     }
 
@@ -94,7 +99,7 @@ public class OpSimilarityJoin extends OpExt {
 
     @Override
     public int hashCode() {
-        return Objects.hash(leftOp, rightOp, leftVar, rightVar, tolerance);
+        return Objects.hash(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability, legacyMode);
     }
 
     @Override
@@ -102,7 +107,9 @@ public class OpSimilarityJoin extends OpExt {
         if (!(other instanceof OpSimilarityJoin)) return false;
         OpSimilarityJoin o = (OpSimilarityJoin) other;
         if (!leftVar.equals(o.leftVar) || !rightVar.equals(o.rightVar)
-                || this.tolerance != o.tolerance || this.legacyMode != o.legacyMode)
+                || this.tolerance != o.tolerance
+                || this.tailProbability != o.tailProbability
+                || this.legacyMode != o.legacyMode)
             return false;
         boolean leftEq  = (leftOp  == null) == (o.leftOp  == null)
                 && (leftOp  == null || leftOp.equalTo(o.leftOp, labelMap));

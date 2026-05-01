@@ -18,7 +18,7 @@ import org.apache.jena.sparql.engine.iterator.QueryIterSimilarityJoinFilter;
  * 
  * Updated for new relational semantics (dual-input nested loop join):
  * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance) { rightPattern }
+ * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  */
 public class OpExecutorProbabilistic extends OpExecutor {
     
@@ -122,11 +122,11 @@ public class OpExecutorProbabilistic extends OpExecutor {
      * 1. Legacy mode (leftOp == rightOp): Filter mode - both variables are in same binding
      * 2. New mode (leftOp != rightOp): Nested loop join - left and right are independent patterns
      * 
-     * Legacy mode: SIMILARITYJOIN(?d1, ?d2, tolerance) { }
+     * Legacy mode: SIMILARITYJOIN(?d1, ?d2, tolerance, tailProbability) { }
      * - All variables bound in single BGP
      * - Apply JS divergence filter to existing bindings
      * 
-     * New mode: { leftPattern } SIMILARITYJOIN(?d1, ?d2, tolerance) { rightPattern }
+     * New mode: { leftPattern } SIMILARITYJOIN(?d1, ?d2, tolerance, tailProbability) { rightPattern }
      * - Execute left and right patterns independently
      * - Nested loop join with JS divergence predicate
      */
@@ -139,6 +139,7 @@ public class OpExecutorProbabilistic extends OpExecutor {
         Var leftVar = opSimilarityJoin.getLeftVar();
         Var rightVar = opSimilarityJoin.getRightVar();
         double tolerance = opSimilarityJoin.getTolerance();
+        double tailProbability = opSimilarityJoin.getTailProbability();
         
         // Get legacy mode flag from the operator
         boolean isLegacyMode = opSimilarityJoin.isLegacyMode();
@@ -154,6 +155,7 @@ public class OpExecutorProbabilistic extends OpExecutor {
                 leftVar,
                 rightVar,
                 tolerance,
+                tailProbability,
                 execCxt
             );
         } else {
@@ -166,10 +168,10 @@ public class OpExecutorProbabilistic extends OpExecutor {
 
             if (pruning) {
                 return new QueryIterPrunedSimilarityJoin(
-                    leftInput, rightOp, leftVar, rightVar, tolerance, execCxt);
+                    leftInput, rightOp, leftVar, rightVar, tolerance, tailProbability, execCxt);
             } else {
                 return new QueryIterSimilarityJoin(
-                    leftInput, rightOp, leftVar, rightVar, tolerance, execCxt);
+                    leftInput, rightOp, leftVar, rightVar, tolerance, tailProbability, execCxt);
             }
         }
     }
