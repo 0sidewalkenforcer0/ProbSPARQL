@@ -102,7 +102,7 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 
 ---
 
-## 4. 22 个 SPARQL 函数
+## 4. 24 个 SPARQL 函数
 
 所有函数通过 `ProbSPARQL.init()` 注册到 `FunctionRegistry`，URI 前缀为 `http://probsparql.org/function#`。
 
@@ -117,16 +117,19 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 
 **实现要点（CDF.java）：** 对每个分量高斯计算 CDF（多维积分），加权求和，使用 erf 函数近似。
 
-### 4.2 比较度量（Comparison）2 个
+### 4.2 比较度量（Comparison）5 个
 
 | 函数 | URI 后缀 | 数学定义 | 范围 |
 |---|---|---|---|
 | PolyJSD | `jsd` | $JS(P\|Q) = \frac{1}{2}KL(P\|M) + \frac{1}{2}KL(Q\|M)$ | $[0, \ln 2]$ |
 | JSDivergence | `jsdivergence` | legacy GMM-only similarity-evaluator compatibility wrapper | score depends on mode |
 | KLDivergence | `kldivergence` | $KL(P\|Q) = \mathbb{E}_P[\ln P/Q]$ | $[0, +\infty)$ |
+| SameTerm | `sameTerm` | RDF term equality | boolean |
+| SameDistribution | `sameDistribution` | datatype value equality for distribution literals | boolean |
 
 `prob:jsd` 是新的数值接口：多态分布比较，GMM 路径固定使用 MC 10K。  
 `prob:jsdivergence` 保留为 legacy GMM-only 接口；其内部现在对应 similarity evaluator，主要服务旧的 V1-V5 模式和 join 场景。
+`prob:sameTerm` 比较 RDF term 本身，因此对 GMM component 顺序敏感；`prob:sameDistribution` 比较解析后的分布值，因此对 GMM component 顺序不敏感。
 
 **legacy `prob:jsdivergence` / similarity evaluator 的 9 种模式（SimilarityEvaluator.java，JSDivergenceConfig.java）：**
 

@@ -6,6 +6,8 @@ import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.probsparql.functions.comparison.PolyJSD;
+import org.apache.jena.probsparql.functions.comparison.SameDistribution;
+import org.apache.jena.probsparql.functions.comparison.SameTerm;
 import org.apache.jena.probsparql.functions.comparison.SimilarityEvaluator;
 import org.apache.jena.probsparql.functions.thresholding.HistogramCDF;
 import org.apache.jena.probsparql.functions.manipulation.HistogramMean;
@@ -120,7 +122,9 @@ public class ProbSPARQL {
         functionRegistry.put(JSDivergence.URI, JSDivergence.class);
         functionRegistry.put(HistogramJSD.URI, HistogramJSD.class);
         functionRegistry.put(PolyJSD.URI, PolyJSD.class);   // polymorphic prob:jsd
-        logger.info("Registered {} comparison functions", 4);
+        functionRegistry.put(SameTerm.URI, SameTerm.class);
+        functionRegistry.put(SameDistribution.URI, SameDistribution.class);
+        logger.info("Registered {} comparison functions", 6);
         
         // Category 3: Probabilistic Transformation Operators
         functionRegistry.put(Scale.URI, Scale.class);
@@ -165,7 +169,7 @@ public class ProbSPARQL {
         logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and SIMILARITYJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (22 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
+        logger.info("{} initialization complete (24 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
     }
     
     /**

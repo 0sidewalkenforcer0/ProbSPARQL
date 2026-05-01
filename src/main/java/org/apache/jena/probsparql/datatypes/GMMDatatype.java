@@ -123,15 +123,6 @@ public class GMMDatatype extends BaseDatatype {
         }
     }
 
-    @Override
-    public String canonicalizeLexicalForm(String lexicalForm) {
-        try {
-            return unparse(parse(lexicalForm));
-        } catch (DatatypeFormatException ex) {
-            return lexicalForm;
-        }
-    }
-    
     /**
      * Validate that JSON object has exactly the required fields in the correct order.
      */

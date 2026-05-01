@@ -12,6 +12,10 @@
  *       Preferred numerical Jensen-Shannon divergence: {@code prob:jsd(?dist1, ?dist2)}</li>
  *   <li>{@link org.apache.jena.probsparql.functions.comparison.JSDivergence} - 
  *       Legacy GMM-only compatibility wrapper: {@code prob:jsdivergence(?gmm1, ?gmm2)}</li>
+ *   <li>{@link org.apache.jena.probsparql.functions.comparison.SameTerm} -
+ *       RDF-term equality: {@code prob:sameTerm(?dist1, ?dist2)}</li>
+ *   <li>{@link org.apache.jena.probsparql.functions.comparison.SameDistribution} -
+ *       Value-based equality: {@code prob:sameDistribution(?dist1, ?dist2)}</li>
  * </ul>
  *
  * <p>{@code prob:jsd} is the stable numerical JSD interface. The legacy

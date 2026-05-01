@@ -1,6 +1,7 @@
 package org.apache.jena.probsparql.datatypes;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -190,6 +191,18 @@ public class DirichletValue implements Sampleable {
     @Override
     public String toString() {
         return "DirichletValue{dimensions=" + getDimensions() + ", alphas=" + Arrays.toString(alphas) + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DirichletValue that)) return false;
+        return Arrays.equals(alphas, that.alphas);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.hashCode(alphas));
     }
 
     // -----------------------------------------------------------------------
