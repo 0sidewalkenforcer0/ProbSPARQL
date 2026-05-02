@@ -1,0 +1,2 @@
+benchmark/data/*.ttl filter=lfs diff=lfs merge=lfs -text
+benchmark/data/**/*.ttl filter=lfs diff=lfs merge=lfs -text
