@@ -1,0 +1,615 @@
+@prefix bench: <http://example.org/benchmark/multid#> .
+@prefix cfm: <http://example.org/ontology/cfm#> .
+@prefix ex: <http://example.org/data/multid/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix uq: <http://example.org/ontology/uncertainty#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:dataset_d2_k3 a bench:MultiDimBenchmarkDataset ;
+    rdfs:label "Multi-dimensional GMM benchmark d=2, K=3"@en ;
+    bench:covarianceType "diag" ;
+    bench:dimensions 2 ;
+    bench:nComponents 3 ;
+    bench:rvCount 100 ;
+    bench:seed 20260704 .
+
+ex:entity_d2_k3_0001 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0001 .
+
+ex:entity_d2_k3_0002 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0002 .
+
+ex:entity_d2_k3_0003 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0003 .
+
+ex:entity_d2_k3_0004 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0004 .
+
+ex:entity_d2_k3_0005 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0005 .
+
+ex:entity_d2_k3_0006 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0006 .
+
+ex:entity_d2_k3_0007 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0007 .
+
+ex:entity_d2_k3_0008 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0008 .
+
+ex:entity_d2_k3_0009 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0009 .
+
+ex:entity_d2_k3_0010 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0010 .
+
+ex:entity_d2_k3_0011 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0011 .
+
+ex:entity_d2_k3_0012 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0012 .
+
+ex:entity_d2_k3_0013 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0013 .
+
+ex:entity_d2_k3_0014 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0014 .
+
+ex:entity_d2_k3_0015 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0015 .
+
+ex:entity_d2_k3_0016 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0016 .
+
+ex:entity_d2_k3_0017 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0017 .
+
+ex:entity_d2_k3_0018 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0018 .
+
+ex:entity_d2_k3_0019 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0019 .
+
+ex:entity_d2_k3_0020 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0020 .
+
+ex:entity_d2_k3_0021 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0021 .
+
+ex:entity_d2_k3_0022 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0022 .
+
+ex:entity_d2_k3_0023 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0023 .
+
+ex:entity_d2_k3_0024 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0024 .
+
+ex:entity_d2_k3_0025 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0025 .
+
+ex:entity_d2_k3_0026 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0026 .
+
+ex:entity_d2_k3_0027 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0027 .
+
+ex:entity_d2_k3_0028 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0028 .
+
+ex:entity_d2_k3_0029 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0029 .
+
+ex:entity_d2_k3_0030 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0030 .
+
+ex:entity_d2_k3_0031 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0031 .
+
+ex:entity_d2_k3_0032 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0032 .
+
+ex:entity_d2_k3_0033 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0033 .
+
+ex:entity_d2_k3_0034 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0034 .
+
+ex:entity_d2_k3_0035 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0035 .
+
+ex:entity_d2_k3_0036 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0036 .
+
+ex:entity_d2_k3_0037 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0037 .
+
+ex:entity_d2_k3_0038 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0038 .
+
+ex:entity_d2_k3_0039 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0039 .
+
+ex:entity_d2_k3_0040 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0040 .
+
+ex:entity_d2_k3_0041 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0041 .
+
+ex:entity_d2_k3_0042 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0042 .
+
+ex:entity_d2_k3_0043 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0043 .
+
+ex:entity_d2_k3_0044 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0044 .
+
+ex:entity_d2_k3_0045 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0045 .
+
+ex:entity_d2_k3_0046 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0046 .
+
+ex:entity_d2_k3_0047 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0047 .
+
+ex:entity_d2_k3_0048 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0048 .
+
+ex:entity_d2_k3_0049 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0049 .
+
+ex:entity_d2_k3_0050 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0050 .
+
+ex:entity_d2_k3_0051 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0051 .
+
+ex:entity_d2_k3_0052 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0052 .
+
+ex:entity_d2_k3_0053 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0053 .
+
+ex:entity_d2_k3_0054 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0054 .
+
+ex:entity_d2_k3_0055 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0055 .
+
+ex:entity_d2_k3_0056 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0056 .
+
+ex:entity_d2_k3_0057 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0057 .
+
+ex:entity_d2_k3_0058 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0058 .
+
+ex:entity_d2_k3_0059 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0059 .
+
+ex:entity_d2_k3_0060 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0060 .
+
+ex:entity_d2_k3_0061 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0061 .
+
+ex:entity_d2_k3_0062 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0062 .
+
+ex:entity_d2_k3_0063 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0063 .
+
+ex:entity_d2_k3_0064 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0064 .
+
+ex:entity_d2_k3_0065 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0065 .
+
+ex:entity_d2_k3_0066 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0066 .
+
+ex:entity_d2_k3_0067 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0067 .
+
+ex:entity_d2_k3_0068 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0068 .
+
+ex:entity_d2_k3_0069 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0069 .
+
+ex:entity_d2_k3_0070 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0070 .
+
+ex:entity_d2_k3_0071 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0071 .
+
+ex:entity_d2_k3_0072 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0072 .
+
+ex:entity_d2_k3_0073 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0073 .
+
+ex:entity_d2_k3_0074 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0074 .
+
+ex:entity_d2_k3_0075 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0075 .
+
+ex:entity_d2_k3_0076 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0076 .
+
+ex:entity_d2_k3_0077 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0077 .
+
+ex:entity_d2_k3_0078 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0078 .
+
+ex:entity_d2_k3_0079 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0079 .
+
+ex:entity_d2_k3_0080 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0080 .
+
+ex:entity_d2_k3_0081 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0081 .
+
+ex:entity_d2_k3_0082 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0082 .
+
+ex:entity_d2_k3_0083 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0083 .
+
+ex:entity_d2_k3_0084 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0084 .
+
+ex:entity_d2_k3_0085 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0085 .
+
+ex:entity_d2_k3_0086 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0086 .
+
+ex:entity_d2_k3_0087 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0087 .
+
+ex:entity_d2_k3_0088 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0088 .
+
+ex:entity_d2_k3_0089 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0089 .
+
+ex:entity_d2_k3_0090 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0090 .
+
+ex:entity_d2_k3_0091 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0091 .
+
+ex:entity_d2_k3_0092 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0092 .
+
+ex:entity_d2_k3_0093 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0093 .
+
+ex:entity_d2_k3_0094 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0094 .
+
+ex:entity_d2_k3_0095 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0095 .
+
+ex:entity_d2_k3_0096 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0096 .
+
+ex:entity_d2_k3_0097 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0097 .
+
+ex:entity_d2_k3_0098 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0098 .
+
+ex:entity_d2_k3_0099 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0099 .
+
+ex:entity_d2_k3_0100 a cfm:Component ;
+    cfm:hasProbabilisticValue ex:rv_d2_k3_0100 .
+
+ex:rv_d2_k3_0001 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.51071,0.137158,0.352132],\"means\":[[1.368001,-7.449134],[-4.748067,-9.24439],[-2.749855,-6.865028]],\"covariances\":[[0.944795,0.903644],[0.682569,1.554715],[0.369709,1.950769]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0002 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.068632,0.456722,0.474646],\"means\":[[-4.61288,-6.864054],[-8.961296,7.322947],[0.056747,-6.085055]],\"covariances\":[[0.600747,1.769581],[1.132467,0.448806],[0.774718,0.599882]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0003 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.169122,0.458424,0.372454],\"means\":[[-6.890908,-1.755186],[0.735111,1.289177],[1.02297,-3.929813]],\"covariances\":[[0.246822,0.53224],[1.966882,1.238771],[1.738487,1.237184]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0004 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.472924,0.073189,0.453887],\"means\":[[7.585423,4.767847],[1.751163,7.278941],[-7.178726,-8.745772]],\"covariances\":[[0.349728,1.823679],[0.765354,0.865581],[0.836088,0.669322]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0005 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.587144,0.316363,0.096493],\"means\":[[2.666633,-6.814116],[6.472225,-6.217712],[-7.914199,-5.261286]],\"covariances\":[[0.645404,0.972619],[0.694573,0.408955],[1.154438,1.064145]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0006 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.132428,0.115465,0.752107],\"means\":[[-2.787874,-4.466513],[7.525661,6.678079],[-3.730014,3.740343]],\"covariances\":[[0.333134,1.022512],[1.699213,1.233898],[0.062104,1.82316]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0007 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.124061,0.582242,0.293697],\"means\":[[-4.439349,9.370047],[8.171904,3.734509],[-5.939881,2.851995]],\"covariances\":[[1.15023,0.114675],[1.395114,0.934347],[1.532051,1.844821]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0008 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.30252,0.516,0.18148],\"means\":[[-5.293813,1.710578],[-2.942326,-5.346211],[-6.285367,7.412968]],\"covariances\":[[0.634536,1.599467],[1.505291,1.322936],[1.614319,0.897716]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0009 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.728303,0.166773,0.104924],\"means\":[[5.492543,5.800949],[6.783768,-8.392888],[6.859844,-7.163147]],\"covariances\":[[1.815853,0.849856],[1.031344,0.553394],[1.977269,1.07079]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0010 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.245497,0.366681,0.387822],\"means\":[[-4.36896,3.970158],[4.438557,-6.848019],[-5.237619,-7.829709]],\"covariances\":[[0.54991,1.148313],[1.429669,0.506198],[1.982212,1.845898]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0011 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.609671,0.275874,0.114455],\"means\":[[-3.899629,-6.13197],[9.602856,7.040748],[-9.494327,0.487461]],\"covariances\":[[1.047005,0.316567],[0.545562,0.120856],[0.967184,1.670692]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0012 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.303901,0.423606,0.272493],\"means\":[[3.533691,-9.36444],[0.843526,-7.121683],[6.616569,-6.692738]],\"covariances\":[[0.92544,0.708496],[1.443832,0.977382],[0.055509,0.444733]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0013 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.373288,0.260907,0.365805],\"means\":[[-2.673462,-7.232337],[-7.412771,4.066415],[-6.658452,3.06954]],\"covariances\":[[1.034065,1.445835],[1.111059,1.265634],[0.640776,0.747198]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0014 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.257759,0.413317,0.328924],\"means\":[[3.988805,-8.912247],[-3.680328,3.471391],[4.576509,7.818817]],\"covariances\":[[1.186187,1.14349],[1.195687,1.330336],[1.107743,1.099757]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0015 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.366764,0.301333,0.331903],\"means\":[[6.47422,2.080113],[2.078704,-9.55647],[2.712951,-1.460114]],\"covariances\":[[0.834058,0.720259],[1.777871,1.973837],[0.756411,0.593609]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0016 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.284119,0.378756,0.337125],\"means\":[[4.593169,-6.861028],[5.635879,0.718968],[2.388996,-0.394103]],\"covariances\":[[1.60082,1.185727],[1.253206,1.756774],[0.914723,0.174992]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0017 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.187268,0.413044,0.399688],\"means\":[[-6.810913,-4.829329],[5.148819,-3.08961],[5.302611,2.019352]],\"covariances\":[[1.567496,1.946892],[1.399841,0.131564],[1.303802,1.282102]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0018 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.338631,0.283744,0.377625],\"means\":[[6.512608,1.06837],[5.106645,-0.79193],[4.955477,-5.35986]],\"covariances\":[[1.000305,0.997086],[1.977075,0.799764],[0.824205,1.130135]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0019 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.423322,0.330644,0.246034],\"means\":[[0.38792,-9.432239],[-9.392492,-6.556905],[5.608366,-7.362396]],\"covariances\":[[1.183634,0.588596],[1.454943,1.34003],[0.413341,0.350936]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0020 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.432616,0.40736,0.160024],\"means\":[[-5.786638,7.001554],[4.827795,1.706432],[-7.488925,-7.394068]],\"covariances\":[[0.126109,1.360662],[0.661999,0.720236],[1.742461,0.505524]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0021 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.41851,0.442715,0.138775],\"means\":[[2.016222,4.723633],[-1.211426,-9.344942],[3.1547,5.516771]],\"covariances\":[[1.724896,0.610013],[1.361856,1.356684],[1.549866,0.756067]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0022 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.132994,0.369107,0.497899],\"means\":[[-4.709862,-4.539916],[-1.058219,7.49632],[-6.665486,8.316396]],\"covariances\":[[0.675085,0.18182],[1.380297,0.217581],[0.658622,1.247858]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0023 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.305567,0.207651,0.486782],\"means\":[[-7.693903,-2.298558],[7.110085,4.174907],[-2.713246,4.39368]],\"covariances\":[[0.833213,0.54065],[1.439466,0.53167],[0.990963,1.314455]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0024 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.351227,0.272778,0.375995],\"means\":[[0.67016,0.961121],[-9.652277,-9.115687],[-7.69932,-6.969265]],\"covariances\":[[0.160836,1.879474],[1.218567,1.799011],[0.847392,1.942096]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0025 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.450587,0.292606,0.256807],\"means\":[[-7.005887,-2.228459],[-1.340209,2.476392],[-8.406515,-2.014202]],\"covariances\":[[0.531421,0.487982],[0.416702,0.065638],[0.773605,0.319172]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0026 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.514886,0.317568,0.167546],\"means\":[[-8.25645,9.280257],[-5.283526,5.229608],[-1.07923,8.994473]],\"covariances\":[[1.108429,1.570129],[1.58133,1.266281],[0.554911,1.40508]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0027 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.729543,0.11629,0.154167],\"means\":[[-9.475697,7.204281],[-5.549874,-7.728066],[-5.822774,-2.507453]],\"covariances\":[[0.713597,1.529922],[1.603498,0.348627],[0.113087,1.585373]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0028 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.429718,0.09782,0.472462],\"means\":[[7.36802,-5.354198],[7.509736,0.643726],[-3.127956,-0.141023]],\"covariances\":[[1.326366,1.445047],[1.320939,0.103348],[1.246587,1.011405]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0029 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.301703,0.164754,0.533543],\"means\":[[-5.251165,3.227267],[-5.072916,-0.847976],[7.083477,4.802288]],\"covariances\":[[0.167168,0.597592],[0.339143,0.625671],[1.665972,0.336885]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0030 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.324334,0.357986,0.31768],\"means\":[[5.867094,-1.280448],[-0.178634,-8.557784],[-0.099896,-6.419436]],\"covariances\":[[0.64612,0.75577],[1.560983,1.391844],[1.469265,1.217158]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0031 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.177188,0.424987,0.397825],\"means\":[[-9.858302,7.407677],[6.116399,-9.944245],[-9.704734,6.045836]],\"covariances\":[[1.139948,1.980795],[0.684686,0.134764],[1.051916,0.543635]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0032 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.252285,0.377113,0.370602],\"means\":[[4.771362,2.361688],[-8.397739,-8.383084],[0.857546,7.70192]],\"covariances\":[[1.955138,1.449722],[0.567875,1.112051],[1.875113,0.227236]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0033 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.258197,0.371986,0.369817],\"means\":[[-5.175532,-4.744688],[-8.818171,-6.025174],[-9.587844,-8.410826]],\"covariances\":[[1.954824,0.940812],[0.355561,1.921177],[1.875156,1.121433]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0034 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.456413,0.191385,0.352202],\"means\":[[9.677414,-7.245693],[-6.650626,-5.55291],[-5.604213,-7.966624]],\"covariances\":[[0.441924,1.026666],[0.365667,1.804776],[1.213454,1.51847]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0035 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.234927,0.303597,0.461476],\"means\":[[-2.066017,6.457279],[3.018091,2.570285],[8.356845,0.494306]],\"covariances\":[[0.99293,1.139366],[1.556898,1.230339],[1.646939,1.631888]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0036 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.392589,0.476684,0.130727],\"means\":[[6.598055,4.539287],[-0.06538,-3.041376],[-5.062619,-7.087531]],\"covariances\":[[0.802603,0.125347],[1.936355,1.531856],[1.003033,0.767093]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0037 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.421991,0.254853,0.323156],\"means\":[[-6.63199,3.02756],[-6.077267,-5.757187],[2.000977,-9.533414]],\"covariances\":[[0.320238,1.667942],[1.890282,1.774781],[0.836425,0.251233]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0038 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.542353,0.356185,0.101462],\"means\":[[6.553123,0.137704],[5.247297,-4.500537],[-5.438479,2.984379]],\"covariances\":[[1.453749,1.362414],[1.632775,1.065207],[1.483639,1.143041]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0039 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.393719,0.367522,0.238759],\"means\":[[1.741138,2.211388],[-2.587764,9.047412],[-4.159936,-9.78369]],\"covariances\":[[1.532037,0.684488],[1.896764,0.772667],[1.281578,1.006343]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0040 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.44013,0.38669,0.17318],\"means\":[[4.1436,7.842205],[-3.35993,-7.685464],[2.590425,-7.839902]],\"covariances\":[[0.258081,1.785369],[1.693873,0.190367],[0.333171,1.915172]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0041 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.18807,0.586072,0.225858],\"means\":[[7.530605,-2.85517],[-8.37646,-6.68505],[6.457937,2.660491]],\"covariances\":[[0.062438,0.675804],[1.998549,0.964535],[0.75235,1.405823]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0042 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.628228,0.112942,0.25883],\"means\":[[9.825179,2.235984],[-8.202891,-0.454615],[5.16485,-4.094262]],\"covariances\":[[1.897307,0.07909],[1.713859,1.473869],[1.574187,0.490323]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0043 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.200198,0.326391,0.473411],\"means\":[[-9.73973,-4.917718],[-2.662718,2.674347],[-2.988409,-0.698575]],\"covariances\":[[1.66998,1.666876],[1.833761,1.61768],[1.166491,0.912945]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0044 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.210961,0.481237,0.307802],\"means\":[[0.658222,9.024628],[-0.945166,9.92533],[-8.446078,1.70623]],\"covariances\":[[1.881551,0.11571],[1.291046,1.470636],[0.751239,1.740612]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0045 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.219488,0.398012,0.3825],\"means\":[[-4.051079,-2.202402],[1.249566,-5.739683],[-9.400946,-0.565343]],\"covariances\":[[0.434909,0.325374],[1.244478,1.300493],[1.83439,1.595206]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0046 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.314222,0.396795,0.288983],\"means\":[[-8.428796,5.084682],[-8.938597,2.259432],[-3.400779,4.45497]],\"covariances\":[[0.245668,0.564857],[1.631592,0.879351],[1.844049,1.844378]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0047 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.419694,0.489421,0.090885],\"means\":[[-6.110492,-8.497421],[9.728521,-8.365051],[-1.748692,-4.906299]],\"covariances\":[[1.225891,1.150248],[1.732244,1.380694],[1.144575,0.18702]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0048 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.602986,0.155503,0.241511],\"means\":[[-8.072314,6.502951],[-3.596531,5.829809],[-6.799178,-2.666882]],\"covariances\":[[1.786218,1.98533],[0.153332,1.588412],[0.921765,0.483347]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0049 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.349576,0.13726,0.513164],\"means\":[[3.103876,2.568933],[-2.485266,6.950802],[6.019939,-0.139556]],\"covariances\":[[0.478094,0.219002],[0.908118,0.272869],[0.612597,0.37371]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0050 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.473906,0.101452,0.424642],\"means\":[[-5.640133,-9.466704],[7.102709,1.869602],[0.370622,-0.07653]],\"covariances\":[[0.851632,0.50442],[0.305782,0.31458],[0.501677,1.614173]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0051 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.261133,0.380902,0.357965],\"means\":[[-2.003012,-7.213063],[7.131211,0.22144],[-5.970268,-7.57102]],\"covariances\":[[1.562358,0.844558],[0.42802,0.427201],[1.130162,1.867022]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0052 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.128517,0.277854,0.593629],\"means\":[[-7.931191,-6.702331],[4.756602,7.856744],[5.60746,-1.06777]],\"covariances\":[[0.339485,0.916326],[1.037177,1.197236],[0.551977,0.416812]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0053 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.450007,0.180538,0.369455],\"means\":[[4.362677,6.47177],[1.188517,-4.718714],[1.768023,-5.489465]],\"covariances\":[[1.486002,0.865802],[1.602929,0.481382],[1.921647,0.344207]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0054 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.235455,0.369013,0.395532],\"means\":[[-4.397394,-4.601722],[-1.306518,-1.295727],[-7.391362,-7.738492]],\"covariances\":[[0.540993,1.719682],[0.805755,1.019699],[0.84139,1.173254]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0055 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.126,0.52065,0.35335],\"means\":[[-5.170121,-2.852926],[-9.471124,-6.910324],[-6.107759,1.594744]],\"covariances\":[[0.812976,1.698588],[1.395197,0.10136],[0.159459,0.536955]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0056 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.544695,0.276475,0.17883],\"means\":[[3.954134,1.733966],[-7.564363,1.758616],[4.560299,2.091159]],\"covariances\":[[0.18996,1.437518],[0.243955,0.339601],[0.440288,1.73463]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0057 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.417077,0.247705,0.335218],\"means\":[[-0.67085,4.310484],[7.274721,3.049943],[-3.946341,9.534949]],\"covariances\":[[0.734652,0.134787],[1.467838,0.67206],[0.827528,1.338586]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0058 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.400358,0.414043,0.185599],\"means\":[[5.214,4.374456],[3.132325,6.038992],[-7.111546,2.538294]],\"covariances\":[[0.242679,0.659884],[1.1242,0.76493],[1.611758,1.347816]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0059 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.417932,0.349725,0.232343],\"means\":[[9.49209,4.510858],[-6.629965,6.509985],[0.802422,6.102798]],\"covariances\":[[1.799185,1.860433],[1.731563,0.665976],[0.824288,0.57951]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0060 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.472618,0.16131,0.366072],\"means\":[[1.609839,8.842566],[-1.261253,-6.967606],[7.778112,0.559584]],\"covariances\":[[0.510221,0.489011],[0.608629,1.429014],[0.305213,1.20089]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0061 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.104496,0.423672,0.471832],\"means\":[[-4.966109,6.213361],[5.964209,-3.336155],[1.133754,3.442885]],\"covariances\":[[1.756605,1.780837],[0.277901,1.083643],[1.219797,1.498547]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0062 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.254455,0.212237,0.533308],\"means\":[[-2.206113,3.680573],[7.972202,-5.86188],[7.601611,1.737551]],\"covariances\":[[0.602381,1.790747],[1.928982,1.223913],[0.70406,0.061875]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0063 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.288016,0.410188,0.301796],\"means\":[[3.194712,3.093817],[0.459315,-0.919078],[-2.424083,3.696872]],\"covariances\":[[1.467246,0.351128],[1.54678,0.299824],[1.91594,1.224823]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0064 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.292183,0.160173,0.547644],\"means\":[[4.878903,1.353449],[-1.357208,6.633152],[0.744732,6.230348]],\"covariances\":[[1.58324,0.149326],[1.623573,1.912172],[1.936569,1.103786]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0065 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.216497,0.523466,0.260037],\"means\":[[3.800321,-7.873525],[-0.950018,-0.511467],[1.361076,1.061177]],\"covariances\":[[0.290483,1.434833],[1.286906,1.859231],[1.448562,1.530293]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0066 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.114769,0.471451,0.41378],\"means\":[[-4.107395,-5.796438],[2.571463,4.766282],[-1.011429,-4.172448]],\"covariances\":[[1.957373,0.281555],[1.313334,0.185549],[1.775901,0.356226]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0067 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.299797,0.440179,0.260024],\"means\":[[0.86696,-1.240765],[8.697292,6.445599],[8.522014,-2.491735]],\"covariances\":[[1.493084,0.221115],[0.634531,1.796277],[1.863747,0.610211]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0068 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.273675,0.449486,0.276839],\"means\":[[6.578544,4.728102],[4.691941,3.775989],[8.855939,2.107656]],\"covariances\":[[1.507291,0.63353],[1.536815,1.677466],[1.418743,0.35158]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0069 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.487639,0.121871,0.39049],\"means\":[[2.925568,1.546355],[-8.481735,6.333291],[-5.455134,-9.414154]],\"covariances\":[[1.669076,0.291054],[1.766721,0.535091],[1.494306,0.960978]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0070 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.368975,0.27997,0.351055],\"means\":[[-2.032708,3.41173],[6.024639,-2.428049],[-0.387952,2.490947]],\"covariances\":[[0.173253,0.709415],[1.138771,1.791505],[0.205513,0.175114]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0071 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.369573,0.4024,0.228027],\"means\":[[-4.69341,-5.003423],[-8.390017,9.846101],[-2.224448,0.460401]],\"covariances\":[[1.009852,1.420846],[0.530345,0.161821],[0.488324,0.867586]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0072 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.284141,0.293988,0.421871],\"means\":[[-9.076372,7.268397],[1.296542,-0.48771],[-4.880296,4.61496]],\"covariances\":[[1.748098,1.382575],[1.58148,0.50748],[0.227759,0.151653]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0073 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.404834,0.448798,0.146368],\"means\":[[-6.767355,2.356695],[4.535913,-7.701597],[-7.892621,-3.761127]],\"covariances\":[[1.130956,0.477933],[1.073017,0.39373],[1.692976,1.881326]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0074 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.693272,0.119573,0.187155],\"means\":[[-1.157055,2.747012],[8.237481,7.172199],[-0.270525,-4.959164]],\"covariances\":[[0.989881,1.345644],[1.773939,1.836471],[0.652087,1.533897]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0075 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.278321,0.166863,0.554816],\"means\":[[-5.001435,3.523832],[-6.553767,-0.59138],[3.811765,-5.780572]],\"covariances\":[[0.903418,0.264495],[1.835826,0.94824],[1.59649,0.744444]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0076 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.32597,0.246875,0.427155],\"means\":[[-4.946122,-5.54005],[5.822311,9.67783],[9.252057,9.298287]],\"covariances\":[[0.697604,0.526195],[0.856911,0.403452],[0.608775,1.04925]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0077 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.246121,0.502229,0.25165],\"means\":[[9.681131,9.15063],[-9.328915,2.617964],[7.290127,7.090571]],\"covariances\":[[0.146485,1.346569],[1.610924,0.30604],[1.64444,0.996121]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0078 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.248998,0.264879,0.486123],\"means\":[[2.897385,8.399048],[-9.167662,-4.268695],[-4.773725,-7.083001]],\"covariances\":[[1.482829,0.387887],[1.737201,1.639867],[1.926283,0.892831]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0079 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.41527,0.50098,0.08375],\"means\":[[-1.359554,9.00785],[-3.922502,-8.119774],[-2.151969,6.664472]],\"covariances\":[[0.707194,1.273702],[1.923768,1.320837],[0.900954,1.741077]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0080 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.493437,0.305451,0.201112],\"means\":[[3.473624,-5.107729],[2.419854,-8.034191],[5.572231,-4.631058]],\"covariances\":[[1.948866,1.1623],[0.733254,1.209643],[0.409853,1.927001]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0081 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.081249,0.395301,0.52345],\"means\":[[-9.680637,7.276208],[4.049572,-5.301141],[4.798283,-7.800561]],\"covariances\":[[0.185808,1.662037],[0.83479,1.548935],[1.79905,1.116324]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0082 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.243871,0.187961,0.568168],\"means\":[[-2.547621,2.853945],[-4.347036,1.378955],[7.080691,-1.859971]],\"covariances\":[[0.249665,0.406292],[0.650256,0.057464],[1.77642,1.130115]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0083 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.253601,0.489069,0.25733],\"means\":[[3.56812,7.695613],[-1.378987,-6.510918],[-9.360105,5.015731]],\"covariances\":[[0.967939,1.71572],[0.382717,1.445981],[1.736629,0.153951]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0084 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.385057,0.394816,0.220127],\"means\":[[4.302569,3.474593],[-9.520784,4.783709],[-1.324539,0.094345]],\"covariances\":[[1.333921,1.967654],[1.4732,1.90473],[0.889047,0.406699]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0085 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.376084,0.192966,0.43095],\"means\":[[0.548762,-6.046811],[-2.104234,8.855927],[-4.301856,-3.286942]],\"covariances\":[[1.12666,1.428347],[1.38078,1.394898],[0.800672,0.765427]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0086 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.340389,0.44454,0.215071],\"means\":[[-3.710108,-7.231538],[0.017475,7.649527],[-3.745114,-2.358137]],\"covariances\":[[0.112498,0.823209],[0.174617,1.412796],[0.418466,1.287019]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0087 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.480333,0.429685,0.089982],\"means\":[[7.49448,7.877522],[3.990287,6.612816],[-6.316203,-5.807653]],\"covariances\":[[0.624966,1.196371],[1.223061,0.132453],[0.103102,0.112305]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0088 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.28084,0.324175,0.394985],\"means\":[[-0.824647,4.221924],[3.229154,3.239747],[7.136,9.159887]],\"covariances\":[[1.99644,0.954703],[0.290447,1.568599],[1.089108,0.606267]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0089 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.178339,0.629662,0.191999],\"means\":[[9.21226,4.687092],[1.912671,-3.17003],[3.995214,6.122924]],\"covariances\":[[1.792396,1.902831],[1.463379,1.509232],[0.962889,1.234566]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0090 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.38552,0.250481,0.363999],\"means\":[[9.205221,1.225063],[-4.706861,9.042649],[1.045189,-8.821844]],\"covariances\":[[0.406904,1.001556],[1.998114,1.621812],[0.680941,1.173896]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0091 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.258175,0.331139,0.410686],\"means\":[[9.354102,2.957907],[-7.21089,-8.521448],[-6.55511,1.579417]],\"covariances\":[[0.303293,0.874134],[1.193499,0.323963],[1.132815,1.517984]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0092 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.425001,0.235491,0.339508],\"means\":[[2.748102,2.796647],[7.728254,2.415105],[-7.157864,4.863262]],\"covariances\":[[1.446427,0.867478],[1.657279,0.500483],[1.988899,0.642302]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0093 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.258782,0.450689,0.290529],\"means\":[[3.32731,-9.108787],[0.403346,2.577611],[0.817398,-5.034111]],\"covariances\":[[1.252693,0.847579],[1.859818,1.851644],[0.893013,1.1653]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0094 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.503642,0.137108,0.35925],\"means\":[[0.11678,-3.215087],[-4.413845,-6.10902],[-5.660841,-9.055282]],\"covariances\":[[0.921558,0.606571],[1.471694,1.412846],[0.4872,1.519801]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0095 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.533487,0.308035,0.158478],\"means\":[[3.928731,-6.018051],[4.570586,-8.597777],[3.755955,8.746]],\"covariances\":[[1.065412,0.272659],[0.875698,0.632487],[1.659718,1.006433]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0096 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.355727,0.405432,0.238841],\"means\":[[-8.401679,4.006681],[6.700048,-1.27171],[9.446517,9.140394]],\"covariances\":[[0.917358,0.165446],[1.164172,0.935712],[0.921506,1.745988]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0097 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.49291,0.373503,0.133587],\"means\":[[9.986904,2.017913],[2.05325,4.549314],[-4.913553,5.721961]],\"covariances\":[[1.193493,1.365231],[1.046464,0.314651],[1.915212,1.284895]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0098 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.290459,0.502489,0.207052],\"means\":[[3.884456,-4.364798],[-7.157364,-7.607148],[1.91162,1.31137]],\"covariances\":[[0.283379,1.319817],[1.465379,0.238304],[1.573151,1.410326]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0099 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.27046,0.487768,0.241772],\"means\":[[-9.788409,-2.478982],[5.533029,3.575532],[-1.63023,8.860404]],\"covariances\":[[0.777453,1.57865],[1.245103,1.891585],[0.813534,1.052519]]}"^^uq:gmmLiteral .
+
+ex:rv_d2_k3_0100 a uq:RandomVariable ;
+    uq:hasDistribution "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.464753,0.415071,0.120176],\"means\":[[-9.832081,-7.048677],[-2.764255,-2.130286],[6.26113,-9.346185]],\"covariances\":[[1.842833,0.966252],[1.141339,0.66923],[1.943315,1.945702]]}"^^uq:gmmLiteral .
+
