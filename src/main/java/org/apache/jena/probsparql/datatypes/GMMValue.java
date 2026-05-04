@@ -32,7 +32,7 @@ public class GMMValue implements Sampleable {
     /** Component means [K][d] */
     private final double[][] means;
     
-    /** Component covariances [K][d][d] */
+    /** Component covariances: full=[K][d][d], diag=[K][1][d], spherical=[K][1][1] */
     private final double[][][] covariances;
     
     /**

@@ -139,7 +139,7 @@ public class Marginal extends FunctionBase2 {
                 break;
                 
             case "diag":
-                variance = cov[dim][0];
+                variance = cov[0][dim];
                 break;
                 
             case "spherical":

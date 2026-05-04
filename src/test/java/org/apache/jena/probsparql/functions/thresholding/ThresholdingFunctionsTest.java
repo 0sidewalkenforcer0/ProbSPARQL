@@ -32,7 +32,7 @@ class ThresholdingFunctionsTest {
         Resource sensor = model.createResource(exNS + "sensor1");
         
         // N(6.0, 0.16)
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[6.0]],\"covariances\":[[[0.16]]]}";
         
         Literal gmmLiteral = model.createTypedLiteral(gmmJson, GMMDatatype.INSTANCE);
@@ -70,7 +70,7 @@ class ThresholdingFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[6.0]],\"covariances\":[[[1.0]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -112,7 +112,7 @@ class ThresholdingFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[6.0]],\"covariances\":[[[0.25]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -153,7 +153,7 @@ class ThresholdingFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[0.5]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -195,7 +195,7 @@ class ThresholdingFunctionsTest {
         Resource sensor = model.createResource(exNS + "sensor2");
         
         // Bimodal GMM
-        String gmmJson = "{\"K\":2,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[0.6,0.4]," +
                         "\"means\":[[5.0],[8.0]]," +
                         "\"covariances\":[[[0.5]],[[0.5]]]}";
@@ -236,7 +236,7 @@ class ThresholdingFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor3");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"diag\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\"," +
                         "\"weights\":[1.0],\"means\":[[6.0]],\"covariances\":[[0.25]]}";
         
         sensor.addProperty(hasDistribution, 

@@ -33,7 +33,7 @@ class TransformationFunctionsTest {
         Resource sensor = model.createResource(exNS + "sensor1");
         
         // N(5.0, 1.0)
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[1.0]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -76,7 +76,7 @@ class TransformationFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[1.0]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -119,7 +119,7 @@ class TransformationFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[4.0]],\"covariances\":[[[2.0]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -165,11 +165,11 @@ class TransformationFunctionsTest {
         Resource sensor2 = model.createResource(exNS + "sensor2");
         
         // X ~ N(3, 1)
-        String gmm1Json = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm1Json = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[1.0],\"means\":[[3.0]],\"covariances\":[[[1.0]]]}";
         
         // Y ~ N(5, 2)
-        String gmm2Json = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm2Json = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[2.0]]]}";
         
         sensor1.addProperty(hasDistribution, 
@@ -217,12 +217,12 @@ class TransformationFunctionsTest {
         Resource sensor2 = model.createResource(exNS + "sensor2");
         
         // Bimodal GMM with K=2
-        String gmm1Json = "{\"K\":2,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm1Json = "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[0.6,0.4]," +
                          "\"means\":[[2.0],[6.0]]," +
                          "\"covariances\":[[[0.5]],[[0.5]]]}";
         
-        String gmm2Json = "{\"K\":2,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm2Json = "{\"n_components\":2,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[0.7,0.3]," +
                          "\"means\":[[1.0],[4.0]]," +
                          "\"covariances\":[[[0.3]],[[0.3]]]}";
@@ -274,7 +274,7 @@ class TransformationFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[2.0]]]}";
         
         sensor.addProperty(hasDistribution, 
@@ -317,11 +317,11 @@ class TransformationFunctionsTest {
         Resource sensor2 = model.createResource(exNS + "sensor2");
         
         // X ~ N(3, 1)
-        String gmm1Json = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm1Json = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[1.0],\"means\":[[3.0]],\"covariances\":[[[1.0]]]}";
         
         // Y ~ N(5, 2)
-        String gmm2Json = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmm2Json = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                          "\"weights\":[1.0],\"means\":[[5.0]],\"covariances\":[[[2.0]]]}";
         
         sensor1.addProperty(hasDistribution, 
@@ -373,7 +373,7 @@ class TransformationFunctionsTest {
         Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
         Resource sensor = model.createResource(exNS + "sensor1");
         
-        String gmmJson = "{\"K\":1,\"d\":1,\"covariance_type\":\"full\"," +
+        String gmmJson = "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"full\"," +
                         "\"weights\":[1.0],\"means\":[[2.0]],\"covariances\":[[[1.0]]]}";
         
         sensor.addProperty(hasDistribution, 

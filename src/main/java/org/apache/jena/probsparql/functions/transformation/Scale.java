@@ -125,9 +125,9 @@ public class Scale extends FunctionBase2 {
                 return fullCov;
                 
             case "diag":
-                double[][] diagCov = new double[d][1];
+                double[][] diagCov = new double[1][d];
                 for (int i = 0; i < d; i++) {
-                    diagCov[i][0] = c2 * cov[i][0];
+                    diagCov[0][i] = c2 * cov[0][i];
                 }
                 return diagCov;
                 

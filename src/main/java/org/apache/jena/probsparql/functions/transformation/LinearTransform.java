@@ -130,9 +130,9 @@ public class LinearTransform extends FunctionBase3 {
                 return fullCov;
                 
             case "diag":
-                double[][] diagCov = new double[d][1];
+                double[][] diagCov = new double[1][d];
                 for (int i = 0; i < d; i++) {
-                    diagCov[i][0] = a2 * cov[i][0];
+                    diagCov[0][i] = a2 * cov[0][i];
                 }
                 return diagCov;
                 

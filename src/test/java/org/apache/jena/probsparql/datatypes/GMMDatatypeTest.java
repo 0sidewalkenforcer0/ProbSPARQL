@@ -86,7 +86,13 @@ class GMMDatatypeTest {
         
         assertNotNull(gmm);
         assertEquals(3, gmm.getNComponents());
-        assertArrayEquals(new double[]{0.5, 0.3, 0.2}, gmm.getWeights(), 1e-9);
+        // GMMValue canonicalizes component order by component content, primarily mean.
+        assertArrayEquals(new double[]{5.45, 5.78, 6.20}, new double[]{
+            gmm.getMeans()[0][0],
+            gmm.getMeans()[1][0],
+            gmm.getMeans()[2][0]
+        }, 1e-9);
+        assertArrayEquals(new double[]{0.3, 0.5, 0.2}, gmm.getWeights(), 1e-9);
     }
     
     @Test

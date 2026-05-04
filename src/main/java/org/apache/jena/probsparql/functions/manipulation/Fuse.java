@@ -259,7 +259,7 @@ public class Fuse extends FunctionBase2 {
             case "diag":
                 for (int i = 0; i < d; i++) {
                     for (int j = 0; j < d; j++) {
-                        full[i][j] = (i == j) ? cov[i][0] : 0.0;
+                        full[i][j] = (i == j) ? cov[0][i] : 0.0;
                     }
                 }
                 return full;
