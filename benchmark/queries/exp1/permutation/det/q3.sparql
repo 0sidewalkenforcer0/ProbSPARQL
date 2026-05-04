@@ -1,0 +1,18 @@
+# Exp1 Q3 DET: Uncertainty Propagation baseline
+# Computes scalar motor power as speed × torque using deterministic point values.
+# Purpose: deterministic counterpart of the probabilistic propagation query.
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?motor ?power WHERE {
+  ?motor a ag:Motor ;
+         ag:hasSpeedCharacteristic  ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  ?speedChar cfm:measuresCharacteristicBy ?speedMeasurement .
+  ?speedMeasurement om:hasValue ?speed .
+  ?torqueChar cfm:measuresCharacteristicBy ?torqueMeasurement .
+  ?torqueMeasurement om:hasValue ?torque .
+  BIND((?speed * ?torque) AS ?power)
+}

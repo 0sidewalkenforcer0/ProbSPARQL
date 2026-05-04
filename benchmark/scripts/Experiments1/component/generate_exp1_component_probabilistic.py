@@ -54,7 +54,7 @@ SCALE_CONFIGS = {
     "E7": {"num_gears": 10000, "label": "Exp1 10000 gears"},
 }
 
-DEFAULT_MAIN_SCALES = ["E1", "E3", "E5", "E7"]
+DEFAULT_COMPONENT_SCALES = ["E1", "E3", "E5", "E7"]
 
 FILE_K_VALUES = [1, 3, 5, 10]
 TEETH_PER_GEAR = 8
@@ -345,16 +345,16 @@ def main() -> None:
     parser.add_argument(
         "--scales",
         nargs="+",
-        default=DEFAULT_MAIN_SCALES,
+        default=DEFAULT_COMPONENT_SCALES,
         choices=list(SCALE_CONFIGS.keys()),
-        help="Exp1 scales to generate (default: E1 E3 E5 E7)",
+        help="Exp1 component-run scales to generate (default: E1 E3 E5 E7)",
     )
     parser.add_argument(
         "--seed", type=int, default=42, help="Base random seed"
     )
     parser.add_argument(
         "--output-dir",
-        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "exp1", "main"),
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "exp1", "component"),
         help="Output directory for exp1_{scale}_K{k}.ttl files",
     )
     args = parser.parse_args()

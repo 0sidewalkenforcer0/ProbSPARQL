@@ -19,7 +19,7 @@ Output: benchmark/data/exp4/exp4_E{3,5,7}_hist_B{50,100}.ttl
 Usage:
     python generate_histogram_datasets.py
     python generate_histogram_datasets.py --scales E3 E5 --bins 50
-    python generate_histogram_datasets.py --input-dir benchmark/data/exp1/main
+    python generate_histogram_datasets.py --input-dir benchmark/data/exp1/component
 """
 import argparse
 import json
@@ -166,7 +166,7 @@ def main():
     script_dir  = os.path.dirname(os.path.realpath(__file__))
     project_root = os.path.realpath(os.path.join(script_dir, "../../.."))
 
-    input_dir  = args.input_dir  or os.path.join(project_root, "benchmark/data/exp1/main")
+    input_dir  = args.input_dir  or os.path.join(project_root, "benchmark/data/exp1/component")
     output_dir = args.output_dir or os.path.join(project_root, "benchmark/data/exp4")
 
     SAMPLES = args.samples

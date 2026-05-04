@@ -34,20 +34,20 @@ Measure the runtime overhead of probabilistic execution relative to deterministi
 ### Active Structure
 
 - Data:
-  - `benchmark/data/exp1/main`
+  - `benchmark/data/exp1/component`
   - `benchmark/data/exp1/permutation`
 - Queries:
   - `benchmark/queries/exp1/det`
   - `benchmark/queries/exp1/prob`
   - `benchmark/queries/exp1/variants`
 - Results:
-  - `benchmark/results/exp1/main`
+  - `benchmark/results/exp1/component`
   - `benchmark/results/exp1/permutation`
   - `benchmark/results/exp1/archive`
 
 ### Active Runs
 
-1. **Exp1 main**
+1. **Exp1 component**
    - Default scales: `E1 E3 E5 E7`
    - Measures DET vs PROB latency across the main query set.
 

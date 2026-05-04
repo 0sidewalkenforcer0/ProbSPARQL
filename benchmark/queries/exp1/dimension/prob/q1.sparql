@@ -1,0 +1,15 @@
+# Exp1 Dimension Q1 PROB: Retrieval
+# Fetches CT tooth-length distributions via pure graph traversal.
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+
+SELECT ?gear ?distribution
+WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               cfm:representedBy ?rv .
+  ?rv cfm:hasDistribution ?distribution .
+}

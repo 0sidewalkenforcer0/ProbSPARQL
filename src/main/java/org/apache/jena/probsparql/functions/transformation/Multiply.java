@@ -6,24 +6,24 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the product of two independent 1-D GMMs.
+ * SPARQL function to compute the product of two independent GMMs.
  * 
- * <p>For Z = X * Y where X ~ GMM1 and Y ~ GMM2 are independent 1-D distributions,
- * this function computes an approximation using moment matching:</p>
+ * <p>For Z = X * Y where X ~ GMM1 and Y ~ GMM2 are independent distributions,
+ * this function computes an approximation using moment matching.</p>
  * <ul>
  *   <li>E[Z] = E[X] * E[Y] (product of means)</li>
  *   <li>Var[Z] ≈ μ²_X * Var[Y] + μ²_Y * Var[X] + Var[X] * Var[Y] (first-order approximation)</li>
  * </ul>
  * 
- * <p>The result is a single Gaussian (K=1) that approximates the product distribution.
+ * <p>The result is a single Gaussian component (K=1) that approximates the product distribution.
  * This is commonly used for uncertainty propagation in multiplicative operations,
  * such as computing power from speed × torque.</p>
  * 
  * <p><b>Limitations:</b></p>
  * <ul>
- *   <li>Only supports 1-D GMMs (d=1)</li>
+ *   <li>Requires both GMMs to have the same dimensionality</li>
  *   <li>Uses first-order approximation (may be inaccurate for large uncertainties)</li>
- *   <li>Returns a single Gaussian approximation</li>
+ *   <li>Returns a single diagonal Gaussian approximation</li>
  * </ul>
  * 
  * <p>Usage in SPARQL:</p>
@@ -55,7 +55,7 @@ public class Multiply extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#multiply";
     
     /**
-     * Compute product of two independent 1-D GMMs using moment matching.
+     * Compute product of two independent GMMs using moment matching.
      * 
      * @param gmm1Node First GMM (X)
      * @param gmm2Node Second GMM (Y)
@@ -66,12 +66,10 @@ public class Multiply extends FunctionBase2 {
         GMMValue gmm1 = extractGMM(gmm1Node, "first");
         GMMValue gmm2 = extractGMM(gmm2Node, "second");
         
-        // Validate 1-D constraint
-        if (gmm1.getDimensions() != 1 || gmm2.getDimensions() != 1) {
+        if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
-                "multiply() only supports 1-D GMMs. Got d1=" + gmm1.getDimensions() +
-                ", d2=" + gmm2.getDimensions() + ". For multi-dimensional multiplication, " +
-                "use prob:joint() to create joint distribution.");
+                "multiply() requires matching dimensions. Got d1=" + gmm1.getDimensions() +
+                ", d2=" + gmm2.getDimensions());
         }
         
         GMMValue productGMM = computeProduct(gmm1, gmm2);
@@ -116,61 +114,73 @@ public class Multiply extends FunctionBase2 {
      * engineering applications where uncertainty is small (&lt;10% CV).</p>
      */
     private GMMValue computeProduct(GMMValue gmm1, GMMValue gmm2) {
-        // Compute moments of input GMMs
-        double mu1 = computeMean(gmm1);
-        double mu2 = computeMean(gmm2);
-        double var1 = computeVariance(gmm1, mu1);
-        double var2 = computeVariance(gmm2, mu2);
-        
-        // Product moments using first-order approximation
-        double muProduct = mu1 * mu2;
-        
-        // Var[XY] = μ²_X Var[Y] + μ²_Y Var[X] + Var[X]Var[Y]
-        // Simplified: For small CV, last term (Var[X]Var[Y]) is often negligible
-        double varProduct = mu1 * mu1 * var2 + mu2 * mu2 * var1 + var1 * var2;
-        
-        // Return single Gaussian (K=1, d=1)
+        int d = gmm1.getDimensions();
+        double[] mu1 = computeMeanVector(gmm1);
+        double[] mu2 = computeMeanVector(gmm2);
+        double[] var1 = computeVarianceVector(gmm1, mu1);
+        double[] var2 = computeVarianceVector(gmm2, mu2);
+
+        double[] muProduct = new double[d];
+        double[] varProduct = new double[d];
+        for (int j = 0; j < d; j++) {
+            muProduct[j] = mu1[j] * mu2[j];
+            varProduct[j] = mu1[j] * mu1[j] * var2[j] + mu2[j] * mu2[j] * var1[j] + var1[j] * var2[j];
+        }
+
         double[] weights = {1.0};
-        double[][] means = {{muProduct}};
-        double[][][] covariances = {{{varProduct}}};
-        
-        return new GMMValue(1, 1, "full", weights, means, covariances);
+        double[][] means = {muProduct};
+        double[][][] covariances = {{varProduct}};
+        return new GMMValue(1, d, "diag", weights, means, covariances);
     }
     
     /**
-     * Compute mean of 1-D GMM: E[X] = Σ w_i * μ_i
+     * Compute per-dimension mean vector of a GMM.
      */
-    private double computeMean(GMMValue gmm) {
-        double mean = 0.0;
+    private double[] computeMeanVector(GMMValue gmm) {
+        int d = gmm.getDimensions();
+        double[] mean = new double[d];
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         
         for (int k = 0; k < gmm.getNComponents(); k++) {
-            mean += weights[k] * means[k][0];
+            for (int j = 0; j < d; j++) {
+                mean[j] += weights[k] * means[k][j];
+            }
         }
         
         return mean;
     }
     
     /**
-     * Compute variance of 1-D GMM: Var[X] = E[X²] - E[X]²
-     * where E[X²] = Σ w_i * (σ²_i + μ²_i)
+     * Compute per-dimension marginal variances of a GMM.
      */
-    private double computeVariance(GMMValue gmm, double mean) {
-        double secondMoment = 0.0;
+    private double[] computeVarianceVector(GMMValue gmm, double[] mean) {
+        int d = gmm.getDimensions();
+        double[] secondMoment = new double[d];
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
         double[][][] covariances = gmm.getCovariances();
         
         for (int k = 0; k < gmm.getNComponents(); k++) {
-            double mu_k = means[k][0];
-            double sigma2_k = covariances[k][0][0]; // Variance of component k
-            
-            // E[X²] contribution from component k: w_k * (σ²_k + μ²_k)
-            secondMoment += weights[k] * (sigma2_k + mu_k * mu_k);
+            for (int j = 0; j < d; j++) {
+                double mu_k = means[k][j];
+                double sigma2_k = marginalVariance(gmm, covariances, k, j);
+                secondMoment[j] += weights[k] * (sigma2_k + mu_k * mu_k);
+            }
         }
-        
-        // Var[X] = E[X²] - E[X]²
-        return secondMoment - mean * mean;
+
+        double[] variance = new double[d];
+        for (int j = 0; j < d; j++) {
+            variance[j] = secondMoment[j] - mean[j] * mean[j];
+        }
+        return variance;
+    }
+
+    private double marginalVariance(GMMValue gmm, double[][][] covariances, int component, int dim) {
+        return switch (gmm.getCovarianceType()) {
+            case "diag", "spherical" -> covariances[component][0][Math.min(dim, covariances[component][0].length - 1)];
+            case "full" -> covariances[component][dim][dim];
+            default -> throw new IllegalArgumentException("Unsupported covariance type: " + gmm.getCovarianceType());
+        };
     }
 }

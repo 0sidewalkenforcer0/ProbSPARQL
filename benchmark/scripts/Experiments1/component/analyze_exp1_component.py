@@ -17,9 +17,9 @@ Charts
 
 Usage
 -----
-  python analyze_exp1_main.py
-  python analyze_exp1_main.py --input benchmark/results/exp1/main/exp1_raw.csv \\
-                                --output benchmark/results/exp1/main
+  python analyze_exp1_component.py
+  python analyze_exp1_component.py --input benchmark/results/exp1/component/exp1_raw.csv \\
+                                   --output benchmark/results/exp1/component
 """
 import argparse
 import os
@@ -361,9 +361,9 @@ def print_summary(merged: pd.DataFrame) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Exp 1 Analysis: System Overhead")
-    parser.add_argument("--input",  default="benchmark/results/exp1/main/exp1_raw.csv",
+    parser.add_argument("--input",  default="benchmark/results/exp1/component/exp1_raw.csv",
                         help="Path to exp1_raw.csv")
-    parser.add_argument("--output", default="benchmark/results/exp1/main",
+    parser.add_argument("--output", default="benchmark/results/exp1/component",
                         help="Output directory for tables and charts")
     args = parser.parse_args()
 

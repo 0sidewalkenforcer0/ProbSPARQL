@@ -57,9 +57,9 @@ public class Exp1PermutationBenchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String dataDir = "benchmark/data/exp1/main";
+        String dataDir = "benchmark/data/exp1/component";
         String permutedDataDir = "benchmark/data/exp1/permutation";
-        String queryDir = "benchmark/queries/exp1";
+        String queryDir = "benchmark/queries/exp1/permutation";
         String outputDir = "benchmark/results/exp1/permutation";
         String scale = DEFAULT_SCALE;
         String q4Variant = DEFAULT_Q4_VARIANT;
@@ -140,7 +140,7 @@ public class Exp1PermutationBenchmark {
                 if ("Q4".equals(qid)) {
                     qPath = switch (q4Variant) {
                         case "legacy", "jsdivergence" -> queryDir + "/prob/q4.sparql";
-                        case "poly", "jsd" -> queryDir + "/variants/q4_jsd.sparql";
+                        case "poly", "jsd" -> queryDir + "/prob/q4_jsd.sparql";
                         default -> throw new IllegalArgumentException(
                                 "Unknown --q4-variant: " + q4Variant + " (expected legacy or poly)");
                     };

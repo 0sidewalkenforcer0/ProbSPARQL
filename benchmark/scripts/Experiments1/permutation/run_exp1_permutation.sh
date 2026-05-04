@@ -17,7 +17,7 @@
 #   benchmark/results/exp1/permutation/
 #
 # Usage:
-#   bash benchmark/scripts/Experiments1/run_exp1_permutation.sh
+#   bash benchmark/scripts/Experiments1/permutation/run_exp1_permutation.sh
 #
 # Optional env vars:
 #   OUTPUT_ROOT  — result root directory
@@ -29,7 +29,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
 
 OUTPUT_ROOT="${OUTPUT_ROOT:-${PROJECT_ROOT}/benchmark/results/exp1/permutation}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
@@ -40,9 +40,9 @@ Q4_VARIANT="${Q4_VARIANT:-legacy}"
 WARMUP_RUNS=3
 BENCHMARK_RUNS=10
 
-DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/main"
+DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/component"
 PERM_DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/permutation"
-QUERY_DIR="${PROJECT_ROOT}/benchmark/queries/exp1"
+QUERY_DIR="${PROJECT_ROOT}/benchmark/queries/exp1/permutation"
 PERM_SCRIPT="${SCRIPT_DIR}/generate_exp1_permutation.py"
 # ── Java 21 resolution ──────────────────────────────────────────────────────
 if [[ -z "${JAVA_HOME:-}" ]]; then

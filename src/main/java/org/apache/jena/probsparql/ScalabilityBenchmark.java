@@ -17,29 +17,29 @@ import java.util.*;
  *
  * <h3>Dataset naming convention</h3>
  * <pre>
- *   benchmark/data/exp1/main/exp1_{scale}_K{k}.ttl   — probabilistic (uq:gmmLiteral)
- *   benchmark/data/exp1/main/exp1_{scale}_det.ttl     — deterministic (xsd:double)
+ *   benchmark/data/exp1/component/exp1_{scale}_K{k}.ttl   — probabilistic (uq:gmmLiteral)
+ *   benchmark/data/exp1/component/exp1_{scale}_det.ttl     — deterministic (xsd:double)
  * </pre>
  *
  * <h3>Query files</h3>
  * <pre>
- *   benchmark/queries/exp1/det/q1.sparql  q2.sparql  q3.sparql
- *   benchmark/queries/exp1/prob/q1.sparql q2.sparql  q3.sparql  q4.sparql
+ *   benchmark/queries/exp1/component/det/q1.sparql  q2.sparql  q3.sparql
+ *   benchmark/queries/exp1/component/prob/q1.sparql q2.sparql  q3.sparql  q4.sparql
  * </pre>
  *
  * <h3>Output CSVs</h3>
  * <pre>
- *   benchmark/results/exp1/main/exp1_raw.csv     — Scale,K,QueryID,Type,Run,Time_ms
- *   benchmark/results/exp1/main/exp1_summary.csv — Scale,K,QueryID,Type,Median_ms,IQR_ms,OverheadRatio
+ *   benchmark/results/exp1/component/exp1_raw.csv     — Scale,K,QueryID,Type,Run,Time_ms
+ *   benchmark/results/exp1/component/exp1_summary.csv — Scale,K,QueryID,Type,Median_ms,IQR_ms,OverheadRatio
  * </pre>
  *
  * <h3>Usage</h3>
  * <pre>
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.ScalabilityBenchmark"
  *   # Optional flags:
- *   #   --data-dir   benchmark/data/exp1/main
- *   #   --query-dir  benchmark/queries/exp1
- *   #   --output-dir benchmark/results/exp1/main
+ *   #   --data-dir   benchmark/data/exp1/component
+ *   #   --query-dir  benchmark/queries/exp1/component
+ *   #   --output-dir benchmark/results/exp1/component
  *   #   --scales     E1 E3 E5 E7
  *   #   --k-values   1 3 5 10
  * </pre>
@@ -60,9 +60,9 @@ public class ScalabilityBenchmark {
         ProbSPARQL.init();
 
         // Defaults
-        String dataDir   = "benchmark/data/exp1/main";
-        String queryDir  = "benchmark/queries/exp1";
-        String outputDir = "benchmark/results/exp1/main";
+        String dataDir   = "benchmark/data/exp1/component";
+        String queryDir  = "benchmark/queries/exp1/component";
+        String outputDir = "benchmark/results/exp1/component";
         List<String>  scales  = new ArrayList<>(Arrays.asList(DEFAULT_SCALES));
         List<Integer> kValues = new ArrayList<>();
         for (int k : DEFAULT_K_VALUES) kValues.add(k);

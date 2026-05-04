@@ -1,0 +1,21 @@
+# Exp1 Dimension Q2 PROB: Multi-dimensional filtering
+# The benchmark runner replaces __CDF_POINT__ with a fixed JSON vector literal
+# whose first coordinate remains 9.8 and whose remaining coordinates are
+# dimension-specific reference thresholds.
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX om:   <http://example.org/ontology/om#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?value ?p WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               cfm:representedBy ?rv ;
+               om:hasValue ?value .
+  ?rv cfm:hasDistribution ?distribution .
+  BIND(prob:cdf(?distribution, __CDF_POINT__) AS ?p)
+  FILTER(?value < 9.8)
+}

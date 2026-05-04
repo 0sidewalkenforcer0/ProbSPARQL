@@ -1,0 +1,20 @@
+# Exp1 Dimension Q4 PROB: Distribution Comparison (legacy path)
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?gear ?char ?jsd WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?ctMeasurement .
+  ?ctMeasurement a ag:CTMeasurement ;
+                 cfm:representedBy ?rvCT .
+  ?rvCT cfm:hasDistribution ?ctDistribution .
+  ?char cfm:measuresCharacteristicBy ?slMeasurement .
+  ?slMeasurement a ag:SLMeasurement ;
+                 cfm:representedBy ?rvSL .
+  ?rvSL cfm:hasDistribution ?slDistribution .
+  BIND(prob:jsdivergence(?ctDistribution, ?slDistribution) AS ?jsd)
+  FILTER(?jsd > 0.3)
+}

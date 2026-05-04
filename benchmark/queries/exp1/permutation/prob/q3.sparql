@@ -1,0 +1,21 @@
+# Exp1 Q3 PROB: Uncertainty Propagation
+# Multiplies motor speed and torque distributions to obtain a propagated
+# power distribution.
+# Purpose: compare probabilistic propagation against deterministic scalar multiplication.
+
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX prob: <http://probsparql.org/function#>
+
+SELECT ?motor ?powerDistribution WHERE {
+  ?motor a ag:Motor ;
+         ag:hasSpeedCharacteristic  ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  ?speedChar cfm:measuresCharacteristicBy ?speedMeasurement .
+  ?speedMeasurement cfm:representedBy ?rvSpeed .
+  ?rvSpeed cfm:hasDistribution ?speedDistribution .
+  ?torqueChar cfm:measuresCharacteristicBy ?torqueMeasurement .
+  ?torqueMeasurement cfm:representedBy ?rvTorque .
+  ?rvTorque cfm:hasDistribution ?torqueDistribution .
+  BIND(prob:multiply(?speedDistribution, ?torqueDistribution) AS ?powerDistribution)
+}

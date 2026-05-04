@@ -8,9 +8,9 @@ remove the random-variable / distribution subgraph while leaving the rest of
 the measurement structure intact.
 
 Usage:
-    python generate_exp1_main_deterministic.py
-    python generate_exp1_main_deterministic.py --scales E1 E3
-    python generate_exp1_main_deterministic.py --input-dir benchmark/data/exp1/main --output-dir benchmark/data/exp1/main
+    python generate_exp1_component_deterministic.py
+    python generate_exp1_component_deterministic.py --scales E1 E3
+    python generate_exp1_component_deterministic.py --input-dir benchmark/data/exp1/component --output-dir benchmark/data/exp1/component
 """
 import argparse
 import json

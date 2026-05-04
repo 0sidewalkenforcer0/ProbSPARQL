@@ -1,0 +1,15 @@
+# Exp1 Dimension Q2 DET: Filtering baseline
+# Selects CT tooth measurements whose dimension-0 point estimate is below 9.8 mm.
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?gear ?value WHERE {
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?measurement .
+  ?measurement a ag:CTMeasurement ;
+               om:hasValue ?value .
+  FILTER(?value < 9.8)
+}

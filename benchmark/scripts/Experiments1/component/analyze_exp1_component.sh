@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # =============================================================================
-# analyze_exp1_main.sh — Analysis and visualization for Experiment 1 main run
+# analyze_exp1_component.sh — Analysis and visualization for Experiment 1 component run
 #
-# Reads exp1_raw.csv produced by run_exp1_main.sh and generates:
+# Reads exp1_raw.csv produced by run_exp1_component.sh and generates:
 #   Tables:
 #     exp1_table1_Q{1-4}.csv   — Absolute latency (ms): rows=scale, cols=DET/K
 #     exp1_table2_overhead.csv — Overhead ratios at K=3
@@ -12,16 +12,16 @@
 #     exp1_chart3_overhead.png    — Overhead ratio grouped-bar by query
 #
 # Usage (from project root):
-#   bash benchmark/scripts/Experiments1/analyze_exp1_main.sh
-#   bash benchmark/scripts/Experiments1/analyze_exp1_main.sh \
-#       --results-dir benchmark/results/exp1/main
+#   bash benchmark/scripts/Experiments1/component/analyze_exp1_component.sh
+#   bash benchmark/scripts/Experiments1/component/analyze_exp1_component.sh \
+#       --results-dir benchmark/results/exp1/component
 # =============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
 
-RESULTS_DIR="${PROJECT_ROOT}/benchmark/results/exp1/main"
+RESULTS_DIR="${PROJECT_ROOT}/benchmark/results/exp1/component"
 OUTPUT_DIR=""  # defaults to RESULTS_DIR if not set
 
 # Parse arguments
@@ -47,12 +47,12 @@ echo
 RAW_CSV="${RESULTS_DIR}/exp1_raw.csv"
 if [[ ! -f "$RAW_CSV" ]]; then
     echo "[ERROR] Raw CSV not found: $RAW_CSV"
-    echo "        Run run_exp1_main.sh first."
+    echo "        Run run_exp1_component.sh first."
     exit 1
 fi
 
 echo "Running analysis..."
-python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments1/analyze_exp1_main.py" \
+python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments1/component/analyze_exp1_component.py" \
     --input  "$RAW_CSV" \
     --output "$OUTPUT_DIR"
 

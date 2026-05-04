@@ -1,0 +1,17 @@
+# Exp1 Dimension Q3 DET: Propagation baseline
+# Computes scalar motor power from dimension-0 point estimates.
+
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
+PREFIX om:  <http://example.org/ontology/om#>
+
+SELECT ?motor ?power WHERE {
+  ?motor a ag:Motor ;
+         ag:hasSpeedCharacteristic  ?speedChar ;
+         ag:hasTorqueCharacteristic ?torqueChar .
+  ?speedChar cfm:measuresCharacteristicBy ?speedMeasurement .
+  ?speedMeasurement om:hasValue ?speed .
+  ?torqueChar cfm:measuresCharacteristicBy ?torqueMeasurement .
+  ?torqueMeasurement om:hasValue ?torque .
+  BIND((?speed * ?torque) AS ?power)
+}

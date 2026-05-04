@@ -82,7 +82,7 @@ def main():
     )
     parser.add_argument("--scales", nargs="+", default=["E5"])
     parser.add_argument("--ks", nargs="+", type=int, default=[3, 5, 10])
-    parser.add_argument("--input-dir", default="benchmark/data/exp1/main")
+    parser.add_argument("--input-dir", default="benchmark/data/exp1/component")
     parser.add_argument("--output-dir", default="benchmark/data/exp1/permutation")
     parser.add_argument("--suffix", default="_permuted")
     parser.add_argument("--seed", type=int, default=42)

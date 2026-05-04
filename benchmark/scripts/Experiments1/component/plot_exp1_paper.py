@@ -10,10 +10,10 @@ Generates:
 
 Usage
 -----
-  python benchmark/scripts/Experiments1/plot_exp1_paper.py
-  python benchmark/scripts/Experiments1/plot_exp1_paper.py \
-      --input  benchmark/results/exp1/main/exp1_raw.csv \
-      --output benchmark/results/exp1/main
+  python benchmark/scripts/Experiments1/component/plot_exp1_paper.py
+  python benchmark/scripts/Experiments1/component/plot_exp1_paper.py \
+      --input  benchmark/results/exp1/component/exp1_raw.csv \
+      --output benchmark/results/exp1/component
 """
 import argparse
 import os
@@ -412,8 +412,8 @@ def fig4_table_image(agg: pd.DataFrame, out: str) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Exp 1 — Publication figures")
-    p.add_argument("--input",  default="benchmark/results/exp1/main/exp1_raw.csv")
-    p.add_argument("--output", default="benchmark/results/exp1/main")
+    p.add_argument("--input",  default="benchmark/results/exp1/component/exp1_raw.csv")
+    p.add_argument("--output", default="benchmark/results/exp1/component")
     args = p.parse_args()
 
     os.makedirs(args.output, exist_ok=True)

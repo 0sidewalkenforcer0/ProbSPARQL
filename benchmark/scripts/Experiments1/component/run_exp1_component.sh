@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# run_exp1_main.sh — Main run for Experiment 1
+# run_exp1_component.sh — Component-complexity run for Experiment 1
 #
 # Experiment 1: System Overhead — ProbSPARQL vs Deterministic SPARQL
 #   Compares query latency across 4 default dataset scales (E1, E3, E5, E7)
@@ -15,7 +15,7 @@
 # Estimated runtime: 30–90 minutes depending on machine speed
 #
 # Usage (from project root):
-#   bash benchmark/scripts/Experiments1/run_exp1_main.sh
+#   bash benchmark/scripts/Experiments1/component/run_exp1_component.sh
 #
 # Optional env vars:
 #   OUTPUT_DIR   — override result output directory
@@ -25,9 +25,9 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
 
-OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp1/main}"
+OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp1/component}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SCALES="${SCALES:-E1 E3 E5 E7}"
 
@@ -75,15 +75,15 @@ mkdir -p "$OUTPUT_DIR"
 # ── Step 2: Generate experiment data (idempotent) ───────────────────────────
 echo
 echo "[2/3] Checking / generating exp1 datasets..."
-DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/main"
-SCRIPTS_DIR="${PROJECT_ROOT}/benchmark/scripts/Experiments1"
+DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/component"
+SCRIPTS_DIR="${PROJECT_ROOT}/benchmark/scripts/Experiments1/component"
 
 read -r -a SCALE_LIST <<< "$SCALES"
 FIRST_SCALE="${SCALE_LIST[0]}"
 
 if [[ ! -f "${DATA_DIR}/exp1_${FIRST_SCALE}_K1.ttl" ]]; then
     echo "      Generating probabilistic exp1 datasets..."
-    python3 "${SCRIPTS_DIR}/generate_exp1_main_probabilistic.py" \
+    python3 "${SCRIPTS_DIR}/generate_exp1_component_probabilistic.py" \
         --scales ${SCALES} \
         --output-dir "${DATA_DIR}"
     echo "      Probabilistic datasets generated."
@@ -93,7 +93,7 @@ fi
 
 if [[ ! -f "${DATA_DIR}/exp1_${FIRST_SCALE}_det.ttl" ]]; then
     echo "      Generating deterministic exp1 datasets..."
-    python3 "${SCRIPTS_DIR}/generate_exp1_main_deterministic.py" \
+    python3 "${SCRIPTS_DIR}/generate_exp1_component_deterministic.py" \
         --scales ${SCALES} \
         --input-dir  "${DATA_DIR}" \
         --output-dir "${DATA_DIR}"
@@ -112,8 +112,8 @@ START_EPOCH=$(date +%s)
 
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.ScalabilityBenchmark" \
-    -Dexec.args="--data-dir ${PROJECT_ROOT}/benchmark/data/exp1/main \
-                 --query-dir ${PROJECT_ROOT}/benchmark/queries/exp1 \
+    -Dexec.args="--data-dir ${PROJECT_ROOT}/benchmark/data/exp1/component \
+                 --query-dir ${PROJECT_ROOT}/benchmark/queries/exp1/component \
                  --output-dir ${OUTPUT_DIR} \
                  --warmup ${WARMUP_RUNS} \
                  --scales ${SCALES} \
@@ -131,5 +131,5 @@ echo "  Run log      : ${OUTPUT_DIR}/exp1_run.log"
 echo "=================================================================="
 echo
 echo "  Next step:"
-echo "    bash benchmark/scripts/Experiments1/analyze_exp1_main.sh \\"
+echo "    bash benchmark/scripts/Experiments1/component/analyze_exp1_component.sh \\"
 echo "        --results-dir ${OUTPUT_DIR}"
