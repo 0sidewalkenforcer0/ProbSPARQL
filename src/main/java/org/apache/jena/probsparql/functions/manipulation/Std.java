@@ -10,6 +10,8 @@ import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase1;
 
+import java.util.Locale;
+
 /**
  * SPARQL function {@code prob:std} — polymorphic standard-deviation computation.
  *
@@ -41,20 +43,7 @@ public class Std extends FunctionBase1 {
 
         if (HistogramDatatype.URI.equals(dtype)) {
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
-            double mu  = hist.mean();
-            double[] probs   = hist.probabilities();
-            double[] bins = hist.getBins();
-            double var = 0.0;
-            for (int i = 0; i < hist.getBinCount(); i++) {
-                double lo = bins[i];
-                double hi = bins[i + 1];
-                double width = hi - lo;
-                double center = 0.5 * (lo + hi);
-                double d = center - mu;
-                double withinBinVar = (width * width) / 12.0;
-                var += probs[i] * (d * d + withinBinVar);
-            }
-            return NodeValue.makeString(String.format("[%.6f]", Math.sqrt(var)));
+            return NodeValue.makeString(formatVector(hist.stdVector()));
         }
 
         if (DirichletDatatype.URI.equals(dtype)) {
@@ -115,7 +104,7 @@ public class Std extends FunctionBase1 {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {
             if (i > 0) sb.append(", ");
-            sb.append(String.format("%.6f", vector[i]));
+            sb.append(String.format(Locale.ROOT, "%.6f", vector[i]));
         }
         sb.append("]");
         return sb.toString();

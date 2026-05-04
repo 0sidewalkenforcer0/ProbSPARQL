@@ -6,13 +6,13 @@ Creates two TTL files used to evaluate the sample-based cross-type JSD fallback:
 
   1. exp4_crosstype_gmm_hist.ttl  — 100 entity pairs, each pair has:
        :e_NNN cfm:hasDistA ?gmm        (uq:gmmLiteral,   K=3)
-       :e_NNN cfm:hasDistB ?hist       (uq:histLiteral, bins+weights)
+       :e_NNN cfm:hasDistB ?hist       (uq:histLiteral, dimensions+edges+weights)
        The histogram is derived from the same underlying GMM (same source dist),
        so the true GMM↔Hist JSD should be close to zero.
 
   2. exp4_crosstype_dir_hist.ttl  — 100 entity pairs, each pair has:
        :e_NNN cfm:hasDistA ?dir        (uq:dirichletLiteral, alphas length = 4)
-       :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral, bins+weights)
+       :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral, dimensions+edges+weights)
        The histogram is built from 1-D marginal samples of the Dirichlet.
 
 The ground-truth JSD for each pair is recorded in a companion CSV:
@@ -81,7 +81,8 @@ def samples_to_hist_json(samples, B):
     else:
         weights_out = counts / total
     rounded_weights = rounded_probabilities(weights_out)
-    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+    return json.dumps({"dimensions": 1,
+                       "edges": [[round(float(x), 6) for x in edges.tolist()]],
                        "weights": rounded_weights})
 
 
@@ -109,8 +110,8 @@ def hist_jsd_exact(h1_json, h2_json):
     h2 = json.loads(h2_json)
     p = np.asarray(h1["weights"], dtype=float)
     q = np.asarray(h2["weights"], dtype=float)
-    bins1 = np.asarray(h1["bins"], dtype=float)
-    bins2 = np.asarray(h2["bins"], dtype=float)
+    bins1 = np.asarray(h1["edges"][0], dtype=float)
+    bins2 = np.asarray(h2["edges"][0], dtype=float)
     if len(p) != len(q) or len(bins1) != len(bins2) or not np.allclose(bins1, bins2):
         return float("nan")
     m = 0.5 * (p + q)

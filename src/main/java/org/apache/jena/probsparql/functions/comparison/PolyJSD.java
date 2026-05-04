@@ -62,7 +62,7 @@ public class PolyJSD extends FunctionBase2 {
             HistogramValue h2 = extractHistogram(d2Node, "second");
             if (!h1.isCompatible(h2))
                 throw new IllegalArgumentException(
-                        "prob:jsd: histograms must have the same bin boundaries");
+                        "prob:jsd: histograms must have the same dimensional grid");
             return NodeValue.makeDouble(HistogramJSD.computeJSD(h1.probabilities(), h2.probabilities()));
         }
 
@@ -79,6 +79,10 @@ public class PolyJSD extends FunctionBase2 {
         // --- Cross-type: universal sample-based fallback ---
         Sampleable s1 = extractSampleable(d1Node, "first");
         Sampleable s2 = extractSampleable(d2Node, "second");
+        if (sampleableDimensions(s1) != sampleableDimensions(s2))
+            throw new IllegalArgumentException(
+                    "prob:jsd: distribution dimension mismatch: d1=" + sampleableDimensions(s1)
+                            + " d2=" + sampleableDimensions(s2));
         return NodeValue.makeDouble(sampleBasedJSD(s1, s2, N_SAMPLES));
     }
 
@@ -185,5 +189,12 @@ public class PolyJSD extends FunctionBase2 {
         throw new IllegalArgumentException(
                 "prob:jsd: " + pos + " argument has unsupported distribution type: "
                 + node.asNode().getLiteralDatatypeURI());
+    }
+
+    private int sampleableDimensions(Sampleable value) {
+        if (value instanceof GMMValue gmm) return gmm.getDimensions();
+        if (value instanceof HistogramValue histogram) return histogram.getDimensions();
+        if (value instanceof DirichletValue dirichlet) return dirichlet.getDimensions();
+        throw new IllegalArgumentException("Unsupported Sampleable implementation: " + value.getClass().getName());
     }
 }

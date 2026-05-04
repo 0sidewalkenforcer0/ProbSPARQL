@@ -49,9 +49,8 @@ public class CDF extends FunctionBase2 {
         if (HistogramDatatype.URI.equals(dtype)) {
             // --- Histogram path ---
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
-            if (!pointNode.isNumber())
-                throw new IllegalArgumentException("prob:cdf: second argument must be numeric for histogram");
-            return NodeValue.makeDouble(hist.cdf(pointNode.getDouble()));
+            double[] point = extractHistogramPoint(pointNode, hist.getDimensions());
+            return NodeValue.makeDouble(hist.cdf(point));
         }
 
         if (DirichletDatatype.URI.equals(dtype)) {
@@ -109,6 +108,19 @@ public class CDF extends FunctionBase2 {
         double[] vector = new double[d];
         for (int i = 0; i < d; i++) vector[i] = Double.parseDouble(parts[i].trim());
         return vector;
+    }
+
+    private double[] extractHistogramPoint(NodeValue node, int d) {
+        if (d == 1) {
+            if (node.isNumber()) return new double[]{node.getDouble()};
+            if (node.isString()) return parseVector(node.getString(), d);
+            throw new IllegalArgumentException("prob:cdf: second argument must be numeric or JSON array for 1D histogram");
+        }
+        if (!node.isString()) {
+            throw new IllegalArgumentException(
+                "prob:cdf: second argument must be a JSON array string for " + d + "D histogram");
+        }
+        return parseVector(node.getString(), d);
     }
 
     // -----------------------------------------------------------------------

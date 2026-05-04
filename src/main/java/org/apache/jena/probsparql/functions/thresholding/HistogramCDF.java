@@ -27,12 +27,46 @@ public class HistogramCDF extends FunctionBase2 {
     @Override
     public NodeValue exec(NodeValue histNode, NodeValue pointNode) {
         HistogramValue hist = HistogramJSD.extractHistogram(histNode, "first");
+        double[] point = extractPoint(pointNode, hist.getDimensions());
+        return NodeValue.makeDouble(hist.cdf(point));
+    }
 
-        if (!pointNode.isNumber())
+    private double[] extractPoint(NodeValue node, int dimensions) {
+        if (dimensions == 1) {
+            if (node.isNumber()) {
+                return new double[]{node.getDouble()};
+            }
+            if (node.isString()) {
+                return parseVector(node.getString(), dimensions);
+            }
             throw new IllegalArgumentException(
-                    "The second argument of prob:histcdf must be a numeric threshold");
+                "The second argument of prob:histcdf must be numeric or a JSON array for 1-D histograms");
+        }
+        if (!node.isString()) {
+            throw new IllegalArgumentException(
+                "The second argument of prob:histcdf must be a JSON array for " + dimensions + "D histograms");
+        }
+        return parseVector(node.getString(), dimensions);
+    }
 
-        double x = pointNode.getDouble();
-        return NodeValue.makeDouble(hist.cdf(x));
+    private double[] parseVector(String str, int dimensions) {
+        str = str.trim();
+        if (!str.startsWith("[") || !str.endsWith("]")) {
+            throw new IllegalArgumentException("Vector must be JSON array format: [v1, v2, ...]");
+        }
+        String content = str.substring(1, str.length() - 1).trim();
+        if (content.isEmpty()) {
+            throw new IllegalArgumentException("Empty vector not allowed");
+        }
+        String[] parts = content.split(",");
+        if (parts.length != dimensions) {
+            throw new IllegalArgumentException(
+                "Vector dimension mismatch: expected " + dimensions + ", got " + parts.length);
+        }
+        double[] vector = new double[dimensions];
+        for (int i = 0; i < dimensions; i++) {
+            vector[i] = Double.parseDouble(parts[i].trim());
+        }
+        return vector;
     }
 }

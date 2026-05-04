@@ -6,8 +6,8 @@ Reads benchmark TTL files containing ``uq:gmmLiteral`` distributions and
 writes new TTL files in which each GMM is replaced by a 1-D histogram
 approximation encoded as ``uq:histLiteral``.
 
-JSON schema expected by HistogramDatatype.java:
-    {"bins":[<double>, ...], "weights":[<double>, ...]}
+Preferred JSON schema expected by HistogramDatatype.java:
+    {"dimensions":1, "edges":[[<double>, ...]], "weights":[<double>, ...]}
 
 For each GMM:
   1. Draw ``SAMPLES`` Monte-Carlo samples from the 1-D mixture.
@@ -88,7 +88,8 @@ def gmm_to_histogram(json_str: str, B: int, rng: np.random.Generator) -> str:
         weights_out = np.full(B, 1.0 / B)
     else:
         weights_out = counts / total
-    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+    return json.dumps({"dimensions": 1,
+                       "edges": [[round(float(x), 6) for x in edges.tolist()]],
                        "weights": [round(float(w), 6) for w in weights_out.tolist()]})
 
 

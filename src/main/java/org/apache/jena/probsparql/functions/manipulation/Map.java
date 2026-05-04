@@ -10,6 +10,8 @@ import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase1;
 
+import java.util.Locale;
+
 /**
  * SPARQL function {@code prob:map} — polymorphic MAP (mode) estimate.
  *
@@ -38,12 +40,7 @@ public class Map extends FunctionBase1 {
 
         if (HistogramDatatype.URI.equals(dtype)) {
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
-            double[] probs = hist.probabilities();
-            double[] centers = hist.binCenters();
-            int maxBin = 0;
-            for (int i = 1; i < hist.getBinCount(); i++)
-                if (probs[i] > probs[maxBin]) maxBin = i;
-            return NodeValue.makeString(String.format("[%.6f]", centers[maxBin]));
+            return NodeValue.makeString(formatVector(hist.mapPoint()));
         }
 
         if (DirichletDatatype.URI.equals(dtype)) {
@@ -81,7 +78,7 @@ public class Map extends FunctionBase1 {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {
             if (i > 0) sb.append(", ");
-            sb.append(String.format("%.6f", vector[i]));
+            sb.append(String.format(Locale.ROOT, "%.6f", vector[i]));
         }
         sb.append("]");
         return sb.toString();

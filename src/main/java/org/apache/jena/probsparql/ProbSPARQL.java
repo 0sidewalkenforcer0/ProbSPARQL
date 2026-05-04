@@ -312,7 +312,7 @@ public class ProbSPARQL {
     private static int distributionDimensions(Object value) {
         return switch (distributionKind(value)) {
             case GMM -> ((GMMValue) value).getDimensions();
-            case HISTOGRAM -> 1;
+            case HISTOGRAM -> ((HistogramValue) value).getDimensions();
             case DIRICHLET -> ((DirichletValue) value).getDimensions();
         };
     }

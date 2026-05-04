@@ -269,6 +269,21 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 | `prob:fuse(?gmm1, ?gmm2)` | Bayesian fusion | `prob:fuse(?prior, ?likelihood)` |
 | `prob:quantile(?gmm, ?p)` | Quantile at probability p | `prob:quantile(?dist, 0.95)` |
 
+For histogram literals, the preferred lexical form is:
+
+```json
+{
+  "dimensions": 2,
+  "edges": [[0.0, 1.0, 2.0], [10.0, 20.0, 30.0]],
+  "weights": [0.1, 0.2, 0.3, 0.4]
+}
+```
+
+`weights` stores cell probability masses on the Cartesian-product grid in row-major order.  
+Legacy 1-D histogram literals of the form `{"bins":[...],"weights":[...]}` are still accepted, but histogram values are now serialized back using the multidimensional schema above.
+
+For multidimensional histograms, `prob:cdf` / `prob:histcdf` interpret the second argument as a JSON array and compute the **joint CDF** `P(X1<=x1, ..., Xd<=xd)`.
+
 ---
 
 ## Special Operators

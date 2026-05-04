@@ -10,6 +10,8 @@ import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase1;
 
+import java.util.Locale;
+
 /**
  * SPARQL function {@code prob:mean} — polymorphic expected-value computation.
  *
@@ -41,8 +43,7 @@ public class Mean extends FunctionBase1 {
 
         if (HistogramDatatype.URI.equals(dtype)) {
             HistogramValue hist = HistogramJSD.extractHistogram(distNode, "first");
-            // Return scalar as single-element JSON array for consistency
-            return NodeValue.makeString(String.format("[%.6f]", hist.mean()));
+            return NodeValue.makeString(formatVector(hist.meanVector()));
         }
 
         if (DirichletDatatype.URI.equals(dtype)) {
@@ -82,7 +83,7 @@ public class Mean extends FunctionBase1 {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < vector.length; i++) {
             if (i > 0) sb.append(", ");
-            sb.append(String.format("%.6f", vector[i]));
+            sb.append(String.format(Locale.ROOT, "%.6f", vector[i]));
         }
         sb.append("]");
         return sb.toString();

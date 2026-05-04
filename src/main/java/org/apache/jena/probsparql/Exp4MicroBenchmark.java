@@ -227,13 +227,13 @@ public class Exp4MicroBenchmark {
         int[] counts = new int[B];
         double total = 0.0;
         for (int i = 0; i < B; i++) { counts[i] = rng.nextInt(1, 50); total += counts[i]; }
-        StringBuilder sb = new StringBuilder("{\"bins\":[");
+        StringBuilder sb = new StringBuilder("{\"dimensions\":1,\"edges\":[[");
         double width = (HIST_HI - HIST_LO) / B;
         for (int i = 0; i <= B; i++) {
             if (i > 0) sb.append(",");
             sb.append(String.format("%.4f", HIST_LO + i * width));
         }
-        sb.append("],\"weights\":[");
+        sb.append("]],\"weights\":[");
         double[] weights = roundedWeights(counts, total);
         for (int i = 0; i < B; i++) {
             if (i > 0) sb.append(",");

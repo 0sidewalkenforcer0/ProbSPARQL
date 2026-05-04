@@ -9,7 +9,7 @@ Conversion:
   1. Parse the gmm literal JSON (K=3, d=1, diag covariance)
   2. Draw SAMPLES=10 000 Monte-Carlo samples from the 1-D mixture
   3. Clip to [mean − 4σ, mean + 4σ]
-  4. Build B bins → JSON: {"bins":[...],"weights":[...]}
+  4. Build B bins → JSON: {"dimensions":1,"edges":[[...]],"weights":[...]}
   5. Replace the GMM lexical form with a histogram lexical form on the same
      cfm:hasDistribution edge, preserving the surrounding Exp1 RDF structure
      (measurement -> RV -> distribution).
@@ -90,7 +90,8 @@ def gmm_json_to_histogram(json_str: str, B: int, rng: np.random.Generator,
     else:
         weights_out = counts / total
     rounded_weights = rounded_probabilities(weights_out)
-    return json.dumps({"bins": [round(float(x), 6) for x in edges.tolist()],
+    return json.dumps({"dimensions": 1,
+                       "edges": [[round(float(x), 6) for x in edges.tolist()]],
                        "weights": rounded_weights})
 
 

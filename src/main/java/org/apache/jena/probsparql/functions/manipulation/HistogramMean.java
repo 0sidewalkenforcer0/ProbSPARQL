@@ -5,6 +5,8 @@ import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase1;
 
+import java.util.Locale;
+
 /**
  * SPARQL function {@code prob:histmean} — expected value of a histogram.
  *
@@ -26,6 +28,16 @@ public class HistogramMean extends FunctionBase1 {
     @Override
     public NodeValue exec(NodeValue histNode) {
         HistogramValue hist = HistogramJSD.extractHistogram(histNode, "first");
-        return NodeValue.makeDouble(hist.mean());
+        return NodeValue.makeString(formatVector(hist.meanVector()));
+    }
+
+    private String formatVector(double[] vector) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < vector.length; i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(String.format(Locale.ROOT, "%.6f", vector[i]));
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

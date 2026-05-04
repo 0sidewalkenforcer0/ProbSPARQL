@@ -7,7 +7,7 @@ import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
  * SPARQL function {@code prob:histjsd} — Jensen-Shannon divergence between two
- * histogram literals.
+ * histogram literals on a shared grid.
  *
  * <p>Computes the symmetric JSD using the discrete definition:</p>
  * <pre>
@@ -17,7 +17,7 @@ import org.apache.jena.sparql.function.FunctionBase2;
  *
  * <p>Convention: 0 log(0/m) = 0 (no contribution from empty bins).</p>
  *
- * <p>Both histograms must have the same bin boundaries; an
+ * <p>Both histograms must have compatible grids; an
  * {@link IllegalArgumentException} is thrown otherwise.</p>
  *
  * <p>Usage in SPARQL:</p>
@@ -39,9 +39,9 @@ public class HistogramJSD extends FunctionBase2 {
 
         if (!h1.isCompatible(h2))
             throw new IllegalArgumentException(
-                    "Histograms must have the same bin boundaries. "
-                    + "Got bins1=" + java.util.Arrays.toString(h1.getBins())
-                    + " bins2=" + java.util.Arrays.toString(h2.getBins()));
+                    "Histograms must have the same dimensional grid. "
+                    + "Got edges1=" + java.util.Arrays.deepToString(h1.getEdges())
+                    + " edges2=" + java.util.Arrays.deepToString(h2.getEdges()));
 
         double jsd = computeJSD(h1.probabilities(), h2.probabilities());
         return NodeValue.makeDouble(jsd);

@@ -131,6 +131,16 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 `prob:jsdivergence` 保留为 legacy GMM-only 接口；其内部现在对应 similarity evaluator，主要服务旧的 V1-V5 模式和 join 场景。
 `prob:sameTerm` 比较 RDF term 本身，因此对 GMM component 顺序敏感；`prob:sameDistribution` 比较解析后的分布值，因此对 GMM component 顺序不敏感。
 
+`uq:histLiteral` 现在使用统一的多维 schema：
+
+```json
+{"dimensions":2,"edges":[[0.0,1.0,2.0],[10.0,20.0,30.0]],"weights":[0.1,0.2,0.3,0.4]}
+```
+
+其中 `weights` 表示多维网格 cell 的概率质量，按 row-major 顺序展开。  
+旧的一维 schema `{"bins":[...],"weights":[...]}` 仍可解析，但系统输出统一使用新的 `dimensions + edges + weights` 形式。  
+对多维 histogram，`prob:cdf` / `prob:histcdf` 的语义是联合 CDF：`P(X1<=x1, ..., Xd<=xd)`。
+
 **legacy `prob:jsdivergence` / similarity evaluator 的 9 种模式（SimilarityEvaluator.java，JSDivergenceConfig.java）：**
 
 | 模式 | 策略 | 样本数 | 用途 |

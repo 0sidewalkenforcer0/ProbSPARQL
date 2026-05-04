@@ -324,6 +324,13 @@ All functions are registered via `FunctionRegistry.get().put(URI, Class)` during
 
 The legacy `prob:jsdivergence` wrapper still supports nine configurable V1-V5 / GT modes (via the `probsparql.mode` JVM property): fixed MC sample counts (`GT_100`, `GT_1K`, `GT_5K`, `GT_10K`), SPRT-based sequential testing (`V3_SPRT`), analytic bounds filtering (`V4_BOUNDS`), and a five-level adaptive cascade (`V5_ADAPTIVE`, the default). In V3/V4/V5, the returned score may be the by-product of a threshold-oriented similarity decision pipeline rather than a uniformly precise JSD estimator.
 
+Histogram literals now use the multidimensional schema
+`{"dimensions":d,"edges":[...],"weights":[...]}` as the canonical form.  The
+parser still accepts the older 1-D `{"bins":[...],"weights":[...]}` schema for
+backwards compatibility, but serialization emits the multidimensional form.
+For multidimensional histograms, `prob:cdf` / `prob:histcdf` evaluate the joint
+CDF `P(X1<=x1, ..., Xd<=xd)`.
+
 #### Category 3 — Transformations (7 functions)
 
 `prob:scale`, `prob:shift`, `prob:linear`, `prob:marginal`, `prob:joint`, `prob:convolve`, `prob:multiply` — all return a new GMM literal computed analytically (when possible) or via sampling.
