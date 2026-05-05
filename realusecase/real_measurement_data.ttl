@@ -3011,3 +3011,2750 @@ ex:c02_RelativeDensity_empiricalRV a uq:RandomVariable ;
     uq:hasDomain uq:nonNegativeDouble ;
     uq:hasDistribution """{"bins":[0.037333,0.1776,0.317867,0.458133,0.5984,0.738667],"weights":[0.588235,0.176471,0.058824,0.117647,0.058824]}"""^^uq:histLiteral .
 
+### BEGIN AUTO-GENERATED SPINDLEGEAR SECTION ###
+
+ex:DataSpindleGearSummary a ex:RealMeasurementDataset ;
+    rdfs:label "Spindle gear RMS, residual-stress, and hardness summary dataset"@en ;
+    ex:rowCount "40"^^xsd:integer .
+
+ex:SpindleGearSample rdfs:subClassOf cfc:Part .
+ex:RMSExceedanceProbabilityMeasurement rdfs:subClassOf im:StructuredLightMeasurement .
+ex:hasRMSOver700ProbabilityCharacteristic a rdf:Property .
+ex:probabilityUnit a om:Unit ;
+    rdfs:label "unitless probability"@en .
+
+ex:spindleSample_001 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_001_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_001_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_001_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_001_pRmsGt700Characteristic .
+
+ex:spindleSample_001_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_001"@en ;
+    im:isMeasuredBy ex:spindleSample_001_rmsMeasurement .
+
+ex:spindleSample_001_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "279.85121"^^xsd:double ;
+    ex:standardDeviation "19.47361"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_001_rmsRV .
+
+ex:spindleSample_001_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[279.85121]],"covariances":[[379.221486]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_001_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_001"@en ;
+    im:isMeasuredBy ex:spindleSample_001_residualStressMeasurement .
+
+ex:spindleSample_001_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "22.62490"^^xsd:double ;
+    ex:standardDeviation "29.14488"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_001_residualStressRV .
+
+ex:spindleSample_001_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[22.62490]],"covariances":[[849.424030]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_001_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_001"@en ;
+    im:isMeasuredBy ex:spindleSample_001_hardnessMeasurement .
+
+ex:spindleSample_001_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "500"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_001_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_001"@en ;
+    im:isMeasuredBy ex:spindleSample_001_pRmsGt700Measurement .
+
+ex:spindleSample_001_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000249547974"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_002 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_002_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_002_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_002_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_002_pRmsGt700Characteristic .
+
+ex:spindleSample_002_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_002"@en ;
+    im:isMeasuredBy ex:spindleSample_002_rmsMeasurement .
+
+ex:spindleSample_002_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "244.34038"^^xsd:double ;
+    ex:standardDeviation "22.00003"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_002_rmsRV .
+
+ex:spindleSample_002_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[244.34038]],"covariances":[[484.001320]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_002_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_002"@en ;
+    im:isMeasuredBy ex:spindleSample_002_residualStressMeasurement .
+
+ex:spindleSample_002_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "22.90924"^^xsd:double ;
+    ex:standardDeviation "20.73158"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_002_residualStressRV .
+
+ex:spindleSample_002_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[22.90924]],"covariances":[[429.798409]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_002_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_002"@en ;
+    im:isMeasuredBy ex:spindleSample_002_hardnessMeasurement .
+
+ex:spindleSample_002_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "460"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_002_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_002"@en ;
+    im:isMeasuredBy ex:spindleSample_002_pRmsGt700Measurement .
+
+ex:spindleSample_002_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000056828235"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_003 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_003_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_003_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_003_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_003_pRmsGt700Characteristic .
+
+ex:spindleSample_003_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_003"@en ;
+    im:isMeasuredBy ex:spindleSample_003_rmsMeasurement .
+
+ex:spindleSample_003_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "261.03652"^^xsd:double ;
+    ex:standardDeviation "30.30458"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_003_rmsRV .
+
+ex:spindleSample_003_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[261.03652]],"covariances":[[918.367569]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_003_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_003"@en ;
+    im:isMeasuredBy ex:spindleSample_003_residualStressMeasurement .
+
+ex:spindleSample_003_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "29.30832"^^xsd:double ;
+    ex:standardDeviation "11.21891"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_003_residualStressRV .
+
+ex:spindleSample_003_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[29.30832]],"covariances":[[125.863942]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_003_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_003"@en ;
+    im:isMeasuredBy ex:spindleSample_003_hardnessMeasurement .
+
+ex:spindleSample_003_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "420"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_003_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_003"@en ;
+    im:isMeasuredBy ex:spindleSample_003_pRmsGt700Measurement .
+
+ex:spindleSample_003_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000113943882"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_004 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_004_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_004_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_004_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_004_pRmsGt700Characteristic .
+
+ex:spindleSample_004_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_004"@en ;
+    im:isMeasuredBy ex:spindleSample_004_rmsMeasurement .
+
+ex:spindleSample_004_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "310.93383"^^xsd:double ;
+    ex:standardDeviation "27.99316"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_004_rmsRV .
+
+ex:spindleSample_004_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[310.93383]],"covariances":[[783.617007]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_004_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_004"@en ;
+    im:isMeasuredBy ex:spindleSample_004_residualStressMeasurement .
+
+ex:spindleSample_004_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "29.93438"^^xsd:double ;
+    ex:standardDeviation "26.72921"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_004_residualStressRV .
+
+ex:spindleSample_004_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[29.93438]],"covariances":[[714.450667]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_004_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_004"@en ;
+    im:isMeasuredBy ex:spindleSample_004_hardnessMeasurement .
+
+ex:spindleSample_004_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "460"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_004_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_004"@en ;
+    im:isMeasuredBy ex:spindleSample_004_pRmsGt700Measurement .
+
+ex:spindleSample_004_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000911198093"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_005 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_005_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_005_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_005_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_005_pRmsGt700Characteristic .
+
+ex:spindleSample_005_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_005"@en ;
+    im:isMeasuredBy ex:spindleSample_005_rmsMeasurement .
+
+ex:spindleSample_005_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "703.93244"^^xsd:double ;
+    ex:standardDeviation "23.42511"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_005_rmsRV .
+
+ex:spindleSample_005_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[703.93244]],"covariances":[[548.735779]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_005_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_005"@en ;
+    im:isMeasuredBy ex:spindleSample_005_residualStressMeasurement .
+
+ex:spindleSample_005_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "38.05643"^^xsd:double ;
+    ex:standardDeviation "11.19714"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_005_residualStressRV .
+
+ex:spindleSample_005_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[38.05643]],"covariances":[[125.375944]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_005_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_005"@en ;
+    im:isMeasuredBy ex:spindleSample_005_hardnessMeasurement .
+
+ex:spindleSample_005_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "370"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_005_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_005"@en ;
+    im:isMeasuredBy ex:spindleSample_005_pRmsGt700Measurement .
+
+ex:spindleSample_005_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.5408714951040714"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_006 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_006_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_006_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_006_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_006_pRmsGt700Characteristic .
+
+ex:spindleSample_006_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_006"@en ;
+    im:isMeasuredBy ex:spindleSample_006_rmsMeasurement .
+
+ex:spindleSample_006_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "695.17157"^^xsd:double ;
+    ex:standardDeviation "31.89121"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_006_rmsRV .
+
+ex:spindleSample_006_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[695.17157]],"covariances":[[1017.049275]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_006_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_006"@en ;
+    im:isMeasuredBy ex:spindleSample_006_residualStressMeasurement .
+
+ex:spindleSample_006_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "31.29410"^^xsd:double ;
+    ex:standardDeviation "10.55411"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_006_residualStressRV .
+
+ex:spindleSample_006_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[31.29410]],"covariances":[[111.389238]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_006_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_006"@en ;
+    im:isMeasuredBy ex:spindleSample_006_hardnessMeasurement .
+
+ex:spindleSample_006_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "360"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_006_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_006"@en ;
+    im:isMeasuredBy ex:spindleSample_006_pRmsGt700Measurement .
+
+ex:spindleSample_006_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.4498727669624886"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_007 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_007_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_007_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_007_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_007_pRmsGt700Characteristic .
+
+ex:spindleSample_007_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_007"@en ;
+    im:isMeasuredBy ex:spindleSample_007_rmsMeasurement .
+
+ex:spindleSample_007_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "846.73670"^^xsd:double ;
+    ex:standardDeviation "28.55906"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_007_rmsRV .
+
+ex:spindleSample_007_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[846.73670]],"covariances":[[815.619908]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_007_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_007"@en ;
+    im:isMeasuredBy ex:spindleSample_007_residualStressMeasurement .
+
+ex:spindleSample_007_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "7.55848"^^xsd:double ;
+    ex:standardDeviation "9.13041"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_007_residualStressRV .
+
+ex:spindleSample_007_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[7.55848]],"covariances":[[83.364387]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_007_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_007"@en ;
+    im:isMeasuredBy ex:spindleSample_007_hardnessMeasurement .
+
+ex:spindleSample_007_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "350"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_007_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_007"@en ;
+    im:isMeasuredBy ex:spindleSample_007_pRmsGt700Measurement .
+
+ex:spindleSample_007_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9977932588416449"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_008 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_008_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_008_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_008_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_008_pRmsGt700Characteristic .
+
+ex:spindleSample_008_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_008"@en ;
+    im:isMeasuredBy ex:spindleSample_008_rmsMeasurement .
+
+ex:spindleSample_008_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "895.71234"^^xsd:double ;
+    ex:standardDeviation "31.49508"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_008_rmsRV .
+
+ex:spindleSample_008_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[895.71234]],"covariances":[[991.940064]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_008_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_008"@en ;
+    im:isMeasuredBy ex:spindleSample_008_residualStressMeasurement .
+
+ex:spindleSample_008_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "11.25238"^^xsd:double ;
+    ex:standardDeviation "9.58469"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_008_residualStressRV .
+
+ex:spindleSample_008_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[11.25238]],"covariances":[[91.866282]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_008_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_008"@en ;
+    im:isMeasuredBy ex:spindleSample_008_hardnessMeasurement .
+
+ex:spindleSample_008_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "330"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_008_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_008"@en ;
+    im:isMeasuredBy ex:spindleSample_008_pRmsGt700Measurement .
+
+ex:spindleSample_008_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.999712695512653"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_009 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_009_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_009_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_009_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_009_pRmsGt700Characteristic .
+
+ex:spindleSample_009_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_009"@en ;
+    im:isMeasuredBy ex:spindleSample_009_rmsMeasurement .
+
+ex:spindleSample_009_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "1111.81919"^^xsd:double ;
+    ex:standardDeviation "25.68024"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_009_rmsRV .
+
+ex:spindleSample_009_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1111.81919]],"covariances":[[659.474726]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_009_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_009"@en ;
+    im:isMeasuredBy ex:spindleSample_009_residualStressMeasurement .
+
+ex:spindleSample_009_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "18.58174"^^xsd:double ;
+    ex:standardDeviation "6.20981"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_009_residualStressRV .
+
+ex:spindleSample_009_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[18.58174]],"covariances":[[38.561740]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_009_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_009"@en ;
+    im:isMeasuredBy ex:spindleSample_009_hardnessMeasurement .
+
+ex:spindleSample_009_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_009_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_009"@en ;
+    im:isMeasuredBy ex:spindleSample_009_pRmsGt700Measurement .
+
+ex:spindleSample_009_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.999999964691182"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_010 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC25_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_010_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_010_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_010_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_010_pRmsGt700Characteristic .
+
+ex:spindleSample_010_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_010"@en ;
+    im:isMeasuredBy ex:spindleSample_010_rmsMeasurement .
+
+ex:spindleSample_010_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "1120.00984"^^xsd:double ;
+    ex:standardDeviation "25.21966"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_010_rmsRV .
+
+ex:spindleSample_010_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1120.00984]],"covariances":[[636.031251]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_010_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_010"@en ;
+    im:isMeasuredBy ex:spindleSample_010_residualStressMeasurement .
+
+ex:spindleSample_010_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "17.93370"^^xsd:double ;
+    ex:standardDeviation "3.76639"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_010_residualStressRV .
+
+ex:spindleSample_010_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[17.93370]],"covariances":[[14.185694]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_010_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_010"@en ;
+    im:isMeasuredBy ex:spindleSample_010_hardnessMeasurement .
+
+ex:spindleSample_010_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "250"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_010_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_010"@en ;
+    im:isMeasuredBy ex:spindleSample_010_pRmsGt700Measurement .
+
+ex:spindleSample_010_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9999999749003068"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_011 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_011_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_011_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_011_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_011_pRmsGt700Characteristic .
+
+ex:spindleSample_011_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_011"@en ;
+    im:isMeasuredBy ex:spindleSample_011_rmsMeasurement .
+
+ex:spindleSample_011_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "68.61588"^^xsd:double ;
+    ex:standardDeviation "3.90694"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_011_rmsRV .
+
+ex:spindleSample_011_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[68.61588]],"covariances":[[15.264180]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_011_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_011"@en ;
+    im:isMeasuredBy ex:spindleSample_011_residualStressMeasurement .
+
+ex:spindleSample_011_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "3.77907"^^xsd:double ;
+    ex:standardDeviation "26.91126"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_011_residualStressRV .
+
+ex:spindleSample_011_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[3.77907]],"covariances":[[724.215915]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_011_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_011"@en ;
+    im:isMeasuredBy ex:spindleSample_011_hardnessMeasurement .
+
+ex:spindleSample_011_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "570"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_011_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_011"@en ;
+    im:isMeasuredBy ex:spindleSample_011_pRmsGt700Measurement .
+
+ex:spindleSample_011_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.000000000003756"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_012 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_012_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_012_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_012_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_012_pRmsGt700Characteristic .
+
+ex:spindleSample_012_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_012"@en ;
+    im:isMeasuredBy ex:spindleSample_012_rmsMeasurement .
+
+ex:spindleSample_012_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "68.56556"^^xsd:double ;
+    ex:standardDeviation "4.88622"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_012_rmsRV .
+
+ex:spindleSample_012_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[68.56556]],"covariances":[[23.875146]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_012_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_012"@en ;
+    im:isMeasuredBy ex:spindleSample_012_residualStressMeasurement .
+
+ex:spindleSample_012_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "12.90117"^^xsd:double ;
+    ex:standardDeviation "28.12576"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_012_residualStressRV .
+
+ex:spindleSample_012_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[12.90117]],"covariances":[[791.058376]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_012_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_012"@en ;
+    im:isMeasuredBy ex:spindleSample_012_hardnessMeasurement .
+
+ex:spindleSample_012_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "570"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_012_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_012"@en ;
+    im:isMeasuredBy ex:spindleSample_012_pRmsGt700Measurement .
+
+ex:spindleSample_012_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000037481"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_013 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_013_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_013_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_013_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_013_pRmsGt700Characteristic .
+
+ex:spindleSample_013_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_013"@en ;
+    im:isMeasuredBy ex:spindleSample_013_rmsMeasurement .
+
+ex:spindleSample_013_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "109.31937"^^xsd:double ;
+    ex:standardDeviation "9.09541"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_013_rmsRV .
+
+ex:spindleSample_013_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[109.31937]],"covariances":[[82.726483]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_013_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_013"@en ;
+    im:isMeasuredBy ex:spindleSample_013_residualStressMeasurement .
+
+ex:spindleSample_013_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "12.77261"^^xsd:double ;
+    ex:standardDeviation "19.08551"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_013_residualStressRV .
+
+ex:spindleSample_013_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[12.77261]],"covariances":[[364.256692]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_013_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_013"@en ;
+    im:isMeasuredBy ex:spindleSample_013_hardnessMeasurement .
+
+ex:spindleSample_013_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "470"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_013_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_013"@en ;
+    im:isMeasuredBy ex:spindleSample_013_pRmsGt700Measurement .
+
+ex:spindleSample_013_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000204775"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_014 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_014_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_014_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_014_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_014_pRmsGt700Characteristic .
+
+ex:spindleSample_014_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_014"@en ;
+    im:isMeasuredBy ex:spindleSample_014_rmsMeasurement .
+
+ex:spindleSample_014_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "109.46581"^^xsd:double ;
+    ex:standardDeviation "7.91513"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_014_rmsRV .
+
+ex:spindleSample_014_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[109.46581]],"covariances":[[62.649283]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_014_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_014"@en ;
+    im:isMeasuredBy ex:spindleSample_014_residualStressMeasurement .
+
+ex:spindleSample_014_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-7.40595"^^xsd:double ;
+    ex:standardDeviation "32.84052"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_014_residualStressRV .
+
+ex:spindleSample_014_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-7.40595]],"covariances":[[1078.499754]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_014_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_014"@en ;
+    im:isMeasuredBy ex:spindleSample_014_hardnessMeasurement .
+
+ex:spindleSample_014_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "450"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_014_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_014"@en ;
+    im:isMeasuredBy ex:spindleSample_014_pRmsGt700Measurement .
+
+ex:spindleSample_014_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000206029"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_015 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_015_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_015_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_015_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_015_pRmsGt700Characteristic .
+
+ex:spindleSample_015_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_015"@en ;
+    im:isMeasuredBy ex:spindleSample_015_rmsMeasurement .
+
+ex:spindleSample_015_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "552.76729"^^xsd:double ;
+    ex:standardDeviation "26.93349"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_015_rmsRV .
+
+ex:spindleSample_015_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[552.76729]],"covariances":[[725.412884]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_015_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_015"@en ;
+    im:isMeasuredBy ex:spindleSample_015_residualStressMeasurement .
+
+ex:spindleSample_015_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-1.73300"^^xsd:double ;
+    ex:standardDeviation "8.75724"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_015_residualStressRV .
+
+ex:spindleSample_015_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-1.73300]],"covariances":[[76.689252]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_015_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_015"@en ;
+    im:isMeasuredBy ex:spindleSample_015_hardnessMeasurement .
+
+ex:spindleSample_015_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "400"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_015_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_015"@en ;
+    im:isMeasuredBy ex:spindleSample_015_pRmsGt700Measurement .
+
+ex:spindleSample_015_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0021617003657678"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_016 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_016_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_016_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_016_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_016_pRmsGt700Characteristic .
+
+ex:spindleSample_016_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_016"@en ;
+    im:isMeasuredBy ex:spindleSample_016_rmsMeasurement .
+
+ex:spindleSample_016_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "522.51419"^^xsd:double ;
+    ex:standardDeviation "26.64371"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_016_rmsRV .
+
+ex:spindleSample_016_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[522.51419]],"covariances":[[709.887283]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_016_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_016"@en ;
+    im:isMeasuredBy ex:spindleSample_016_residualStressMeasurement .
+
+ex:spindleSample_016_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-4.82523"^^xsd:double ;
+    ex:standardDeviation "11.15361"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_016_residualStressRV .
+
+ex:spindleSample_016_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-4.82523]],"covariances":[[124.403016]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_016_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_016"@en ;
+    im:isMeasuredBy ex:spindleSample_016_hardnessMeasurement .
+
+ex:spindleSample_016_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "410"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_016_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_016"@en ;
+    im:isMeasuredBy ex:spindleSample_016_pRmsGt700Measurement .
+
+ex:spindleSample_016_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0006137909249766"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_017 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_017_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_017_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_017_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_017_pRmsGt700Characteristic .
+
+ex:spindleSample_017_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_017"@en ;
+    im:isMeasuredBy ex:spindleSample_017_rmsMeasurement .
+
+ex:spindleSample_017_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "722.64626"^^xsd:double ;
+    ex:standardDeviation "23.79095"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_017_rmsRV .
+
+ex:spindleSample_017_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[722.64626]],"covariances":[[566.009302]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_017_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_017"@en ;
+    im:isMeasuredBy ex:spindleSample_017_residualStressMeasurement .
+
+ex:spindleSample_017_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "4.58476"^^xsd:double ;
+    ex:standardDeviation "5.85521"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_017_residualStressRV .
+
+ex:spindleSample_017_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[4.58476]],"covariances":[[34.283484]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_017_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_017"@en ;
+    im:isMeasuredBy ex:spindleSample_017_hardnessMeasurement .
+
+ex:spindleSample_017_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_017_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_017"@en ;
+    im:isMeasuredBy ex:spindleSample_017_pRmsGt700Measurement .
+
+ex:spindleSample_017_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.7198251209400233"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_018 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_018_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_018_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_018_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_018_pRmsGt700Characteristic .
+
+ex:spindleSample_018_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_018"@en ;
+    im:isMeasuredBy ex:spindleSample_018_rmsMeasurement .
+
+ex:spindleSample_018_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "645.07887"^^xsd:double ;
+    ex:standardDeviation "37.35860"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_018_rmsRV .
+
+ex:spindleSample_018_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[645.07887]],"covariances":[[1395.664994]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_018_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_018"@en ;
+    im:isMeasuredBy ex:spindleSample_018_residualStressMeasurement .
+
+ex:spindleSample_018_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "9.11625"^^xsd:double ;
+    ex:standardDeviation "1.95397"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_018_residualStressRV .
+
+ex:spindleSample_018_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[9.11625]],"covariances":[[3.817999]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_018_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_018"@en ;
+    im:isMeasuredBy ex:spindleSample_018_hardnessMeasurement .
+
+ex:spindleSample_018_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_018_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_018"@en ;
+    im:isMeasuredBy ex:spindleSample_018_pRmsGt700Measurement .
+
+ex:spindleSample_018_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0920898618885393"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_019 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_019_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_019_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_019_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_019_pRmsGt700Characteristic .
+
+ex:spindleSample_019_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_019"@en ;
+    im:isMeasuredBy ex:spindleSample_019_rmsMeasurement .
+
+ex:spindleSample_019_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "819.12315"^^xsd:double ;
+    ex:standardDeviation "39.76728"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_019_rmsRV .
+
+ex:spindleSample_019_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[819.12315]],"covariances":[[1581.436559]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_019_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_019"@en ;
+    im:isMeasuredBy ex:spindleSample_019_residualStressMeasurement .
+
+ex:spindleSample_019_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "22.77071"^^xsd:double ;
+    ex:standardDeviation "4.66289"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_019_residualStressRV .
+
+ex:spindleSample_019_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[22.77071]],"covariances":[[21.742543]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_019_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_019"@en ;
+    im:isMeasuredBy ex:spindleSample_019_hardnessMeasurement .
+
+ex:spindleSample_019_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "260"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_019_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_019"@en ;
+    im:isMeasuredBy ex:spindleSample_019_pRmsGt700Measurement .
+
+ex:spindleSample_019_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9930598290280525"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_020 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC34_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_020_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_020_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_020_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_020_pRmsGt700Characteristic .
+
+ex:spindleSample_020_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_020"@en ;
+    im:isMeasuredBy ex:spindleSample_020_rmsMeasurement .
+
+ex:spindleSample_020_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "747.99638"^^xsd:double ;
+    ex:standardDeviation "57.34329"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_020_rmsRV .
+
+ex:spindleSample_020_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[747.99638]],"covariances":[[3288.252908]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_020_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_020"@en ;
+    im:isMeasuredBy ex:spindleSample_020_residualStressMeasurement .
+
+ex:spindleSample_020_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "19.26702"^^xsd:double ;
+    ex:standardDeviation "5.24444"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_020_residualStressRV .
+
+ex:spindleSample_020_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[19.26702]],"covariances":[[27.504151]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_020_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_020"@en ;
+    im:isMeasuredBy ex:spindleSample_020_hardnessMeasurement .
+
+ex:spindleSample_020_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "270"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_020_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_020"@en ;
+    im:isMeasuredBy ex:spindleSample_020_pRmsGt700Measurement .
+
+ex:spindleSample_020_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.8807812402566296"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_021 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_021_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_021_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_021_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_021_pRmsGt700Characteristic .
+
+ex:spindleSample_021_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_021"@en ;
+    im:isMeasuredBy ex:spindleSample_021_rmsMeasurement .
+
+ex:spindleSample_021_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "65.36400"^^xsd:double ;
+    ex:standardDeviation "2.09419"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_021_rmsRV .
+
+ex:spindleSample_021_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[65.36400]],"covariances":[[4.385632]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_021_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_021"@en ;
+    im:isMeasuredBy ex:spindleSample_021_residualStressMeasurement .
+
+ex:spindleSample_021_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-0.80540"^^xsd:double ;
+    ex:standardDeviation "26.06331"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_021_residualStressRV .
+
+ex:spindleSample_021_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-0.80540]],"covariances":[[679.296128]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_021_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_021"@en ;
+    im:isMeasuredBy ex:spindleSample_021_hardnessMeasurement .
+
+ex:spindleSample_021_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "610"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_021_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_021"@en ;
+    im:isMeasuredBy ex:spindleSample_021_pRmsGt700Measurement .
+
+ex:spindleSample_021_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.00000000000328"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_022 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_022_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_022_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_022_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_022_pRmsGt700Characteristic .
+
+ex:spindleSample_022_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_022"@en ;
+    im:isMeasuredBy ex:spindleSample_022_rmsMeasurement .
+
+ex:spindleSample_022_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "62.31740"^^xsd:double ;
+    ex:standardDeviation "8.87460"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_022_rmsRV .
+
+ex:spindleSample_022_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[62.31740]],"covariances":[[78.758525]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_022_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_022"@en ;
+    im:isMeasuredBy ex:spindleSample_022_residualStressMeasurement .
+
+ex:spindleSample_022_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-1.90703"^^xsd:double ;
+    ex:standardDeviation "15.56109"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_022_residualStressRV .
+
+ex:spindleSample_022_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-1.90703]],"covariances":[[242.147522]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_022_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_022"@en ;
+    im:isMeasuredBy ex:spindleSample_022_hardnessMeasurement .
+
+ex:spindleSample_022_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "580"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_022_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_022"@en ;
+    im:isMeasuredBy ex:spindleSample_022_pRmsGt700Measurement .
+
+ex:spindleSample_022_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.000000000002889"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_023 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_023_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_023_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_023_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_023_pRmsGt700Characteristic .
+
+ex:spindleSample_023_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_023"@en ;
+    im:isMeasuredBy ex:spindleSample_023_rmsMeasurement .
+
+ex:spindleSample_023_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "101.31020"^^xsd:double ;
+    ex:standardDeviation "4.64324"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_023_rmsRV .
+
+ex:spindleSample_023_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[101.31020]],"covariances":[[21.559678]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_023_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_023"@en ;
+    im:isMeasuredBy ex:spindleSample_023_residualStressMeasurement .
+
+ex:spindleSample_023_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "15.03500"^^xsd:double ;
+    ex:standardDeviation "8.11466"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_023_residualStressRV .
+
+ex:spindleSample_023_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[15.03500]],"covariances":[[65.847707]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_023_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_023"@en ;
+    im:isMeasuredBy ex:spindleSample_023_hardnessMeasurement .
+
+ex:spindleSample_023_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "460"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_023_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_023"@en ;
+    im:isMeasuredBy ex:spindleSample_023_pRmsGt700Measurement .
+
+ex:spindleSample_023_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000146672"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_024 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_024_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_024_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_024_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_024_pRmsGt700Characteristic .
+
+ex:spindleSample_024_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_024"@en ;
+    im:isMeasuredBy ex:spindleSample_024_rmsMeasurement .
+
+ex:spindleSample_024_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "102.06717"^^xsd:double ;
+    ex:standardDeviation "6.21353"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_024_rmsRV .
+
+ex:spindleSample_024_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[102.06717]],"covariances":[[38.607955]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_024_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_024"@en ;
+    im:isMeasuredBy ex:spindleSample_024_residualStressMeasurement .
+
+ex:spindleSample_024_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "-13.79312"^^xsd:double ;
+    ex:standardDeviation "20.35666"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_024_residualStressRV .
+
+ex:spindleSample_024_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[-13.79312]],"covariances":[[414.393606]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_024_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_024"@en ;
+    im:isMeasuredBy ex:spindleSample_024_hardnessMeasurement .
+
+ex:spindleSample_024_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "460"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_024_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_024"@en ;
+    im:isMeasuredBy ex:spindleSample_024_pRmsGt700Measurement .
+
+ex:spindleSample_024_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000151372"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_025 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_025_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_025_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_025_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_025_pRmsGt700Characteristic .
+
+ex:spindleSample_025_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_025"@en ;
+    im:isMeasuredBy ex:spindleSample_025_rmsMeasurement .
+
+ex:spindleSample_025_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "491.84081"^^xsd:double ;
+    ex:standardDeviation "24.69522"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_025_rmsRV .
+
+ex:spindleSample_025_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[491.84081]],"covariances":[[609.853891]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_025_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_025"@en ;
+    im:isMeasuredBy ex:spindleSample_025_residualStressMeasurement .
+
+ex:spindleSample_025_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "9.91666"^^xsd:double ;
+    ex:standardDeviation "9.79453"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_025_residualStressRV .
+
+ex:spindleSample_025_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[9.91666]],"covariances":[[95.932818]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_025_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_025"@en ;
+    im:isMeasuredBy ex:spindleSample_025_hardnessMeasurement .
+
+ex:spindleSample_025_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "470"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_025_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_025"@en ;
+    im:isMeasuredBy ex:spindleSample_025_pRmsGt700Measurement .
+
+ex:spindleSample_025_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0001710643447037"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_026 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_026_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_026_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_026_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_026_pRmsGt700Characteristic .
+
+ex:spindleSample_026_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_026"@en ;
+    im:isMeasuredBy ex:spindleSample_026_rmsMeasurement .
+
+ex:spindleSample_026_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "518.55425"^^xsd:double ;
+    ex:standardDeviation "21.95041"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_026_rmsRV .
+
+ex:spindleSample_026_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[518.55425]],"covariances":[[481.820499]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_026_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_026"@en ;
+    im:isMeasuredBy ex:spindleSample_026_residualStressMeasurement .
+
+ex:spindleSample_026_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "1.54511"^^xsd:double ;
+    ex:standardDeviation "12.79557"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_026_residualStressRV .
+
+ex:spindleSample_026_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1.54511]],"covariances":[[163.726612]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_026_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_026"@en ;
+    im:isMeasuredBy ex:spindleSample_026_hardnessMeasurement .
+
+ex:spindleSample_026_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "460"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_026_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_026"@en ;
+    im:isMeasuredBy ex:spindleSample_026_pRmsGt700Measurement .
+
+ex:spindleSample_026_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.000520479482425"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_027 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_027_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_027_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_027_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_027_pRmsGt700Characteristic .
+
+ex:spindleSample_027_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_027"@en ;
+    im:isMeasuredBy ex:spindleSample_027_rmsMeasurement .
+
+ex:spindleSample_027_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "621.95411"^^xsd:double ;
+    ex:standardDeviation "19.50261"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_027_rmsRV .
+
+ex:spindleSample_027_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[621.95411]],"covariances":[[380.351797]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_027_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_027"@en ;
+    im:isMeasuredBy ex:spindleSample_027_residualStressMeasurement .
+
+ex:spindleSample_027_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "3.12498"^^xsd:double ;
+    ex:standardDeviation "5.73178"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_027_residualStressRV .
+
+ex:spindleSample_027_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[3.12498]],"covariances":[[32.853302]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_027_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_027"@en ;
+    im:isMeasuredBy ex:spindleSample_027_hardnessMeasurement .
+
+ex:spindleSample_027_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "350"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_027_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_027"@en ;
+    im:isMeasuredBy ex:spindleSample_027_pRmsGt700Measurement .
+
+ex:spindleSample_027_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0372582460632056"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_028 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_028_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_028_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_028_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_028_pRmsGt700Characteristic .
+
+ex:spindleSample_028_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_028"@en ;
+    im:isMeasuredBy ex:spindleSample_028_rmsMeasurement .
+
+ex:spindleSample_028_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "620.15549"^^xsd:double ;
+    ex:standardDeviation "27.86284"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_028_rmsRV .
+
+ex:spindleSample_028_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[620.15549]],"covariances":[[776.337853]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_028_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_028"@en ;
+    im:isMeasuredBy ex:spindleSample_028_residualStressMeasurement .
+
+ex:spindleSample_028_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "0.50175"^^xsd:double ;
+    ex:standardDeviation "4.64535"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_028_residualStressRV .
+
+ex:spindleSample_028_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[0.50175]],"covariances":[[21.579277]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_028_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_028"@en ;
+    im:isMeasuredBy ex:spindleSample_028_hardnessMeasurement .
+
+ex:spindleSample_028_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "340"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_028_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_028"@en ;
+    im:isMeasuredBy ex:spindleSample_028_pRmsGt700Measurement .
+
+ex:spindleSample_028_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0346613164680325"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_029 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_029_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_029_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_029_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_029_pRmsGt700Characteristic .
+
+ex:spindleSample_029_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_029"@en ;
+    im:isMeasuredBy ex:spindleSample_029_rmsMeasurement .
+
+ex:spindleSample_029_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "763.94305"^^xsd:double ;
+    ex:standardDeviation "34.39450"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_029_rmsRV .
+
+ex:spindleSample_029_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[763.94305]],"covariances":[[1182.981630]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_029_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_029"@en ;
+    im:isMeasuredBy ex:spindleSample_029_residualStressMeasurement .
+
+ex:spindleSample_029_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "29.49843"^^xsd:double ;
+    ex:standardDeviation "2.37006"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_029_residualStressRV .
+
+ex:spindleSample_029_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[29.49843]],"covariances":[[5.617184]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_029_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_029"@en ;
+    im:isMeasuredBy ex:spindleSample_029_hardnessMeasurement .
+
+ex:spindleSample_029_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "280"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_029_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_029"@en ;
+    im:isMeasuredBy ex:spindleSample_029_pRmsGt700Measurement .
+
+ex:spindleSample_029_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9348865318461299"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_030 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC42_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_030_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_030_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_030_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_030_pRmsGt700Characteristic .
+
+ex:spindleSample_030_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_030"@en ;
+    im:isMeasuredBy ex:spindleSample_030_rmsMeasurement .
+
+ex:spindleSample_030_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "766.71267"^^xsd:double ;
+    ex:standardDeviation "52.51983"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_030_rmsRV .
+
+ex:spindleSample_030_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[766.71267]],"covariances":[[2758.332543]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_030_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_030"@en ;
+    im:isMeasuredBy ex:spindleSample_030_residualStressMeasurement .
+
+ex:spindleSample_030_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "30.24851"^^xsd:double ;
+    ex:standardDeviation "3.95463"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_030_residualStressRV .
+
+ex:spindleSample_030_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[30.24851]],"covariances":[[15.639098]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_030_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_030"@en ;
+    im:isMeasuredBy ex:spindleSample_030_hardnessMeasurement .
+
+ex:spindleSample_030_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "270"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_030_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_030"@en ;
+    im:isMeasuredBy ex:spindleSample_030_pRmsGt700Measurement .
+
+ex:spindleSample_030_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9415686408000437"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_031 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_031_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_031_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_031_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_031_pRmsGt700Characteristic .
+
+ex:spindleSample_031_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_031"@en ;
+    im:isMeasuredBy ex:spindleSample_031_rmsMeasurement .
+
+ex:spindleSample_031_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "63.15183"^^xsd:double ;
+    ex:standardDeviation "4.44687"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_031_rmsRV .
+
+ex:spindleSample_031_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[63.15183]],"covariances":[[19.774653]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_031_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_031"@en ;
+    im:isMeasuredBy ex:spindleSample_031_residualStressMeasurement .
+
+ex:spindleSample_031_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "83.48032"^^xsd:double ;
+    ex:standardDeviation "24.55914"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_031_residualStressRV .
+
+ex:spindleSample_031_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[83.48032]],"covariances":[[603.151358]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_031_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_031"@en ;
+    im:isMeasuredBy ex:spindleSample_031_hardnessMeasurement .
+
+ex:spindleSample_031_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "670"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_031_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_031"@en ;
+    im:isMeasuredBy ex:spindleSample_031_pRmsGt700Measurement .
+
+ex:spindleSample_031_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000029912"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_032 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T30 ;
+    ex:hasRMSCharacteristic ex:spindleSample_032_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_032_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_032_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_032_pRmsGt700Characteristic .
+
+ex:spindleSample_032_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_032"@en ;
+    im:isMeasuredBy ex:spindleSample_032_rmsMeasurement .
+
+ex:spindleSample_032_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "64.33897"^^xsd:double ;
+    ex:standardDeviation "3.69978"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_032_rmsRV .
+
+ex:spindleSample_032_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[64.33897]],"covariances":[[13.688372]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_032_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_032"@en ;
+    im:isMeasuredBy ex:spindleSample_032_residualStressMeasurement .
+
+ex:spindleSample_032_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "80.31245"^^xsd:double ;
+    ex:standardDeviation "20.92968"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_032_residualStressRV .
+
+ex:spindleSample_032_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[80.31245]],"covariances":[[438.051505]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_032_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_032"@en ;
+    im:isMeasuredBy ex:spindleSample_032_hardnessMeasurement .
+
+ex:spindleSample_032_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "660"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_032_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_032"@en ;
+    im:isMeasuredBy ex:spindleSample_032_pRmsGt700Measurement .
+
+ex:spindleSample_032_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000031429"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_033 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_033_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_033_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_033_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_033_pRmsGt700Characteristic .
+
+ex:spindleSample_033_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_033"@en ;
+    im:isMeasuredBy ex:spindleSample_033_rmsMeasurement .
+
+ex:spindleSample_033_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "91.45985"^^xsd:double ;
+    ex:standardDeviation "6.55542"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_033_rmsRV .
+
+ex:spindleSample_033_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[91.45985]],"covariances":[[42.973531]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_033_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_033"@en ;
+    im:isMeasuredBy ex:spindleSample_033_residualStressMeasurement .
+
+ex:spindleSample_033_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "40.83992"^^xsd:double ;
+    ex:standardDeviation "16.30152"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_033_residualStressRV .
+
+ex:spindleSample_033_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[40.83992]],"covariances":[[265.739554]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_033_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_033"@en ;
+    im:isMeasuredBy ex:spindleSample_033_hardnessMeasurement .
+
+ex:spindleSample_033_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "580"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_033_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_033"@en ;
+    im:isMeasuredBy ex:spindleSample_033_pRmsGt700Measurement .
+
+ex:spindleSample_033_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000097297"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_034 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T250 ;
+    ex:hasRMSCharacteristic ex:spindleSample_034_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_034_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_034_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_034_pRmsGt700Characteristic .
+
+ex:spindleSample_034_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_034"@en ;
+    im:isMeasuredBy ex:spindleSample_034_rmsMeasurement .
+
+ex:spindleSample_034_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "79.46199"^^xsd:double ;
+    ex:standardDeviation "8.82098"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_034_rmsRV .
+
+ex:spindleSample_034_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[79.46199]],"covariances":[[77.809688]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_034_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_034"@en ;
+    im:isMeasuredBy ex:spindleSample_034_residualStressMeasurement .
+
+ex:spindleSample_034_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "65.63114"^^xsd:double ;
+    ex:standardDeviation "15.86573"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_034_residualStressRV .
+
+ex:spindleSample_034_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[65.63114]],"covariances":[[251.721388]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_034_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_034"@en ;
+    im:isMeasuredBy ex:spindleSample_034_hardnessMeasurement .
+
+ex:spindleSample_034_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "610"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_034_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_034"@en ;
+    im:isMeasuredBy ex:spindleSample_034_pRmsGt700Measurement .
+
+ex:spindleSample_034_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000000000059019"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_035 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_035_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_035_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_035_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_035_pRmsGt700Characteristic .
+
+ex:spindleSample_035_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_035"@en ;
+    im:isMeasuredBy ex:spindleSample_035_rmsMeasurement .
+
+ex:spindleSample_035_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "445.15907"^^xsd:double ;
+    ex:standardDeviation "17.34626"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_035_rmsRV .
+
+ex:spindleSample_035_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[445.15907]],"covariances":[[300.892736]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_035_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_035"@en ;
+    im:isMeasuredBy ex:spindleSample_035_residualStressMeasurement .
+
+ex:spindleSample_035_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "47.78960"^^xsd:double ;
+    ex:standardDeviation "9.60500"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_035_residualStressRV .
+
+ex:spindleSample_035_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[47.78960]],"covariances":[[92.256025]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_035_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_035"@en ;
+    im:isMeasuredBy ex:spindleSample_035_hardnessMeasurement .
+
+ex:spindleSample_035_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "500"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_035_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_035"@en ;
+    im:isMeasuredBy ex:spindleSample_035_pRmsGt700Measurement .
+
+ex:spindleSample_035_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000244618296073"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_036 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T375 ;
+    ex:hasRMSCharacteristic ex:spindleSample_036_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_036_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_036_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_036_pRmsGt700Characteristic .
+
+ex:spindleSample_036_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_036"@en ;
+    im:isMeasuredBy ex:spindleSample_036_rmsMeasurement .
+
+ex:spindleSample_036_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "415.38645"^^xsd:double ;
+    ex:standardDeviation "45.21906"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_036_rmsRV .
+
+ex:spindleSample_036_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[415.38645]],"covariances":[[2044.763387]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_036_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_036"@en ;
+    im:isMeasuredBy ex:spindleSample_036_residualStressMeasurement .
+
+ex:spindleSample_036_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "47.20161"^^xsd:double ;
+    ex:standardDeviation "9.06378"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_036_residualStressRV .
+
+ex:spindleSample_036_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[47.20161]],"covariances":[[82.152108]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_036_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_036"@en ;
+    im:isMeasuredBy ex:spindleSample_036_hardnessMeasurement .
+
+ex:spindleSample_036_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "530"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_036_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_036"@en ;
+    im:isMeasuredBy ex:spindleSample_036_pRmsGt700Measurement .
+
+ex:spindleSample_036_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0000070752699846"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_037 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_037_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_037_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_037_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_037_pRmsGt700Characteristic .
+
+ex:spindleSample_037_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_037"@en ;
+    im:isMeasuredBy ex:spindleSample_037_rmsMeasurement .
+
+ex:spindleSample_037_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "518.02116"^^xsd:double ;
+    ex:standardDeviation "29.56717"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_037_rmsRV .
+
+ex:spindleSample_037_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[518.02116]],"covariances":[[874.217542]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_037_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_037"@en ;
+    im:isMeasuredBy ex:spindleSample_037_residualStressMeasurement .
+
+ex:spindleSample_037_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "5.72552"^^xsd:double ;
+    ex:standardDeviation "6.78746"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_037_residualStressRV .
+
+ex:spindleSample_037_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[5.72552]],"covariances":[[46.069613]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_037_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_037"@en ;
+    im:isMeasuredBy ex:spindleSample_037_hardnessMeasurement .
+
+ex:spindleSample_037_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "470"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_037_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_037"@en ;
+    im:isMeasuredBy ex:spindleSample_037_pRmsGt700Measurement .
+
+ex:spindleSample_037_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.0005090517133629"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_038 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T550 ;
+    ex:hasRMSCharacteristic ex:spindleSample_038_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_038_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_038_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_038_pRmsGt700Characteristic .
+
+ex:spindleSample_038_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_038"@en ;
+    im:isMeasuredBy ex:spindleSample_038_rmsMeasurement .
+
+ex:spindleSample_038_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "508.32995"^^xsd:double ;
+    ex:standardDeviation "32.32650"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_038_rmsRV .
+
+ex:spindleSample_038_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[508.32995]],"covariances":[[1045.002602]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_038_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_038"@en ;
+    im:isMeasuredBy ex:spindleSample_038_residualStressMeasurement .
+
+ex:spindleSample_038_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "1.03934"^^xsd:double ;
+    ex:standardDeviation "9.63236"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_038_residualStressRV .
+
+ex:spindleSample_038_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[1.03934]],"covariances":[[92.782359]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_038_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_038"@en ;
+    im:isMeasuredBy ex:spindleSample_038_hardnessMeasurement .
+
+ex:spindleSample_038_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "440"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_038_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_038"@en ;
+    im:isMeasuredBy ex:spindleSample_038_pRmsGt700Measurement .
+
+ex:spindleSample_038_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.000339990796812"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_039 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_039_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_039_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_039_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_039_pRmsGt700Characteristic .
+
+ex:spindleSample_039_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_039"@en ;
+    im:isMeasuredBy ex:spindleSample_039_rmsMeasurement .
+
+ex:spindleSample_039_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "761.65839"^^xsd:double ;
+    ex:standardDeviation "34.38552"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_039_rmsRV .
+
+ex:spindleSample_039_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[761.65839]],"covariances":[[1182.363986]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_039_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_039"@en ;
+    im:isMeasuredBy ex:spindleSample_039_residualStressMeasurement .
+
+ex:spindleSample_039_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "25.66366"^^xsd:double ;
+    ex:standardDeviation "3.52330"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_039_residualStressRV .
+
+ex:spindleSample_039_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[25.66366]],"covariances":[[12.413643]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_039_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_039"@en ;
+    im:isMeasuredBy ex:spindleSample_039_hardnessMeasurement .
+
+ex:spindleSample_039_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "360"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_039_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_039"@en ;
+    im:isMeasuredBy ex:spindleSample_039_pRmsGt700Measurement .
+
+ex:spindleSample_039_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.9288462151001835"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+ex:spindleSample_040 a ex:SpindleGearSample ;
+    ex:sourceDataset ex:DataSpindleGearSummary ;
+    ex:hasProcessCondition ex:hardCond_CC50_T625 ;
+    ex:hasRMSCharacteristic ex:spindleSample_040_rmsCharacteristic ;
+    ex:hasResidualStressCharacteristic ex:spindleSample_040_residualStressCharacteristic ;
+    ex:hasHardnessCharacteristic ex:spindleSample_040_hardnessCharacteristic ;
+    ex:hasRMSOver700ProbabilityCharacteristic ex:spindleSample_040_pRmsGt700Characteristic .
+
+ex:spindleSample_040_rmsCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "RMS measurement characteristic for spindleSample_040"@en ;
+    im:isMeasuredBy ex:spindleSample_040_rmsMeasurement .
+
+ex:spindleSample_040_rmsMeasurement a ex:RMSMeasurement ;
+    om:hasValue "672.38402"^^xsd:double ;
+    ex:standardDeviation "33.24979"^^xsd:double ;
+    om:hasUnit ex:rmsDatasetUnit ;
+    uq:representedBy ex:spindleSample_040_rmsRV .
+
+ex:spindleSample_040_rmsRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[672.38402]],"covariances":[[1105.548535]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_040_residualStressCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Residual-stress measurement characteristic for spindleSample_040"@en ;
+    im:isMeasuredBy ex:spindleSample_040_residualStressMeasurement .
+
+ex:spindleSample_040_residualStressMeasurement a ex:ResidualStressMeasurement ;
+    om:hasValue "17.79901"^^xsd:double ;
+    ex:standardDeviation "3.77358"^^xsd:double ;
+    om:hasUnit ex:residualStressDatasetUnit ;
+    uq:representedBy ex:spindleSample_040_residualStressRV .
+
+ex:spindleSample_040_residualStressRV a uq:RandomVariable ;
+    uq:hasDomain uq:double ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[17.79901]],"covariances":[[14.239906]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_040_hardnessCharacteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Hardness characteristic for spindleSample_040"@en ;
+    im:isMeasuredBy ex:spindleSample_040_hardnessMeasurement .
+
+ex:spindleSample_040_hardnessMeasurement a ex:HardnessMeasurement ;
+    om:hasValue "360"^^xsd:double ;
+    om:hasUnit ex:hardnessHV .
+
+ex:spindleSample_040_pRmsGt700Characteristic a im:MeasurableCharacteristic ;
+    rdfs:label "Probability characteristic P(RMS > 700) for spindleSample_040"@en ;
+    im:isMeasuredBy ex:spindleSample_040_pRmsGt700Measurement .
+
+ex:spindleSample_040_pRmsGt700Measurement a ex:RMSExceedanceProbabilityMeasurement ;
+    om:hasValue "0.2403674699485148"^^xsd:double ;
+    om:hasUnit ex:probabilityUnit .
+
+### END AUTO-GENERATED SPINDLEGEAR SECTION ###
+
+### BEGIN AUTO-GENERATED R4 COMPATIBILITY MAPPING ###
+
+# Compatibility mapping: explicit types + hardness distribution with ISO 6507 3% std
+ex:HardnessRmsSample rdfs:subClassOf ag:DriveGear .
+ex:SpindleGearSample rdfs:subClassOf ag:SpindleGear .
+im:hasHardCharacteristic a rdf:Property .
+
+om:HardnessVickers a om:Unit ;
+    rdfs:label "Hardness Vickers unit"@en .
+
+ex:hardSample_001 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_001_hardnessCharacteristic .
+ex:hardSample_001_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_001_hardnessRV .
+ex:hardSample_001_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[480.0]],"covariances":[[207.36]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_002 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_002_hardnessCharacteristic .
+ex:hardSample_002_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_002_hardnessRV .
+ex:hardSample_002_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[480.0]],"covariances":[[207.36]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_003 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_003_hardnessCharacteristic .
+ex:hardSample_003_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_003_hardnessRV .
+ex:hardSample_003_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[440.0]],"covariances":[[174.24]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_004 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_004_hardnessCharacteristic .
+ex:hardSample_004_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_004_hardnessRV .
+ex:hardSample_004_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[440.0]],"covariances":[[174.24]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_005 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_005_hardnessCharacteristic .
+ex:hardSample_005_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_005_hardnessRV .
+ex:hardSample_005_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[380.0]],"covariances":[[129.96]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_006 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_006_hardnessCharacteristic .
+ex:hardSample_006_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_006_hardnessRV .
+ex:hardSample_006_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[380.0]],"covariances":[[129.96]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_007 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_007_hardnessCharacteristic .
+ex:hardSample_007_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_007_hardnessRV .
+ex:hardSample_007_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_008 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_008_hardnessCharacteristic .
+ex:hardSample_008_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_008_hardnessRV .
+ex:hardSample_008_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_009 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_009_hardnessCharacteristic .
+ex:hardSample_009_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_009_hardnessRV .
+ex:hardSample_009_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[260.0]],"covariances":[[60.84]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_010 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_010_hardnessCharacteristic .
+ex:hardSample_010_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_010_hardnessRV .
+ex:hardSample_010_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[260.0]],"covariances":[[60.84]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_011 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_011_hardnessCharacteristic .
+ex:hardSample_011_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_011_hardnessRV .
+ex:hardSample_011_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[550.0]],"covariances":[[272.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_012 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_012_hardnessCharacteristic .
+ex:hardSample_012_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_012_hardnessRV .
+ex:hardSample_012_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[550.0]],"covariances":[[272.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_013 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_013_hardnessCharacteristic .
+ex:hardSample_013_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_013_hardnessRV .
+ex:hardSample_013_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_014 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_014_hardnessCharacteristic .
+ex:hardSample_014_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_014_hardnessRV .
+ex:hardSample_014_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_015 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_015_hardnessCharacteristic .
+ex:hardSample_015_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_015_hardnessRV .
+ex:hardSample_015_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[420.0]],"covariances":[[158.76]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_016 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_016_hardnessCharacteristic .
+ex:hardSample_016_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_016_hardnessRV .
+ex:hardSample_016_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[420.0]],"covariances":[[158.76]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_017 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_017_hardnessCharacteristic .
+ex:hardSample_017_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_017_hardnessRV .
+ex:hardSample_017_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[350.0]],"covariances":[[110.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_018 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_018_hardnessCharacteristic .
+ex:hardSample_018_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_018_hardnessRV .
+ex:hardSample_018_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[350.0]],"covariances":[[110.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_019 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_019_hardnessCharacteristic .
+ex:hardSample_019_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_019_hardnessRV .
+ex:hardSample_019_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_020 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_020_hardnessCharacteristic .
+ex:hardSample_020_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_020_hardnessRV .
+ex:hardSample_020_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_021 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_021_hardnessCharacteristic .
+ex:hardSample_021_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_021_hardnessRV .
+ex:hardSample_021_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[600.0]],"covariances":[[324.0]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_022 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_022_hardnessCharacteristic .
+ex:hardSample_022_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_022_hardnessRV .
+ex:hardSample_022_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[600.0]],"covariances":[[324.0]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_023 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_023_hardnessCharacteristic .
+ex:hardSample_023_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_023_hardnessRV .
+ex:hardSample_023_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[470.0]],"covariances":[[198.81]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_024 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_024_hardnessCharacteristic .
+ex:hardSample_024_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_024_hardnessRV .
+ex:hardSample_024_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[470.0]],"covariances":[[198.81]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_025 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_025_hardnessCharacteristic .
+ex:hardSample_025_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_025_hardnessRV .
+ex:hardSample_025_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_026 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_026_hardnessCharacteristic .
+ex:hardSample_026_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_026_hardnessRV .
+ex:hardSample_026_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_027 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_027_hardnessCharacteristic .
+ex:hardSample_027_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_027_hardnessRV .
+ex:hardSample_027_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[360.0]],"covariances":[[116.64]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_028 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_028_hardnessCharacteristic .
+ex:hardSample_028_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_028_hardnessRV .
+ex:hardSample_028_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[360.0]],"covariances":[[116.64]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_029 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_029_hardnessCharacteristic .
+ex:hardSample_029_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_029_hardnessRV .
+ex:hardSample_029_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_030 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_030_hardnessCharacteristic .
+ex:hardSample_030_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_030_hardnessRV .
+ex:hardSample_030_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_031 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_031_hardnessCharacteristic .
+ex:hardSample_031_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_031_hardnessRV .
+ex:hardSample_031_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[660.0]],"covariances":[[392.04]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_032 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_032_hardnessCharacteristic .
+ex:hardSample_032_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_032_hardnessRV .
+ex:hardSample_032_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[660.0]],"covariances":[[392.04]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_033 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_033_hardnessCharacteristic .
+ex:hardSample_033_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_033_hardnessRV .
+ex:hardSample_033_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[600.0]],"covariances":[[324.0]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_034 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_034_hardnessCharacteristic .
+ex:hardSample_034_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_034_hardnessRV .
+ex:hardSample_034_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[600.0]],"covariances":[[324.0]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_035 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_035_hardnessCharacteristic .
+ex:hardSample_035_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_035_hardnessRV .
+ex:hardSample_035_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[510.0]],"covariances":[[234.09]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_036 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_036_hardnessCharacteristic .
+ex:hardSample_036_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_036_hardnessRV .
+ex:hardSample_036_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[510.0]],"covariances":[[234.09]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_037 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_037_hardnessCharacteristic .
+ex:hardSample_037_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_037_hardnessRV .
+ex:hardSample_037_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_038 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_038_hardnessCharacteristic .
+ex:hardSample_038_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_038_hardnessRV .
+ex:hardSample_038_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_039 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_039_hardnessCharacteristic .
+ex:hardSample_039_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_039_hardnessRV .
+ex:hardSample_039_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:hardSample_040 a ag:DriveGear ;
+    im:hasHardCharacteristic ex:hardSample_040_hardnessCharacteristic .
+ex:hardSample_040_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:hardSample_040_hardnessRV .
+ex:hardSample_040_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_001 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_001_hardnessCharacteristic .
+ex:spindleSample_001_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_001_hardnessRV .
+ex:spindleSample_001_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[500.0]],"covariances":[[225.0]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_002 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_002_hardnessCharacteristic .
+ex:spindleSample_002_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_002_hardnessRV .
+ex:spindleSample_002_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[460.0]],"covariances":[[190.44]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_003 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_003_hardnessCharacteristic .
+ex:spindleSample_003_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_003_hardnessRV .
+ex:spindleSample_003_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[420.0]],"covariances":[[158.76]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_004 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_004_hardnessCharacteristic .
+ex:spindleSample_004_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_004_hardnessRV .
+ex:spindleSample_004_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[460.0]],"covariances":[[190.44]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_005 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_005_hardnessCharacteristic .
+ex:spindleSample_005_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_005_hardnessRV .
+ex:spindleSample_005_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[370.0]],"covariances":[[123.21]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_006 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_006_hardnessCharacteristic .
+ex:spindleSample_006_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_006_hardnessRV .
+ex:spindleSample_006_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[360.0]],"covariances":[[116.64]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_007 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_007_hardnessCharacteristic .
+ex:spindleSample_007_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_007_hardnessRV .
+ex:spindleSample_007_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[350.0]],"covariances":[[110.25]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_008 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_008_hardnessCharacteristic .
+ex:spindleSample_008_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_008_hardnessRV .
+ex:spindleSample_008_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[330.0]],"covariances":[[98.01]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_009 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_009_hardnessCharacteristic .
+ex:spindleSample_009_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_009_hardnessRV .
+ex:spindleSample_009_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_010 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_010_hardnessCharacteristic .
+ex:spindleSample_010_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_010_hardnessRV .
+ex:spindleSample_010_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[250.0]],"covariances":[[56.25]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_011 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_011_hardnessCharacteristic .
+ex:spindleSample_011_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_011_hardnessRV .
+ex:spindleSample_011_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[570.0]],"covariances":[[292.41]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_012 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_012_hardnessCharacteristic .
+ex:spindleSample_012_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_012_hardnessRV .
+ex:spindleSample_012_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[570.0]],"covariances":[[292.41]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_013 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_013_hardnessCharacteristic .
+ex:spindleSample_013_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_013_hardnessRV .
+ex:spindleSample_013_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[470.0]],"covariances":[[198.81]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_014 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_014_hardnessCharacteristic .
+ex:spindleSample_014_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_014_hardnessRV .
+ex:spindleSample_014_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[450.0]],"covariances":[[182.25]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_015 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_015_hardnessCharacteristic .
+ex:spindleSample_015_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_015_hardnessRV .
+ex:spindleSample_015_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[400.0]],"covariances":[[144.0]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_016 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_016_hardnessCharacteristic .
+ex:spindleSample_016_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_016_hardnessRV .
+ex:spindleSample_016_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[410.0]],"covariances":[[151.29]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_017 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_017_hardnessCharacteristic .
+ex:spindleSample_017_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_017_hardnessRV .
+ex:spindleSample_017_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_018 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_018_hardnessCharacteristic .
+ex:spindleSample_018_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_018_hardnessRV .
+ex:spindleSample_018_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_019 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_019_hardnessCharacteristic .
+ex:spindleSample_019_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_019_hardnessRV .
+ex:spindleSample_019_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[260.0]],"covariances":[[60.84]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_020 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_020_hardnessCharacteristic .
+ex:spindleSample_020_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_020_hardnessRV .
+ex:spindleSample_020_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[270.0]],"covariances":[[65.61]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_021 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_021_hardnessCharacteristic .
+ex:spindleSample_021_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_021_hardnessRV .
+ex:spindleSample_021_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[610.0]],"covariances":[[334.89]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_022 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_022_hardnessCharacteristic .
+ex:spindleSample_022_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_022_hardnessRV .
+ex:spindleSample_022_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[580.0]],"covariances":[[302.76]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_023 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_023_hardnessCharacteristic .
+ex:spindleSample_023_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_023_hardnessRV .
+ex:spindleSample_023_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[460.0]],"covariances":[[190.44]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_024 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_024_hardnessCharacteristic .
+ex:spindleSample_024_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_024_hardnessRV .
+ex:spindleSample_024_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[460.0]],"covariances":[[190.44]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_025 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_025_hardnessCharacteristic .
+ex:spindleSample_025_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_025_hardnessRV .
+ex:spindleSample_025_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[470.0]],"covariances":[[198.81]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_026 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_026_hardnessCharacteristic .
+ex:spindleSample_026_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_026_hardnessRV .
+ex:spindleSample_026_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[460.0]],"covariances":[[190.44]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_027 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_027_hardnessCharacteristic .
+ex:spindleSample_027_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_027_hardnessRV .
+ex:spindleSample_027_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[350.0]],"covariances":[[110.25]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_028 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_028_hardnessCharacteristic .
+ex:spindleSample_028_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_028_hardnessRV .
+ex:spindleSample_028_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[340.0]],"covariances":[[104.04]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_029 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_029_hardnessCharacteristic .
+ex:spindleSample_029_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_029_hardnessRV .
+ex:spindleSample_029_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[280.0]],"covariances":[[70.56]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_030 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_030_hardnessCharacteristic .
+ex:spindleSample_030_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_030_hardnessRV .
+ex:spindleSample_030_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[270.0]],"covariances":[[65.61]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_031 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_031_hardnessCharacteristic .
+ex:spindleSample_031_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_031_hardnessRV .
+ex:spindleSample_031_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[670.0]],"covariances":[[404.01]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_032 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_032_hardnessCharacteristic .
+ex:spindleSample_032_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_032_hardnessRV .
+ex:spindleSample_032_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[660.0]],"covariances":[[392.04]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_033 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_033_hardnessCharacteristic .
+ex:spindleSample_033_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_033_hardnessRV .
+ex:spindleSample_033_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[580.0]],"covariances":[[302.76]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_034 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_034_hardnessCharacteristic .
+ex:spindleSample_034_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_034_hardnessRV .
+ex:spindleSample_034_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[610.0]],"covariances":[[334.89]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_035 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_035_hardnessCharacteristic .
+ex:spindleSample_035_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_035_hardnessRV .
+ex:spindleSample_035_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[500.0]],"covariances":[[225.0]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_036 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_036_hardnessCharacteristic .
+ex:spindleSample_036_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_036_hardnessRV .
+ex:spindleSample_036_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[530.0]],"covariances":[[252.81]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_037 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_037_hardnessCharacteristic .
+ex:spindleSample_037_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_037_hardnessRV .
+ex:spindleSample_037_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[470.0]],"covariances":[[198.81]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_038 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_038_hardnessCharacteristic .
+ex:spindleSample_038_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_038_hardnessRV .
+ex:spindleSample_038_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[440.0]],"covariances":[[174.24]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_039 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_039_hardnessCharacteristic .
+ex:spindleSample_039_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_039_hardnessRV .
+ex:spindleSample_039_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[360.0]],"covariances":[[116.64]]}"""^^uq:gmmLiteral .
+
+ex:spindleSample_040 a ag:SpindleGear ;
+    im:hasHardCharacteristic ex:spindleSample_040_hardnessCharacteristic .
+ex:spindleSample_040_hardnessMeasurement om:hasUnit om:HardnessVickers ;
+    uq:representedBy ex:spindleSample_040_hardnessRV .
+ex:spindleSample_040_hardnessRV a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution """{"n_components":1,"dimensions":1,"covariance_type":"diag","weights":[1.0],"means":[[360.0]],"covariances":[[116.64]]}"""^^uq:gmmLiteral .
+
+### END AUTO-GENERATED R4 COMPATIBILITY MAPPING ###
+
+

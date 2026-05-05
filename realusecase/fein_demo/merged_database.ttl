@@ -1,0 +1,376 @@
+# =============================================================================
+#  FEIN CG 15-125 Variant Identification — MERGED DATABASE
+#
+#  This file is the union of historical_database.ttl and unknown_database.ttl.
+#  Load this single file into Apache Jena Fuseki before running
+#  query_most_likely_fein_variant.sparql.
+#
+#  Expected query result: ag:FeinCG15125BL (highest combined score ~0.86)
+#    due to: classScore=0.85, tooth similarity≈0.97, hardness similarity≈0.94
+#
+#  NOTE: ALL MEASUREMENT VALUES AND DISTRIBUTION PARAMETERS ARE TOY/DEMO VALUES.
+#        They do NOT represent real FEIN product data.
+#
+#  Graph loading example (Fuseki CLI):
+#    s-put http://localhost:3030/ds/data default merged_database.ttl
+# =============================================================================
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ag:   <http://example.org/ontology/anglegrinder#> .
+@prefix cfm:  <http://example.org/ontology/cfm#> .
+@prefix om:   <http://example.org/ontology/om#> .
+@prefix uq:   <http://example.org/ontology/uncertainty#> .
+@prefix ex:   <http://example.org/data/fein-demo/> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Units
+# ─────────────────────────────────────────────────────────────────────────────
+
+om:millimetre a om:LengthUnit ;
+    rdfs:label "millimetre"@en .
+
+om:hardnessRockwellC a om:Unit ;
+    rdfs:label "Rockwell C hardness unit (HRC)"@en .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Extension Properties  (from historical_database.ttl)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ag:hasToothLengthCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has tooth-length characteristic"@en ;
+    rdfs:comment "Links a CrownGear to its tooth-length MeasurableCharacteristics node. Follows im:hasHardCharacteristic pattern."@en ;
+    rdfs:domain ag:CrownGear ;
+    rdfs:range  cfm:MeasurableCharacteristics .
+
+ag:hasHardnessCharacteristic a owl:ObjectProperty ;
+    rdfs:label "has hardness characteristic"@en ;
+    rdfs:comment "Links a CrownGear to its hardness MeasurableCharacteristics node."@en ;
+    rdfs:domain ag:CrownGear ;
+    rdfs:range  cfm:MeasurableCharacteristics .
+
+ag:hasTypeToothLengthDistribution a owl:ObjectProperty ;
+    rdfs:label "has type-level tooth-length distribution"@en ;
+    rdfs:comment "Links a FEIN variant class to the aggregate RV p(toothLength | type)."@en ;
+    rdfs:domain owl:Class ;
+    rdfs:range  uq:RandomVariable .
+
+ag:hasTypeHardnessDistribution a owl:ObjectProperty ;
+    rdfs:label "has type-level hardness distribution"@en ;
+    rdfs:comment "Links a FEIN variant class to the aggregate RV p(hardness | type)."@en ;
+    rdfs:domain owl:Class ;
+    rdfs:range  uq:RandomVariable .
+
+uq:aggregatedInto a owl:ObjectProperty ;
+    rdfs:label "aggregated into"@en ;
+    rdfs:comment "Provenance: instance-measurement RV → type-level aggregate RV."@en ;
+    rdfs:domain uq:RandomVariable ;
+    rdfs:range  uq:RandomVariable .
+
+ag:hasClassificationScore a owl:ObjectProperty ;
+    rdfs:label "has classification score"@en ;
+    rdfs:comment "Links an AngleGrinder to a score node for one candidate variant."@en ;
+    rdfs:domain ag:AngleGrinder .
+
+ag:forVariant a owl:ObjectProperty ;
+    rdfs:label "for variant"@en ;
+    rdfs:comment "Links a classification-score node to its candidate variant class."@en .
+
+ag:scoreValue a owl:DatatypeProperty ;
+    rdfs:label "score value"@en ;
+    rdfs:range  xsd:double .
+
+ag:hasClassificationGMM a owl:ObjectProperty ;
+    rdfs:label "has classification GMM"@en ;
+    rdfs:comment "Links an AngleGrinder to the uq:RandomVariable encoding visual classification belief as a GMM over one-hot type prototypes."@en ;
+    rdfs:domain ag:AngleGrinder ;
+    rdfs:range  uq:RandomVariable .
+
+ag:hasTypeClassPrototype a owl:ObjectProperty ;
+    rdfs:label "has type classification prototype"@en ;
+    rdfs:comment "Links a FEIN variant type to its 1-component 3D GMM prototype (one-hot position in classification space)."@en ;
+    rdfs:domain owl:Class ;
+    rdfs:range  uq:RandomVariable .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Three FEIN Angle Grinder Model Series  (each rdfs:subClassOf ag:AngleGrinder)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ag:FeinCG15125BL a owl:Class ;
+    rdfs:subClassOf ag:AngleGrinder ;
+    rdfs:label "FEIN CG 15-125 BL"@en .
+
+ag:FeinCG15125P a owl:Class ;
+    rdfs:subClassOf ag:AngleGrinder ;
+    rdfs:label "FEIN CG 15-125 P"@en .
+
+ag:FeinCG15125BLP a owl:Class ;
+    rdfs:subClassOf ag:AngleGrinder ;
+    rdfs:label "FEIN CG 15-125 BLP"@en .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  One-hot Classification Prototypes
+#  Dimension order: [BL, P, BLP]
+# ─────────────────────────────────────────────────────────────────────────────
+
+ag:FeinCG15125BL  ag:hasTypeClassPrototype ex:proto_class_BL .
+ag:FeinCG15125P   ag:hasTypeClassPrototype ex:proto_class_P .
+ag:FeinCG15125BLP ag:hasTypeClassPrototype ex:proto_class_BLP .
+
+ex:proto_class_BL a uq:RandomVariable ;
+    rdfs:label "Classification prototype — BL [1,0,0]"@en ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[1.0,0.0,0.0]],\"covariances\":[[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+ex:proto_class_P a uq:RandomVariable ;
+    rdfs:label "Classification prototype — P [0,1,0]"@en ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[0.0,1.0,0.0]],\"covariances\":[[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+ex:proto_class_BLP a uq:RandomVariable ;
+    rdfs:label "Classification prototype — BLP [0,0,1]"@en ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[0.0,0.0,1.0]],\"covariances\":[[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Type-Level Statistical Profiles (aggregate distributions)
+#  TOY/DEMO values: BL ~7.00 mm / 61.5 HRC, INOX ~7.35 mm / 64.0 HRC,
+#                   BLP ~6.65 mm / 60.0 HRC
+# ─────────────────────────────────────────────────────────────────────────────
+
+ag:FeinCG15125BL
+    ag:hasTypeToothLengthDistribution ex:globalRV_toothlen_BL ;
+    ag:hasTypeHardnessDistribution    ex:globalRV_hardness_BL .
+
+ex:globalRV_toothlen_BL a uq:RandomVariable ;
+    rdfs:label "Type-level tooth-length dist — BL (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.00]],\"covariances\":[[0.04]]}"^^uq:gmmLiteral .
+
+ex:globalRV_hardness_BL a uq:RandomVariable ;
+    rdfs:label "Type-level hardness dist — BL (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.5]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .
+
+ag:FeinCG15125P
+    ag:hasTypeToothLengthDistribution ex:globalRV_toothlen_INOX ;
+    ag:hasTypeHardnessDistribution    ex:globalRV_hardness_INOX .
+
+ex:globalRV_toothlen_INOX a uq:RandomVariable ;
+    rdfs:label "Type-level tooth-length dist — BL Inox (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.35]],\"covariances\":[[0.04]]}"^^uq:gmmLiteral .
+
+ex:globalRV_hardness_INOX a uq:RandomVariable ;
+    rdfs:label "Type-level hardness dist — BL Inox (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[64.0]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .
+
+ag:FeinCG15125BLP
+    ag:hasTypeToothLengthDistribution ex:globalRV_toothlen_BLP ;
+    ag:hasTypeHardnessDistribution    ex:globalRV_hardness_BLP .
+
+ex:globalRV_toothlen_BLP a uq:RandomVariable ;
+    rdfs:label "Type-level tooth-length dist — BLP (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.65]],\"covariances\":[[0.04]]}"^^uq:gmmLiteral .
+
+ex:globalRV_hardness_BLP a uq:RandomVariable ;
+    rdfs:label "Type-level hardness dist — BLP (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[60.0]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Historical Instance: FEIN CG 15-125 BL — unit #001  (TOY: 7.03 mm / 61.4 HRC)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:hist_grinder_BL_001 a ag:FeinCG15125BL ;
+    rdfs:label "Historical FEIN CG 15-125 BL — unit 001 (DEMO)"@en ;
+    ag:hasPart ex:hist_gear_BL_001 .
+
+ex:hist_gear_BL_001 a ag:CrownGear ;
+    ag:hasToothLengthCharacteristic ex:hist_toothlen_char_BL_001 ;
+    ag:hasHardnessCharacteristic    ex:hist_hardness_char_BL_001 .
+
+ex:hist_toothlen_char_BL_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_toothlen_BL_001 a om:Measure ;
+    om:hasUnit om:millimetre ; om:hasValue "7.03"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_toothlen_char_BL_001 ;
+    uq:representedBy  ex:hist_rv_toothlen_BL_001 .
+ex:hist_rv_toothlen_BL_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.03]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_toothlen_BL .
+
+ex:hist_hardness_char_BL_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_hardness_BL_001 a om:Measure ;
+    om:hasUnit om:hardnessRockwellC ; om:hasValue "61.4"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_hardness_char_BL_001 ;
+    uq:representedBy  ex:hist_rv_hardness_BL_001 .
+ex:hist_rv_hardness_BL_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.4]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_hardness_BL .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Historical Instance: FEIN CG 15-125 BL — unit #002  (TOY: 6.97 mm / 61.6 HRC)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:hist_grinder_BL_002 a ag:FeinCG15125BL ;
+    rdfs:label "Historical FEIN CG 15-125 BL — unit 002 (DEMO)"@en ;
+    ag:hasPart ex:hist_gear_BL_002 .
+
+ex:hist_gear_BL_002 a ag:CrownGear ;
+    ag:hasToothLengthCharacteristic ex:hist_toothlen_char_BL_002 ;
+    ag:hasHardnessCharacteristic    ex:hist_hardness_char_BL_002 .
+
+ex:hist_toothlen_char_BL_002 a cfm:MeasurableCharacteristics .
+ex:hist_meas_toothlen_BL_002 a om:Measure ;
+    om:hasUnit om:millimetre ; om:hasValue "6.97"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_toothlen_char_BL_002 ;
+    uq:representedBy  ex:hist_rv_toothlen_BL_002 .
+ex:hist_rv_toothlen_BL_002 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.97]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_toothlen_BL .
+
+ex:hist_hardness_char_BL_002 a cfm:MeasurableCharacteristics .
+ex:hist_meas_hardness_BL_002 a om:Measure ;
+    om:hasUnit om:hardnessRockwellC ; om:hasValue "61.6"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_hardness_char_BL_002 ;
+    uq:representedBy  ex:hist_rv_hardness_BL_002 .
+ex:hist_rv_hardness_BL_002 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.6]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_hardness_BL .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Historical Instance: FEIN CG 15-125 BL Inox — unit #001  (TOY: 7.34 mm / 64.1 HRC)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:hist_grinder_INOX_001 a ag:FeinCG15125P ;
+    rdfs:label "Historical FEIN CG 15-125 BL Inox — unit 001 (DEMO)"@en ;
+    ag:hasPart ex:hist_gear_INOX_001 .
+
+ex:hist_gear_INOX_001 a ag:CrownGear ;
+    ag:hasToothLengthCharacteristic ex:hist_toothlen_char_INOX_001 ;
+    ag:hasHardnessCharacteristic    ex:hist_hardness_char_INOX_001 .
+
+ex:hist_toothlen_char_INOX_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_toothlen_INOX_001 a om:Measure ;
+    om:hasUnit om:millimetre ; om:hasValue "7.34"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_toothlen_char_INOX_001 ;
+    uq:representedBy  ex:hist_rv_toothlen_INOX_001 .
+ex:hist_rv_toothlen_INOX_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.34]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_toothlen_INOX .
+
+ex:hist_hardness_char_INOX_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_hardness_INOX_001 a om:Measure ;
+    om:hasUnit om:hardnessRockwellC ; om:hasValue "64.1"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_hardness_char_INOX_001 ;
+    uq:representedBy  ex:hist_rv_hardness_INOX_001 .
+ex:hist_rv_hardness_INOX_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[64.1]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_hardness_INOX .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Historical Instance: FEIN CG 15-125 BLP — unit #001  (TOY: 6.66 mm / 59.9 HRC)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:hist_grinder_BLP_001 a ag:FeinCG15125BLP ;
+    rdfs:label "Historical FEIN CG 15-125 BLP — unit 001 (DEMO)"@en ;
+    ag:hasPart ex:hist_gear_BLP_001 .
+
+ex:hist_gear_BLP_001 a ag:CrownGear ;
+    ag:hasToothLengthCharacteristic ex:hist_toothlen_char_BLP_001 ;
+    ag:hasHardnessCharacteristic    ex:hist_hardness_char_BLP_001 .
+
+ex:hist_toothlen_char_BLP_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_toothlen_BLP_001 a om:Measure ;
+    om:hasUnit om:millimetre ; om:hasValue "6.66"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_toothlen_char_BLP_001 ;
+    uq:representedBy  ex:hist_rv_toothlen_BLP_001 .
+ex:hist_rv_toothlen_BLP_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.66]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_toothlen_BLP .
+
+ex:hist_hardness_char_BLP_001 a cfm:MeasurableCharacteristics .
+ex:hist_meas_hardness_BLP_001 a om:Measure ;
+    om:hasUnit om:hardnessRockwellC ; om:hasValue "59.9"^^xsd:double ;
+    cfm:measuresCharacteristic ex:hist_hardness_char_BLP_001 ;
+    uq:representedBy  ex:hist_rv_hardness_BLP_001 .
+ex:hist_rv_hardness_BLP_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[59.9]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral ;
+    uq:aggregatedInto ex:globalRV_hardness_BLP .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Unknown Grinder — classification belief and physical measurements
+#  (TOY: tooth 7.05 mm / hardness 61.8 HRC; P(BL)=0.85)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:unknownGrinder_001 a ag:AngleGrinder ;
+    rdfs:label "Incoming angle grinder of unknown variant — unit 001 (DEMO)"@en ;
+    ag:hasPart ex:unknownGear_001 ;
+    ag:hasClassificationGMM    ex:unknownGrinder_001_classGMM ;
+    ag:hasClassificationScore  ex:classScore_BL_001 ,
+                                ex:classScore_INOX_001 ,
+                                ex:classScore_BLP_001 .
+
+ex:classScore_BL_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL (DEMO)"@en ;
+    ag:forVariant ag:FeinCG15125BL ;
+    ag:scoreValue "0.85"^^xsd:double .
+
+ex:classScore_INOX_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL Inox (DEMO)"@en ;
+    ag:forVariant ag:FeinCG15125P ;
+    ag:scoreValue "0.10"^^xsd:double .
+
+ex:classScore_BLP_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BLP (DEMO)"@en ;
+    ag:forVariant ag:FeinCG15125BLP ;
+    ag:scoreValue "0.05"^^xsd:double .
+
+ex:unknownGrinder_001_classGMM a uq:RandomVariable ;
+    rdfs:label "Classification-belief GMM — unknown grinder 001 (DEMO)"@en ;
+    rdfs:comment "3-component GMM over one-hot type prototypes [BL, BL_Inox, BLP]. Very small covariances (1e-4) make each component near-degenerate, approximating a categorical distribution. TOY VALUE."@en ;
+    uq:hasDistribution
+        "{\"n_components\":3,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[0.85,0.10,0.05],\"means\":[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]],\"covariances\":[[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+ex:unknownGear_001 a ag:CrownGear ;
+    rdfs:label "Crown gear of unknown grinder 001 (DEMO)"@en ;
+    ag:hasToothLengthCharacteristic ex:unknown_toothlen_char_001 ;
+    ag:hasHardnessCharacteristic    ex:unknown_hardness_char_001 .
+
+ex:unknown_toothlen_char_001 a cfm:MeasurableCharacteristics .
+ex:unknown_meas_toothlen_001 a om:Measure ;
+    om:hasUnit om:millimetre ; om:hasValue "7.05"^^xsd:double ;
+    cfm:measuresCharacteristic ex:unknown_toothlen_char_001 ;
+    uq:representedBy  ex:unknown_rv_toothlen_001 .
+ex:unknown_rv_toothlen_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.05]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral .
+
+ex:unknown_hardness_char_001 a cfm:MeasurableCharacteristics .
+ex:unknown_meas_hardness_001 a om:Measure ;
+    om:hasUnit om:hardnessRockwellC ; om:hasValue "61.8"^^xsd:double ;
+    cfm:measuresCharacteristic ex:unknown_hardness_char_001 ;
+    uq:representedBy  ex:unknown_rv_hardness_001 .
+ex:unknown_rv_hardness_001 a uq:RandomVariable ;
+    uq:hasDomain uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.8]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .

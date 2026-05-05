@@ -1,27 +1,24 @@
-PREFIX ex: <https://w3id.org/probsparql/examples/real-manufacturing/>
-PREFIX cfc: <https://w3id.org/circular-factory/ontology/product-structure#>
+PREFIX ag: <https://w3id.org/circular-factory/ontology/angle-grinder#>
 PREFIX im: <https://w3id.org/circular-factory/ontology/inspection-measurement#>
 PREFIX om: <http://www.ontology-of-units-of-measure.org/resource/om-2/>
 PREFIX uq: <http://example.org/ontology/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-# R4-real/prototype syntax: compatible RMS pairing with DIVJOIN.
-# This query returns pairs of real measurement samples whose RMS distributions
-# are sufficiently similar under H0: Delta <= 0.1 at alpha=0.05.
-SELECT ?sample1 ?sample2 WHERE {
-  { ?sample1 a ex:HardnessRmsSample ;
-             ex:hasRMSCharacteristic ?char1 .
-    ?char1 im:isMeasuredBy ?measurement1 .
-    ?measurement1 uq:representedBy ?rv1 .
-    ?rv1 uq:hasDistribution ?dist1 . }
+SELECT ?driveGear ?spindleGear WHERE {
+  { ?driveGear a ag:DriveGear ;
+      im:hasHardCharacteristic ?hardcharA .
+    ?hardcharA im:isMeasuredBy ?measA .
+    ?measA om:hasUnit om:HardnessVickers ;
+      uq:representedBy ?rvA .
+    ?rvA uq:hasDomain uq:nonNegativeDouble ;
+      uq:hasDistribution ?distA . }
 
-  DIVJOIN(?dist1, ?dist2, 0.1, 0.05)
+  SIMILARITYJOIN(?distA, ?distB, 0.3, 0.05)
 
-  { ?sample2 a ex:HardnessRmsSample ;
-             ex:hasRMSCharacteristic ?char2 .
-    FILTER(STR(?sample1) < STR(?sample2))
-    ?char2 im:isMeasuredBy ?measurement2 .
-    ?measurement2 uq:representedBy ?rv2 .
-    ?rv2 uq:hasDistribution ?dist2 . }
+  { ?spindleGear a ag:SpindleGear ;
+      im:hasHardCharacteristic ?hardcharB .
+    ?hardcharB im:isMeasuredBy ?measB .
+    ?measB om:hasUnit om:HardnessVickers ;
+      uq:representedBy ?rvB .
+    ?rvB uq:hasDomain uq:nonNegativeDouble ;
+      uq:hasDistribution ?distB . }
 }

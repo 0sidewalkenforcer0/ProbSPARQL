@@ -1,0 +1,314 @@
+# =============================================================================
+#  FEIN CG 15-125 Variant Identification — UNKNOWN GRINDER DATABASE
+#
+#  An incoming angle grinder of unknown variant has been:
+#    (a) photographed → visual CNN classifier outputs P(BL)=0.85, P(BL Inox)=0.10,
+#        P(BLP)=0.05  (TOY/DEMO values)
+#    (b) physically inspected → crown-gear tooth length and hardness measured
+#        tooth length ~7.05 mm, hardness ~61.8 HRC  (TOY/DEMO values)
+#
+#  Classification belief is encoded two ways:
+#    1. As individual score nodes (ag:hasClassificationScore / ag:forVariant /
+#       ag:scoreValue) — used directly in the SPARQL query.
+#    2. As a single GMM over one-hot type prototypes in 3-D — alternative
+#       representation for downstream probabilistic processing.
+#
+#  New properties reused from historical_database.ttl:
+#    ag:hasClassificationScore  — links grinder to a score node
+#    ag:forVariant              — score node → candidate variant class
+#    ag:scoreValue              — probability score (xsd:double)
+#
+#  NOTE: ALL VALUES ARE TOY/DEMO — not real FEIN product data.
+# =============================================================================
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix ag:   <http://example.org/ontology/anglegrinder#> .
+@prefix cfm:  <http://example.org/ontology/cfm#> .
+@prefix om:   <http://example.org/ontology/om#> .
+@prefix uq:   <http://example.org/ontology/uncertainty#> .
+@prefix ex:   <http://example.org/data/fein-demo/> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  New extension properties for classification belief
+#  (no equivalent exists in core schema)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ag:hasClassificationScore a owl:ObjectProperty ;
+    rdfs:label "has classification score"@en ;
+    rdfs:comment "Links an AngleGrinder to a blank-node score record that captures the prior probability assigned by a visual classifier for one candidate variant."@en ;
+    rdfs:domain ag:AngleGrinder .
+
+ag:forVariant a owl:ObjectProperty ;
+    rdfs:label "for variant"@en ;
+    rdfs:comment "Links a classification-score node to the candidate variant class it scores."@en .
+
+ag:scoreValue a owl:DatatypeProperty ;
+    rdfs:label "score value"@en ;
+    rdfs:comment "Probability score in [0,1] from a visual classifier."@en ;
+    rdfs:range  xsd:double .
+
+ag:hasClassificationGMM a owl:ObjectProperty ;
+    rdfs:label "has classification GMM"@en ;
+    rdfs:comment "Links an AngleGrinder to the uq:RandomVariable that encodes the full visual classification belief as a GMM over one-hot type prototypes."@en ;
+    rdfs:domain ag:AngleGrinder ;
+    rdfs:range  uq:RandomVariable .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Unit declarations (duplicated here so this file is self-contained;
+#  duplicate triples are harmless in Turtle and are idempotent in SPARQL load)
+# ─────────────────────────────────────────────────────────────────────────────
+
+om:millimetre a om:LengthUnit ;
+    rdfs:label "millimetre"@en .
+
+om:hardnessRockwellC a om:Unit ;
+    rdfs:label "Rockwell C hardness unit (HRC)"@en .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Unknown Grinder
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:unknownGrinder_001 a ag:AngleGrinder ;
+    rdfs:label "Incoming angle grinder of unknown model series — unit 001 (DEMO)"@en ;
+    rdfs:comment "Model series unknown (BL / BL Inox / BLP); to be classified by ProbSPARQL query. TOY DEMO."@en ;
+    ag:hasPart  ex:unknownGear_001 ;
+    # --- Visual classification GMM (used by ProbSPARQL query via JSD) ---
+    ag:hasClassificationGMM    ex:unknownGrinder_001_classGMM ;
+    # --- Visual classification scores (legacy scalar encoding, kept for reference) ---
+    ag:hasClassificationScore  ex:classScore_BL_001 ,
+                                ex:classScore_INOX_001 ,
+                                ex:classScore_BLP_001 .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Classification score nodes
+#  (candidate BL, BL Inox, BLP with visual-classifier prior probabilities)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:classScore_BL_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL (DEMO)"@en ;
+    rdfs:comment "P(FEIN CG 15-125 BL | image) = 0.85. TOY VALUE from simulated CNN output."@en ;
+    ag:forVariant  ag:FeinCG15125BL ;
+    ag:scoreValue  "0.85"^^xsd:double .
+
+ex:classScore_INOX_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL Inox (DEMO)"@en ;
+    rdfs:comment "P(FEIN CG 15-125 BL Inox | image) = 0.10. TOY VALUE."@en ;
+    ag:forVariant  ag:FeinCG15125P ;
+    ag:scoreValue  "0.10"^^xsd:double .
+
+ex:classScore_BLP_001 a rdf:Statement ;
+    rdfs:label "Visual classification score: BLP (DEMO)"@en ;
+    rdfs:comment "P(FEIN CG 15-125 BLP | image) = 0.05. TOY VALUE."@en ;
+    ag:forVariant  ag:FeinCG15125BLP ;
+    ag:scoreValue  "0.05"^^xsd:double .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Alternative GMM encoding of classification belief
+#  A 3-component, 3-dimensional GMM over one-hot type prototypes:
+#    component 0 → BL    (weight 0.85, mean [1,0,0])
+#    component 1 → INOX  (weight 0.10, mean [0,1,0])
+#    component 2 → BLP   (weight 0.05, mean [0,0,1])
+#  Provided for downstream probabilistic processing; not used by the demo query.
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:unknownGrinder_001_classGMM a uq:RandomVariable ;
+    rdfs:label "Classification-belief GMM — unknown grinder 001 (DEMO)"@en ;
+    rdfs:comment "3-component GMM over one-hot type prototypes. Component order: [BL, BL_Inox, BLP]. Weights = classifier posterior probabilities. Very small covariances (1e-4) make each component near-degenerate, approximating a categorical distribution. TOY VALUE."@en ;
+    uq:hasDistribution
+        "{\"n_components\":3,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[0.85,0.10,0.05],\"means\":[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]],\"covariances\":[[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Unknown Crown Gear — physical measurements
+# ─────────────────────────────────────────────────────────────────────────────
+
+ex:unknownGear_001 a ag:CrownGear ;
+    rdfs:label "Crown gear of unknown grinder 001 (DEMO)"@en ;
+    ag:hasToothLengthCharacteristic ex:unknown_toothlen_char_001 ;
+    ag:hasHardnessCharacteristic    ex:unknown_hardness_char_001 .
+
+# Tooth-length characteristic
+ex:unknown_toothlen_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth-length characteristic — unknown gear 001"@en .
+
+# Tooth-length measurement (TOY VALUE: 7.05 mm)
+ex:unknown_meas_toothlen_001 a om:Measure ;
+    rdfs:label "CT tooth-length measurement — unknown gear 001 (DEMO)"@en ;
+    rdfs:comment "TOY VALUE: measured from CT scan of incoming grinder. Not real data."@en ;
+    om:hasUnit  om:millimetre ;
+    om:hasValue "7.05"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_toothlen_char_001 ;
+    uq:representedBy   ex:unknown_rv_toothlen_001 .
+
+ex:unknown_rv_toothlen_001 a uq:RandomVariable ;
+    rdfs:label "Tooth-length distribution — unknown gear 001 (DEMO)"@en ;
+    rdfs:comment "Gaussian uncertainty from repeated CT measurements. TOY VALUE."@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.05]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral .
+
+# Hardness characteristic
+ex:unknown_hardness_char_001 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness characteristic — unknown gear 001"@en .
+
+# Hardness measurement (TOY VALUE: 61.8 HRC)
+ex:unknown_meas_hardness_001 a om:Measure ;
+    rdfs:label "Rockwell-C hardness measurement — unknown gear 001 (DEMO)"@en ;
+    rdfs:comment "TOY VALUE: hardness indentation test on incoming gear tooth. Not real data."@en ;
+    om:hasUnit  om:hardnessRockwellC ;
+    om:hasValue "61.8"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_hardness_char_001 ;
+    uq:representedBy   ex:unknown_rv_hardness_001 .
+
+ex:unknown_rv_hardness_001 a uq:RandomVariable ;
+    rdfs:label "Hardness distribution — unknown gear 001 (DEMO)"@en ;
+    rdfs:comment "Gaussian uncertainty from repeated hardness tests. TOY VALUE."@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.8]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .
+
+# =============================================================================
+#  Unknown Grinder 002  —  likely FEIN CG 15-125 P (BL Inox)
+#  tooth ≈ 7.34 mm, hardness ≈ 64.1 HRC
+#  visual CNN: P(BL)=0.07, P(P/Inox)=0.88, P(BLP)=0.05
+# =============================================================================
+
+ex:unknownGrinder_002 a ag:AngleGrinder ;
+    rdfs:label "Incoming angle grinder of unknown model series — unit 002 (DEMO)"@en ;
+    rdfs:comment "Likely BL Inox (P) variant. TOY DEMO."@en ;
+    ag:hasPart  ex:unknownGear_002 ;
+    ag:hasClassificationGMM    ex:unknownGrinder_002_classGMM ;
+    ag:hasClassificationScore  ex:classScore_BL_002 ,
+                                ex:classScore_INOX_002 ,
+                                ex:classScore_BLP_002 .
+
+ex:classScore_BL_002 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL (grinder 002, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125BL ;
+    ag:scoreValue  "0.07"^^xsd:double .
+
+ex:classScore_INOX_002 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL Inox (grinder 002, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125P ;
+    ag:scoreValue  "0.88"^^xsd:double .
+
+ex:classScore_BLP_002 a rdf:Statement ;
+    rdfs:label "Visual classification score: BLP (grinder 002, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125BLP ;
+    ag:scoreValue  "0.05"^^xsd:double .
+
+ex:unknownGrinder_002_classGMM a uq:RandomVariable ;
+    rdfs:label "Classification-belief GMM — unknown grinder 002 (DEMO)"@en ;
+    uq:hasDistribution
+        "{\"n_components\":3,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[0.07,0.88,0.05],\"means\":[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]],\"covariances\":[[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+ex:unknownGear_002 a ag:CrownGear ;
+    rdfs:label "Crown gear of unknown grinder 002 (DEMO)"@en ;
+    ag:hasToothLengthCharacteristic ex:unknown_toothlen_char_002 ;
+    ag:hasHardnessCharacteristic    ex:unknown_hardness_char_002 .
+
+ex:unknown_toothlen_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth-length characteristic — unknown gear 002"@en .
+
+ex:unknown_meas_toothlen_002 a om:Measure ;
+    rdfs:label "CT tooth-length measurement — unknown gear 002 (DEMO)"@en ;
+    om:hasUnit  om:millimetre ;
+    om:hasValue "7.34"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_toothlen_char_002 ;
+    uq:representedBy   ex:unknown_rv_toothlen_002 .
+
+ex:unknown_rv_toothlen_002 a uq:RandomVariable ;
+    rdfs:label "Tooth-length distribution — unknown gear 002 (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.34]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral .
+
+ex:unknown_hardness_char_002 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness characteristic — unknown gear 002"@en .
+
+ex:unknown_meas_hardness_002 a om:Measure ;
+    rdfs:label "Rockwell-C hardness measurement — unknown gear 002 (DEMO)"@en ;
+    om:hasUnit  om:hardnessRockwellC ;
+    om:hasValue "64.1"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_hardness_char_002 ;
+    uq:representedBy   ex:unknown_rv_hardness_002 .
+
+ex:unknown_rv_hardness_002 a uq:RandomVariable ;
+    rdfs:label "Hardness distribution — unknown gear 002 (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[64.1]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .
+
+# =============================================================================
+#  Unknown Grinder 003  —  likely FEIN CG 15-125 BLP
+#  tooth ≈ 6.68 mm, hardness ≈ 59.9 HRC
+#  visual CNN: P(BL)=0.05, P(P/Inox)=0.10, P(BLP)=0.85
+# =============================================================================
+
+ex:unknownGrinder_003 a ag:AngleGrinder ;
+    rdfs:label "Incoming angle grinder of unknown model series — unit 003 (DEMO)"@en ;
+    rdfs:comment "Likely BLP variant. TOY DEMO."@en ;
+    ag:hasPart  ex:unknownGear_003 ;
+    ag:hasClassificationGMM    ex:unknownGrinder_003_classGMM ;
+    ag:hasClassificationScore  ex:classScore_BL_003 ,
+                                ex:classScore_INOX_003 ,
+                                ex:classScore_BLP_003 .
+
+ex:classScore_BL_003 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL (grinder 003, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125BL ;
+    ag:scoreValue  "0.05"^^xsd:double .
+
+ex:classScore_INOX_003 a rdf:Statement ;
+    rdfs:label "Visual classification score: BL Inox (grinder 003, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125P ;
+    ag:scoreValue  "0.10"^^xsd:double .
+
+ex:classScore_BLP_003 a rdf:Statement ;
+    rdfs:label "Visual classification score: BLP (grinder 003, DEMO)"@en ;
+    ag:forVariant  ag:FeinCG15125BLP ;
+    ag:scoreValue  "0.85"^^xsd:double .
+
+ex:unknownGrinder_003_classGMM a uq:RandomVariable ;
+    rdfs:label "Classification-belief GMM — unknown grinder 003 (DEMO)"@en ;
+    uq:hasDistribution
+        "{\"n_components\":3,\"dimensions\":3,\"covariance_type\":\"diag\",\"weights\":[0.05,0.10,0.85],\"means\":[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]],\"covariances\":[[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4],[1e-4,1e-4,1e-4]]}"^^uq:gmmLiteral .
+
+ex:unknownGear_003 a ag:CrownGear ;
+    rdfs:label "Crown gear of unknown grinder 003 (DEMO)"@en ;
+    ag:hasToothLengthCharacteristic ex:unknown_toothlen_char_003 ;
+    ag:hasHardnessCharacteristic    ex:unknown_hardness_char_003 .
+
+ex:unknown_toothlen_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Tooth-length characteristic — unknown gear 003"@en .
+
+ex:unknown_meas_toothlen_003 a om:Measure ;
+    rdfs:label "CT tooth-length measurement — unknown gear 003 (DEMO)"@en ;
+    om:hasUnit  om:millimetre ;
+    om:hasValue "6.68"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_toothlen_char_003 ;
+    uq:representedBy   ex:unknown_rv_toothlen_003 .
+
+ex:unknown_rv_toothlen_003 a uq:RandomVariable ;
+    rdfs:label "Tooth-length distribution — unknown gear 003 (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.68]],\"covariances\":[[0.01]]}"^^uq:gmmLiteral .
+
+ex:unknown_hardness_char_003 a cfm:MeasurableCharacteristics ;
+    rdfs:label "Hardness characteristic — unknown gear 003"@en .
+
+ex:unknown_meas_hardness_003 a om:Measure ;
+    rdfs:label "Rockwell-C hardness measurement — unknown gear 003 (DEMO)"@en ;
+    om:hasUnit  om:hardnessRockwellC ;
+    om:hasValue "59.9"^^xsd:double ;
+    cfm:measuresCharacteristic  ex:unknown_hardness_char_003 ;
+    uq:representedBy   ex:unknown_rv_hardness_003 .
+
+ex:unknown_rv_hardness_003 a uq:RandomVariable ;
+    rdfs:label "Hardness distribution — unknown gear 003 (DEMO)"@en ;
+    uq:hasDomain  uq:nonNegativeDouble ;
+    uq:hasDistribution
+        "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[59.9]],\"covariances\":[[0.25]]}"^^uq:gmmLiteral .

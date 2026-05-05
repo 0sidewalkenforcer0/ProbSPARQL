@@ -1,0 +1,105 @@
+# =============================================================================
+#  FEIN CG 15-125 Variant Identification — ProbSPARQL Query
+#
+#  Identifies the most likely FEIN CG 15-125 variant for an incoming unknown
+#  angle grinder by fusing two sources of evidence:
+#
+#  (a) Visual classification prior — P(variant | image) encoded as
+#      ag:scoreValue on ag:hasClassificationScore nodes  (weight 0.50)
+#
+#  (b) Physical measurement compatibility via Jensen-Shannon Divergence (JSD):
+#      • Crown-gear tooth-length distribution similarity    (weight 0.25)
+#      • Crown-gear hardness distribution similarity        (weight 0.25)
+#
+#  Similarity is defined as  sim = 1 / (1 + JSD)  ∈ (0, 1].
+#
+#  Final combined score:
+#      finalScore = 0.50 × classScore
+#                 + 0.25 × toothSimilarity
+#                 + 0.25 × hardnessSimilarity
+#
+#  Expected result with demo data:
+#      ag:FEIN_CG_15_125_BL  (classScore=0.85, tooth sim≈0.97, hardness sim≈0.94)
+#
+#  Requirements:
+#      • ProbSPARQL Jena extension loaded (prob:jsd function)
+#      • merged_database.ttl loaded into the Fuseki endpoint
+#
+#  Usage (Fuseki):
+#      curl -s -G http://localhost:3030/ds/sparql \
+#           --data-urlencode "query@query_most_likely_fein_variant.sparql"
+# =============================================================================
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX om:   <http://example.org/ontology/om#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex:   <http://example.org/data/fein-demo/>
+
+SELECT
+    ?unknownGrinder
+    ?candidateVariant
+    ?finalScore
+WHERE {
+
+    # ─────────────────────────────────────────────────────────────────────────
+    #  Block 1 — Unknown grinder: component structure
+    # ─────────────────────────────────────────────────────────────────────────
+
+    ?unknownGrinder a ag:AngleGrinder ;
+        ag:hasPart ?unknownGear .
+    ?unknownGear a ag:CrownGear .
+
+    ?unknownGear ag:hasToothLengthCharacteristic ?utlChar .
+    ?utlMeas     cfm:measuresCharacteristic ?utlChar ;
+                 uq:representedBy           ?utlRV .
+    ?utlRV       uq:hasDistribution         ?unknownToothDist .
+
+    ?unknownGear ag:hasHardnessCharacteristic ?uhChar .
+    ?uhMeas      cfm:measuresCharacteristic ?uhChar ;
+                 uq:representedBy           ?uhRV .
+    ?uhRV        uq:hasDistribution         ?unknownHardDist .
+
+    # ─────────────────────────────────────────────────────────────────────────
+    #  Block 2 — Classification belief via classGMM × variant prototype (JSD)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    ?unknownGrinder   ag:hasClassificationGMM ?classGMMRV .
+    ?classGMMRV       uq:hasDistribution       ?classGMMDist .
+
+    ?candidateVariant ag:hasTypeClassPrototype ?protoRV .
+    ?protoRV          uq:hasDistribution       ?protoDist .
+
+    # ─────────────────────────────────────────────────────────────────────────
+    #  Block 3 — Type-level statistical profiles (historical aggregate)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    ?candidateVariant ag:hasTypeToothLengthDistribution ?typeToothRV .
+    ?typeToothRV      uq:hasDistribution                ?typeToothDist .
+
+    ?candidateVariant ag:hasTypeHardnessDistribution ?typeHardRV .
+    ?typeHardRV       uq:hasDistribution              ?typeHardDist .
+
+    # ─────────────────────────────────────────────────────────────────────────
+    #  Block 4 — ProbSPARQL: all three JSD scores + weighted fusion
+    # ─────────────────────────────────────────────────────────────────────────
+
+    BIND( prob:jsd(?classGMMDist,     ?protoDist)      AS ?classJSD )
+    BIND( prob:jsd(?unknownToothDist, ?typeToothDist)  AS ?toothJSD )
+    BIND( prob:jsd(?unknownHardDist,  ?typeHardDist)   AS ?hardnessJSD )
+
+    BIND( 1.0 / (1.0 + ?classJSD)    AS ?classScore )
+    BIND( 1.0 / (1.0 + ?toothJSD)    AS ?toothSimilarity )
+    BIND( 1.0 / (1.0 + ?hardnessJSD) AS ?hardnessSimilarity )
+
+    BIND( 0.50 * ?classScore
+        + 0.25 * ?toothSimilarity
+        + 0.25 * ?hardnessSimilarity AS ?finalScore )
+
+    FILTER( BOUND(?toothJSD) && BOUND(?hardnessJSD) )
+}
+ORDER BY ?unknownGrinder DESC(?finalScore)
