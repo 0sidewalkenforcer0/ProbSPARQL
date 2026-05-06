@@ -16,7 +16,7 @@ import java.io.File;
  * 
  * This server provides:
  * - HTTP SPARQL endpoint at http://localhost:3030/probsparql
- * - All 24 ProbSPARQL functions (prob:fuse, prob:map, prob:mean, etc.)
+ * - All 27 ProbSPARQL functions (prob:fuse, prob:map, prob:mean, etc.)
  * - Property functions for fuzzyJoin and exactJoin
  * - Web UI for query testing
  * - RESTful API for programmatic access
@@ -116,7 +116,7 @@ public class ProbSPARQLFuseki {
         logger.info("  Transformation: prob:scale, prob:shift, prob:linear, prob:marginal,");
         logger.info("                  prob:joint, prob:convolve, prob:multiply");
         logger.info("  Manipulation:   prob:mean, prob:std, prob:map, prob:modecount,");
-        logger.info("                  prob:mix, prob:fuse, prob:quantile");
+        logger.info("                  prob:mix, prob:fuse, prob:quantile, prob:sample");
         logger.info("  Property Funcs: probpf:fuzzyJoin, probpf:exactJoin");
         logger.info("");
         logger.info("Example Query:");

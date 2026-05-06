@@ -11,6 +11,7 @@
  *   <li>{@code prob:map(?gmm)} - Maximum A Posteriori estimate (mode)</li>
  *   <li>{@code prob:quantile(?gmm, ?q)} - Compute quantiles (1D only)</li>
  *   <li>{@code prob:modeCount(?gmm)} - Count number of components K</li>
+ *   <li>{@code prob:sample(?dist, ?n)} - Draw {@code n} samples as a JSON array</li>
  * </ul>
  * 
  * <h2>Distribution Combination Functions</h2>
@@ -28,6 +29,7 @@
  *   <li>mix - Returns new GMM (weighted mixture)</li>
  *   <li>fuse - Returns new GMM (Bayesian fusion)</li>
  *   <li>quantile - Returns double (1D quantile)</li>
+ *   <li>sample - Returns JSON string with shape [n][dimensions]</li>
  * </ul>
  * 
  * <h2>Usage Examples</h2>

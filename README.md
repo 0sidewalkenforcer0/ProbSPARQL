@@ -268,6 +268,7 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 | `prob:std(?gmm)` | Standard deviation | `prob:std(?dist)` |
 | `prob:fuse(?gmm1, ?gmm2)` | Bayesian fusion | `prob:fuse(?prior, ?likelihood)` |
 | `prob:quantile(?gmm, ?p)` | Quantile at probability p | `prob:quantile(?dist, 0.95)` |
+| `prob:sample(?dist, ?n)` | Draw n samples as a JSON array with shape `[n][dimensions]` | `prob:sample(?dist, 10)` |
 
 For histogram literals, the preferred lexical form is:
 

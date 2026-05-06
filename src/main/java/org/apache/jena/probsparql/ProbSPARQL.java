@@ -34,6 +34,7 @@ import org.apache.jena.probsparql.functions.manipulation.ModeCount;
 import org.apache.jena.probsparql.functions.manipulation.Mix;
 import org.apache.jena.probsparql.functions.manipulation.Fuse;
 import org.apache.jena.probsparql.functions.manipulation.Quantile;
+import org.apache.jena.probsparql.functions.manipulation.Sample;
 import org.apache.jena.probsparql.propertyfunctions.ExactJoinPF;
 import org.apache.jena.probsparql.propertyfunctions.FuzzyJoinPF;
 import org.apache.jena.sparql.algebra.Algebra;
@@ -154,7 +155,8 @@ public class ProbSPARQL {
         functionRegistry.put(Fuse.URI, Fuse.class);
         functionRegistry.put(Quantile.URI, Quantile.class);
         functionRegistry.put(HistogramMean.URI, HistogramMean.class);
-        logger.info("Registered {} manipulation functions", 8);
+        functionRegistry.put(Sample.URI, Sample.class);
+        logger.info("Registered {} manipulation functions", 9);
         
         // Category 5: Probabilistic Property Functions (JOIN operations)
         PropertyFunctionRegistry pfRegistry = PropertyFunctionRegistry.get();
@@ -178,7 +180,7 @@ public class ProbSPARQL {
         logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and SIMILARITYJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (24 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
+        logger.info("{} initialization complete (27 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
     }
     
     /**
