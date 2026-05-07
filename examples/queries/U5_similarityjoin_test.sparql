@@ -1,7 +1,7 @@
-# U5: Probabilistic Similarity Search (New Relational SIMILARITYJOIN Syntax)
+# U5: Probabilistic Similarity Search (DIVJOIN Syntax)
 # "For the current gear, retrieve all historical gears whose CT tooth-length distributions are similar."
 #
-# Current syntax: { leftPattern } SIMILARITYJOIN(?left, ?right, tolerance, tailProbability) { rightPattern }
+# Current syntax: { leftPattern } DIVJOIN(?left, ?right, tolerance, tailProbability) { rightPattern }
 # - Left table: Current gears with CT measurements
 # - Right table: Historical gears with CT measurements
 # - Join condition: JS(?currentDist, ?historicalDist) <= 0.3
@@ -26,8 +26,8 @@ WHERE {
                     cfm:hasProbabilisticValue ?rvCurrent .
     ?rvCurrent uq:hasDistribution ?currentDist .
   }
-  # SIMILARITYJOIN: Find similar historical cases (JS divergence <= 0.3)
-  SIMILARITYJOIN(?currentDist, ?historicalDist, 0.3, 0.05)
+  # DIVJOIN: Find similar historical cases (JS divergence <= 0.3)
+  DIVJOIN(?currentDist, ?historicalDist, 0.3, 0.05)
   {
     # Right table: Historical gears with CT measurements
     ?historicalGear a ag:HistoricalGear ;

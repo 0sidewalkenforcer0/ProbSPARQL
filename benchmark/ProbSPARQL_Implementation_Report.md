@@ -42,16 +42,16 @@ Two new keyword tokens are declared and two syntax forms are supported for each 
 
 **Token declarations:**
 ```javacc
-<SIMILARITYJOIN> : { "SIMILARITYJOIN" }
+<SIMILARITYJOIN> : { "DIVJOIN" }
 <FUSEJOIN>       : { "FUSEJOIN" }
 ```
 
-**Syntax forms for SIMILARITYJOIN:**
+**Syntax forms for DIVJOIN:**
 
 | Form | Syntax | Mode |
 |------|--------|------|
-| Relational | `{ leftPat } SIMILARITYJOIN(?v1,?v2,θ,α) { rightPat }` | `legacyMode = false` |
-| Legacy filter | `SIMILARITYJOIN(?v1,?v2,θ,α) { pat }` | `legacyMode = true` |
+| Relational | `{ leftPat } DIVJOIN(?v1,?v2,θ,α) { rightPat }` | `legacyMode = false` |
+| Legacy filter | `DIVJOIN(?v1,?v2,θ,α) { pat }` | `legacyMode = true` |
 
 The grammar defines four production rules:
 
@@ -78,13 +78,13 @@ Element SimilarityJoinGraphPattern() { … → new ElementSimilarityJoin(pattern
 Element FuseJoinGraphPattern()       { … → new ElementFuseJoin(pattern, …)       }
 ```
 
-For `SIMILARITYJOIN`, `θ` is the similarity threshold and `α` is the one-sided tail probability passed into the sequential confidence bounds used by `V3_SPRT` and the SPRT phase of `V5_ADAPTIVE`.
+For `DIVJOIN`, `θ` is the similarity threshold and `α` is the one-sided tail probability passed into the sequential confidence bounds used by `V3_SPRT` and the SPRT phase of `V5_ADAPTIVE`.
 
 All four rules are incorporated in `GraphPatternNotTriples()` and in the outer `GroupGraphPatternSub()` loop (see §2.2).
 
 ### 2.2 Generated Parser (`ARQParser.java`) — Lookahead Fix
 
-Because `main.jj` was modified after `ARQParser.java` was last auto-generated, the outer `GroupGraphPatternSub` loop in the generated file did not contain the necessary lookahead to dispatch the relational binary form. The symptom is that the parser first consumes `{ ?rv1 … }` as a standalone `GroupGraphPattern`, then enters `SimilarityJoinGraphPattern()` with the current token already positioned at `SIMILARITYJOIN`, causing `jj_2_4`'s lookahead to fail and `leftPattern` remaining `null` — triggering legacy mode for every query.
+Because `main.jj` was modified after `ARQParser.java` was last auto-generated, the outer `GroupGraphPatternSub` loop in the generated file did not contain the necessary lookahead to dispatch the relational binary form. The symptom is that the parser first consumes `{ ?rv1 … }` as a standalone `GroupGraphPattern`, then enters `SimilarityJoinGraphPattern()` with the current token already positioned at `DIVJOIN`, causing `jj_2_4`'s lookahead to fail and `leftPattern` remaining `null` — triggering legacy mode for every query.
 
 **Root cause in `ARQParser.java` (before fix):**
 ```java
@@ -97,8 +97,8 @@ elg.addElement(el);
 **Fix applied to `ARQParser.java`:**
 ```java
 // Test BEFORE consuming whether the upcoming token stream matches
-// { GroupGraphPattern } SIMILARITYJOIN(...):
-if (jj_2_4(2147483647)) {           // jj_2_4 scans GroupGraphPattern() SIMILARITYJOIN
+// { GroupGraphPattern } DIVJOIN(...):
+if (jj_2_4(2147483647)) {           // jj_2_4 scans GroupGraphPattern() DIVJOIN
     el = SimilarityJoinGraphPattern();  // which now correctly captures leftPattern
 } else {
     el = GraphPatternNotTriples();
@@ -106,7 +106,7 @@ if (jj_2_4(2147483647)) {           // jj_2_4 scans GroupGraphPattern() SIMILARI
 elg.addElement(el);
 ```
 
-The `jj_2_4` method performs an infinite-depth lookahead that scans for the exact token sequence `GroupGraphPattern() SIMILARITYJOIN`, without consuming the input. When this lookahead succeeds, `SimilarityJoinGraphPattern()` is called from a position where its own internal lookahead (`LOOKAHEAD(GroupGraphPattern() <SIMILARITYJOIN>)`) succeeds, enabling `leftPattern` to be populated and `legacyMode = false`.
+The `jj_2_4` method performs an infinite-depth lookahead that scans for the exact token sequence `GroupGraphPattern() DIVJOIN`, without consuming the input. When this lookahead succeeds, `SimilarityJoinGraphPattern()` is called from a position where its own internal lookahead (`LOOKAHEAD(GroupGraphPattern() <SIMILARITYJOIN>)`) succeeds, enabling `leftPattern` to be populated and `legacyMode = false`.
 
 ### 2.3 Query Routing
 
@@ -153,7 +153,7 @@ public void visit(OpVisitor opVisitor) {
 }
 ```
 
-This caused `ApplyTransformVisitor.visit(OpSimilarityJoin)` to never be called. Instead, `leftOp.visit()` pushed the compiled sub-op (a `OpBGP`) onto the result stack. `TransformSimplify` then saw two consecutive `OpBGP` nodes and merged them, silently erasing `OpSimilarityJoin` from the algebra tree. All queries using `SIMILARITYJOIN` executed as plain cross-joins with no JSD filtering, returning all `n(n-1)/2` pairs.
+This caused `ApplyTransformVisitor.visit(OpSimilarityJoin)` to never be called. Instead, `leftOp.visit()` pushed the compiled sub-op (a `OpBGP`) onto the result stack. `TransformSimplify` then saw two consecutive `OpBGP` nodes and merged them, silently erasing `OpSimilarityJoin` from the algebra tree. All queries using `DIVJOIN` executed as plain cross-joins with no JSD filtering, returning all `n(n-1)/2` pairs.
 
 **After fix (`OpExt` extension):**
 
@@ -377,13 +377,13 @@ Experiment 1 measures the **execution-time overhead** that ProbSPARQL introduces
 | Q3 — Distribution Comparison | BGP + `BIND(prob:jsd(…))` or legacy `BIND(prob:jsdivergence(…))` + `FILTER` |
 | Q4 — Pure Graph Traversal | BGP only (no `prob:` functions) |
 
-**None of the four queries use `SIMILARITYJOIN` or `FUSEJOIN` syntax.** All probabilistic computations are expressed via `BIND` + standard SPARQL `FILTER`.
+**None of the four queries use `DIVJOIN` or `FUSEJOIN` syntax.** All probabilistic computations are expressed via `BIND` + standard SPARQL `FILTER`.
 
 ### 6.2 Execution Path for BIND/FILTER Queries
 
 For a query containing only `BIND` and `FILTER`:
 
-1. **Parsing** — `ARQParser` produces `ElementBind` and `ElementFilter` nodes. The tokens `SIMILARITYJOIN` and `FUSEJOIN` never appear, so neither the new lookahead branch in `GroupGraphPatternSub` nor `SimilarityJoinGraphPattern()` is ever entered.
+1. **Parsing** — `ARQParser` produces `ElementBind` and `ElementFilter` nodes. The tokens `DIVJOIN` and `FUSEJOIN` never appear, so neither the new lookahead branch in `GroupGraphPatternSub` nor `SimilarityJoinGraphPattern()` is ever entered.
 
 2. **Engine selection** — `QueryEngineProbabilistic.Factory.accept()` walks the syntax tree and finds no `ElementSimilarityJoin` or `ElementFuseJoin`. It returns `false`. The query is handled entirely by the pre-existing `QueryEngineMain`.
 
@@ -399,14 +399,14 @@ For a query containing only `BIND` and `FILTER`:
 
 - **Scope of change**: `OpSimilarityJoin.java` only.  
 - **Activation condition**: This fix has any effect only when `OpSimilarityJoin` is instantiated and placed into an algebra tree. `OpSimilarityJoin` is only created in `AlgebraGeneratorProbabilistic.compileSimilarityJoin()`, which is only called when an `ElementSimilarityJoin` node is present.  
-- **Conclusion**: Because Experiment 1 queries contain no `SIMILARITYJOIN` syntax, `OpSimilarityJoin` is never instantiated, the `visit()` method is never called, and `TransformSimplify` never encounters this operator. **Fix A has zero effect on Experiment 1 query execution.**
+- **Conclusion**: Because Experiment 1 queries contain no `DIVJOIN` syntax, `OpSimilarityJoin` is never instantiated, the `visit()` method is never called, and `TransformSimplify` never encounters this operator. **Fix A has zero effect on Experiment 1 query execution.**
 
 #### Fix B — `ARQParser.java` lookahead dispatch
 
 - **Scope of change**: The `GroupGraphPatternSub` loop in `ARQParser.java`. Specifically, the loop body was changed to test `jj_2_4(2147483647)` before each non-triple group element.  
-- **Activation condition**: `jj_2_4` scans the upcoming token stream for the pattern `GroupGraphPattern() SIMILARITYJOIN`. This scan is a lookahead-only operation that does **not consume input**. It returns `false` for any token sequence that is not `LBRACE … RBRACE SIMILARITYJOIN`, which covers all tokens produced by standard SPARQL constructs including `FILTER`, `BIND`, `OPTIONAL`, `GRAPH`, `VALUES`, and plain BGP triples.  
+- **Activation condition**: `jj_2_4` scans the upcoming token stream for the pattern `GroupGraphPattern() DIVJOIN`. This scan is a lookahead-only operation that does **not consume input**. It returns `false` for any token sequence that is not `LBRACE … RBRACE DIVJOIN`, which covers all tokens produced by standard SPARQL constructs including `FILTER`, `BIND`, `OPTIONAL`, `GRAPH`, `VALUES`, and plain BGP triples.  
 - **Conclusion**: For every element in an Experiment 1 query, `jj_2_4` returns `false`, the new branch is never taken, and `GraphPatternNotTriples()` is called exactly as before. **Fix B has zero effect on Experiment 1 query parsing.**
 
 ### 6.4 Conclusion
 
-**Experiment 1 does not need to be re-run.** The two recent bug fixes operate exclusively on the code paths activated by `SIMILARITYJOIN` syntax. The complete execution path for `BIND`/`FILTER` queries — from tokenisation through parsing, algebra compilation, engine selection, and iterator execution — is identical before and after the fixes. The numerical results, timing measurements, and overhead ratios produced by Experiment 1 remain fully valid.
+**Experiment 1 does not need to be re-run.** The two recent bug fixes operate exclusively on the code paths activated by `DIVJOIN` syntax. The complete execution path for `BIND`/`FILTER` queries — from tokenisation through parsing, algebra compilation, engine selection, and iterator execution — is identical before and after the fixes. The numerical results, timing measurements, and overhead ratios produced by Experiment 1 remain fully valid.

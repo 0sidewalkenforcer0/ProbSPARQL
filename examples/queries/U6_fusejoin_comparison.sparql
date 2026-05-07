@@ -8,9 +8,9 @@ PREFIX uq: <http://example.org/ontology/uncertainty#>
 PREFIX prob: <http://probsparql.org/function#>
 PREFIX ex: <http://example.org/data/>
 
-# Comparison: FUSEJOIN vs SIMILARITYJOIN
+# Comparison: FUSEJOIN vs DIVJOIN
 # FUSEJOIN creates a fused distribution when JS divergence <= tolerance
-# SIMILARITYJOIN keeps original distributions when JS divergence <= tolerance
+# DIVJOIN keeps original distributions when JS divergence <= tolerance
 
 SELECT ?spindle ?caliperDist ?laserDist ?fusedDist
 WHERE {

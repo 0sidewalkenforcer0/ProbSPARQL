@@ -20,7 +20,7 @@ import java.util.List;
  * QueryIterSimilarityJoin: Iterator for SimilarityJoin operation with nested loop join semantics.
  * 
  * Relational semantics:
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * Algorithm (Nested Loop Join):
  * 1. Materialize left table bindings

@@ -12,7 +12,7 @@ The benchmark suite currently contains five active experiments:
 | Experiment | Focus | Current Scope |
 |---|---|---|
 | Exp1 | System overhead and robustness | Main DET vs PROB overhead benchmark, plus a permutation-invariance supplement |
-| Exp2 | Operator-level optimization | In-engine filtering vs `SIMILARITYJOIN` |
+| Exp2 | Operator-level optimization | In-engine filtering vs `DIVJOIN` |
 | Exp3 | JSD method comparison | Single benchmark for controlled comparison of GMM JSD strategies |
 | Exp4 | Generalization across distribution families | GMM / histogram / Dirichlet dispatch, microbenchmarks, and end-to-end cases |
 | Exp5 | Execution placement | In-engine filtering vs post-processing |
@@ -60,7 +60,7 @@ Measure the runtime overhead of probabilistic execution relative to deterministi
 - `q4.sparql` is the active legacy `prob:jsdivergence` path used when evaluating the adaptive JSD implementation in the permutation supplement.
 - Variant queries such as `q4_jsd.sparql` are retained only for controlled comparisons.
 
-## Experiment 2: In-Engine Filtering vs SIMILARITYJOIN
+## Experiment 2: In-Engine Filtering vs DIVJOIN
 
 ### Objective
 
@@ -87,7 +87,7 @@ Measure the benefit of a dedicated similarity-join operator over ordinary in-eng
 
 ### Notes
 
-- The formal Exp2 comparison is limited to in-engine filtering plans and `SIMILARITYJOIN`.
+- The formal Exp2 comparison is limited to in-engine filtering plans and `DIVJOIN`.
 
 ## Experiment 3: JSD Method Benchmark
 

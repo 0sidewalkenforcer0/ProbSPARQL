@@ -211,7 +211,7 @@ The `examples/queries/` directory contains ready-to-use queries:
 | `U2_probabilistic_comparison.sparql` | Compare distributions using divergence measures |
 | `U3_distribution_transformation.sparql` | Scale, shift, and transform distributions |
 | `U4_distribution_manipulation.sparql` | Extract mean, std, quantiles |
-| `U5_similarityjoin_test.sparql` | SIMILARITYJOIN operator examples |
+| `U5_similarityjoin_test.sparql` | DIVJOIN operator examples |
 | `U6_fusejoin_comparison.sparql` | FUSEJOIN (Bayesian fusion) examples |
 | `U7_complex_filter_pattern.sparql` | Complex nested graph pattern with probabilistic filter |
 
@@ -303,7 +303,7 @@ SELECT ?sensor ?posterior WHERE {
 }
 ```
 
-### SIMILARITYJOIN - Similarity Filter
+### DIVJOIN - Similarity Filter
 
 Filters pairs of distributions by similarity:
 
@@ -312,12 +312,12 @@ PREFIX uq: <http://example.org/ontology/uncertainty#>
 
 SELECT ?sensor1 ?sensor2 WHERE {
   { ?sensor1 uq:hasDistribution ?dist1 . }
-  SIMILARITYJOIN(?dist1, ?dist2, 0.1, 0.05)
+  DIVJOIN(?dist1, ?dist2, 0.1, 0.05)
   { ?sensor2 uq:hasDistribution ?dist2 . }
 }
 ```
 
-`SIMILARITYJOIN` takes four arguments:
+`DIVJOIN` takes four arguments:
 
 - `?dist1`, `?dist2`: the distribution variables to compare
 - `0.1`: the similarity threshold, interpreted as `JSD(?dist1, ?dist2) <= 0.1`
@@ -368,7 +368,7 @@ ProbSPARQL/
 │   ├── datatypes/               # GMM datatype implementation
 │   ├── functions/               # SPARQL function implementations
 │   ├── propertyfunctions/       # Property function implementations
-│   ├── algebra/                 # FUSEJOIN/SIMILARITYJOIN operators
+│   ├── algebra/                 # FUSEJOIN/DIVJOIN operators
 │   ├── engine/                  # Query engine extensions
 │   └── server/                  # Fuseki HTTP server
 ├── examples/

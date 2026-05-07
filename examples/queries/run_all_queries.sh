@@ -42,7 +42,7 @@ get_description() {
         U2) echo "Probabilistic Comparison (KL/JS divergence)" ;;
         U3) echo "Distribution Transformation (scale, shift, linear)" ;;
         U4) echo "Distribution Manipulation (mean, std, fuse)" ;;
-        U5) echo "SIMILARITYJOIN (similarity filtering)" ;;
+        U5) echo "DIVJOIN (similarity filtering)" ;;
         U6) echo "FUSEJOIN (Bayesian fusion)" ;;
         *) echo "Unknown" ;;
     esac

@@ -70,8 +70,8 @@ public class QueryRunner {
     */
     
     /**
-     * Holds SIMILARITYJOIN metadata extracted from query.
-     * Relational form: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
+     * Holds DIVJOIN metadata extracted from query.
+     * Relational form: { leftPattern } DIVJOIN(...) { rightPattern }
      * 
      * @deprecated This class is no longer used since we now use formal JavaCC extension.
      *             The JavaCC parser directly creates ElementSimilarityJoin objects.
@@ -83,7 +83,7 @@ public class QueryRunner {
         String leftVar;
         String rightVar;
         double tolerance;
-        String modifiedQuery;  // Query with SIMILARITYJOIN syntax replaced
+        String modifiedQuery;  // Query with DIVJOIN syntax replaced
         
         SimilarityJoinInfo(String leftPattern, String rightPattern,
                           String left, String right, double tol, String modQuery) {
@@ -126,7 +126,7 @@ public class QueryRunner {
     
     /**
      * Find the opening brace that precedes the given position.
-     * Walks backwards to find the block before FUSEJOIN/SIMILARITYJOIN.
+     * Walks backwards to find the block before FUSEJOIN/DIVJOIN.
      * Skips whitespace and comment lines (starting with #).
      * 
      * @deprecated No longer used - JavaCC parser handles syntax parsing directly.
@@ -300,21 +300,21 @@ public class QueryRunner {
     */
     
     /**
-     * Detect and parse SIMILARITYJOIN syntax.
-     * Relational form: { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+     * Detect and parse DIVJOIN syntax.
+     * Relational form: { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
      * 
-     * Legacy filter form: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
+     * Legacy filter form: DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
      * 
-     * @return SimilarityJoinInfo if SIMILARITYJOIN detected, null otherwise
+     * @return SimilarityJoinInfo if DIVJOIN detected, null otherwise
      * 
      * @deprecated This method is no longer used. The JavaCC parser now directly parses
-     *             SIMILARITYJOIN syntax and creates ElementSimilarityJoin objects. No preprocessing needed.
+     *             DIVJOIN syntax and creates ElementSimilarityJoin objects. No preprocessing needed.
      */
     /*
     private static SimilarityJoinInfo preprocessSimilarityJoin(String queryString) {
-        // Match the SIMILARITYJOIN operator with arguments
+        // Match the DIVJOIN operator with arguments
         Pattern pattern = Pattern.compile(
-            "SIMILARITYJOIN\\s*\\(\\s*\\?(\\w+)\\s*,\\s*\\?(\\w+)\\s*,\\s*([0-9.]+)\\s*\\)",
+            "DIVJOIN\\s*\\(\\s*\\?(\\w+)\\s*,\\s*\\?(\\w+)\\s*,\\s*([0-9.]+)\\s*,\\s*([0-9.]+)\\s*\\)",
             Pattern.CASE_INSENSITIVE
         );
         
@@ -327,7 +327,7 @@ public class QueryRunner {
             int simjoinStart = matcher.start();
             int simjoinEnd = matcher.end();
             
-            // Look for the right pattern { } after SIMILARITYJOIN(...)
+            // Look for the right pattern { } after DIVJOIN(...)
             int rightBlockStart = -1;
             int rightBlockEnd = -1;
             String rightPattern = "";
@@ -347,7 +347,7 @@ public class QueryRunner {
                 }
             }
             
-            // Look for the left pattern { } before SIMILARITYJOIN
+            // Look for the left pattern { } before DIVJOIN
             int leftBlockStart = findPrecedingBlockStart(queryString, simjoinStart);
             int leftBlockEnd = -1;
             String leftPattern = "";
@@ -367,12 +367,12 @@ public class QueryRunner {
                 String afterRight = queryString.substring(rightBlockEnd + 1);
                 modifiedQuery = beforeLeft + "{ " + leftPattern + "\n" + rightPattern + " }" + afterRight;
             } else if (!rightPattern.isEmpty()) {
-                // Old syntax: just remove the SIMILARITYJOIN block
+                // Old syntax: just remove the DIVJOIN block
                 String beforeSim = queryString.substring(0, simjoinStart);
                 String afterRight = queryString.substring(rightBlockEnd + 1);
                 modifiedQuery = beforeSim + afterRight;
             } else {
-                // No valid patterns found - just remove SIMILARITYJOIN syntax
+                // No valid patterns found - just remove DIVJOIN syntax
                 modifiedQuery = matcher.replaceFirst("");
             }
             
@@ -433,7 +433,7 @@ public class QueryRunner {
         // ========================================================================
         // OLD REGEX-BASED PREPROCESSING (DEPRECATED - NOW USING JAVACC EXTENSION)
         // ========================================================================
-        // The JavaCC parser now directly handles FUSEJOIN and SIMILARITYJOIN syntax,
+        // The JavaCC parser now directly handles FUSEJOIN and DIVJOIN syntax,
         // creating ElementFuseJoin and ElementSimilarityJoin objects automatically.
         // No preprocessing is needed anymore.
         /*
@@ -456,24 +456,24 @@ public class QueryRunner {
             System.out.println("[DEBUG]   Tolerance: " + fuseJoinInfo.tolerance);
             System.out.println("[DEBUG]   Modified query:\n" + fuseJoinInfo.modifiedQuery);
         } else {
-            // Check for SIMILARITYJOIN if no FUSEJOIN found
+            // Check for DIVJOIN if no FUSEJOIN found
             similarityJoinInfo = preprocessSimilarityJoin(queryString);
             if (similarityJoinInfo != null) {
                 queryString = similarityJoinInfo.modifiedQuery;
-                System.out.println("[DEBUG] ✓ SIMILARITYJOIN detected!");
+                System.out.println("[DEBUG] ✓ DIVJOIN detected!");
                 System.out.println("[DEBUG]   Left pattern: " + (similarityJoinInfo.leftPattern.isEmpty() ? "(none)" : similarityJoinInfo.leftPattern));
                 System.out.println("[DEBUG]   Right pattern: " + (similarityJoinInfo.rightPattern.isEmpty() ? "(none)" : similarityJoinInfo.rightPattern));
                 System.out.println("[DEBUG]   Variables: ?" + similarityJoinInfo.leftVar + ", ?" + similarityJoinInfo.rightVar);
                 System.out.println("[DEBUG]   Tolerance: " + similarityJoinInfo.tolerance);
                 System.out.println("[DEBUG]   Modified query:\n" + similarityJoinInfo.modifiedQuery);
             } else {
-                System.out.println("[DEBUG] No FUSEJOIN or SIMILARITYJOIN detected - standard SPARQL query");
+                System.out.println("[DEBUG] No FUSEJOIN or DIVJOIN detected - standard SPARQL query");
             }
         }
         
         // Execute query
         String queryType = fuseJoinInfo != null ? "FUSEJOIN" : 
-                          (similarityJoinInfo != null ? "SIMILARITYJOIN" : "Standard");
+                          (similarityJoinInfo != null ? "DIVJOIN" : "Standard");
         */
         
         // NEW APPROACH: Direct parsing with JavaCC - no preprocessing needed
@@ -495,7 +495,7 @@ public class QueryRunner {
             // ========================================================================
             // OLD CONTEXT-BASED APPROACH (DEPRECATED)
             // ========================================================================
-            // With JavaCC extension, FUSEJOIN and SIMILARITYJOIN are parsed directly
+            // With JavaCC extension, FUSEJOIN and DIVJOIN are parsed directly
             // into ElementFuseJoin and ElementSimilarityJoin objects, which are then
             // compiled into OpFuseJoin and OpSimilarityJoin by AlgebraGenerator.
             // No context variables are needed - the information is in the algebra tree.
@@ -516,9 +516,9 @@ public class QueryRunner {
                 System.out.println("[DEBUG]   Right pattern stored: " + (!fuseJoinInfo.rightPattern.isEmpty()));
             }
             
-            // Pass SIMILARITYJOIN metadata to execution context
+            // Pass DIVJOIN metadata to execution context
             if (similarityJoinInfo != null) {
-                System.out.println("[DEBUG] Setting SIMILARITYJOIN context variables:");
+                System.out.println("[DEBUG] Setting DIVJOIN context variables:");
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_LEFT_VAR, similarityJoinInfo.leftVar);
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_RIGHT_VAR, similarityJoinInfo.rightVar);
                 qexec.getContext().set(ProbSPARQL.SIMILARITYJOIN_TOLERANCE, similarityJoinInfo.tolerance);

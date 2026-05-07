@@ -82,7 +82,7 @@ public class ProbSPARQL {
     public static final Symbol FUSEJOIN_LEFT_PATTERN = Symbol.create("http://probsparql.org/fusejoin#leftPattern");
     public static final Symbol FUSEJOIN_RIGHT_PATTERN = Symbol.create("http://probsparql.org/fusejoin#rightPattern");
     
-    // Context symbols for SIMILARITYJOIN metadata
+    // Context symbols for the internal SimilarityJoin metadata used by DIVJOIN.
     public static final Symbol SIMILARITYJOIN_LEFT_VAR = Symbol.create("http://probsparql.org/similarityjoin#leftVar");
     public static final Symbol SIMILARITYJOIN_RIGHT_VAR = Symbol.create("http://probsparql.org/similarityjoin#rightVar");
     public static final Symbol SIMILARITYJOIN_TOLERANCE = Symbol.create("http://probsparql.org/similarityjoin#tolerance");
@@ -177,10 +177,10 @@ public class ProbSPARQL {
         // Category 7: Register QueryEngineProbabilistic for FUSEJOIN support
         // This engine uses AlgebraGeneratorProbabilistic to handle ElementFuseJoin
         QueryEngineRegistry.addFactory(new QueryEngineProbabilistic.Factory());
-        logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and SIMILARITYJOIN syntax support");
+        logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and DIVJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (27 functions + 2 property functions + 3 join strategies + FUSEJOIN/SIMILARITYJOIN syntax)", NAME);
+        logger.info("{} initialization complete (27 functions + 2 property functions + 3 join strategies + FUSEJOIN/DIVJOIN syntax)", NAME);
     }
     
     /**

@@ -566,7 +566,7 @@ public interface ARQParserConstants {
     "\"semijoin\"",
     "\"antijoin\"",
     "\"unfold\"",
-    "\"SIMILARITYJOIN\"",
+    "\"DIVJOIN\"",
     "\"FUSEJOIN\"",
     "\"TRIPLE\"",
     "\"isTRIPLE\"",

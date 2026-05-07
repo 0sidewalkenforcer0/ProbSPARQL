@@ -19,8 +19,8 @@ import java.util.Objects;
  * preserves it intact through TransformSimplify and other algebra transforms.
  *
  * Two modes:
- * 1. Relational (legacyMode=false): { leftOp } SIMILARITYJOIN(...) { rightOp }
- * 2. Legacy     (legacyMode=true ): SIMILARITYJOIN(...) { rightOp }  – filter semantics
+ * 1. Relational (legacyMode=false): { leftOp } DIVJOIN(...) { rightOp }
+ * 2. Legacy     (legacyMode=true ): DIVJOIN(...) { rightOp }  – filter semantics
  */
 public class OpSimilarityJoin extends OpExt {
     private final Op leftOp;

@@ -17,7 +17,7 @@ import org.apache.jena.sparql.function.FunctionBase2;
  *
  * <p>The decision threshold used by V3/V4/V5 in this legacy path comes from
  * {@code probsparql.sprt.epsilon}. Query operators such as
- * {@code SIMILARITYJOIN} should use the internal threshold-aware
+ * {@code DIVJOIN} should use the internal threshold-aware
  * {@code evaluateSimilarity(..., tolerance)} path instead so the query
  * tolerance is propagated into the evaluator.</p>
  */

@@ -23,11 +23,11 @@ import java.util.Deque;
  * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
  *   -> OpFuseJoin(leftOp, rightOp, leftVar, rightVar, tolerance, resultVar)
  * 
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  *   -> OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability)
  * 
  * Legacy filter semantics (single pattern):
- * SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
+ * DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
  *   -> OpSimilarityJoin(patternOp, patternOp, leftVar, rightVar, tolerance, tailProbability, legacyMode=true)
  */
 public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
@@ -114,7 +114,7 @@ public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
      * Override compileOneInGroup to handle our custom Elements within an ElementGroup.
      * This is called for each element in a group during group compilation.
      * 
-     * For SIMILARITYJOIN and FUSEJOIN, they are binary operators that:
+     * For DIVJOIN and FUSEJOIN, they are binary operators that:
      * 1. Take the current accumulated result as the left operand (if no explicit left pattern)
      * 2. Compile their own left and right patterns if they have them
      */
@@ -169,7 +169,7 @@ public class AlgebraGeneratorProbabilistic extends AlgebraGenerator {
     }
     
     // =========================================================================
-    // SIMILARITYJOIN Compilation
+    // DIVJOIN Compilation
     // =========================================================================
     
     /**

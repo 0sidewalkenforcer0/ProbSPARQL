@@ -11,7 +11,7 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.syntax.*;
 
 /**
- * Custom query engine for ProbSPARQL that handles FUSEJOIN and SIMILARITYJOIN operations.
+ * Custom query engine for ProbSPARQL that handles FUSEJOIN and DIVJOIN operations.
  * 
  * This engine integrates seamlessly with Jena's query execution pipeline:
  * 1. Uses AlgebraGeneratorProbabilistic to compile ElementSimilarityJoin/ElementFuseJoin
@@ -19,8 +19,8 @@ import org.apache.jena.sparql.syntax.*;
  * 2. Registers OpExecutorProbabilistic to execute these custom operators
  * 
  * Supports both relational and legacy semantics:
- * - Relational: { leftPattern } SIMILARITYJOIN(?v1, ?v2, tolerance, tailProbability) { rightPattern }
- * - Legacy: SIMILARITYJOIN(?v1, ?v2, tolerance, tailProbability) { pattern }
+ * - Relational: { leftPattern } DIVJOIN(?v1, ?v2, tolerance, tailProbability) { rightPattern }
+ * - Legacy: DIVJOIN(?v1, ?v2, tolerance, tailProbability) { pattern }
  */
 public class QueryEngineProbabilistic extends QueryEngineMain {
     

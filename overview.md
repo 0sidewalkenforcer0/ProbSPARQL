@@ -16,7 +16,7 @@
 |---|---|
 | **数据模型** | Gaussian Mixture Models (GMMs) 作为自定义 RDF 数据类型 |
 | **SPARQL 函数** | 22 个概率函数（PDF/CDF、JSD/KL、变换、融合等） |
-| **特殊连接算子** | 2 个自定义连接（FUSEJOIN、SIMILARITYJOIN） |
+| **特殊连接算子** | 2 个自定义连接（FUSEJOIN、DIVJOIN） |
 | **服务器** | 基于 Jena-Fuseki 的 HTTP SPARQL 端点 |
 | **JSD 计算方案** | 9 种计算模式（GT-100/1K/5K/10K, V1-V5） |
 
@@ -219,11 +219,11 @@ FUSEJOIN(?distCT, ?distLaser, 0.3, ?fused)
 
 **语义：** 对左右两侧模式的所有笛卡尔积，若 $JS(\mathtt{distL}, \mathtt{distR}) \leq \text{tolerance}$，则将融合结果绑定到结果变量。
 
-### 6.2 SIMILARITYJOIN 语法
+### 6.2 DIVJOIN 语法
 
 ```sparql
 { ?s uq:hasDistL ?gl . }
-SIMILARITYJOIN(?gl, ?gr, 0.3, 0.05)
+DIVJOIN(?gl, ?gr, 0.3, 0.05)
 { ?t uq:hasDistR ?gr . }
 ```
 
@@ -232,7 +232,7 @@ SIMILARITYJOIN(?gl, ?gr, 0.3, 0.05)
 ### 6.3 实现栈（完整流水线）
 
 ```
-SPARQL 字符串（含 FUSEJOIN/SIMILARITYJOIN 关键字）
+SPARQL 字符串（含 FUSEJOIN/DIVJOIN 关键字）
         ↓
 修改后的 JavaCC 解析器（jena-arq/src/main/javacc/sparql_11.jj）
         ↓
@@ -340,7 +340,7 @@ SPRT 测试（顺序概率比检验，SPRTSampler）
 | `MacroQ3_power_and_wear` | 电机功率 × 磨损联合查询 | ~30% | 高 |
 | `MacroQ4_full_inspection_report` | UNION 三路诊断分支 | 可变 | 极高 |
 | `JSD_loose/medium/strict` | 纯 JSD 选择性测试 | 60%/25%/5% | 中 |
-| `simjoin_benchmark` | SIMILARITYJOIN 基准 | 依数据集 | 高 |
+| `simjoin_benchmark` | DIVJOIN 基准 | 依数据集 | 高 |
 
 ---
 
@@ -381,7 +381,7 @@ SPRT 测试（顺序概率比检验，SPRTSampler）
 | `ThresholdingFunctionsTest.java` | PDF/CDF 数值正确性 |
 | `TransformationFunctionsTest.java` | Scale/Shift/Marginal 等变换 |
 | `ProbabilisticJoinTest.java` | 属性函数连接 |
-| `ProbabilisticJoinsTest.java` | FUSEJOIN/SIMILARITYJOIN 集成 |
+| `ProbabilisticJoinsTest.java` | FUSEJOIN/DIVJOIN 集成 |
 | `TestOpFuseJoinExecution.java` | OpFuseJoin 代数执行 |
 | `ProbSPARQLTest.java` | 端到端查询测试 |
 | `GMMDataLoadingTest.java` | 真实数据加载 |
@@ -421,7 +421,7 @@ mvn exec:java -Dprobsparql.mode=V5_ADAPTIVE -Dexec.mainClass="..."
 
 3. **V5 自适应采样（三阶段过滤）**：通过边界过滤 → SPRT 早停 → 分层采样三级渐进，在精度和延迟间取得最佳平衡。
 
-4. **侵入式 Jena 修改**：通过直接修改 Jena 源码（JavaCC 解析器、代数层、执行层），而非纯插件方式，以支持新语法关键字 `FUSEJOIN`/`SIMILARITYJOIN`。
+4. **侵入式 Jena 修改**：通过直接修改 Jena 源码（JavaCC 解析器、代数层、执行层），而非纯插件方式，以支持新语法关键字 `FUSEJOIN`/`DIVJOIN`。
 
 5. **物化嵌套循环连接**：当前连接实现为内存物化的嵌套循环，对大数据集存在扩展性挑战（已有 `ScalabilityBenchmark` 验证此瓶颈）。
 

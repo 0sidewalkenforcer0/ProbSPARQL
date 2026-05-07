@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SimilarityJoinSyntaxTest {
 
@@ -46,7 +47,7 @@ class SimilarityJoinSyntaxTest {
             PREFIX ex: <http://example.org/>
             SELECT * WHERE {
               { ?left ex:dist ?d1 . }
-              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              DIVJOIN(?d1, ?d2, 0.3, 0.05)
               { ?right ex:dist ?d2 . }
             }
             """;
@@ -58,6 +59,20 @@ class SimilarityJoinSyntaxTest {
         assertNotNull(similarityJoin, "Compiled algebra should contain an OpSimilarityJoin");
         assertEquals(0.3, similarityJoin.getTolerance(), 1e-12);
         assertEquals(0.05, similarityJoin.getTailProbability(), 1e-12);
+    }
+
+    @Test
+    void testLegacySimilarityJoinKeywordIsRejected() {
+        String queryString = """
+            PREFIX ex: <http://example.org/>
+            SELECT * WHERE {
+              { ?left ex:dist ?d1 . }
+              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              { ?right ex:dist ?d2 . }
+            }
+            """;
+
+        assertThrows(Exception.class, () -> QueryFactory.create(queryString, Syntax.syntaxARQ));
     }
 
     @Test
@@ -84,7 +99,7 @@ class SimilarityJoinSyntaxTest {
                 PREFIX ex: <http://example.org/>
                 SELECT * WHERE {
                   { ex:left ex:dist ?d1 . }
-                  SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+                  DIVJOIN(?d1, ?d2, 0.3, 0.05)
                   { ex:right ex:dist ?d2 . }
                 }
                 """, Syntax.syntaxARQ);
@@ -92,7 +107,7 @@ class SimilarityJoinSyntaxTest {
             try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
                 ResultSet results = qexec.execSelect();
                 assertTrue(results.hasNext(),
-                    "A four-argument SIMILARITYJOIN query should execute and return the similar pair");
+                    "A four-argument DIVJOIN query should execute and return the similar pair");
             }
         } finally {
             System.clearProperty("probsparql.mode");
@@ -127,7 +142,7 @@ class SimilarityJoinSyntaxTest {
             PREFIX ex: <http://example.org/>
             SELECT * WHERE {
               { ex:histLeft ex:dist ?d1 . }
-              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              DIVJOIN(?d1, ?d2, 0.3, 0.05)
               { ex:histRight ex:dist ?d2 . }
             }
             """, Syntax.syntaxARQ);
@@ -135,7 +150,7 @@ class SimilarityJoinSyntaxTest {
         try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
             ResultSet results = qexec.execSelect();
             assertTrue(results.hasNext(),
-                "Histogram SIMILARITYJOIN should use the polymorphic similarity path");
+                "Histogram DIVJOIN should use the polymorphic similarity path");
         }
     }
 
@@ -161,7 +176,7 @@ class SimilarityJoinSyntaxTest {
             PREFIX ex: <http://example.org/>
             SELECT * WHERE {
               { ex:dirLeft ex:dist ?d1 . }
-              SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+              DIVJOIN(?d1, ?d2, 0.3, 0.05)
               { ex:dirRight ex:dist ?d2 . }
             }
             """, Syntax.syntaxARQ);
@@ -169,7 +184,7 @@ class SimilarityJoinSyntaxTest {
         try (QueryExecution qexec = QueryExecutionFactory.create(query, model)) {
             ResultSet results = qexec.execSelect();
             assertTrue(results.hasNext(),
-                "Dirichlet SIMILARITYJOIN should use the polymorphic similarity path");
+                "Dirichlet DIVJOIN should use the polymorphic similarity path");
         }
     }
 
@@ -203,7 +218,7 @@ class SimilarityJoinSyntaxTest {
                 PREFIX ex: <http://example.org/>
                 SELECT * WHERE {
                   { ex:histPrunedLeft ex:dist ?d1 . }
-                  SIMILARITYJOIN(?d1, ?d2, 0.3, 0.05)
+                  DIVJOIN(?d1, ?d2, 0.3, 0.05)
                   { ex:histPrunedRight ex:dist ?d2 . }
                 }
                 """, Syntax.syntaxARQ);

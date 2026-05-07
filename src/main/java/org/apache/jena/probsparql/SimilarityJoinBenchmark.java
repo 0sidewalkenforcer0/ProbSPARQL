@@ -19,7 +19,7 @@ import java.util.*;
  * SimilarityJoin Performance Benchmark
  * 
  * Compares V1-V5 + GT_10K on four datasets (easy/medium/hard/mixed) using
- * the full SIMILARITYJOIN query path:
+ * the full DIVJOIN query path:
  *   JavaCC Parser → OpSimilarityJoin → QueryIterSimilarityJoin → JSDivergence
  *
  * Outputs:
@@ -155,7 +155,7 @@ public class SimilarityJoinBenchmark {
     }
 
     /**
-     * Execute SIMILARITYJOIN query through the full engine path.
+     * Execute DIVJOIN query through the full engine path.
      */
     private static int executeSimJoinQuery(Model model, String queryString) {
         Query query = QueryFactory.create(queryString);

@@ -10,9 +10,9 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.probsparql.ProbSPARQL;
 
 /**
- * QueryIterSimilarityJoinFilter: Filter iterator for legacy SIMILARITYJOIN syntax.
+ * QueryIterSimilarityJoinFilter: Filter iterator for legacy DIVJOIN syntax.
  * 
- * Legacy syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
+ * Legacy syntax: DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { }
  * - Both distribution variables are already bound in the input bindings
  * - This iterator filters bindings based on JS divergence
  * 

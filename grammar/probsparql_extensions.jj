@@ -1,7 +1,7 @@
 /**
  * ProbSPARQL JavaCC Grammar Extensions
  * 
- * This file contains the grammar rules for SIMILARITYJOIN and FUSEJOIN operators
+ * This file contains the grammar rules for DIVJOIN and FUSEJOIN operators
  * that should be merged into Jena's sparql_11.jj grammar file.
  * 
  * These extensions add support for probabilistic similarity joins based on
@@ -16,7 +16,7 @@
 TOKEN [IGNORE_CASE] :
 {
     // ProbSPARQL Extension Keywords
-    < SIMILARITYJOIN : "SIMILARITYJOIN" >
+    < SIMILARITYJOIN : "DIVJOIN" >
 |   < FUSEJOIN : "FUSEJOIN" >
 }
 
@@ -33,17 +33,17 @@ TOKEN [IGNORE_CASE] :
  */
 
 // -----------------------------------------------------------------------------
-// SIMILARITYJOIN Rule
+// DIVJOIN Rule
 // -----------------------------------------------------------------------------
 /**
- * SimilarityJoinGraphPattern: Parses SIMILARITYJOIN syntax
+ * SimilarityJoinGraphPattern: Parses DIVJOIN syntax
  * 
  * Syntax options:
  * 1. Relational semantics (binary join):
- *    { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ *    { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * 2. Legacy filter semantics (unary filter):
- *    SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
+ *    DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
  * 
  * The join condition is: JS(?leftVar, ?rightVar) <= tolerance
  * where JS is the Jensen-Shannon divergence. The tailProbability argument is

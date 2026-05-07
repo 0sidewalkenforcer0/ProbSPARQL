@@ -886,7 +886,7 @@ Element GroupGraphPatternSub() : { Element el = null ; }
       elg.addElement(el) ; } 
   )?
   (
-    // Check for relational ProbSPARQL joins: { leftPattern } FUSEJOIN/SIMILARITYJOIN(...) { rightPattern }
+    // Check for relational ProbSPARQL joins: { leftPattern } FUSEJOIN/DIVJOIN(...) { rightPattern }
     // This must be checked before GraphPatternNotTriples to catch the pattern correctly
     (
       LOOKAHEAD(GroupGraphPattern() <FUSEJOIN> <LPAREN>)
@@ -978,12 +978,12 @@ Element GraphPatternNotTriples() : { Element el = null ; }
 #endif
  |
    // ProbSPARQL Extensions
-   // Try relational semantics first: { leftPattern } FUSEJOIN/SIMILARITYJOIN(...) { rightPattern }
+   // Try relational semantics first: { leftPattern } FUSEJOIN/DIVJOIN(...) { rightPattern }
    el = RelationalFuseJoinGraphPattern()
  |
    el = RelationalSimilarityJoinGraphPattern()
  |
-   // Fallback to legacy syntax: FUSEJOIN/SIMILARITYJOIN(...) { pattern }
+   // Fallback to legacy syntax: FUSEJOIN/DIVJOIN(...) { pattern }
    el = FuseJoinGraphPattern()
  |
    el = SimilarityJoinGraphPattern()
@@ -1016,7 +1016,7 @@ Element AntiJoinGraphPattern() : { Element el ; }
 #endif
 
 // ===========================================================================
-// ProbSPARQL Extensions: FUSEJOIN and SIMILARITYJOIN
+// ProbSPARQL Extensions: FUSEJOIN and DIVJOIN
 // ===========================================================================
 
 // Relational FUSEJOIN: { leftPattern } FUSEJOIN(...) { rightPattern }
@@ -1045,7 +1045,7 @@ Element RelationalFuseJoinGraphPattern() : {
   }
 }
 
-// Relational SIMILARITYJOIN: { leftPattern } SIMILARITYJOIN(...) { rightPattern }
+// Relational DIVJOIN: { leftPattern } DIVJOIN(...) { rightPattern }
 Element RelationalSimilarityJoinGraphPattern() : {
   Element leftPattern = null ; Element rightPattern = null ;
   Var leftVar ; Var rightVar ; 
@@ -1053,7 +1053,7 @@ Element RelationalSimilarityJoinGraphPattern() : {
   Node tailProbabilityNode ; double tailProbability ;
 }
 {
-  // Lookahead to check if we have { pattern } SIMILARITYJOIN(...) { pattern }
+  // Lookahead to check if we have { pattern } DIVJOIN(...) { pattern }
   LOOKAHEAD(GroupGraphPattern() <SIMILARITYJOIN>)
   leftPattern = GroupGraphPattern()
   <SIMILARITYJOIN> <LPAREN>
@@ -1097,8 +1097,8 @@ Element FuseJoinGraphPattern() : {
   }
 }
 
-// SIMILARITYJOIN: Similarity-based join based on JS divergence
-// Syntax: SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
+// DIVJOIN: Similarity-based join based on JS divergence
+// Syntax: DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { pattern }
 // The join condition is: JS(?leftVar, ?rightVar) <= tolerance
 // Unlike FUSEJOIN, no fusion is performed - just filtering based on similarity
 Element SimilarityJoinGraphPattern() : { 
@@ -2915,7 +2915,7 @@ TOKEN [IGNORE_CASE] :
 
 // ProbSPARQL Extension Tokens (must be before other keywords to ensure proper matching)
 ||  < FUSEJOIN:        "FUSEJOIN" >
-||  < SIMILARITYJOIN:  "SIMILARITYJOIN" >
+||  < SIMILARITYJOIN:  "DIVJOIN" >
 #ifdef ARQ
 |  < LET:         "LET" >
 |  < LATERAL:     "lateral" >

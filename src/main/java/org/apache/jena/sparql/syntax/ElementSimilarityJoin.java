@@ -3,10 +3,10 @@ package org.apache.jena.sparql.syntax;
 import org.apache.jena.sparql.util.NodeIsomorphismMap;
 
 /**
- * Syntax element representing SIMILARITYJOIN pattern in SPARQL query.
+ * Syntax element representing DIVJOIN pattern in SPARQL query.
  * 
  * Relational syntax:
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  * 
  * This represents a true binary join operation where:
  * - leftPattern generates the left table

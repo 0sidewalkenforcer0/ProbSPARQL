@@ -16,7 +16,7 @@ package org.apache.jena.sparql.syntax;
  * public class MyVisitor extends ElementVisitorBase implements ElementVisitorProbabilistic {
  *     @Override
  *     public void visit(ElementSimilarityJoin el) {
- *         // Handle SIMILARITYJOIN
+ *         // Handle DIVJOIN
  *     }
  *     
  *     @Override
@@ -42,4 +42,3 @@ public interface ElementVisitorProbabilistic extends ElementVisitor {
      */
     void visit(ElementFuseJoin el);
 }
-

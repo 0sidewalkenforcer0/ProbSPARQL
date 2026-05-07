@@ -50,6 +50,60 @@ private int jjStopAtPos(int pos, int kind)
    jjmatchedPos = pos;
    return pos + 1;
 }
+private boolean isDivJoinBoundary(int c)
+{
+   return !Character.isLetterOrDigit(c) && c != '_' && c != '-' && c != ':';
+}
+private Token tryDivJoinToken(Token specialToken)
+{
+   if (curChar != 'D' && curChar != 'd')
+      return null;
+
+   final String rest = "IVJOIN";
+   int consumed = 0;
+   try
+   {
+      for (int i = 0; i < rest.length(); i++)
+      {
+         curChar = input_stream.readChar();
+         consumed++;
+         if (Character.toUpperCase((char)curChar) != rest.charAt(i))
+         {
+            input_stream.backup(consumed);
+            return null;
+         }
+      }
+
+      try
+      {
+         curChar = input_stream.readChar();
+         consumed++;
+         if (!isDivJoinBoundary(curChar))
+         {
+            input_stream.backup(consumed);
+            return null;
+         }
+         input_stream.backup(1);
+      }
+      catch(java.io.IOException e)
+      {
+         // EOF after DIVJOIN is still a complete keyword token.
+      }
+
+      Token t = Token.newToken(SIMILARITYJOIN, input_stream.GetImage());
+      t.beginLine = input_stream.getBeginLine();
+      t.beginColumn = input_stream.getBeginColumn();
+      t.endLine = input_stream.getEndLine();
+      t.endColumn = input_stream.getEndColumn();
+      t.specialToken = specialToken;
+      return t;
+   }
+   catch(java.io.IOException e)
+   {
+      input_stream.backup(consumed);
+      return null;
+   }
+}
 private int jjMoveStringLiteralDfa0_0(){
    switch(curChar)
    {
@@ -4537,8 +4591,11 @@ protected Token jjFillToken()
    final int endLine;
    final int beginColumn;
    final int endColumn;
+   String actualImage = input_stream.GetImage();
+   if (jjmatchedKind == SIMILARITYJOIN && !"DIVJOIN".equalsIgnoreCase(actualImage))
+      throw new TokenMgrError("The SIMILARITYJOIN keyword has been replaced by DIVJOIN", TokenMgrError.LEXICAL_ERROR);
    String im = jjstrLiteralImages[jjmatchedKind];
-   curTokenImage = (im == null) ? input_stream.GetImage() : im;
+   curTokenImage = (im == null) ? actualImage : im;
    beginLine = input_stream.getBeginLine();
    beginColumn = input_stream.getBeginColumn();
    endLine = input_stream.getEndLine();
@@ -4905,6 +4962,10 @@ public Token getNextToken()
       matchedToken.specialToken = specialToken;
       return matchedToken;
    }
+
+   matchedToken = tryDivJoinToken(specialToken);
+   if (matchedToken != null)
+      return matchedToken;
 
    jjmatchedKind = 0x7fffffff;
    jjmatchedPos = 0;

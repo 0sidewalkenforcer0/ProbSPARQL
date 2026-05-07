@@ -18,7 +18,7 @@ import org.apache.jena.sparql.engine.iterator.QueryIterSimilarityJoinFilter;
  * 
  * Updated for new relational semantics (dual-input nested loop join):
  * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
- * { leftPattern } SIMILARITYJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
+ * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  */
 public class OpExecutorProbabilistic extends OpExecutor {
     
@@ -122,11 +122,11 @@ public class OpExecutorProbabilistic extends OpExecutor {
      * 1. Legacy mode (leftOp == rightOp): Filter mode - both variables are in same binding
      * 2. New mode (leftOp != rightOp): Nested loop join - left and right are independent patterns
      * 
-     * Legacy mode: SIMILARITYJOIN(?d1, ?d2, tolerance, tailProbability) { }
+     * Legacy mode: DIVJOIN(?d1, ?d2, tolerance, tailProbability) { }
      * - All variables bound in single BGP
      * - Apply JS divergence filter to existing bindings
      * 
-     * New mode: { leftPattern } SIMILARITYJOIN(?d1, ?d2, tolerance, tailProbability) { rightPattern }
+     * New mode: { leftPattern } DIVJOIN(?d1, ?d2, tolerance, tailProbability) { rightPattern }
      * - Execute left and right patterns independently
      * - Nested loop join with JS divergence predicate
      */

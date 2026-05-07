@@ -38,7 +38,7 @@ public class PerformanceBenchmark {
         "Probabilistic Comparison (JS/KL)",
         "Distribution Transformation",
         "Distribution Manipulation",
-        "SIMILARITYJOIN",
+        "DIVJOIN",
         "FUSEJOIN"
     };
     
