@@ -37,7 +37,10 @@
 
     * {
       box-sizing: border-box;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    button, a, .tab-button, input[type="range"], input[type="file"] + .file-upload-button,
+    .stat, .pane, .upload-progress-fill, #engineMonitor, .export-csv-btn, .add-query-btn {
+      transition: color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s, transform 0.2s, box-shadow 0.2s, width 0.3s;
     }
 
     body {
@@ -281,6 +284,104 @@
       color: #000;
     }
 
+    .upload-progress-wrap {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .upload-progress-wrap.visible {
+      display: block;
+    }
+
+    .upload-progress-track {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .upload-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), #fff8a0);
+      border-radius: 4px;
+      transition: width 0.15s ease;
+    }
+
+    .upload-progress-label {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--primary);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .uploaded-files-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .uploaded-file-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--success);
+      animation: fadeInUp 0.25s ease;
+    }
+
+    .uploaded-file-item .uf-icon {
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .uploaded-file-item .uf-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .uploaded-file-item .uf-size {
+      font-size: 10px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .query-file-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: rgba(237, 183, 14, 0.08);
+      border: 1px solid rgba(237, 183, 14, 0.3);
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--primary);
+      max-width: 260px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .query-file-badge.visible {
+      display: flex;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     #ttlFile {
       position: absolute;
       width: 100%;
@@ -336,6 +437,12 @@
       background: rgba(255, 255, 255, 0.05);
       border-color: #fff;
       transform: translateY(-2px);
+    }
+
+    .add-query-btn {
+      white-space: nowrap;
+      font-size: 0.82rem;
+      gap: 5px;
     }
 
     button:disabled {
@@ -402,6 +509,79 @@
       resize: none;
       min-height: 500px;
       caret-color: var(--primary);
+    }
+
+    /* ── CodeMirror integration ─────────────────────────────── */
+    .CodeMirror {
+      flex: 1;
+      height: auto;
+      min-height: 460px;
+      font-family: var(--font-mono) !important;
+      font-size: 15px !important;
+      line-height: 1.6 !important;
+      background: #000 !important;
+      color: #7dd3fc !important;
+    }
+    .CodeMirror-scroll { min-height: 460px; }
+    .CodeMirror-gutters { background: #050a14 !important; border-right: 1px solid var(--border) !important; }
+    .CodeMirror-linenumber { color: #3d526a !important; padding: 0 8px !important; }
+    .CodeMirror-cursor { border-left: 2px solid var(--primary) !important; }
+    .CodeMirror-selected { background: rgba(237,183,14,0.12) !important; }
+    .CodeMirror-matchingbracket { color: var(--primary) !important; font-weight: bold; }
+    /* SPARQL token colours */
+    .cm-keyword   { color: #c792ea !important; font-weight: 600; }
+    .cm-variable  { color: #82aaff !important; }
+    .cm-string    { color: #c3e88d !important; }
+    .cm-comment   { color: #546e7a !important; font-style: italic; }
+    .cm-number    { color: #f78c6c !important; }
+    .cm-atom      { color: #ff5370 !important; }
+    .cm-operator  { color: #89ddff !important; }
+    .cm-uri       { color: #80cbc4 !important; }
+    .cm-prefixed-name { color: #7dd3fc !important; }
+    .cm-prefix    { color: #ffcb6b !important; }
+    /* ── Query history dropdown ──────────────────────────────── */
+    .query-history-wrap { position: relative; }
+    .query-history-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 300;
+      background: #0d1526; border: 1px solid var(--border-bright);
+      border-radius: var(--radius-md); min-width: 360px; max-width: 520px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    .qh-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--primary);
+    }
+    .qh-clear-btn {
+      background: none; border: none; color: var(--text-muted); cursor: pointer;
+      font-size: 11px; padding: 2px 6px; border-radius: 4px;
+    }
+    .qh-clear-btn:hover { color: var(--danger); background: rgba(239,68,68,.1); }
+    .qh-list { list-style: none; margin: 0; padding: 4px 0; max-height: 280px; overflow-y: auto; }
+    .qh-item {
+      padding: 8px 14px; cursor: pointer; font-size: 12px;
+      font-family: var(--font-mono); color: var(--text-muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .qh-item:hover { background: rgba(237,183,14,.07); color: var(--text-main); }
+    .qh-empty { padding: 14px; text-align: center; font-size: 12px; color: var(--text-muted); }
+    /* ── Triples search ──────────────────────────────────────── */
+    .triples-search-input {
+      background: rgba(255,255,255,.05); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-main);
+      font-size: 12px; padding: 4px 10px; width: 160px;
+      font-family: var(--font-mono); outline: none;
+    }
+    .triples-search-input:focus { border-color: var(--primary); }
+    .triples-search-input::placeholder { color: var(--text-muted); }
+    /* ── Graph operation hint ────────────────────────────────── */
+    .graph-hint {
+      font-size: 11px; color: var(--text-muted);
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 4px 10px;
+      white-space: nowrap;
     }
 
     .status {
@@ -773,6 +953,195 @@
       word-break: break-word;
     }
 
+    /* ── Distribution Visualisation ─────────────────────────────── */
+    .workbench.viz-open { grid-template-columns: 1fr 1fr 350px; }
+    .dist-viz-pane { min-width: 0; }
+    .dist-viz-header { justify-content: space-between; }
+    .dist-viz-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 7px;
+      font-size: 18px;
+      line-height: 1;
+      border-radius: 4px;
+      min-width: unset;
+      box-shadow: none;
+      transform: none;
+    }
+    .dist-viz-close:hover { color: #fff; background: rgba(255,255,255,0.08); transform: none !important; }
+    .dist-viz-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .dist-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+    }
+    .dist-type-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-left: 8px;
+      background: rgba(237,183,14,0.12);
+      color: var(--primary);
+      border: 1px solid var(--primary-glow);
+    }
+    .dist-viz-varname {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .dist-summary {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.9;
+      background: rgba(0,0,0,0.2);
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .dist-summary strong { color: #e2e8f0; }
+    .dist-rot-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 2px 2px;
+    }
+    .dist-rot-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      flex-shrink: 0;
+    }
+    .dist-rot-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: rgba(237,183,14,0.2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+    }
+    .dist-rot-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 6px rgba(237,183,14,0.5);
+    }
+    .dist-rot-slider::-moz-range-thumb {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: none;
+      cursor: pointer;
+    }
+    .dist-rot-val {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #94a3b8;
+      min-width: 30px;
+      text-align: right;
+    }
+
+    /* Export CSV button */
+    .export-csv-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      box-shadow: none;
+    }
+    .export-csv-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: rgba(237,183,14,0.07);
+      transform: none;
+    }
+
+    /* Sortable table headers */
+    th.sortable { cursor: pointer; user-select: none; -webkit-user-select: none; }
+    th.sortable:hover { color: #fff; }
+    th.sort-asc::after  { content: " ↑"; font-size: 10px; opacity: 0.7; }
+    th.sort-desc::after { content: " ↓"; font-size: 10px; opacity: 0.7; }
+
+    /* Engine offline style */
+    .engine-offline #engineMonitor {
+      border-left-color: var(--danger);
+      background: rgba(239,68,68,0.05);
+    }
+    .engine-offline .monitor-label { color: var(--danger); }
+    .engine-offline .monitor-value { text-shadow: 0 0 10px rgba(239,68,68,0.3); }
+    .engine-offline #enginePulseDot {
+      background: var(--danger);
+      box-shadow: 0 0 15px var(--danger), 0 0 30px var(--danger);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--success);
+      color: var(--success);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast.toast-error {
+      background: rgba(239,68,68,0.12);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    td.dist-clickable { cursor: pointer; max-width: 200px; }
+    td.dist-clickable:hover { background: rgba(237,183,14,0.07) !important; }
+    .dist-cell-inner { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11px; }
+    .dist-cell-indicator {
+      flex-shrink: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 5px var(--primary);
+    }
+    .dist-cell-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
     .graph-link-label {
       fill: #64748b;
       font-size: 9px;
@@ -806,19 +1175,21 @@
       .stats { grid-template-columns: 1fr; }
     }
   </style>
+  <!-- CodeMirror 5 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css">
 </head>
 <body>
   <header>
     <div class="header-left">
-      <h1 id="mainTitle">Circular factory demostration between B02, B03, and A03</h1>
+      <h1 id="mainTitle">Circular Factory Hackathon</h1>
       <p style="margin: 6px 0 0; font-size: 13px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;">Probabilistic Knowledge Discovery Engine</p>
     </div>
     <div class="header-right" style="display: flex; align-items: center; gap: 24px;">
-      <div class="system-monitor">
+      <div class="system-monitor" id="engineMonitor">
         <div class="monitor-label">Core Engine Status</div>
         <div class="monitor-value">
-          <span class="pulse-dot"></span>
-          Synchronized
+          <span id="enginePulseDot" class="pulse-dot"></span>
+          <span id="engineStatus">Connecting...</span>
         </div>
       </div>
     </div>
@@ -845,6 +1216,28 @@
         <div class="control-row">
           <label for="querySelect">Query</label>
           <select id="querySelect"></select>
+          <span id="queryFileBadge" class="query-file-badge">
+            <svg style="width:12px;height:12px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span id="queryFileBadgeText"></span>
+          </span>
+          <input type="file" id="sparqlFile" accept=".sparql,.rq" style="display:none">
+          <button class="secondary add-query-btn" type="button" onclick="document.getElementById('sparqlFile').click()" title="Upload a .sparql or .rq file to add it to the query list">
+            <svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add Query
+          </button>
+          <div class="query-history-wrap">
+            <button id="queryHistoryBtn" class="secondary" type="button" title="Show recent queries">
+              <svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              History
+            </button>
+            <div id="queryHistoryDropdown" class="query-history-dropdown" style="display:none">
+              <div class="qh-header">
+                <span>Recent Queries</span>
+                <button id="queryHistoryClear" class="qh-clear-btn" type="button">Clear All</button>
+              </div>
+              <ul id="queryHistoryList" class="qh-list"></ul>
+            </div>
+          </div>
           <button id="reset" class="secondary" type="button">Reset</button>
         </div>
         <button id="run" type="button">
@@ -853,7 +1246,7 @@
         </button>
       </div>
 
-      <section class="workbench">
+      <section id="queryWorkbench" class="workbench">
         <div class="pane">
           <div class="pane-title">
             <span>SPARQL</span>
@@ -863,10 +1256,33 @@
         </div>
 
         <div class="pane">
-          <div class="pane-title">Results</div>
+          <div class="pane-title">
+            Results
+            <button id="exportCsvBtn" class="export-csv-btn" title="Export results as CSV" style="display:none">
+              <svg style="width:13px;height:13px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV
+            </button>
+          </div>
           <div id="status" class="status">Ready</div>
           <div id="result" class="result">
             <pre>No result</pre>
+          </div>
+        </div>
+
+        <div id="distVizPane" class="pane dist-viz-pane" style="display:none">
+          <div class="pane-title dist-viz-header">
+            <span>Distribution <span id="distVizTypeBadge" class="dist-type-badge">GMM</span></span>
+            <button id="distVizClose" class="dist-viz-close" title="Close panel">✕</button>
+          </div>
+          <div class="dist-viz-body">
+            <div id="distVizVarName" class="dist-viz-varname"></div>
+            <div id="distVizRotRow" class="dist-rot-row" style="display:none">
+              <span class="dist-rot-label">Rotate</span>
+              <input type="range" id="distVizRot" min="0" max="360" value="0" step="1" class="dist-rot-slider">
+              <span id="distVizRotLabel" class="dist-rot-val">0°</span>
+            </div>
+            <svg id="distVizSvg" class="dist-svg" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid meet"></svg>
+            <div id="distVizSummary" class="dist-summary"></div>
           </div>
         </div>
       </section>
@@ -877,10 +1293,18 @@
         <div class="dataset-toolbar">
           <h2>Data Upload</h2>
           <div class="import-row">
-            <div class="file-upload-container">
-              <span id="fileNameLabel" class="file-upload-label">Initialize Data Stream (.TTL)</span>
-              <div class="file-upload-button">Select Source</div>
-              <input id="ttlFile" type="file" accept=".ttl,text/turtle">
+            <div>
+              <div class="file-upload-container">
+                <span id="fileNameLabel" class="file-upload-label">Initialize Data Stream (.TTL)</span>
+                <div class="file-upload-button">Select Source</div>
+                <input id="ttlFile" type="file" accept=".ttl,text/turtle">
+              </div>
+              <div id="uploadProgressWrap" class="upload-progress-wrap">
+                <div class="upload-progress-track">
+                  <div id="uploadProgressFill" class="upload-progress-fill"></div>
+                </div>
+                <div id="uploadProgressLabel" class="upload-progress-label">Uploading... 0%</div>
+              </div>
             </div>
             
             <button id="uploadTtl" type="button">
@@ -893,6 +1317,7 @@
               Refresh Engine
             </button>
           </div>
+          <div id="uploadedFilesList" class="uploaded-files-list"></div>
         </div>
 
         <div class="stats">
@@ -924,7 +1349,10 @@
           </div>
 
           <div class="pane">
-            <div class="pane-title">Triples</div>
+            <div class="pane-title">
+              Triples
+              <input id="triplesSearch" type="text" placeholder="Filter triples..." class="triples-search-input">
+            </div>
             <div id="tripleStatus" class="status">Ready</div>
             <div id="tripleResult" class="table-wrap">
               <pre>No result</pre>
@@ -953,6 +1381,7 @@
               <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
               Reset View
             </button>
+            <div class="graph-hint">Drag to pan · Scroll to zoom · Click node for details · Double-click to expand</div>
           </div>
         </div>
 
@@ -974,6 +1403,12 @@
       </section>
     </section>
   </main>
+
+  <div id="toastEl" class="toast"></div>
+
+  <!-- CodeMirror 5 JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/sparql/sparql.min.js"></script>
 
   <script>
     const endpoint = "/probsparql/query";
@@ -1015,6 +1450,54 @@ WHERE {
   FILTER(?hardnessCdf > 0.9)
 }
 ORDER BY ?bevelLabel`
+      },
+      {
+        id: "fein-variant-id",
+        label: "FEIN Variant Identification",
+        source: "realusecase/fein_demo/query_most_likely_fein_variant.sparql",
+        query: `# FEIN demo query:
+# Identify the most likely FEIN angle grinder variant for an unknown grinder
+# by fusing GMM classification similarity with tooth-length and hardness JSD scores.
+# Weights: 50% classification, 25% tooth length, 25% hardness.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
+PREFIX om:   <http://example.org/ontology/om#>
+PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX prob: <http://probsparql.org/function#>
+PREFIX ex:   <http://example.org/data/fein-demo/>
+
+SELECT ?unknownGrinder ?candidateVariant ?finalScore
+WHERE {
+    ?unknownGrinder a ag:AngleGrinder ; ag:hasPart ?unknownGear .
+    ?unknownGear a ag:CrownGear .
+    ?unknownGear ag:hasToothLengthCharacteristic ?utlChar .
+    ?utlMeas cfm:measuresCharacteristic ?utlChar ; uq:representedBy ?utlRV .
+    ?utlRV uq:hasDistribution ?unknownToothDist .
+    ?unknownGear ag:hasHardnessCharacteristic ?uhChar .
+    ?uhMeas cfm:measuresCharacteristic ?uhChar ; uq:representedBy ?uhRV .
+    ?uhRV uq:hasDistribution ?unknownHardDist .
+    ?unknownGrinder ag:hasClassificationGMM ?classGMMRV .
+    ?classGMMRV uq:hasDistribution ?classGMMDist .
+    ?candidateVariant ag:hasTypeClassPrototype ?protoRV .
+    ?protoRV uq:hasDistribution ?protoDist .
+    ?candidateVariant ag:hasTypeToothLengthDistribution ?typeToothRV .
+    ?typeToothRV uq:hasDistribution ?typeToothDist .
+    ?candidateVariant ag:hasTypeHardnessDistribution ?typeHardRV .
+    ?typeHardRV uq:hasDistribution ?typeHardDist .
+    BIND( prob:jsd(?classGMMDist, ?protoDist) AS ?classJSD )
+    BIND( prob:jsd(?unknownToothDist, ?typeToothDist) AS ?toothJSD )
+    BIND( prob:jsd(?unknownHardDist, ?typeHardDist) AS ?hardnessJSD )
+    BIND( 1.0 / (1.0 + ?classJSD) AS ?classScore )
+    BIND( 1.0 / (1.0 + ?toothJSD) AS ?toothSimilarity )
+    BIND( 1.0 / (1.0 + ?hardnessJSD) AS ?hardnessSimilarity )
+    BIND( 0.50 * ?classScore + 0.25 * ?toothSimilarity + 0.25 * ?hardnessSimilarity AS ?finalScore )
+    FILTER( BOUND(?toothJSD) && BOUND(?hardnessJSD) )
+}
+ORDER BY ?unknownGrinder DESC(?finalScore)`
       }
     ];
 
@@ -1052,6 +1535,28 @@ LIMIT 60`
     const uploadTtlButton = document.getElementById("uploadTtl");
     const ttlFileInput = document.getElementById("ttlFile");
     const fileNameLabel = document.getElementById("fileNameLabel");
+    const uploadProgressWrap = document.getElementById("uploadProgressWrap");
+    const uploadProgressFill = document.getElementById("uploadProgressFill");
+    const uploadProgressLabel = document.getElementById("uploadProgressLabel");
+    const uploadedFilesList = document.getElementById("uploadedFilesList");
+    const queryFileBadge = document.getElementById("queryFileBadge");
+    const queryFileBadgeText = document.getElementById("queryFileBadgeText");
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function addUploadedFile(file) {
+      const item = document.createElement("div");
+      item.className = "uploaded-file-item";
+      item.innerHTML = `
+        <span class="uf-icon">✓</span>
+        <span class="uf-name">${file.name}</span>
+        <span class="uf-size">${formatBytes(file.size)}</span>`;
+      uploadedFilesList.appendChild(item);
+    }
 
     ttlFileInput.addEventListener("change", () => {
       const file = ttlFileInput.files && ttlFileInput.files[0];
@@ -1062,11 +1567,13 @@ LIMIT 60`
         fileNameLabel.textContent = "Initialize Data Stream (.TTL)";
         fileNameLabel.style.color = "var(--text-muted)";
       }
+      uploadProgressWrap.classList.remove("visible");
+      uploadProgressFill.style.width = "0%";
     });
 
     const querySelect = document.getElementById("querySelect");
     const queryName = document.getElementById("queryName");
-    const queryInput = document.getElementById("query");
+    let queryInput = document.getElementById("query");
     const statusNode = document.getElementById("status");
     const resultNode = document.getElementById("result");
     const typeStatusNode = document.getElementById("typeStatus");
@@ -1122,6 +1629,70 @@ LIMIT 60`
     function setQuery(entry) {
       queryInput.value = entry.query;
       queryName.textContent = entry.source;
+      // Persist draft to sessionStorage
+      try { sessionStorage.setItem("probsparql_draft", entry.query); } catch(_){}
+    }
+
+    // ── SPARQL error parser ──────────────────────────────────────
+    function parseSparqlError(raw) {
+      // Strip Java stack trace lines
+      const lines = raw.split("\n").filter(l => !/^\s+at /.test(l) && !l.includes(".java:"));
+      let msg = lines.slice(0, 3).join(" ").replace(/\s+/g, " ").trim();
+      // Highlight common issues
+      if (/unrecognized|unexpected token/i.test(msg)) {
+        msg = "⚠️ Syntax error — " + msg.substring(0, 160);
+      } else if (/parse error/i.test(msg)) {
+        const loc = msg.match(/line (\d+)/i);
+        msg = "⚠️ Parse error" + (loc ? " at line " + loc[1] : "") + " — " + msg.substring(0, 120);
+      } else if (/undefined prefix/i.test(msg) || /prefix.*not.*defined/i.test(msg)) {
+        const pfx = msg.match(/prefix[:\s]+([\w]+)/i);
+        msg = "⚠️ Undefined PREFIX" + (pfx ? " '" + pfx[1] + ":' — add it to the query header" : "");
+      } else if (/HTTP 4/.test(msg)) {
+        msg = "⚠️ Server rejected query (" + (msg.match(/HTTP \d+/) || [""])[0] + ") — " + msg.substring(0, 100);
+      }
+      return msg.substring(0, 240) || raw.substring(0, 240);
+    }
+
+    // ── Query history (localStorage) ────────────────────────────
+    const HISTORY_KEY = "probsparql_history";
+    function loadHistory() {
+      try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch(_) { return []; }
+    }
+    function saveHistory(queries) {
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(queries)); } catch(_) {}
+    }
+    function pushHistory(text) {
+      const h = loadHistory().filter(q => q !== text);
+      h.unshift(text);
+      saveHistory(h.slice(0, 10));
+    }
+    function renderHistoryDropdown() {
+      const list = document.getElementById("queryHistoryList");
+      const h = loadHistory();
+      if (!h.length) {
+        list.innerHTML = '<li class="qh-empty">No recent queries yet</li>';
+        return;
+      }
+      list.innerHTML = h.map((q, i) => {
+        const preview = q.replace(/^#[^\n]*\n/gm, "").replace(/\s+/g, " ").trim().substring(0, 80);
+        return `<li class="qh-item" data-idx="${i}" title="${q.replace(/"/g, '&quot;')}">${preview}…</li>`;
+      }).join("");
+      list.querySelectorAll(".qh-item").forEach(li => {
+        li.addEventListener("click", () => {
+          const idx = Number(li.dataset.idx);
+          queryInput.value = loadHistory()[idx] || "";
+          document.getElementById("queryHistoryDropdown").style.display = "none";
+        });
+      });
+    }
+
+    function updateQueryFileBadge(entry) {
+      if (entry && entry.source) {
+        queryFileBadgeText.textContent = entry.source.split("/").pop();
+        queryFileBadge.classList.add("visible");
+      } else {
+        queryFileBadge.classList.remove("visible");
+      }
     }
 
     function populateQuerySelect() {
@@ -1132,16 +1703,32 @@ LIMIT 60`
         querySelect.appendChild(option);
       });
       setQuery(exampleQueries[0]);
+      updateQueryFileBadge(exampleQueries[0]);
     }
 
-    async function sparql(query) {
+    // Active abort controller for the running query
+    let _queryAbort = null;
+
+    // Toast notification
+    function showToast(msg, isError = false) {
+      const el = document.getElementById("toastEl");
+      el.textContent = msg;
+      el.className = "toast" + (isError ? " toast-error" : "");
+      void el.offsetWidth;
+      el.classList.add("show");
+      clearTimeout(el._timer);
+      el._timer = setTimeout(() => el.classList.remove("show"), 3000);
+    }
+
+    async function sparql(query, signal) {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/sparql-query",
           "Accept": "application/sparql-results+json, application/json"
         },
-        body: query
+        body: query,
+        signal
       });
       const text = await response.text();
       if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
@@ -1205,9 +1792,37 @@ LIMIT 60`
       const table = document.createElement("table");
       const thead = document.createElement("thead");
       const headerRow = document.createElement("tr");
-      vars.forEach((name) => {
+      // Sort state
+      let sortCol = null, sortDir = 1;
+      function applySortToTbody(tbody) {
+        if (sortCol === null) return;
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        rows.sort((a, b) => {
+          const av = a.cells[sortCol] ? a.cells[sortCol].dataset.raw || a.cells[sortCol].textContent : "";
+          const bv = b.cells[sortCol] ? b.cells[sortCol].dataset.raw || b.cells[sortCol].textContent : "";
+          const an = parseFloat(av), bn = parseFloat(bv);
+          if (!isNaN(an) && !isNaN(bn)) return (an - bn) * sortDir;
+          return av.localeCompare(bv) * sortDir;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      }
+      let tbodyRef = null;
+      vars.forEach((name, colIdx) => {
         const th = document.createElement("th");
         th.textContent = name;
+        th.className = "sortable";
+        th.title = `Sort by ${name}`;
+        th.addEventListener("click", () => {
+          if (sortCol === colIdx) {
+            sortDir = -sortDir;
+            th.className = "sortable " + (sortDir === 1 ? "sort-asc" : "sort-desc");
+          } else {
+            headerRow.querySelectorAll("th").forEach(t => t.className = "sortable");
+            sortCol = colIdx; sortDir = 1;
+            th.className = "sortable sort-asc";
+          }
+          if (tbodyRef) applySortToTbody(tbodyRef);
+        });
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
@@ -1218,11 +1833,33 @@ LIMIT 60`
         const tr = document.createElement("tr");
         vars.forEach((name) => {
           const td = document.createElement("td");
-          td.textContent = row[name] ? row[name].value : "";
+          const raw = row[name];
+          const term = raw ? { value: raw.value || "", type: raw.type || "", datatype: raw.datatype || "" } : null;
+          if (term && isDistLiteral(term)) {
+            td.className = "dist-clickable";
+            td.title = "Click to visualise distribution";
+            const inner = document.createElement("div");
+            inner.className = "dist-cell-inner";
+            const dot = document.createElement("span");
+            dot.className = "dist-cell-indicator";
+            const lbl = document.createElement("span");
+            lbl.className = "dist-cell-text";
+            lbl.textContent = shorten(term.value, 42);
+            inner.appendChild(dot);
+            inner.appendChild(lbl);
+            td.appendChild(inner);
+            td.addEventListener("click", () => showDistViz(term, name));
+          } else {
+            const v = term ? term.value : "";
+            td.textContent = v;
+            td.dataset.raw = v;
+          }
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
       });
+      tbodyRef = tbody;
+      if (sortCol !== null) applySortToTbody(tbody);
       table.appendChild(tbody);
       target.appendChild(table);
       return bindings.length;
@@ -1237,22 +1874,42 @@ LIMIT 60`
 
       uploadTtlButton.disabled = true;
       setStatus(tripleStatusNode, `Uploading ${file.name}...`);
+      uploadProgressFill.style.width = "0%";
+      uploadProgressLabel.textContent = "Uploading... 0%";
+      uploadProgressWrap.classList.add("visible");
+
       try {
-        const response = await fetch("/probsparql", {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/turtle",
-            "Accept": "application/json"
-          },
-          body: file
+        await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/probsparql");
+          xhr.setRequestHeader("Content-Type", "text/turtle");
+          xhr.setRequestHeader("Accept", "application/json");
+          xhr.upload.addEventListener("progress", (e) => {
+            if (e.lengthComputable) {
+              const pct = Math.round((e.loaded / e.total) * 100);
+              uploadProgressFill.style.width = pct + "%";
+              uploadProgressLabel.textContent = `Uploading... ${pct}%`;
+            }
+          });
+          xhr.addEventListener("load", () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              uploadProgressFill.style.width = "100%";
+              uploadProgressLabel.textContent = "Upload complete ✓";
+              resolve(xhr.responseText);
+            } else {
+              reject(new Error(xhr.responseText || `HTTP ${xhr.status}`));
+            }
+          });
+          xhr.addEventListener("error", () => reject(new Error("Network error")));
+          xhr.send(file);
         });
-        const text = await response.text();
-        if (!response.ok) {
-          throw new Error(text || `HTTP ${response.status}`);
-        }
+
+        addUploadedFile(file);
+        showToast(`Uploaded ${file.name} ✓`);
         fileNameLabel.textContent = "Initialize Data Stream (.TTL)";
         fileNameLabel.style.color = "var(--text-muted)";
         ttlFileInput.value = "";
+        setTimeout(() => uploadProgressWrap.classList.remove("visible"), 2000);
         await refreshDataset();
         graphNeedsRefresh = true;
         if (activeTab === "graph") {
@@ -1262,6 +1919,7 @@ LIMIT 60`
         }
         setStatus(tripleStatusNode, `Uploaded ${file.name}`);
       } catch (error) {
+        uploadProgressWrap.classList.remove("visible");
         renderFallback(tripleResultNode, error.message);
         setStatus(tripleStatusNode, "TTL upload failed", true);
       } finally {
@@ -1269,17 +1927,53 @@ LIMIT 60`
       }
     }
 
+    // Last data snapshot for CSV export
+    let _lastQueryJson = null;
+
     async function runQuery() {
-      runButton.disabled = true;
+      // If already running, cancel it
+      if (_queryAbort) {
+        _queryAbort.abort();
+        _queryAbort = null;
+        runButton.textContent = "";
+        const icon = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        icon.setAttribute("viewBox","0 0 24 24"); icon.setAttribute("fill","none");
+        icon.setAttribute("stroke","currentColor"); icon.setAttribute("stroke-width","2.5");
+        icon.setAttribute("stroke-linecap","round"); icon.setAttribute("stroke-linejoin","round");
+        icon.style.cssText = "width:16px;height:16px";
+        const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
+        poly.setAttribute("points","5 3 19 12 5 21 5 3");
+        icon.appendChild(poly);
+        runButton.appendChild(icon);
+        runButton.appendChild(document.createTextNode(" Query"));
+        runButton.disabled = false;
+        setStatus(statusNode, "Cancelled");
+        return;
+      }
+      _queryAbort = new AbortController();
+      // Change button to Stop
+      runButton.innerHTML = `<svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg> Stop`;
       setStatus(statusNode, "Running...");
+      document.getElementById("exportCsvBtn").style.display = "none";
+      const t0 = Date.now();
       try {
-        const json = await sparql(queryInput.value);
+        const queryText = queryInput.value;
+        const json = await sparql(queryText, _queryAbort.signal);
+        _lastQueryJson = json;
+        pushHistory(queryText);
         const count = renderTable(resultNode, json);
-        setStatus(statusNode, `${count} result row${count === 1 ? "" : "s"}`);
+        const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
+        setStatus(statusNode, `${count} result row${count === 1 ? "" : "s"} · ${elapsed}s`);
+        document.getElementById("exportCsvBtn").style.display = count > 0 ? "" : "none";
       } catch (error) {
-        renderFallback(resultNode, error.message);
-        setStatus(statusNode, "Query failed", true);
+        if (error.name === "AbortError") return;
+        _lastQueryJson = null;
+        const friendlyMsg = parseSparqlError(error.message);
+        renderFallback(resultNode, friendlyMsg);
+        setStatus(statusNode, "Query failed: " + friendlyMsg.replace(/^\u26a0\ufe0f /, ""), true);
       } finally {
+        _queryAbort = null;
+        runButton.innerHTML = `<svg style="width:16px;height:16px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Query`;
         runButton.disabled = false;
       }
     }
@@ -1375,6 +2069,423 @@ LIMIT 60`
       } catch (error) {
         return "";
       }
+    }
+
+    // ── Distribution Visualisation ──────────────────────────────────
+    function isDistLiteral(term) {
+      if (!term || term.type !== "literal" || !term.datatype) return false;
+      return /gmmLiteral|histLiteral|dirichletLiteral/.test(term.datatype);
+    }
+
+    function distLiteralType(term) {
+      const dt = term.datatype || "";
+      if (dt.includes("gmmLiteral")) return "gmm";
+      if (dt.includes("histLiteral")) return "hist";
+      if (dt.includes("dirichletLiteral")) return "dirichlet";
+      return null;
+    }
+
+    const DVW = 320, DVH = 200;
+    const DVM = { l: 46, r: 14, t: 14, b: 34 };
+    const DVpW = DVW - DVM.l - DVM.r;  // 260
+    const DVpH = DVH - DVM.t - DVM.b;  // 152
+
+    function dvX(x, lo, hi) { return DVM.l + (x - lo) / (hi - lo) * DVpW; }
+    function dvY(y, lo, hi) { return DVM.t + DVpH - (y - lo) / (hi - lo) * DVpH; }
+
+    function fmtTick(v) {
+      if (v === 0) return "0";
+      const a = Math.abs(v);
+      if (a >= 1000) return v.toExponential(1);
+      if (a >= 10)   return v.toFixed(1);
+      if (a >= 0.01) return v.toFixed(3);
+      return v.toExponential(1);
+    }
+
+    function dvAxes(parts, xLo, xHi, yLo, yHi) {
+      const bY = dvY(yLo, yLo, yHi);
+      parts.push(`<line x1="${DVM.l}" y1="${DVM.t}" x2="${DVM.l}" y2="${bY}" stroke="#1e293b" stroke-width="1"/>`);
+      parts.push(`<line x1="${DVM.l}" y1="${bY}" x2="${DVM.l + DVpW}" y2="${bY}" stroke="#1e293b" stroke-width="1"/>`);
+      for (let i = 0; i <= 4; i++) {
+        const xv = xLo + (xHi - xLo) * i / 4;
+        const px = dvX(xv, xLo, xHi);
+        parts.push(`<line x1="${px.toFixed(1)}" y1="${bY}" x2="${px.toFixed(1)}" y2="${(bY + 4).toFixed(1)}" stroke="#334155" stroke-width="1"/>`);
+        parts.push(`<text x="${px.toFixed(1)}" y="${(bY + 14).toFixed(1)}" text-anchor="middle" font-size="8" fill="#475569">${fmtTick(xv)}</text>`);
+      }
+      for (let i = 0; i <= 3; i++) {
+        const yv = yLo + (yHi - yLo) * i / 3;
+        const py = dvY(yv, yLo, yHi);
+        parts.push(`<line x1="${(DVM.l - 4).toFixed(1)}" y1="${py.toFixed(1)}" x2="${DVM.l}" y2="${py.toFixed(1)}" stroke="#334155" stroke-width="1"/>`);
+        parts.push(`<text x="${(DVM.l - 6).toFixed(1)}" y="${(py + 3).toFixed(1)}" text-anchor="end" font-size="8" fill="#475569">${fmtTick(yv)}</text>`);
+      }
+    }
+
+    function gaussPdf(x, mu, sig2) {
+      return Math.exp(-(x - mu) * (x - mu) / (2 * sig2)) / Math.sqrt(2 * Math.PI * sig2);
+    }
+
+    // ── SVG interaction helpers ──────────────────────────────────────────────
+    const DVns = "http://www.w3.org/2000/svg";
+
+    function _dvClientToSvg(svgEl, cx, cy) {
+      const r = svgEl.getBoundingClientRect();
+      return [(cx - r.left) / r.width * DVW, (cy - r.top) / r.height * DVH];
+    }
+
+    function _dvCreateTip(svgEl) {
+      const g = document.createElementNS(DVns, "g");
+      g.setAttribute("id", "_dvTip"); g.style.display = "none"; g.style.pointerEvents = "none";
+      const bg = document.createElementNS(DVns, "rect");
+      bg.setAttribute("id", "_dvTipBg"); bg.setAttribute("rx", "3");
+      bg.setAttribute("fill", "#0f172a"); bg.setAttribute("stroke", "#edb70e");
+      bg.setAttribute("stroke-width", "0.7"); bg.setAttribute("opacity", "0.95");
+      const t1 = document.createElementNS(DVns, "text");
+      t1.setAttribute("id", "_dvTipL1"); t1.setAttribute("font-size", "8.5");
+      t1.setAttribute("fill", "#edb70e"); t1.setAttribute("font-family", "monospace");
+      const t2 = document.createElementNS(DVns, "text");
+      t2.setAttribute("id", "_dvTipL2"); t2.setAttribute("font-size", "8");
+      t2.setAttribute("fill", "#94a3b8"); t2.setAttribute("font-family", "monospace");
+      g.appendChild(bg); g.appendChild(t1); g.appendChild(t2);
+      svgEl.appendChild(g);
+    }
+
+    function _dvShowTip(svgEl, svgX, svgY, l1, l2) {
+      const g  = svgEl.querySelector("#_dvTip"),  bg = svgEl.querySelector("#_dvTipBg");
+      const t1 = svgEl.querySelector("#_dvTipL1"), t2 = svgEl.querySelector("#_dvTipL2");
+      if (!g) return;
+      const px = 5, py = 4, lh = 11;
+      const hasL2 = l2 != null;
+      const w = Math.max((Math.max(l1.length, hasL2 ? l2.length : 0)) * 5.3 + px * 2, 60);
+      const h = (hasL2 ? 2 : 1) * lh + py * 2;
+      let tx = svgX + 9, ty = svgY - h - 5;
+      if (tx + w > DVW - 4) tx = svgX - w - 9;
+      if (ty < 2) ty = svgY + 7;
+      bg.setAttribute("x", tx); bg.setAttribute("y", ty);
+      bg.setAttribute("width", w); bg.setAttribute("height", h);
+      t1.setAttribute("x", tx + px); t1.setAttribute("y", ty + py + 8); t1.textContent = l1;
+      if (hasL2) {
+        t2.style.display = ""; t2.setAttribute("x", tx + px);
+        t2.setAttribute("y", ty + py + 8 + lh); t2.textContent = l2;
+      } else { t2.style.display = "none"; }
+      g.style.display = "";
+    }
+
+    function _dvHideTip(svgEl) { const g = svgEl.querySelector("#_dvTip"); if (g) g.style.display = "none"; }
+
+    function _dvCreateCrosshair(svgEl) {
+      const g = document.createElementNS(DVns, "g");
+      g.setAttribute("id", "_dvCh"); g.style.display = "none"; g.style.pointerEvents = "none";
+      const vl = document.createElementNS(DVns, "line"); vl.setAttribute("id", "_dvChV");
+      vl.setAttribute("stroke", "rgba(237,183,14,0.45)"); vl.setAttribute("stroke-width", "0.8");
+      vl.setAttribute("stroke-dasharray", "3,2");
+      const dot = document.createElementNS(DVns, "circle"); dot.setAttribute("id", "_dvChDot");
+      dot.setAttribute("r", "3"); dot.setAttribute("fill", "#edb70e");
+      dot.setAttribute("stroke", "rgba(0,0,0,0.4)"); dot.setAttribute("stroke-width", "0.8");
+      g.appendChild(vl); g.appendChild(dot); svgEl.appendChild(g);
+    }
+
+    function _dvMoveCrosshair(svgEl, svgX, dotY, baseY) {
+      const g = svgEl.querySelector("#_dvCh"); if (!g) return;
+      const vl = svgEl.querySelector("#_dvChV"), dot = svgEl.querySelector("#_dvChDot");
+      vl.setAttribute("x1", svgX.toFixed(1)); vl.setAttribute("y1", DVM.t);
+      vl.setAttribute("x2", svgX.toFixed(1)); vl.setAttribute("y2", baseY.toFixed(1));
+      dot.setAttribute("cx", svgX.toFixed(1)); dot.setAttribute("cy", dotY.toFixed(1));
+      g.style.display = "";
+    }
+
+    function _dvHideCrosshair(svgEl) { const g = svgEl.querySelector("#_dvCh"); if (g) g.style.display = "none"; }
+
+    function _dvAddOverlay(svgEl, onMove, onLeave) {
+      const ov = document.createElementNS(DVns, "rect");
+      ov.setAttribute("x", DVM.l); ov.setAttribute("y", DVM.t);
+      ov.setAttribute("width", DVpW); ov.setAttribute("height", DVpH);
+      ov.setAttribute("fill", "transparent"); ov.style.cursor = "crosshair";
+      ov.addEventListener("mousemove", onMove); ov.addEventListener("mouseleave", onLeave);
+      svgEl.appendChild(ov);
+    }
+
+    // ── Render functions ─────────────────────────────────────────────────────
+    function renderGmmViz(json, svgEl, summaryEl, rotAngle) {
+      const K = json.n_components || json.K || 0;
+      const dim = json.dimensions || (json.means && json.means.length && Array.isArray(json.means[0]) ? json.means[0].length : 1);
+      const weights = json.weights || [];
+      const means = json.means || [];
+      const covs = json.covariances || [];
+      const getMu   = (k, d = 0) => Array.isArray(means[k]) ? (means[k][d] || 0) : (means[k] || 0);
+      const getSig2 = (k, d = 0) => Math.max(Array.isArray(covs[k]) ? (covs[k][d] || 1e-6) : (covs[k] || 1e-6), 1e-12);
+      const parts = [];
+
+      if (dim <= 1) {
+        // ── 1D: crosshair + PDF value tooltip on hover ──
+        let xLo = Infinity, xHi = -Infinity;
+        for (let k = 0; k < K; k++) {
+          const sig = Math.sqrt(getSig2(k));
+          xLo = Math.min(xLo, getMu(k) - 3.8 * sig);
+          xHi = Math.max(xHi, getMu(k) + 3.8 * sig);
+        }
+        if (!isFinite(xLo) || xLo === xHi) { xLo = -1; xHi = 1; }
+        const N = 240;
+        const xs = Array.from({length: N}, (_, i) => xLo + (xHi - xLo) * i / (N - 1));
+        const ys = xs.map(x => weights.reduce((s, w, k) => s + w * gaussPdf(x, getMu(k), getSig2(k)), 0));
+        const yHi = Math.max(...ys) * 1.12 || 1;
+        dvAxes(parts, xLo, xHi, 0, yHi);
+        const polyPts = xs.map((x, i) => `${dvX(x, xLo, xHi).toFixed(1)},${dvY(ys[i], 0, yHi).toFixed(1)}`).join(" ");
+        const baseY = dvY(0, 0, yHi).toFixed(1);
+        parts.push(`<polygon points="${dvX(xLo,xLo,xHi).toFixed(1)},${baseY} ${polyPts} ${dvX(xHi,xLo,xHi).toFixed(1)},${baseY}" fill="rgba(237,183,14,0.10)" stroke="none"/>`);
+        parts.push(`<polyline points="${polyPts}" fill="none" stroke="#edb70e" stroke-width="1.8" stroke-linejoin="round"/>`);
+        const compC = ["#38bdf8","#f472b6","#4ade80","#f97316","#a78bfa"];
+        if (K > 1) {
+          for (let k = 0; k < K; k++) {
+            const cPts = xs.map(x => {
+              const y = weights[k] * gaussPdf(x, getMu(k), getSig2(k));
+              return `${dvX(x,xLo,xHi).toFixed(1)},${dvY(y,0,yHi).toFixed(1)}`;
+            }).join(" ");
+            parts.push(`<polyline points="${cPts}" fill="none" stroke="${compC[k % compC.length]}" stroke-width="1" stroke-dasharray="3,2" opacity="0.65"/>`);
+          }
+        }
+        svgEl.innerHTML = parts.join("");
+        _dvCreateTip(svgEl);
+        _dvCreateCrosshair(svgEl);
+        _dvAddOverlay(svgEl,
+          (e) => {
+            const [sx] = _dvClientToSvg(svgEl, e.clientX, e.clientY);
+            if (sx < DVM.l || sx > DVM.l + DVpW) return;
+            const dataX = xLo + (sx - DVM.l) / DVpW * (xHi - xLo);
+            const px2 = weights.reduce((s, w, k) => s + w * gaussPdf(dataX, getMu(k), getSig2(k)), 0);
+            const dotY = dvY(px2, 0, yHi);
+            _dvMoveCrosshair(svgEl, sx, dotY, dvY(0, 0, yHi));
+            _dvShowTip(svgEl, sx, dotY, `x = ${fmtTick(dataX)}`, `p(x) = ${px2.toFixed(5)}`);
+          },
+          () => { _dvHideCrosshair(svgEl); _dvHideTip(svgEl); }
+        );
+        let html = `<strong>${K}-component GMM (1D)</strong><br>`;
+        for (let k = 0; k < K; k++) html += `C${k+1}: w=${(weights[k]*100).toFixed(1)}%,&nbsp; \u03bc=${getMu(k).toFixed(4)},&nbsp; \u03c3=${Math.sqrt(getSig2(k)).toFixed(4)}<br>`;
+        summaryEl.innerHTML = html;
+
+      } else if (dim <= 2) {
+        // ── 2D: rotation + component hover highlighting ──
+        const \u03b8 = (rotAngle || 0) * Math.PI / 180;
+        const ct = Math.cos(\u03b8), st = Math.sin(\u03b8);
+        const rMu  = (k) => [ct * getMu(k,0) - st * getMu(k,1), st * getMu(k,0) + ct * getMu(k,1)];
+        const rSig = (k) => [
+          Math.sqrt(Math.abs(ct*ct*getSig2(k,0) + st*st*getSig2(k,1))),
+          Math.sqrt(Math.abs(st*st*getSig2(k,0) + ct*ct*getSig2(k,1)))
+        ];
+        let xLo=Infinity, xHi=-Infinity, yLo=Infinity, yHi=-Infinity;
+        for (let k = 0; k < K; k++) {
+          const [mx,my] = rMu(k), [sx,sy] = rSig(k);
+          xLo=Math.min(xLo,mx-3*sx); xHi=Math.max(xHi,mx+3*sx);
+          yLo=Math.min(yLo,my-3*sy); yHi=Math.max(yHi,my+3*sy);
+        }
+        if (xLo===xHi) { xLo-=1; xHi+=1; } if (yLo===yHi) { yLo-=1; yHi+=1; }
+        dvAxes(parts, xLo, xHi, yLo, yHi);
+        svgEl.innerHTML = parts.join("");
+        const cc = ["#edb70e","#38bdf8","#f472b6","#4ade80","#f97316","#a78bfa"];
+        const fullSummary = () => {
+          let h = `<strong>${K}-component GMM (2D, \u03b8=${rotAngle||0}\u00b0)</strong><br>`;
+          for (let k = 0; k < K; k++) h += `C${k+1}: w=${(weights[k]*100).toFixed(1)}%, \u03bc\u2080=[${getMu(k,0).toFixed(3)},${getMu(k,1).toFixed(3)}]<br>`;
+          return h;
+        };
+        summaryEl.innerHTML = fullSummary();
+        for (let k = 0; k < K; k++) {
+          const [mx,my] = rMu(k), [sx,sy] = rSig(k);
+          const cx = dvX(mx,xLo,xHi), cy = dvY(my,yLo,yHi);
+          const rx = sx/(xHi-xLo)*DVpW, ry = sy/(yHi-yLo)*DVpH;
+          const col = cc[k%cc.length];
+          const e2 = document.createElementNS(DVns,"ellipse");
+          e2.setAttribute("cx",cx.toFixed(1)); e2.setAttribute("cy",cy.toFixed(1));
+          e2.setAttribute("rx",(rx*2).toFixed(1)); e2.setAttribute("ry",(ry*2).toFixed(1));
+          e2.setAttribute("fill","none"); e2.setAttribute("stroke",col);
+          e2.setAttribute("stroke-width","0.8"); e2.setAttribute("stroke-opacity","0.30"); e2.setAttribute("stroke-dasharray","3,2");
+          const e1 = document.createElementNS(DVns,"ellipse");
+          e1.setAttribute("cx",cx.toFixed(1)); e1.setAttribute("cy",cy.toFixed(1));
+          e1.setAttribute("rx",rx.toFixed(1)); e1.setAttribute("ry",ry.toFixed(1));
+          e1.setAttribute("fill",col); e1.setAttribute("fill-opacity","0.15");
+          e1.setAttribute("stroke",col); e1.setAttribute("stroke-width","1.5"); e1.style.cursor = "pointer";
+          const dotEl = document.createElementNS(DVns,"circle");
+          dotEl.setAttribute("cx",cx.toFixed(1)); dotEl.setAttribute("cy",cy.toFixed(1));
+          dotEl.setAttribute("r","2.5"); dotEl.setAttribute("fill",col); dotEl.style.cursor = "pointer";
+          const lbl = document.createElementNS(DVns,"text");
+          lbl.setAttribute("x",(cx+4).toFixed(1)); lbl.setAttribute("y",(cy-4).toFixed(1));
+          lbl.setAttribute("font-size","8"); lbl.setAttribute("fill",col); lbl.setAttribute("pointer-events","none");
+          lbl.textContent = `C${k+1} ${(weights[k]*100).toFixed(0)}%`;
+          const onEnter = () => {
+            e1.setAttribute("fill-opacity","0.40"); e1.setAttribute("stroke-width","2.5");
+            summaryEl.innerHTML = `<strong>C${k+1}</strong> \u2014 w=${(weights[k]*100).toFixed(2)}%<br>`+
+              `\u03bc (rotated) = [${rMu(k)[0].toFixed(4)}, ${rMu(k)[1].toFixed(4)}]<br>`+
+              `\u03bc (original) = [${getMu(k,0).toFixed(4)}, ${getMu(k,1).toFixed(4)}]<br>`+
+              `\u03c3 = [${rSig(k)[0].toFixed(4)}, ${rSig(k)[1].toFixed(4)}]`;
+          };
+          const onLeave = () => { e1.setAttribute("fill-opacity","0.15"); e1.setAttribute("stroke-width","1.5"); summaryEl.innerHTML = fullSummary(); };
+          [e1, dotEl].forEach(el => { el.addEventListener("mouseenter", onEnter); el.addEventListener("mouseleave", onLeave); });
+          svgEl.appendChild(e2); svgEl.appendChild(e1); svgEl.appendChild(dotEl);
+          if (K <= 8) svgEl.appendChild(lbl);
+        }
+        _dvCreateTip(svgEl);
+
+      } else {
+        // ── N-D: bar chart with per-bar hover tooltip ──
+        const allMeans = [];
+        for (let k=0; k<K; k++) for (let d=0; d<dim; d++) allMeans.push(getMu(k,d));
+        const yLo = Math.min(0, ...allMeans) * 1.05;
+        const yHi = Math.max(0, ...allMeans) * 1.15 || 1;
+        const xTotal = K * (dim + 1);
+        dvAxes(parts, 0, xTotal, yLo, yHi);
+        svgEl.innerHTML = parts.join("");
+        const cc = ["#edb70e","#38bdf8","#f472b6","#4ade80","#f97316","#a78bfa"];
+        let xi = 0;
+        for (let k=0; k<K; k++) {
+          for (let d=0; d<dim; d++) {
+            const mu = getMu(k, d);
+            const x1=dvX(xi+0.08,0,xTotal), x2=dvX(xi+0.92,0,xTotal);
+            const y1=dvY(Math.max(mu,yLo),yLo,yHi), y2=dvY(yLo,yLo,yHi);
+            const bar = document.createElementNS(DVns,"rect");
+            bar.setAttribute("x",x1.toFixed(1)); bar.setAttribute("y",y1.toFixed(1));
+            bar.setAttribute("width",(x2-x1).toFixed(1)); bar.setAttribute("height",Math.abs(y2-y1).toFixed(1));
+            bar.setAttribute("fill",cc[k%cc.length]); bar.setAttribute("fill-opacity","0.75"); bar.setAttribute("rx","2");
+            bar.style.cursor = "pointer";
+            bar.addEventListener("mouseenter", (e) => {
+              bar.setAttribute("fill-opacity","1");
+              const [svgXx, svgYy] = _dvClientToSvg(svgEl, e.clientX, e.clientY);
+              _dvShowTip(svgEl, svgXx, svgYy, `C${k+1} dim${d}`, `\u03bc = ${mu.toFixed(5)}`);
+            });
+            bar.addEventListener("mouseleave", () => { bar.setAttribute("fill-opacity","0.75"); _dvHideTip(svgEl); });
+            svgEl.appendChild(bar);
+            xi++;
+          }
+          xi++;
+        }
+        _dvCreateTip(svgEl);
+        summaryEl.innerHTML = `<strong>GMM ${dim}D</strong> \u2014 ${K} component${K>1?"s":""}<br>Hover bars to inspect \u03bc values.`;
+      }
+    }
+
+    function renderHistViz(json, svgEl, summaryEl) {
+      const counts = json.counts || [];
+      const B = json.B || counts.length;
+      const xLo = json.min !== undefined ? json.min : 0;
+      const xHi = json.max !== undefined ? json.max : 1;
+      if (!counts.length) { summaryEl.textContent = "Empty histogram."; return; }
+      const total = counts.reduce((a, b) => a + b, 0) || 1;
+      const probs = counts.map(c => c / total);
+      const yHi = Math.max(...probs) * 1.12 || 1;
+      const binW = (xHi - xLo) / B;
+      const parts = [];
+      dvAxes(parts, xLo, xHi, 0, yHi);
+      svgEl.innerHTML = parts.join("");
+      counts.forEach((cnt, i) => {
+        if (!cnt) return;
+        const p = cnt / total;
+        const x1 = dvX(xLo + i * binW, xLo, xHi), x2 = dvX(xLo + (i+1)*binW, xLo, xHi);
+        const y1 = dvY(p, 0, yHi), y2 = dvY(0, 0, yHi);
+        const bar = document.createElementNS(DVns,"rect");
+        bar.setAttribute("x",(x1+0.5).toFixed(1)); bar.setAttribute("y",y1.toFixed(1));
+        bar.setAttribute("width",Math.max(x2-x1-1,0.5).toFixed(1)); bar.setAttribute("height",Math.abs(y2-y1).toFixed(1));
+        bar.setAttribute("fill","#38bdf8"); bar.setAttribute("fill-opacity","0.75"); bar.setAttribute("rx","1");
+        bar.style.cursor = "crosshair";
+        bar.addEventListener("mouseenter", (e) => {
+          bar.setAttribute("fill-opacity","1");
+          const [svgXx, svgYy] = _dvClientToSvg(svgEl, e.clientX, e.clientY);
+          _dvShowTip(svgEl, svgXx, svgYy,
+            `bin ${i}: [${fmtTick(xLo+i*binW)}, ${fmtTick(xLo+(i+1)*binW)})`,
+            `count=${cnt}  p=${(p*100).toFixed(2)}%`);
+        });
+        bar.addEventListener("mouseleave", () => { bar.setAttribute("fill-opacity","0.75"); _dvHideTip(svgEl); });
+        svgEl.appendChild(bar);
+      });
+      _dvCreateTip(svgEl);
+      _dvCreateCrosshair(svgEl);
+      _dvAddOverlay(svgEl,
+        (e) => {
+          const [sx] = _dvClientToSvg(svgEl, e.clientX, e.clientY);
+          if (sx < DVM.l || sx > DVM.l + DVpW) return;
+          const dataX = xLo + (sx - DVM.l) / DVpW * (xHi - xLo);
+          const bi = Math.max(0, Math.min(Math.floor((dataX - xLo) / binW), B - 1));
+          _dvMoveCrosshair(svgEl, sx, dvY((counts[bi]||0)/total, 0, yHi), dvY(0, 0, yHi));
+        },
+        () => _dvHideCrosshair(svgEl)
+      );
+      const nonZero = counts.filter(c => c > 0).length;
+      const mean = counts.reduce((s, c, i) => s + c * (xLo + (i + 0.5) * binW), 0) / total;
+      summaryEl.innerHTML = `<strong>Histogram</strong> \u2014 ${B} bins<br>Range: [${fmtTick(xLo)},\u00a0${fmtTick(xHi)}]<br>Samples: ${total}\u00a0\u00a0Non-zero: ${nonZero}<br>Mean \u2248 ${mean.toFixed(4)}<br><em>Hover bars for details, crosshair follows position.</em>`;
+    }
+
+    function renderDirichletViz(json, svgEl, summaryEl) {
+      const alpha = json.alpha || [];
+      if (!alpha.length) { summaryEl.textContent = "No alpha vector."; return; }
+      const K = alpha.length;
+      const sumA = alpha.reduce((a, b) => a + b, 0);
+      const probs = alpha.map(a => a / sumA);
+      const yHi = Math.max(...probs) * 1.15 || 1;
+      const parts = [];
+      dvAxes(parts, 0, K, 0, yHi);
+      svgEl.innerHTML = parts.join("");
+      const cc = ["#edb70e","#38bdf8","#f472b6","#4ade80","#f97316","#a78bfa","#fb7185","#34d399"];
+      probs.forEach((p, i) => {
+        const x1=dvX(i+0.1,0,K), x2=dvX(i+0.9,0,K);
+        const y1=dvY(p,0,yHi), y2=dvY(0,0,yHi);
+        const bar = document.createElementNS(DVns,"rect");
+        bar.setAttribute("x",x1.toFixed(1)); bar.setAttribute("y",y1.toFixed(1));
+        bar.setAttribute("width",(x2-x1).toFixed(1)); bar.setAttribute("height",Math.abs(y2-y1).toFixed(1));
+        bar.setAttribute("fill",cc[i%cc.length]); bar.setAttribute("fill-opacity","0.85"); bar.setAttribute("rx","2");
+        bar.style.cursor = "pointer";
+        bar.addEventListener("mouseenter", (e) => {
+          bar.setAttribute("fill-opacity","1");
+          const [svgXx, svgYy] = _dvClientToSvg(svgEl, e.clientX, e.clientY);
+          _dvShowTip(svgEl, svgXx, svgYy, `k${i+1}: \u03b1=${alpha[i].toFixed(3)}`, `E[p_${i+1}] = ${(p*100).toFixed(2)}%`);
+        });
+        bar.addEventListener("mouseleave", () => { bar.setAttribute("fill-opacity","0.85"); _dvHideTip(svgEl); });
+        svgEl.appendChild(bar);
+        const lbl = document.createElementNS(DVns,"text");
+        lbl.setAttribute("x",((x1+x2)/2).toFixed(1)); lbl.setAttribute("y",(dvY(0,0,yHi)+22).toFixed(1));
+        lbl.setAttribute("text-anchor","middle"); lbl.setAttribute("font-size","8"); lbl.setAttribute("fill","#64748b");
+        lbl.setAttribute("pointer-events","none"); lbl.textContent = String(i+1);
+        svgEl.appendChild(lbl);
+      });
+      _dvCreateTip(svgEl);
+      summaryEl.innerHTML = `<strong>Dirichlet</strong> \u2014 k=${K}, \u03a3\u03b1=${sumA.toFixed(2)}<br>\u03b1 = [${alpha.map(a=>a.toFixed(2)).join(", ")}]<br>E[p_i] = \u03b1_i / \u03a3\u03b1<br><em>Hover bars for details.</em>`;
+    }
+
+    // ── State for re-rendering (rotation, etc.) ──────────────────────────────
+    let _dvState = { type: null, json: null, varName: null, rotAngle: 0 };
+
+    function _dvDraw() {
+      const svgEl = document.getElementById("distVizSvg");
+      const summaryEl = document.getElementById("distVizSummary");
+      svgEl.innerHTML = ""; summaryEl.innerHTML = "";
+      try {
+        if (_dvState.type === "gmm")       renderGmmViz(_dvState.json, svgEl, summaryEl, _dvState.rotAngle);
+        else if (_dvState.type === "hist") renderHistViz(_dvState.json, svgEl, summaryEl);
+        else                               renderDirichletViz(_dvState.json, svgEl, summaryEl);
+      } catch (err) { summaryEl.textContent = "Render error: " + err.message; }
+    }
+
+    function showDistViz(term, varName) {
+      const type = distLiteralType(term);
+      const workbench = document.getElementById("queryWorkbench");
+      const pane      = document.getElementById("distVizPane");
+      const badge     = document.getElementById("distVizTypeBadge");
+      const varEl     = document.getElementById("distVizVarName");
+      const rotRow    = document.getElementById("distVizRotRow");
+      const rotInput  = document.getElementById("distVizRot");
+      const rotLabel  = document.getElementById("distVizRotLabel");
+      let json;
+      try { json = JSON.parse(term.value); } catch (err) {
+        document.getElementById("distVizSummary").textContent = "Parse error: " + err.message;
+        pane.style.display = ""; workbench.classList.add("viz-open"); return;
+      }
+      const dim = type === "gmm"
+        ? (json.dimensions || (json.means && json.means.length && Array.isArray(json.means[0]) ? json.means[0].length : 1))
+        : 0;
+      _dvState = { type, json, varName, rotAngle: 0 };
+      varEl.textContent = "?" + varName;
+      badge.textContent = { gmm: "GMM", hist: "HIST", dirichlet: "DIRICHLET" }[type] || type.toUpperCase();
+      if (rotRow)   rotRow.style.display  = (type === "gmm" && dim >= 2) ? "" : "none";
+      if (rotInput) rotInput.value        = 0;
+      if (rotLabel) rotLabel.textContent  = "0\u00b0";
+      pane.style.display = "";
+      workbench.classList.add("viz-open");
+      _dvDraw();
     }
 
     function summarizeTermValue(term) {
@@ -2119,11 +3230,89 @@ LIMIT 20`;
       }
     }
 
-    querySelect.addEventListener("change", () => setQuery(selectedExample()));
-    resetButton.addEventListener("click", () => setQuery(selectedExample()));
+    querySelect.addEventListener("change", () => {
+      const entry = selectedExample();
+      if (entry) {
+        setQuery(entry);
+        updateQueryFileBadge(entry);
+      }
+    });
+
+    // Dynamically add uploaded .sparql/.rq files to the query dropdown
+    document.getElementById("sparqlFile").addEventListener("change", function () {
+      const file = this.files && this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        const id = "user-" + file.name.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+        const label = file.name.replace(/\.(sparql|rq)$/i, "");
+        const entry = { id, label, source: file.name, query: text };
+        const existingIdx = exampleQueries.findIndex(q => q.id === id);
+        if (existingIdx >= 0) {
+          exampleQueries[existingIdx] = entry;
+          const existingOpt = querySelect.querySelector(`option[value="${CSS.escape(id)}"]`);
+          if (existingOpt) existingOpt.textContent = label;
+        } else {
+          exampleQueries.push(entry);
+          const option = document.createElement("option");
+          option.value = id;
+          option.textContent = label;
+          querySelect.appendChild(option);
+        }
+        querySelect.value = id;
+        setQuery(entry);
+        updateQueryFileBadge(entry);
+      };
+      reader.readAsText(file);
+      this.value = "";
+    });
     runButton.addEventListener("click", runQuery);
-    uploadTtlButton.addEventListener("click", uploadTtl);
-    refreshDatasetButton.addEventListener("click", refreshDataset);
+
+    // Ctrl+Enter / Tab: handled by CodeMirror extraKeys (see CM init below).
+    // Fallback for non-CM environments:
+    document.getElementById("query").addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const start = e.target.selectionStart, end = e.target.selectionEnd;
+        e.target.value = e.target.value.substring(0, start) + "  " + e.target.value.substring(end);
+        e.target.selectionStart = e.target.selectionEnd = start + 2;
+      } else if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault(); runQuery();
+      }
+    });
+
+    // Escape closes dist viz panel
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.getElementById("distVizPane").style.display !== "none") {
+        document.getElementById("distVizClose").click();
+      }
+    });
+
+    // Export CSV
+    document.getElementById("exportCsvBtn").addEventListener("click", () => {
+      if (!_lastQueryJson) return;
+      const vars = _lastQueryJson.head && _lastQueryJson.head.vars || [];
+      const rows = _lastQueryJson.results && _lastQueryJson.results.bindings || [];
+      const escape = v => "\"" + String(v).replace(/"/g, "\"\"") + "\"";
+      const lines = [vars.map(escape).join(",")];
+      rows.forEach(row => lines.push(vars.map(v => escape(row[v] ? row[v].value : "")).join(",")));
+      const blob = new Blob([lines.join("\r\n")], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const fname = (selectedExample().id || "query").replace(/[^\w-]/g, "_") + "_results.csv";
+      const a = document.createElement("a"); a.href = url; a.download = fname; a.click();
+      URL.revokeObjectURL(url);
+      showToast("CSV downloaded ✓");
+    });
+
+    // Reset with confirmation if user has modified query
+    resetButton.addEventListener("click", () => {
+      const original = selectedExample().query;
+      if (queryInput.value !== original) {
+        if (!confirm("Reset query? Your edits will be lost.")) return;
+      }
+      setQuery(selectedExample());
+    });
     refreshGraphButton.addEventListener("click", refreshGraph);
     resetGraphButton.addEventListener("click", fitGraphToViewport);
     graphLimitInput.addEventListener("change", () => {
@@ -2142,9 +3331,104 @@ LIMIT 20`;
       button.addEventListener("click", () => activateTab(button.dataset.tab));
     });
 
+    document.getElementById("distVizClose").addEventListener("click", () => {
+      document.getElementById("distVizPane").style.display = "none";
+      document.getElementById("queryWorkbench").classList.remove("viz-open");
+    });
+
+    document.getElementById("distVizRot").addEventListener("input", function () {
+      _dvState.rotAngle = Number(this.value);
+      document.getElementById("distVizRotLabel").textContent = this.value + "\u00b0";
+      _dvDraw();
+    });
+
     populateQuerySelect();
+
+    // ── CodeMirror 5 init ─────────────────────────────────────────────
+    if (typeof CodeMirror !== "undefined") {
+      const _cm = CodeMirror.fromTextArea(document.getElementById("query"), {
+        mode: "sparql",
+        lineNumbers: true,
+        lineWrapping: true,
+        tabSize: 2,
+        indentWithTabs: false,
+        matchBrackets: true,
+        extraKeys: {
+          "Ctrl-Enter":  () => runQuery(),
+          "Cmd-Enter":   () => runQuery(),
+          "Tab": cm => cm.execCommand("indentMore"),
+          "Shift-Tab": cm => cm.execCommand("indentLess")
+        }
+      });
+      // Restore sessionStorage draft
+      const draft = sessionStorage.getItem("probsparql_draft");
+      if (draft) _cm.setValue(draft);
+      // Auto-save draft on change
+      _cm.on("change", () => {
+        try { sessionStorage.setItem("probsparql_draft", _cm.getValue()); } catch(_){}
+      });
+      // Replace queryInput reference with a proxy so existing code works unchanged
+      queryInput = {
+        get value() { return _cm.getValue(); },
+        set value(v) { _cm.setValue(v); },
+        get selectionStart() { return 0; },
+        set selectionStart(_) {},
+        get selectionEnd()   { return 0; },
+        set selectionEnd(_)  {},
+        addEventListener() {} // CM extraKeys handle keyboard
+      };
+    }
+
+    // ── History dropdown toggle ──────────────────────────────────────
+    const histBtn = document.getElementById("queryHistoryBtn");
+    const histDrop = document.getElementById("queryHistoryDropdown");
+    histBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const showing = histDrop.style.display !== "none";
+      if (!showing) { renderHistoryDropdown(); }
+      histDrop.style.display = showing ? "none" : "";
+    });
+    document.addEventListener("click", () => histDrop.style.display = "none");
+    histDrop.addEventListener("click", e => e.stopPropagation());
+    document.getElementById("queryHistoryClear").addEventListener("click", () => {
+      saveHistory([]);
+      renderHistoryDropdown();
+    });
+
+    // ── Triples table live filter ──────────────────────────────────────
+    document.getElementById("triplesSearch").addEventListener("input", function () {
+      const q = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#tripleResult tbody tr");
+      rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none"; });
+    });
+
     refreshDataset();
     graphState.transform = { x: 0, y: 0, k: 1 };
+
+    // P1: Real connection status check
+    async function checkEngineStatus() {
+      const monitor = document.getElementById("engineMonitor");
+      const statusSpan = document.getElementById("engineStatus");
+      const dot = document.getElementById("enginePulseDot");
+      try {
+        const r = await fetch(endpoint + "?query=ASK+%7B%7D", {
+          method: "GET",
+          headers: { "Accept": "application/sparql-results+json" },
+          signal: AbortSignal.timeout(4000)
+        });
+        if (r.ok) {
+          document.body.classList.remove("engine-offline");
+          statusSpan.textContent = "Online";
+        } else {
+          throw new Error("HTTP " + r.status);
+        }
+      } catch (e) {
+        document.body.classList.add("engine-offline");
+        statusSpan.textContent = "Offline";
+      }
+    }
+    checkEngineStatus();
+    setInterval(checkEngineStatus, 20000);
   </script>
 </body>
 </html>
