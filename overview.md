@@ -1,7 +1,7 @@
 # ProbSPARQL 代码库理解文档
 
-> 文档版本：2026-03-20  
-> 项目版本：1.0.0-SNAPSHOT  
+> 文档版本：2026-05-11
+> 项目版本：1.0.0-SNAPSHOT
 > 基于 Apache Jena 6.0.0-SNAPSHOT + Java 21
 
 ---
@@ -14,8 +14,8 @@
 
 | 维度 | 内容 |
 |---|---|
-| **数据模型** | Gaussian Mixture Models (GMMs) 作为自定义 RDF 数据类型 |
-| **SPARQL 函数** | 22 个概率函数（PDF/CDF、JSD/KL、变换、融合等） |
+| **数据模型** | GMM、Histogram、Dirichlet 三类概率 literal，通过 Jena 自定义 RDF datatype 解析为内部值对象 |
+| **SPARQL 函数** | 29 个概率函数（PDF/CDF、JSD/KL、采样、变换、融合、相等性判断等） |
 | **特殊连接算子** | 2 个自定义连接（FUSEJOIN、DIVJOIN） |
 | **服务器** | 基于 Jena-Fuseki 的 HTTP SPARQL 端点 |
 | **JSD 计算方案** | 9 种计算模式（GT-100/1K/5K/10K, V1-V5） |
@@ -40,14 +40,15 @@ ProbSPARQL/
 │   └── jena-arq/                  # 核心 ARQ（SPARQL 引擎）修改
 ├── src/
 │   ├── main/java/org/apache/jena/
-│   │   ├── probsparql/            # ProbSPARQL 核心实现（63 个 Java 文件）
+│   │   ├── probsparql/            # ProbSPARQL 核心实现
 │   │   └── sparql/                # Jena 内部扩展（语法/代数/执行器）
-│   └── test/java/                 # 单元测试（11 个 ProbSPARQL 相关测试类）
+│   └── test/java/                 # ProbSPARQL 单元测试
 ├── benchmark/
-│   ├── data/                      # 合成数据集（S0-S4, simjoin easy/medium/hard/mixed）
-│   ├── queries/                   # 18 个 SPARQL 基准查询
-│   ├── results/                   # 已产生的 CSV 实验结果
-│   └── scripts/                   # Python 绘图脚本
+│   ├── README.md                  # 当前实验实现说明
+│   ├── queries/                   # Exp1-Exp5 的 SPARQL 查询
+│   ├── scripts/                   # 数据生成、远程实验运行、分析脚本
+│   ├── data/                      # 生成数据目录（git ignore）
+│   └── results/                   # 生成结果目录（git ignore）
 ├── examples/
 │   ├── data/angle-grinder-instances.ttl  # 真实工业数据
 │   └── queries/                   # 示例查询
@@ -56,11 +57,21 @@ ProbSPARQL/
 
 ---
 
-## 3. 数据模型：Gaussian Mixture Model (GMM)
+## 3. 数据模型：概率 Literal 层
 
-**核心文件：** `src/main/java/org/apache/jena/probsparql/datatypes/GMMDatatype.java` 和 `GMMValue.java`
+**核心文件：** `src/main/java/org/apache/jena/probsparql/datatypes/`
 
-### 3.1 数学定义
+当前实现注册三类概率 datatype：
+
+| Datatype | URI | Java 值对象 | 说明 |
+|---|---|---|---|
+| GMM | `http://example.org/ontology/uncertainty#gmmLiteral` | `GMMValue` | 多维 Gaussian Mixture Model |
+| Histogram | `http://example.org/ontology/uncertainty#histLiteral` | `HistogramValue` | 多维 histogram，CDF 语义为联合 CDF |
+| Dirichlet | `http://example.org/ontology/uncertainty#dirichletLiteral` | `DirichletValue` | simplex 上的 Dirichlet 分布 |
+
+### 3.1 Gaussian Mixture Model (GMM)
+
+#### 数学定义
 
 $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k)$$
 
@@ -70,7 +81,7 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 - $w_k \geq 0$，$\sum_k w_k = 1$
 - $\boldsymbol{\Sigma}_k$：协方差矩阵
 
-### 3.2 协方差类型
+#### 协方差类型
 
 | 类型 | 描述 | 参数大小 |
 |---|---|---|
@@ -78,7 +89,7 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 | `diag` | 对角线，每维独立方差 | $K \times d$ |
 | `spherical` | 标量，各维共享方差 | $K$ |
 
-### 3.3 RDF 序列化格式（JSON Literal）
+#### RDF 序列化格式（JSON Literal）
 
 ```json
 {
@@ -91,45 +102,16 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 }
 ```
 
-作为自定义 Jena 类型注册，URI 为 `http://example.org/gmm-datatype`。
+作为自定义 Jena 类型注册，URI 为 `http://example.org/ontology/uncertainty#gmmLiteral`。
 
-### 3.4 验证规则（GMMValue.java）
+#### 验证规则（GMMValue.java）
 
 - 权重求和为 1.0（容差 1e-3）
 - 协方差矩阵需为正半定（Cholesky 分解检验）
 - 维度一致性检查
 - 关键方法：`deepCopy()`、`toJsonString()`、Cholesky 分解工具
 
----
-
-## 4. 24 个 SPARQL 函数
-
-所有函数通过 `ProbSPARQL.init()` 注册到 `FunctionRegistry`，URI 前缀为 `http://probsparql.org/function#`。
-
-### 4.1 概率阈值（Thresholding）4 个
-
-| 函数 | URI 后缀 | 参数 | 返回 |
-|---|---|---|---|
-| PDF | `pdf` | GMM, point | 概率密度值 |
-| CDF | `cdf` | GMM, point | 累积概率 $\in [0,1]$ |
-| LogPDF | `logpdf` | GMM, point | $\ln$ 密度 |
-| LogCDF | `logcdf` | GMM, point | $\ln$ 累积概率 |
-
-**实现要点（CDF.java）：** 对每个分量高斯计算 CDF（多维积分），加权求和，使用 erf 函数近似。
-
-### 4.2 比较度量（Comparison）5 个
-
-| 函数 | URI 后缀 | 数学定义 | 范围 |
-|---|---|---|---|
-| PolyJSD | `jsd` | $JS(P\|Q) = \frac{1}{2}KL(P\|M) + \frac{1}{2}KL(Q\|M)$ | $[0, \ln 2]$ |
-| JSDivergence | `jsdivergence` | legacy GMM-only similarity-evaluator compatibility wrapper | score depends on mode |
-| KLDivergence | `kldivergence` | $KL(P\|Q) = \mathbb{E}_P[\ln P/Q]$ | $[0, +\infty)$ |
-| SameTerm | `sameTerm` | RDF term equality | boolean |
-| SameDistribution | `sameDistribution` | datatype value equality for distribution literals | boolean |
-
-`prob:jsd` 是新的数值接口：多态分布比较，GMM 路径固定使用 MC 10K。  
-`prob:jsdivergence` 保留为 legacy GMM-only 接口；其内部现在对应 similarity evaluator，主要服务旧的 V1-V5 模式和 join 场景。
-`prob:sameTerm` 比较 RDF term 本身，因此对 GMM component 顺序敏感；`prob:sameDistribution` 比较解析后的分布值，因此对 GMM component 顺序不敏感。
+### 3.2 Histogram Literal
 
 `uq:histLiteral` 现在使用统一的多维 schema：
 
@@ -137,9 +119,46 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 {"dimensions":2,"edges":[[0.0,1.0,2.0],[10.0,20.0,30.0]],"weights":[0.1,0.2,0.3,0.4]}
 ```
 
-其中 `weights` 表示多维网格 cell 的概率质量，按 row-major 顺序展开。  
-旧的一维 schema `{"bins":[...],"weights":[...]}` 仍可解析，但系统输出统一使用新的 `dimensions + edges + weights` 形式。  
-对多维 histogram，`prob:cdf` / `prob:histcdf` 的语义是联合 CDF：`P(X1<=x1, ..., Xd<=xd)`。
+其中 `weights` 表示多维网格 cell 的概率质量，按 row-major 顺序展开。旧的一维 schema `{"bins":[...],"weights":[...]}` 仍可解析，但系统输出统一使用新的 `dimensions + edges + weights` 形式。对多维 histogram，`prob:cdf` / `prob:histcdf` 的语义是联合 CDF：`P(X1<=x1, ..., Xd<=xd)`。
+
+### 3.3 Dirichlet Literal
+
+Dirichlet literal 用于表示 simplex 上的分类概率分布，当前主要服务 datatype extensibility、`prob:mean` / `prob:std` / `prob:cdf` / `prob:jsd` 等多态接口验证。
+
+---
+
+## 4. 29 个 SPARQL 函数
+
+所有函数通过 `ProbSPARQL.init()` 注册到 `FunctionRegistry`，URI 前缀为 `http://probsparql.org/function#`。
+
+### 4.1 概率阈值（Thresholding）5 个
+
+| 函数 | URI 后缀 | 参数 | 返回 |
+|---|---|---|---|
+| PDF | `pdf` | distribution, point | 概率密度值 |
+| CDF | `cdf` | distribution, point | 累积概率 $\in [0,1]$ |
+| LogPDF | `logpdf` | distribution, point | $\ln$ 密度 |
+| LogCDF | `logcdf` | distribution, point | $\ln$ 累积概率 |
+| HistogramCDF | `histcdf` | Histogram, point | histogram CDF / 联合 CDF |
+
+**实现要点（CDF.java）：** 入口按 literal value 类型分派；GMM 路径对每个分量高斯计算 CDF 并加权求和，Histogram 路径计算 joint CDF，Dirichlet 路径使用对应 value backend。
+
+### 4.2 比较度量（Comparison）8 个
+
+| 函数 | URI 后缀 | 数学定义 | 范围 |
+|---|---|---|---|
+| PolyJSD | `jsd` | $JS(P\|Q) = \frac{1}{2}KL(P\|M) + \frac{1}{2}KL(Q\|M)$ | $[0, \ln 2]$ |
+| JSDivergence | `jsdivergence` | legacy GMM-only similarity-evaluator compatibility wrapper | score depends on mode |
+| KLDivergence | `kldivergence` | $KL(P\|Q) = \mathbb{E}_P[\ln P/Q]$ | $[0, +\infty)$ |
+| HistogramJSD | `histjsd` | histogram 专用 JSD | $[0, \ln 2]$ |
+| JSDMode | `jsdMode` | benchmark 专用：按 mode 调用 V1-V5 GMM evaluator | numeric score |
+| LastDivJoinStats | `lastDivJoinStats` | benchmark 专用：读取 server-side DIVJOIN pruning stats | numeric counter |
+| SameTerm | `sameTerm` | RDF term equality | boolean |
+| SameDistribution | `sameDistribution` | datatype value equality for distribution literals | boolean |
+
+`prob:jsd` 是新的数值接口：多态分布比较，GMM 路径固定使用 MC 10K。  
+`prob:jsdivergence` 保留为 legacy GMM-only 接口；其内部现在对应 similarity evaluator，主要服务旧的 V1-V5 模式和 join 场景。
+`prob:sameTerm` 比较 RDF term 本身，因此对 GMM component 顺序敏感；`prob:sameDistribution` 比较解析后的分布值，因此对 GMM component 顺序不敏感。
 
 **legacy `prob:jsdivergence` / similarity evaluator 的 9 种模式（SimilarityEvaluator.java，JSDivergenceConfig.java）：**
 
@@ -161,7 +180,7 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 |---|---|---|
 | `scale` | $P(\lambda x)$ | 缩放均值和协方差 |
 | `shift` | $P(x - c)$ | 平移均值 |
-| `lineartransform` | $a_0 + a_1 x + \ldots$ | 多项式变换 |
+| `linearTransform` | $a_0 + a_1 x + \ldots$ | 多项式变换 |
 | `marginal` | 提取第 $i$ 维 | 选择均值/协方差子矩阵 |
 | `joint` | 独立 GMM 的联合分布 | 块对角协方差 |
 | `convolve` | $P(x+y)$ 卷积 | 高斯卷积：加均值、合并协方差 |
@@ -175,9 +194,11 @@ $$P(\mathbf{x}) = \sum_{k=1}^{K} w_k \cdot \mathcal{N}(\mathbf{x} \mid \boldsymb
 | `std` | 标准差 |
 | `quantile` | 百分位数（数值求解） |
 | `map` | 最大后验估计（MAP） |
-| `modecount` | 模态数量（峰值个数） |
+| `modeCount` | 模态数量（峰值个数） |
 | `mix` | 从多个 GMM 创建混合分布 |
 | `fuse` | **Bayesian 融合**（Gaussian Product） |
+| `histmean` | Histogram 均值 |
+| `sample` | 从支持的分布中抽样，返回 JSON array |
 
 ---
 
@@ -300,47 +321,30 @@ SPRT 测试（顺序概率比检验，SPRTSampler）
 
 ## 8. 基准测试框架
 
-### 8.1 已有基准测试类
+当前 benchmark 采用 remote-first 方式：本地 Java benchmark client 通过 HTTP 调用预先加载在 Fuseki 上的数据集服务。`benchmark/data` 和 `benchmark/results` 是生成目录，不作为当前实验协议的一部分提交。详细说明见 `benchmark/README.md`。
 
-| 类 | 目的 | 输出 |
-|---|---|---|
-| `PerformanceBenchmark.java` | U1-U6 六类查询的端到端延迟 | JSON + Markdown 表 |
-| `SimilarityJoinBenchmark.java` | V1-V5+GT_10K 各模式在 4 个数据集上的延迟 | `simjoin_results.csv`、`simjoin_v5_breakdown.csv` |
-| `SimilarityJoinAccuracyBenchmark.java` | 各模式 MAE/RMSE/相关系数（vs GT_10K） | `simjoin_accuracy_latency.csv` |
-| `ConvergenceBenchmark.java` | 分层采样在不同样本数下的收敛 | `simjoin_convergence.csv` |
-| `ScalabilityBenchmark.java` | 不同数据规模（100-5000 实体）× GMM 复杂度（K=1-5） | CSV |
-| `SamplingBenchmark.java` | 单函数级的采样策略对比 | — |
-| `SamplingStrategyBenchmark.java` | 各采样策略的详细分解 | — |
-| `ComprehensiveBenchmark.java` | 综合场景基准 | — |
-| `FullBenchmark.java` | 集成运行所有基准 | — |
+### 8.1 当前实验套件
 
-### 8.2 基准数据集
-
-| 数据集 | 路径 | 内容 |
-|---|---|---|
-| S0-S4 | `benchmark/data/benchmark_S*.ttl` | SimilarityJoin 合成数据 |
-| JSD_easy/mixed/hard | `benchmark/data/benchmark_JSD_*.ttl` | 按 JSD 难度分级 |
-| simjoin_easy/medium/hard/mixed | `benchmark/data/simjoin_*.ttl` | selectivity 梯度数据集 |
-| angle-grinder | `examples/data/angle-grinder-instances.ttl` | 真实工业传感器数据 |
-
-### 8.3 基准查询（18 个 .sparql 文件）
-
-| 查询 | 操作 | selectivity | 复杂度 |
+| 实验 | Java Runner | 目的 | 关键输入 |
 |---|---|---|---|
-| `MQ1_cdf_strict` | CDF 阈值过滤（严格） | ~5% | 低 |
-| `MQ1_cdf_loose` | CDF 阈值过滤（宽松） | ~40% | 低 |
-| `MQ2_jsd_strict` | JSD 比较（严格） | ~10% | 低 |
-| `MQ2_jsd_loose` | JSD 比较（宽松） | ~40% | 低 |
-| `MQ3_product_filtered` | 分布乘积 + 均值过滤 | ~35% | 中 |
-| `MQ3_product_nofilter` | 分布乘积（无过滤） | 100% | 中 |
-| `MQ4_fusion_map` | FUSEJOIN + MAP 提取 | ~80% | 高 |
-| `MQ4_fusion_mean_std` | FUSEJOIN + 均值/标准差 | ~80% | 高 |
-| `MacroQ1_wear_detection` | 磨损检测（CDF ≥ 0.85） | ~25% | 低-中 |
-| `MacroQ2_anomaly_then_fuse` | 异常检测 → 融合二步流水线 | ~20% | 高 |
-| `MacroQ3_power_and_wear` | 电机功率 × 磨损联合查询 | ~30% | 高 |
-| `MacroQ4_full_inspection_report` | UNION 三路诊断分支 | 可变 | 极高 |
-| `JSD_loose/medium/strict` | 纯 JSD 选择性测试 | 60%/25%/5% | 中 |
-| `simjoin_benchmark` | DIVJOIN 基准 | 依数据集 | 高 |
+| Exp1 component | `ScalabilityBenchmark.java` | DET vs PROB 系统开销 | `benchmark/queries/exp1/component` |
+| Exp1 dimension | `Exp1DimensionBenchmark.java` | 固定 K=3，维度 1/2/4/8 的扩展性 | `benchmark/queries/exp1/dimension` |
+| Exp1 permutation | `Exp1PermutationBenchmark.java` | GMM component 顺序扰动下的语义稳定性 | `benchmark/queries/exp1/permutation` |
+| Exp2 | `Exp2Benchmark.java` | In-engine filtering vs `DIVJOIN` | `benchmark/queries/exp2` |
+| Exp3 | `Exp3Benchmark.java` | V1/V2/V3/V4/V5 JSD decision 方法对比 | remote TTL 中的 `prob:referenceJSD` |
+| Exp4 | `Exp4*.java` | GMM / Histogram / Dirichlet datatype extensibility | `benchmark/queries/exp4` |
+| Exp5 | `Exp5Benchmark.java` | In-engine early filter vs client-side post-processing | `benchmark/queries/exp5` |
+
+### 8.2 运行方式
+
+所有正式脚本位于 `benchmark/scripts/ExperimentsN`，通过 `ENDPOINT_TEMPLATE` 指定远程 Fuseki endpoint：
+
+```bash
+export ENDPOINT_TEMPLATE='https://fujitsu.example.org/{dataset}/query'
+bash benchmark/scripts/Experiments2/run_exp2.sh
+```
+
+其中 `{dataset}` 会被替换成实验约定的 service name，例如 `exp2_npairs_5000_uf_0p2`、`simjoin_easy`、`exp1_E5_K3_D4` 等。
 
 ---
 
@@ -350,13 +354,11 @@ SPRT 测试（顺序概率比检验，SPRTSampler）
 
 初始化顺序：
 1. Jena 系统初始化（`JenaSystem.init()`）
-2. 注册 GMM 自定义数据类型（`TypeMapper`）
-3. 注册 22 个 SPARQL 函数（`FunctionRegistry`）
+2. 注册 GMM、Histogram、Dirichlet 三类自定义数据类型（`TypeMapper`）
+3. 注册 29 个 SPARQL 函数（`FunctionRegistry`）
 4. 注册属性函数 `FuzzyJoinPF`、`ExactJoinPF`（`PropertyFunctionRegistry`）
-5. 覆盖代数生成器（`AlgebraGeneratorProbabilistic`）
-6. 注册概率查询引擎工厂（`QueryEngineRegistry`）
-7. 注册概率执行器（`QC.setFactory(OpExecutorProbabilistic.FACTORY)`）
-8. 注册概率连接策略（`ProbabilisticJoins`）
+5. 初始化概率连接策略（`ProbabilisticJoins`）
+6. 注册概率查询引擎工厂（`QueryEngineRegistry`），由 `QueryEngineProbabilistic` 在含 `FUSEJOIN` / `DIVJOIN` 的查询中安装概率代数生成器和执行器
 
 ---
 
@@ -403,19 +405,18 @@ mvn test
 # 启动 HTTP 端点
 mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki"
 
-# 运行基准测试（示例）
-mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.SimilarityJoinBenchmark"
-mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.PerformanceBenchmark"
-
-# 切换 JSD 计算模式
-mvn exec:java -Dprobsparql.mode=V5_ADAPTIVE -Dexec.mainClass="..."
+# 运行正式 benchmark（远程 Fuseki endpoint）
+export ENDPOINT_TEMPLATE='https://fujitsu.example.org/{dataset}/query'
+bash benchmark/scripts/Experiments1/component/run_exp1_component.sh
+bash benchmark/scripts/Experiments2/run_exp2.sh
+bash benchmark/scripts/Experiments3/run_exp3.sh
 ```
 
 ---
 
 ## 13. 关键设计决策
 
-1. **GMM 作为统一不确定性表示**：相比简单高斯，GMM 支持多峰、非对称分布，更贴近真实传感器误差分布。
+1. **多态概率 datatype 层**：GMM 是主要数值不确定性表示，Histogram 和 Dirichlet 用于非参数分布和 datatype extensibility；`prob:jsd` 等接口尽量通过统一的 value 层分派。
 
 2. **JSD 而非 KL 作为匹配度量**：JSD 对称、有界（$[0, \ln 2]$），可直接作为连接阈值；KL 散度在实践中可能发散至无穷。
 
@@ -423,7 +424,7 @@ mvn exec:java -Dprobsparql.mode=V5_ADAPTIVE -Dexec.mainClass="..."
 
 4. **侵入式 Jena 修改**：通过直接修改 Jena 源码（JavaCC 解析器、代数层、执行层），而非纯插件方式，以支持新语法关键字 `FUSEJOIN`/`DIVJOIN`。
 
-5. **物化嵌套循环连接**：当前连接实现为内存物化的嵌套循环，对大数据集存在扩展性挑战（已有 `ScalabilityBenchmark` 验证此瓶颈）。
+5. **物化嵌套循环连接**：当前连接实现为内存物化的嵌套循环，对大数据集存在扩展性挑战；`DIVJOIN` 的 pruning cascade 主要减少 full JSD 计算，不改变候选对生成复杂度。
 
 ---
 

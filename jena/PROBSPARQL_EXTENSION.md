@@ -6,7 +6,7 @@ This is a modified version of Apache Jena with ProbSPARQL extensions for probabi
 
 ### 1. Grammar (JavaCC)
 - `jena-arq/Grammar/main.jj`
-  - Added FUSEJOIN and SIMILARITYJOIN tokens
+  - Added FUSEJOIN and DIVJOIN syntax support
   - Added FuseJoinGraphPattern() and SimilarityJoinGraphPattern() rules
   - Added these operators to GraphPatternNotTriples()
 
@@ -38,12 +38,12 @@ SELECT ?result WHERE {
 }
 ```
 
-### SIMILARITYJOIN
+### DIVJOIN
 Filters results based on JS divergence between distributions being within tolerance.
 
 ```sparql
 SELECT ?s1 ?s2 WHERE {
-  SIMILARITYJOIN(?dist1, ?dist2, 0.1, 0.05) {
+  DIVJOIN(?dist1, ?dist2, 0.1, 0.05) {
     ?s1 :hasDist ?dist1 .
     ?s2 :hasDist ?dist2 .
   }
@@ -53,6 +53,16 @@ SELECT ?s1 ?s2 WHERE {
 The four arguments are the left distribution, the right distribution, the JSD
 threshold, and the one-sided tail probability used by the sequential confidence
 bounds in `V3_SPRT` and `V5_ADAPTIVE`.
+
+The relational binary form is also supported:
+
+```sparql
+SELECT ?s1 ?s2 WHERE {
+  { ?s1 :hasDist ?dist1 . }
+  DIVJOIN(?dist1, ?dist2, 0.1, 0.05)
+  { ?s2 :hasDist ?dist2 . }
+}
+```
 
 ## Building
 

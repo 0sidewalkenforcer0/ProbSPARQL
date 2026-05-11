@@ -28,8 +28,9 @@ QueryEngineProbabilistic       ← Layer 3: Execution Engine
   → QueryIterPrunedSimilarityJoin / QueryIterFuseJoin
     │
     ▼
-GMMDatatype / FunctionRegistry ← Layer 4: Data Types & Functions
- → prob:jsdivergence, prob:cdf, prob:mean, …
+Probabilistic datatypes / FunctionRegistry ← Layer 4: Data Types & Functions
+ → uq:gmmLiteral, uq:histLiteral, uq:dirichletLiteral
+ → prob:jsd, prob:jsdivergence, prob:cdf, prob:mean, …
 ```
 
 ---
@@ -122,7 +123,7 @@ Two new `Element` subclasses are added to the syntax tree:
 
 | Class | Superclass | Fields |
 |-------|-----------|--------|
-| `ElementSimilarityJoin` | `Element` | `leftPattern`, `rightPattern`, `leftVar`, `rightVar`, `tolerance` |
+| `ElementSimilarityJoin` | `Element` | `leftPattern`, `rightPattern`, `leftVar`, `rightVar`, `tolerance`, `tailProbability` |
 | `ElementFuseJoin` | `Element` | `leftPattern`, `rightPattern`, `leftVar`, `rightVar`, `tolerance`, `resultVar` |
 
 Both classes have two constructors: one for the relational (dual-pattern) form where `leftPattern ≠ null`, and one for the legacy (single-pattern) form where `leftPattern == null`. The `visit(ElementVisitor)` method delegates to `ElementVisitorProbabilistic` when available, or visits both sub-patterns for standard Jena visitors.
@@ -160,7 +161,8 @@ This caused `ApplyTransformVisitor.visit(OpSimilarityJoin)` to never be called. 
 ```java
 public class OpSimilarityJoin extends OpExt {
     public OpSimilarityJoin(Op leftOp, Op rightOp, Var leftVar, Var rightVar,
-                            double tolerance, boolean legacyMode) {
+                            double tolerance, double tailProbability,
+                            boolean legacyMode) {
         super("SimilarityJoin");   // tag used for SSE serialization
         …
     }
@@ -203,7 +205,7 @@ The same analysis and fix applies to `OpFuseJoin`, which uses the analogous `Op1
 compileSimilarityJoinInGroup(simJoin, current):
   leftOp  = compileElement(simJoin.leftPattern)
   rightOp = compileElement(simJoin.rightPattern)
-  simJoinOp = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, θ, false)
+  simJoinOp = new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, θ, α, false)
   if current ≠ ⊤:
       return OpJoin(current, simJoinOp)
   return simJoinOp
@@ -212,7 +214,7 @@ compileSimilarityJoinInGroup(simJoin, current):
 **Compilation for legacy semantics (`leftPattern == null`):**
 ```
   leftOp = rightOp = compileElement(simJoin.rightPattern)
-  return new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, θ, legacyMode=true)
+  return new OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, θ, α, legacyMode=true)
 ```
 
 ---
@@ -279,13 +281,23 @@ A second override of `executeOp` covers the case where `OpSimilarityJoin` / `OpF
 | L4 | Component-pair bounds filter | `BoundsFilterSampler` distance bound |
 | L5 | Full MC-sampled JSD | `JSD(GMM₁, GMM₂) > θ` via `AdaptiveSampler` |
 
-Pruning statistics (pairs pruned per level, total pairs, result count) are accumulated in `PruningStats` and published via a `ThreadLocal` holder (`Exp2PruningHolder`) for retrieval by the benchmark harness after iterator exhaustion.
+Pruning statistics (pairs pruned per level, total pairs, result count) are accumulated in `PruningStats` and published through `Exp2PruningHolder`. The holder keeps a thread-local slot for in-process callers and a latest-stats snapshot that the remote benchmark harness reads through `prob:lastDivJoinStats(...)` after iterator exhaustion.
 
 ---
 
 ## 5. Data Types and Function Registry
 
-### 5.1 Probabilistic Literal Type: `GMMDatatype` / `GMMValue`
+### 5.1 Probabilistic Literal Types
+
+ProbSPARQL currently registers three probabilistic literal families:
+
+| Datatype | RDF datatype URI | Java value class | Notes |
+|----------|------------------|------------------|-------|
+| GMM | `http://example.org/ontology/uncertainty#gmmLiteral` | `GMMValue` | Multivariate Gaussian mixture with `K`, `d`, weights, means, and covariance matrices |
+| Histogram | `http://example.org/ontology/uncertainty#histLiteral` | `HistogramValue` | Multidimensional histogram with joint CDF semantics |
+| Dirichlet | `http://example.org/ontology/uncertainty#dirichletLiteral` | `DirichletValue` | Simplex-valued distribution used for datatype-extensibility experiments |
+
+#### GMM literal details
 
 | Aspect | Detail |
 |--------|--------|
@@ -295,7 +307,7 @@ Pruning statistics (pairs pruned per level, total pairs, result count) are accum
 | Registration | `TypeMapper.getInstance().registerDatatype(GMMDatatype.INSTANCE)` called in `ProbSPARQL.init()` |
 | Validation | Checked on parse: weight sum ∈ [1 ± 1e-6], all arrays dimensionally consistent |
 
-A `GMMValue` node is serialised and recovered transparently by Jena's literal machinery. When Jena evaluates a `BIND(prob:jsd(?d1, ?d2) AS ?jsd)` or legacy `BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)` expression, the function implementation directly casts the `NodeValue`'s underlying Java object to the underlying distribution value without re-parsing the JSON string.
+A parsed probabilistic literal is recovered transparently by Jena's literal machinery. When Jena evaluates a `BIND(prob:jsd(?d1, ?d2) AS ?jsd)` or legacy `BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)` expression, the function implementation casts the `NodeValue`'s underlying Java object to the parsed distribution value without re-parsing the JSON string.
 
 ### 5.2 Registered SPARQL Functions
 
@@ -311,7 +323,7 @@ All functions are registered via `FunctionRegistry.get().put(URI, Class)` during
 | `prob:logcdf` | 2 | Log-CDF |
 | `prob:histcdf` | 2 | CDF for histogram-typed distributions |
 
-#### Category 2 — Divergence / Comparison (4 functions)
+#### Category 2 — Divergence / Comparison (8 functions)
 
 | URI | Arity | Description |
 |-----|-------|-------------|
@@ -319,6 +331,10 @@ All functions are registered via `FunctionRegistry.get().put(URI, Class)` during
 | `prob:jsdivergence` | 2 | Legacy GMM-only compatibility wrapper for the V1-V5 similarity-evaluator stack |
 | `prob:kldivergence` | 2 | KL divergence (asymmetric) |
 | `prob:histjsd` | 2 | JSD for histogram-typed distributions |
+| `prob:jsdMode` | 3 | Benchmark-only dispatcher for the legacy GMM V1-V5 mode stack without mutating global JVM state |
+| `prob:lastDivJoinStats` | 1 | Benchmark-only accessor for the latest server-side DIVJOIN pruning counters |
+| `prob:sameTerm` | 2 | RDF term identity, preserving lexical differences |
+| `prob:sameDistribution` | 2 | Datatype value equality, matching SPARQL `=` distribution semantics |
 
 `prob:jsd` is the stable numerical interface. For GMM paths it uses a fixed MC-10K estimator; other supported distribution types use their own type-specific numerical implementations or a sample-based fallback.
 
@@ -335,7 +351,7 @@ CDF `P(X1<=x1, ..., Xd<=xd)`.
 
 `prob:scale`, `prob:shift`, `prob:linear`, `prob:marginal`, `prob:joint`, `prob:convolve`, `prob:multiply` — all return a new GMM literal computed analytically (when possible) or via sampling.
 
-#### Category 4 — Distribution Manipulation (8 functions)
+#### Category 4 — Distribution Manipulation (9 functions)
 
 | URI | Description |
 |-----|-------------|
@@ -347,6 +363,7 @@ CDF `P(X1<=x1, ..., Xd<=xd)`.
 | `prob:fuse` | Bayesian sensor fusion (product of distributions, re-normalised) |
 | `prob:quantile` | Quantile function Q(p) |
 | `prob:histmean` | Mean of a histogram distribution |
+| `prob:sample` | Draws `n` samples from a supported distribution and returns a JSON array |
 
 #### Category 5 — Property Functions (2)
 
@@ -357,56 +374,56 @@ CDF `P(X1<=x1, ..., Xd<=xd)`.
 `ProbSPARQL.init()` is idempotent and thread-safe (guarded by `synchronized` + `initialized` flag). It must be called before any probabilistic query is executed. The sequence is:
 
 1. `JenaSystem.init()` — ensures Jena base modules are loaded.
-2. Register `GMMDatatype` and `HistogramDatatype` with Jena's `TypeMapper`.
-3. Register all 22 SPARQL functions into `FunctionRegistry`.
+2. Register `GMMDatatype`, `HistogramDatatype`, and `DirichletDatatype` with Jena's `TypeMapper`.
+3. Register all 29 SPARQL functions into `FunctionRegistry`.
 4. Register 2 property functions into `PropertyFunctionRegistry`.
 5. Register `QueryEngineProbabilistic.Factory` with `QueryEngineRegistry` (highest priority).
 
 ---
 
-## 6. Impact Analysis: Does Experiment 1 Need Re-running?
+## 6. Current Benchmark Harness Alignment
 
-### 6.1 What Experiment 1 Measures
+The active benchmark harness is remote-first. Java benchmark classes run as
+local clients and send SPARQL over HTTP to preloaded Fuseki services through
+`RemoteBenchmarkClient`. Generated TTL datasets are not loaded by the benchmark
+runners themselves; they must be generated separately and deployed as Fuseki
+services whose names match the runner's dataset naming convention.
 
-Experiment 1 measures the **execution-time overhead** that ProbSPARQL introduces over standard deterministic SPARQL for four query types:
+### 6.1 Scalar Function Queries
 
-| Query | SPARQL constructs used |
-|-------|----------------------|
-| Q1 — Threshold Filtering | BGP + `BIND(prob:cdf(…) AS ?p)` + `FILTER` |
-| Q2 — Statistical Summary | BGP + `BIND(prob:multiply(…))` + `BIND(prob:mean(…))` |
-| Q3 — Distribution Comparison | BGP + `BIND(prob:jsd(…))` or legacy `BIND(prob:jsdivergence(…))` + `FILTER` |
-| Q4 — Pure Graph Traversal | BGP only (no `prob:` functions) |
+Experiments 1, 4, and 5 mostly use standard SPARQL `BIND` and `FILTER`
+expressions with registered scalar functions such as `prob:cdf`, `prob:mean`,
+`prob:std`, `prob:jsd`, and `prob:sample`. These queries follow Jena's standard
+expression-evaluation path. `QueryEngineProbabilistic` is not required unless
+the query syntax contains `DIVJOIN` or `FUSEJOIN`.
 
-**None of the four queries use `DIVJOIN` or `FUSEJOIN` syntax.** All probabilistic computations are expressed via `BIND` + standard SPARQL `FILTER`.
+### 6.2 DIVJOIN Queries
 
-### 6.2 Execution Path for BIND/FILTER Queries
+Experiment 2 exercises the relational `DIVJOIN(?left, ?right, tolerance,
+tailProbability)` syntax. The server-side parser, algebra generator, and
+probabilistic executor are therefore required on the Fuseki endpoint. When
+`probsparql.simjoin.pruning=true`, execution uses `QueryIterPrunedSimilarityJoin`
+and publishes pruning counters through `Exp2PruningHolder`; the remote harness
+then reads them with `prob:lastDivJoinStats(...)`.
 
-For a query containing only `BIND` and `FILTER`:
+### 6.3 Mode-Specific JSD Queries
 
-1. **Parsing** — `ARQParser` produces `ElementBind` and `ElementFilter` nodes. The tokens `DIVJOIN` and `FUSEJOIN` never appear, so neither the new lookahead branch in `GroupGraphPatternSub` nor `SimilarityJoinGraphPattern()` is ever entered.
+Experiment 3 compares the legacy GMM JSD strategy stack without mutating global
+JVM mode state. It uses the benchmark-only scalar function
+`prob:jsdMode(?d1, ?d2, "V3_SPRT")` and analogous mode strings for `V1_MC`,
+`V2_STRATIFIED`, `V4_BOUNDS`, and `V5_ADAPTIVE`. Reference JSD values are
+embedded in the remote TTL datasets as `prob:referenceJSD`.
 
-2. **Engine selection** — `QueryEngineProbabilistic.Factory.accept()` walks the syntax tree and finds no `ElementSimilarityJoin` or `ElementFuseJoin`. It returns `false`. The query is handled entirely by the pre-existing `QueryEngineMain`.
+### 6.4 Public Interface Boundary
 
-3. **Algebra compilation** — Because `QueryEngineMain` is used, `AlgebraGeneratorProbabilistic` is **not** invoked. The standard `AlgebraGenerator` compiles the query into `OpProject(OpFilter(OpExtend(OpBGP)))`. No `OpSimilarityJoin` is produced, and the `OpExt` fix is irrelevant.
+The current public boundary is:
 
-4. **Execution** — `OpExecutorProbabilistic.exec()` is registered only inside `QueryEngineProbabilistic`'s context (step 2 of §4.1). Since `QueryEngineMain` is used, `OpExecutorProbabilistic` is **never registered** and the standard `OpExecutor` runs the plan.
-
-5. **Function evaluation** — `prob:cdf`, `prob:mean`, `prob:jsd`, `prob:jsdivergence`, etc., are SPARQL scalar functions evaluated by Jena's standard expression evaluator when it encounters `OpExtend`. Their execution still stays on the scalar-function path; only the internal semantics of the legacy `prob:jsdivergence` wrapper differ from the newer numerical `prob:jsd` interface.
-
-### 6.3 Analysis of Each Bug Fix
-
-#### Fix A — `OpSimilarityJoin extends OpExt` (visitor pattern)
-
-- **Scope of change**: `OpSimilarityJoin.java` only.  
-- **Activation condition**: This fix has any effect only when `OpSimilarityJoin` is instantiated and placed into an algebra tree. `OpSimilarityJoin` is only created in `AlgebraGeneratorProbabilistic.compileSimilarityJoin()`, which is only called when an `ElementSimilarityJoin` node is present.  
-- **Conclusion**: Because Experiment 1 queries contain no `DIVJOIN` syntax, `OpSimilarityJoin` is never instantiated, the `visit()` method is never called, and `TransformSimplify` never encounters this operator. **Fix A has zero effect on Experiment 1 query execution.**
-
-#### Fix B — `ARQParser.java` lookahead dispatch
-
-- **Scope of change**: The `GroupGraphPatternSub` loop in `ARQParser.java`. Specifically, the loop body was changed to test `jj_2_4(2147483647)` before each non-triple group element.  
-- **Activation condition**: `jj_2_4` scans the upcoming token stream for the pattern `GroupGraphPattern() DIVJOIN`. This scan is a lookahead-only operation that does **not consume input**. It returns `false` for any token sequence that is not `LBRACE … RBRACE DIVJOIN`, which covers all tokens produced by standard SPARQL constructs including `FILTER`, `BIND`, `OPTIONAL`, `GRAPH`, `VALUES`, and plain BGP triples.  
-- **Conclusion**: For every element in an Experiment 1 query, `jj_2_4` returns `false`, the new branch is never taken, and `GraphPatternNotTriples()` is called exactly as before. **Fix B has zero effect on Experiment 1 query parsing.**
-
-### 6.4 Conclusion
-
-**Experiment 1 does not need to be re-run.** The two recent bug fixes operate exclusively on the code paths activated by `DIVJOIN` syntax. The complete execution path for `BIND`/`FILTER` queries — from tokenisation through parsing, algebra compilation, engine selection, and iterator execution — is identical before and after the fixes. The numerical results, timing measurements, and overhead ratios produced by Experiment 1 remain fully valid.
+- `prob:jsd` is the preferred numerical JSD function and supports GMM,
+  histogram, Dirichlet, and cross-type sample-based fallback paths.
+- `DIVJOIN` is the query-level similarity-decision operator. Its fourth
+  argument is the one-sided tail probability used by the sequential decision
+  logic.
+- `prob:jsdivergence` remains as a legacy GMM-only compatibility wrapper for
+  the V1-V5 similarity-evaluator stack.
+- `prob:jsdMode` and `prob:lastDivJoinStats` are benchmark support functions,
+  not general user-facing APIs.

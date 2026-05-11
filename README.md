@@ -1,8 +1,8 @@
 # ProbSPARQL: Querying Knowledge Graphs with Multi-dimensional, Uncertain Numeric Data
 
-**Probabilistic SPARQL Extension for Apache Jena with Gaussian Mixture Models (GMMs)**
+**Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals**
 
-ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data with uncertainty represented as Gaussian Mixture Models.
+ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data with distribution-valued literals. The current prototype supports Gaussian mixture models (GMMs), multidimensional histograms, and Dirichlet distributions, with polymorphic numerical comparison through `prob:jsd`.
 
 ---
 
@@ -16,7 +16,7 @@ ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data wi
 - [Usage Examples](#usage-examples)
 - [Available Functions](#available-functions)
 - [Special Operators](#special-operators)
-- [GMM Data Format](#gmm-data-format)
+- [Probabilistic Data Formats](#probabilistic-data-formats)
 - [Project Structure](#project-structure)
 - [License](#license)
 
@@ -115,7 +115,7 @@ mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.QueryRunner" \
   -Dexec.args="examples/data/angle-grinder-instances.ttl examples/queries/U1_probabilistic_thresholding.sparql"
 ```
 
-This executes a probabilistic query that evaluates PDF values on GMM distributions.
+This executes a probabilistic query that evaluates PDF values on distribution literals.
 
 ---
 
@@ -217,7 +217,7 @@ The `examples/queries/` directory contains ready-to-use queries:
 
 ### Run All Example Queries
 
-A convenience script is provided to run all U1-U6 queries:
+A convenience script is provided to run all U1-U7 queries:
 
 ```bash
 cd examples/queries
@@ -241,49 +241,47 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 ### Thresholding Functions
 | Function | Description | Example |
 |----------|-------------|---------|
-| `prob:pdf(?gmm, ?x)` | Probability density at point x | `prob:pdf(?dist, 5.0)` |
-| `prob:cdf(?gmm, ?x)` | Cumulative probability up to x | `prob:cdf(?dist, 5.0)` |
-| `prob:logpdf(?gmm, ?x)` | Log probability density | `prob:logpdf(?dist, 5.0)` |
-| `prob:logcdf(?gmm, ?x)` | Log cumulative probability | `prob:logcdf(?dist, 5.0)` |
+| `prob:pdf(?dist, ?x)` | Probability density at point x | `prob:pdf(?dist, 5.0)` |
+| `prob:cdf(?dist, ?x)` | Cumulative probability up to x; for multidimensional histograms this is the joint CDF | `prob:cdf(?dist, 5.0)` |
+| `prob:logpdf(?dist, ?x)` | Log probability density | `prob:logpdf(?dist, 5.0)` |
+| `prob:logcdf(?dist, ?x)` | Log cumulative probability | `prob:logcdf(?dist, 5.0)` |
+| `prob:histcdf(?hist, ?x)` | Histogram CDF; accepts the multidimensional histogram schema | `prob:histcdf(?hist, "[1.0,2.0]")` |
 
 ### Comparison Functions
 | Function | Description | Example |
 |----------|-------------|---------|
 | `prob:kldivergence(?gmm1, ?gmm2)` | KL divergence between distributions | `prob:kldivergence(?d1, ?d2)` |
 | `prob:jsd(?dist1, ?dist2)` | Preferred JSD interface. Returns a numerical Jensen-Shannon divergence for supported distribution types; MC paths use a fixed 10K sample budget | `prob:jsd(?d1, ?d2)` |
-<!-- | `prob:jsdivergence(?gmm1, ?gmm2)` | Legacy GMM-only compatibility wrapper. Internally routed through the threshold-aware similarity evaluator used by the old V1-V5 modes | `prob:jsdivergence(?d1, ?d2)` | -->
+| `prob:jsdivergence(?gmm1, ?gmm2)` | Legacy GMM-only compatibility wrapper for the threshold-aware V1-V5 similarity evaluator | `prob:jsdivergence(?d1, ?d2)` |
+| `prob:histjsd(?hist1, ?hist2)` | Histogram-specific JSD | `prob:histjsd(?h1, ?h2)` |
+| `prob:sameTerm(?a, ?b)` | RDF term equality; lexical-form sensitive | `prob:sameTerm(?d1, ?d2)` |
+| `prob:sameDistribution(?a, ?b)` | Datatype value equality; uses parsed distribution equality | `prob:sameDistribution(?d1, ?d2)` |
 
 ### Transformation Functions
 | Function | Description | Example |
 |----------|-------------|---------|
-| `prob:scale(?gmm, ?factor)` | Scale distribution | `prob:scale(?dist, 2.0)` |
-| `prob:shift(?gmm, ?offset)` | Shift distribution | `prob:shift(?dist, 1.0)` |
-| `prob:linear(?gmm, ?a, ?b)` | Linear transform (ax + b) | `prob:linear(?dist, 2.0, 1.0)` |
-| `prob:convolve(?gmm1, ?gmm2)` | Convolve two distributions | `prob:convolve(?d1, ?d2)` |
+| `prob:scale(?gmm, ?factor)` | Scale a GMM distribution | `prob:scale(?dist, 2.0)` |
+| `prob:shift(?gmm, ?offset)` | Shift a GMM distribution | `prob:shift(?dist, 1.0)` |
+| `prob:linearTransform(?gmm, ?a, ?b)` | Linear transform (ax + b) | `prob:linearTransform(?dist, 2.0, 1.0)` |
+| `prob:marginal(?gmm, ?dim)` | Extract one marginal dimension | `prob:marginal(?dist, 0)` |
+| `prob:joint(?gmm1, ?gmm2)` | Build an independent joint distribution | `prob:joint(?d1, ?d2)` |
+| `prob:convolve(?gmm1, ?gmm2)` | Convolve two GMM distributions | `prob:convolve(?d1, ?d2)` |
+| `prob:multiply(?gmm1, ?gmm2)` | Approximate product distribution | `prob:multiply(?d1, ?d2)` |
 
 ### Manipulation Functions
 | Function | Description | Example |
 |----------|-------------|---------|
-| `prob:mean(?gmm)` | Expected value | `prob:mean(?dist)` |
-| `prob:std(?gmm)` | Standard deviation | `prob:std(?dist)` |
+| `prob:mean(?dist)` | Expected value | `prob:mean(?dist)` |
+| `prob:std(?dist)` | Standard deviation | `prob:std(?dist)` |
+| `prob:map(?dist)` | MAP / representative point | `prob:map(?dist)` |
+| `prob:modeCount(?dist)` | Number of mixture modes | `prob:modeCount(?dist)` |
+| `prob:mix(?gmm1, ?gmm2)` | Weighted mixture of two GMMs | `prob:mix(?d1, ?d2)` |
 | `prob:fuse(?gmm1, ?gmm2)` | Bayesian fusion | `prob:fuse(?prior, ?likelihood)` |
 | `prob:quantile(?gmm, ?p)` | Quantile at probability p | `prob:quantile(?dist, 0.95)` |
+| `prob:histmean(?hist)` | Mean of a histogram distribution | `prob:histmean(?hist)` |
 | `prob:sample(?dist, ?n)` | Draw n samples as a JSON array with shape `[n][dimensions]` | `prob:sample(?dist, 10)` |
 
-For histogram literals, the preferred lexical form is:
-
-```json
-{
-  "dimensions": 2,
-  "edges": [[0.0, 1.0, 2.0], [10.0, 20.0, 30.0]],
-  "weights": [0.1, 0.2, 0.3, 0.4]
-}
-```
-
-`weights` stores cell probability masses on the Cartesian-product grid in row-major order.  
-Legacy 1-D histogram literals of the form `{"bins":[...],"weights":[...]}` are still accepted, but histogram values are now serialized back using the multidimensional schema above.
-
-For multidimensional histograms, `prob:cdf` / `prob:histcdf` interpret the second argument as a JSON array and compute the **joint CDF** `P(X1<=x1, ..., Xd<=xd)`.
+Benchmark support functions such as `prob:jsdMode` and `prob:lastDivJoinStats` are registered for experiment harnesses, but they are not the primary public API.
 
 ---
 
@@ -325,7 +323,9 @@ SELECT ?sensor1 ?sensor2 WHERE {
 
 ---
 
-## GMM Data Format
+## Probabilistic Data Formats
+
+### GMM Literals
 
 GMM distributions are JSON literals with datatype `uq:gmmLiteral`:
 
@@ -356,6 +356,27 @@ ex:sensor1 uq:hasDistribution
   "{\"K\":1,\"d\":1,\"weights\":[1.0],\"means\":[[25.0]],\"covariances\":[[[0.25]]]}"^^uq:gmmLiteral .
 ```
 
+### Histogram Literals
+
+For histogram literals, the preferred lexical form is:
+
+```json
+{
+  "dimensions": 2,
+  "edges": [[0.0, 1.0, 2.0], [10.0, 20.0, 30.0]],
+  "weights": [0.1, 0.2, 0.3, 0.4]
+}
+```
+
+`weights` stores cell probability masses on the Cartesian-product grid in row-major order.
+Legacy 1-D histogram literals of the form `{"bins":[...],"weights":[...]}` are still accepted, but histogram values are now serialized back using the multidimensional schema above.
+
+For multidimensional histograms, `prob:cdf` / `prob:histcdf` interpret the second argument as a JSON array and compute the **joint CDF** `P(X1<=x1, ..., Xd<=xd)`.
+
+### Dirichlet Literals
+
+Dirichlet literals use datatype `uq:dirichletLiteral` and are supported by the polymorphic datatype layer for the current comparison and manipulation functions used in the prototype.
+
 ---
 
 ## Project Structure
@@ -365,7 +386,7 @@ ProbSPARQL/
 ├── src/main/java/org/apache/jena/probsparql/
 │   ├── ProbSPARQL.java          # Main initialization
 │   ├── QueryRunner.java         # Command-line query runner
-│   ├── datatypes/               # GMM datatype implementation
+│   ├── datatypes/               # GMM, histogram, and Dirichlet datatypes
 │   ├── functions/               # SPARQL function implementations
 │   ├── propertyfunctions/       # Property function implementations
 │   ├── algebra/                 # FUSEJOIN/DIVJOIN operators
