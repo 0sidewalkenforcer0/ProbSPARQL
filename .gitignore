@@ -54,5 +54,9 @@ benchmark/results/**/*.tex
 !benchmark/results/**/
 !benchmark/results/**/.gitkeep
 
+# Generated multidimensional GMM benchmark artifacts; keep generator scripts tracked.
+benchmark/multiDdata/*.ttl
+benchmark/multiDdata/manifest.json
+
 # Packaged desktop app artifacts
 dist/
