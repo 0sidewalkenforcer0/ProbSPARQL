@@ -28,19 +28,31 @@ Thumbs.db
 # Test outputs
 test-output/
 
+# Python cache
+__pycache__/
+*.py[cod]
+
 # Jena TDB databases
 TDB/
 TDB2/
 
 # Benchmark data and generated results (regenerable via scripts)
+benchmark/data/**
 benchmark/data/**/*.ttl
 benchmark/data/*.ttl
+benchmark/results/**
 benchmark/results/**/*.png
 benchmark/results/**/*.pdf
 benchmark/results/**/*.svg
 benchmark/results/**/*.csv
 benchmark/results/**/*.json
 benchmark/results/**/*.tex
+!benchmark/data/
+!benchmark/data/**/
+!benchmark/data/**/.gitkeep
+!benchmark/results/
+!benchmark/results/**/
+!benchmark/results/**/.gitkeep
 
 # Packaged desktop app artifacts
 dist/

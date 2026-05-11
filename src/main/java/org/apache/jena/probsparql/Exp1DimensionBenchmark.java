@@ -24,7 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Exp1 supplement: fixed scale E5, fixed K=3, varying GMM dimension d.
+ * Exp1 supplement: fixed scale E5, fixed K=3, varying GMM dimension d in
+ * {1, 2, 4, 8}.
  * Runs Q1-Q3 with deterministic and probabilistic paths on the same multidimensional
  * datasets, plus two Q4 probabilistic variants.
  */
@@ -35,7 +36,7 @@ public class Exp1DimensionBenchmark {
 
     private static final String DEFAULT_SCALE = "E5";
     private static final int DEFAULT_K = 3;
-    private static final int[] DEFAULT_DIMENSIONS = {1, 3, 5, 10};
+    private static final int[] DEFAULT_DIMENSIONS = {1, 2, 4, 8};
 
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
@@ -75,6 +76,8 @@ public class Exp1DimensionBenchmark {
         System.out.printf("Scale      : %s%n", scale);
         System.out.printf("K          : %d%n", k);
         System.out.printf("Dimensions : %s%n", dimensions);
+        System.out.printf("Warmup     : %d%n", WARMUP_RUNS);
+        System.out.printf("Runs       : %d%n", BENCHMARK_RUNS);
         System.out.printf("Data dir   : %s%n", dataDir);
         System.out.printf("Query dir  : %s%n", queryDir);
         System.out.printf("Output dir : %s%n", outputDir);

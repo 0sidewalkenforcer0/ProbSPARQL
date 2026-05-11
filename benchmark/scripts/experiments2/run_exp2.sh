@@ -2,11 +2,11 @@
 # =============================================================================
 # run_exp2.sh — Full overnight run for Experiment 2
 #
-# Experiment 2: In-engine Filtering vs SimilarityJoin with Mixed-K Datasets
+# Experiment 2: In-engine Filtering vs DIVJOIN with Mixed-K Datasets
 #   Three-way comparison across:
 #     InEngine_CheapFirst
 #     InEngine_JSDFirst
-#     SimilarityJoin
+#     DIVJOIN
 #   across:
 #     N_PAIRS ∈ {100, 500, 1000, 5000, 10000}
 #     unimodalFrac ∈ {0.2, 0.5, 0.8}
@@ -60,7 +60,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US" 
 
 echo "=================================================================="
-echo "  Experiment 2 — In-engine Filtering vs SimilarityJoin  [FULL RUN]"
+echo "  Experiment 2 — In-engine Filtering vs DIVJOIN  [FULL RUN]"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
 echo "  Output dir   : $OUTPUT_DIR"

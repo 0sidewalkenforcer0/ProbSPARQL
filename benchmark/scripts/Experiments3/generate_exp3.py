@@ -4,21 +4,21 @@ Exp3 Data Generator
 ===================
 Generates 4 TTL datasets (easy/medium/hard/mixed) with controlled JSD values
 for the Exp3 classification benchmark with threshold θ=0.3.
-Current official dataset version corresponds to the former exp3_1_k5_n300_new
-configuration (K=5, N=300).
 
 Each dataset contains N LeftEntity + N RightEntity pairs.
-JSD is controlled via rejection sampling with high-precision MC (50k samples).
+JSD is controlled via rejection sampling. Accepted pairs store a high-precision
+reference JSD estimated with 10^6 Monte Carlo samples by default, matching the
+supplementary-material benchmark protocol.
 
 JSD ranges (θ=0.3):
-  Easy:   |JSD - 0.3| > 0.2   → JSD ∈ [0, 0.1) ∪ (0.5, log2]
-  Medium: 0.05 < |JSD-0.3| ≤ 0.2  → JSD ∈ [0.1, 0.25) ∪ (0.35, 0.5]
-  Hard:   |JSD - 0.3| ≤ 0.05  → JSD ∈ [0.25, 0.35]
+  Easy:   |JSD - 0.3| >= 0.15 → JSD ∈ [0, 0.15] ∪ [0.45, log2]
+  Medium: 0.05 <= |JSD - 0.3| < 0.15 → JSD ∈ [0.15, 0.25] ∪ [0.35, 0.45]
+  Hard:   |JSD - 0.3| < 0.05 → JSD ∈ (0.25, 0.35)
   Mixed:  1/3 easy + 1/3 medium + 1/3 hard
 
 Usage:
   pip install numpy
-  python generate_exp3.py [--n 100] [--k 2] [--output-dir benchmark/data/exp3] [--seed 42]
+  python generate_exp3.py [--n 2400] [--k 5] [--output-dir benchmark/data/exp3] [--seed 42]
 """
 
 import argparse
@@ -30,6 +30,13 @@ import sys
 import time
 
 import numpy as np
+
+THETA = 0.3
+DEFAULT_N = 2400
+DEFAULT_K = 5
+DEFAULT_REFERENCE_SAMPLES = 1_000_000
+DEFAULT_SCREENING_SAMPLES = 50_000
+LOG2 = math.log(2.0)
 
 
 # ===========================================================================
@@ -125,11 +132,11 @@ def perturb_gmm(weights, means, covariances, offset_range, var_scale_range, rng)
 # ===========================================================================
 
 JSD_RANGES = {
-    "easy_low": (0.0, 0.1),  # Almost identical → JSD ≈ 0
-    "easy_high": (0.5, 0.693),  # Very different → JSD near log(2)
-    "medium_low": (0.1, 0.25),  # Moderate, below threshold
-    "medium_high": (0.35, 0.5),  # Moderate, above threshold
-    "hard": (0.25, 0.35),  # Near threshold 0.3
+    "easy_low": (0.0, THETA - 0.15),
+    "easy_high": (THETA + 0.15, LOG2),
+    "medium_low": (THETA - 0.15, THETA - 0.05),
+    "medium_high": (THETA + 0.05, THETA + 0.15),
+    "hard": (THETA - 0.05, THETA + 0.05),
 }
 
 # Perturbation parameters tuned to hit each JSD range
@@ -142,17 +149,38 @@ PERTURB_PARAMS = {
 }
 
 
-def generate_pair_for_range(jsd_low, jsd_high, perturb_key, rng, k=2, max_attempts=5000):
-    """Generate a GMM pair whose true JSD falls in [jsd_low, jsd_high]."""
+def generate_pair_for_range(
+    jsd_low,
+    jsd_high,
+    perturb_key,
+    rng,
+    k=DEFAULT_K,
+    reference_samples=DEFAULT_REFERENCE_SAMPLES,
+    screening_samples=DEFAULT_SCREENING_SAMPLES,
+    max_attempts=5000,
+):
+    """Generate a GMM pair whose reference JSD falls in [jsd_low, jsd_high].
+
+    Screening uses a smaller MC budget only to avoid running the 10^6-sample
+    reference estimate on every rejected candidate. The accepted pair's stored
+    ground-truth value is always recomputed with reference_samples.
+    """
     params = PERTURB_PARAMS[perturb_key]
-    verify_rng = np.random.default_rng(12345)  # Deterministic verification
 
     for _ in range(max_attempts):
         w1, m1, c1 = random_gmm(rng, k=k)
         w2, m2, c2 = perturb_gmm(w1, m1, c1, **params, rng=rng)
-        jsd = compute_jsd_mc(w1, m1, c1, w2, m2, c2, 50000, verify_rng)
-        if jsd_low <= jsd <= jsd_high:
-            return w1, m1, c1, w2, m2, c2, jsd
+        screen_rng = np.random.default_rng(int(rng.integers(0, 2**32 - 1)))
+        screen_jsd = compute_jsd_mc(
+            w1, m1, c1, w2, m2, c2, screening_samples, screen_rng
+        )
+        if jsd_low <= screen_jsd <= jsd_high:
+            reference_rng = np.random.default_rng(int(rng.integers(0, 2**32 - 1)))
+            reference_jsd = compute_jsd_mc(
+                w1, m1, c1, w2, m2, c2, reference_samples, reference_rng
+            )
+            if jsd_low <= reference_jsd <= jsd_high:
+                return w1, m1, c1, w2, m2, c2, reference_jsd
 
     raise RuntimeError(
         f"Failed to generate pair for JSD [{jsd_low}, {jsd_high}] "
@@ -160,25 +188,48 @@ def generate_pair_for_range(jsd_low, jsd_high, perturb_key, rng, k=2, max_attemp
     )
 
 
-def generate_easy_pair(rng, k=2):
+def generate_easy_pair(rng, k=DEFAULT_K, reference_samples=DEFAULT_REFERENCE_SAMPLES,
+                       screening_samples=DEFAULT_SCREENING_SAMPLES):
     """Generate an easy pair: 50% chance low JSD, 50% chance high JSD."""
     if rng.random() < 0.5:
-        return generate_pair_for_range(*JSD_RANGES["easy_low"], "easy_low", rng, k=k)
+        return generate_pair_for_range(
+            *JSD_RANGES["easy_low"], "easy_low", rng, k=k,
+            reference_samples=reference_samples,
+            screening_samples=screening_samples,
+        )
     else:
-        return generate_pair_for_range(*JSD_RANGES["easy_high"], "easy_high", rng, k=k)
+        return generate_pair_for_range(
+            *JSD_RANGES["easy_high"], "easy_high", rng, k=k,
+            reference_samples=reference_samples,
+            screening_samples=screening_samples,
+        )
 
 
-def generate_medium_pair(rng, k=2):
+def generate_medium_pair(rng, k=DEFAULT_K, reference_samples=DEFAULT_REFERENCE_SAMPLES,
+                         screening_samples=DEFAULT_SCREENING_SAMPLES):
     """Generate a medium pair: 50% low-medium, 50% high-medium."""
     if rng.random() < 0.5:
-        return generate_pair_for_range(*JSD_RANGES["medium_low"], "medium_low", rng, k=k)
+        return generate_pair_for_range(
+            *JSD_RANGES["medium_low"], "medium_low", rng, k=k,
+            reference_samples=reference_samples,
+            screening_samples=screening_samples,
+        )
     else:
-        return generate_pair_for_range(*JSD_RANGES["medium_high"], "medium_high", rng, k=k)
+        return generate_pair_for_range(
+            *JSD_RANGES["medium_high"], "medium_high", rng, k=k,
+            reference_samples=reference_samples,
+            screening_samples=screening_samples,
+        )
 
 
-def generate_hard_pair(rng, k=2):
+def generate_hard_pair(rng, k=DEFAULT_K, reference_samples=DEFAULT_REFERENCE_SAMPLES,
+                       screening_samples=DEFAULT_SCREENING_SAMPLES):
     """Generate a hard pair: JSD ≈ 0.3."""
-    return generate_pair_for_range(*JSD_RANGES["hard"], "hard", rng, k=k)
+    return generate_pair_for_range(
+        *JSD_RANGES["hard"], "hard", rng, k=k,
+        reference_samples=reference_samples,
+        screening_samples=screening_samples,
+    )
 
 
 # ===========================================================================
@@ -259,12 +310,14 @@ def main():
     parser = argparse.ArgumentParser(
         description="Generate Exp3 benchmark data"
     )
-    parser.add_argument(
-        "--n", type=int, default=100, help="Number of pairs per dataset"
-    )
-    parser.add_argument(
-        "--k", type=int, default=2, help="Number of GMM components per distribution"
-    )
+    parser.add_argument("--n", type=int, default=DEFAULT_N,
+                        help="Number of pairs per Easy/Medium/Hard dataset; Mixed has the same total N")
+    parser.add_argument("--k", type=int, default=DEFAULT_K,
+                        help="Number of GMM components per distribution")
+    parser.add_argument("--reference-samples", type=int, default=DEFAULT_REFERENCE_SAMPLES,
+                        help="MC samples for accepted-pair reference JSD")
+    parser.add_argument("--screening-samples", type=int, default=DEFAULT_SCREENING_SAMPLES,
+                        help="MC samples for rejection-sampling screening")
     parser.add_argument("--output-dir", default=None, help="Output directory")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     args = parser.parse_args()
@@ -280,6 +333,8 @@ def main():
     rng = np.random.default_rng(args.seed)
 
     print(f"Generating Exp3 benchmark data (N={N}, K={K}, seed={args.seed})")
+    print(f"Reference JSD samples: {args.reference_samples}")
+    print(f"Screening samples    : {args.screening_samples}")
     print(f"Output directory: {args.output_dir}")
     print()
 
@@ -293,11 +348,17 @@ def main():
     print("[1/4] Generating Easy dataset...")
     t0 = time.time()
     easy_pairs = []
+    progress_every = max(20, N // 20)
     for i in range(N):
-        pair = generate_easy_pair(rng, k=K)
+        pair = generate_easy_pair(
+            rng,
+            k=K,
+            reference_samples=args.reference_samples,
+            screening_samples=args.screening_samples,
+        )
         easy_pairs.append(pair)
         gt_rows.append(("easy", i + 1, pair[6]))
-        if (i + 1) % 20 == 0:
+        if (i + 1) % progress_every == 0:
             print(f"  {i + 1}/{N} pairs generated")
     datasets["easy"] = easy_pairs
     print(f"  Done in {time.time() - t0:.1f}s")
@@ -307,10 +368,15 @@ def main():
     t0 = time.time()
     medium_pairs = []
     for i in range(N):
-        pair = generate_medium_pair(rng, k=K)
+        pair = generate_medium_pair(
+            rng,
+            k=K,
+            reference_samples=args.reference_samples,
+            screening_samples=args.screening_samples,
+        )
         medium_pairs.append(pair)
         gt_rows.append(("medium", i + 1, pair[6]))
-        if (i + 1) % 20 == 0:
+        if (i + 1) % progress_every == 0:
             print(f"  {i + 1}/{N} pairs generated")
     datasets["medium"] = medium_pairs
     print(f"  Done in {time.time() - t0:.1f}s")
@@ -320,10 +386,15 @@ def main():
     t0 = time.time()
     hard_pairs = []
     for i in range(N):
-        pair = generate_hard_pair(rng, k=K)
+        pair = generate_hard_pair(
+            rng,
+            k=K,
+            reference_samples=args.reference_samples,
+            screening_samples=args.screening_samples,
+        )
         hard_pairs.append(pair)
         gt_rows.append(("hard", i + 1, pair[6]))
-        if (i + 1) % 20 == 0:
+        if (i + 1) % progress_every == 0:
             print(f"  {i + 1}/{N} pairs generated")
     datasets["hard"] = hard_pairs
     print(f"  Done in {time.time() - t0:.1f}s")
@@ -342,7 +413,12 @@ def main():
 
     for gen_func, label, count in zip(generators, gen_labels, counts):
         for _ in range(count):
-            pair = gen_func(rng, k=K)
+            pair = gen_func(
+                rng,
+                k=K,
+                reference_samples=args.reference_samples,
+                screening_samples=args.screening_samples,
+            )
             mixed_pairs.append(pair)
             mixed_gt_rows.append(("mixed", pair[6]))
 
@@ -359,7 +435,7 @@ def main():
     print("\nWriting TTL files...")
     for name, pairs in datasets.items():
         path = os.path.join(args.output_dir, f"simjoin_{name}.ttl")
-        write_ttl(pairs, path, f"SimilarityJoin {name.capitalize()} (N={N})")
+        write_ttl(pairs, path, f"JSD method benchmark {name.capitalize()} (N={N})")
 
     # --- Write ground truth CSV ---
     with open(gt_path, "w", newline="") as f:

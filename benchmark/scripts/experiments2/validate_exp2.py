@@ -5,8 +5,8 @@ validate_exp2.py — Validation checks for Exp2 results
 Checks:
   Check 1: All retained variants return the same result count
   Check 2: Calibration CSV sanity — multimodalPairs and theta ordering
-  Check 3: Speedup ordering — SimilarityJoin should generally beat InEngine_CF at high unimodalFrac
-  Check 4: Pruning stats conservation / SimilarityJoin invariants
+  Check 3: Speedup ordering — DIVJOIN should generally beat InEngine_CF at high unimodalFrac
+  Check 4: Pruning stats conservation / DIVJOIN invariants
 
 Exit code: 0 = all checks passed, 1 = failures found.
 
@@ -81,13 +81,13 @@ def validate(results_dir):
     # -----------------------------------------------------------------------
     # Check 1: retained variants agree on result count
     # -----------------------------------------------------------------------
-    print("\n[Check 1] InEngine_CF, InEngine_JF, and SimilarityJoin have identical result counts")
+    print("\n[Check 1] InEngine_CF, InEngine_JF, and DIVJOIN have identical result counts")
     check1_pass = True
     for k in all_keys:
         values = (cnt_a_cf[k], cnt_a_jf[k], cnt_c[k])
         if len(set(values)) != 1:
             msg = (f"  FAIL: count mismatch at nPairs={k[0]} uf={k[1]} sel={k[2]} :: "
-                   f"InEngine_CF={values[0]} InEngine_JF={values[1]} SimilarityJoin={values[2]}")
+                   f"InEngine_CF={values[0]} InEngine_JF={values[1]} DIVJOIN={values[2]}")
             failures.append(msg)
             check1_pass = False
     if check1_pass:
@@ -127,7 +127,7 @@ def validate(results_dir):
     # -----------------------------------------------------------------------
     # Check 4: Speedup ordering — C faster than A by large unimodalFrac
     # -----------------------------------------------------------------------
-    print("\n[Check 3] Speedup ordering: SimilarityJoin faster than InEngine_CF at high unimodalFrac (>=0.5)")
+    print("\n[Check 3] Speedup ordering: DIVJOIN faster than InEngine_CF at high unimodalFrac (>=0.5)")
     check3_pass = True
     # Aggregate speedup by (unimodalFrac, selectivity)
     speedup_by_uf = defaultdict(list)
@@ -141,13 +141,13 @@ def validate(results_dir):
         speeds = speedup_by_uf[uf]
         avg = sum(speeds) / len(speeds) if speeds else float("nan")
         if flt(uf) >= 0.5 and avg < 1.0:
-            msg = (f"  [NOTE] SimilarityJoin slower than InEngine_CF at uf={uf} (avg speedup={avg:.2f}x)")
+            msg = (f"  [NOTE] DIVJOIN slower than InEngine_CF at uf={uf} (avg speedup={avg:.2f}x)")
             warnings.append(msg)
             check3_pass = False
         status = "✓" if avg >= 1.0 else "✗"
-        print(f"  uf={uf}: avg speedup SimilarityJoin/InEngine_CF = {avg:.2f}x {status}")
+        print(f"  uf={uf}: avg speedup DIVJOIN/InEngine_CF = {avg:.2f}x {status}")
     if check3_pass:
-        print("  PASS: SimilarityJoin is faster than InEngine_CF at high unimodalFrac")
+        print("  PASS: DIVJOIN is faster than InEngine_CF at high unimodalFrac")
 
     # -----------------------------------------------------------------------
     # Check 5: Pruning stats sanity
@@ -167,26 +167,10 @@ def validate(results_dir):
                 msg = (f"  FAIL: TotalPairs={total} != sum={summed} "
                        f"at nPairs={r['NPairs']} uf={r['UnimodalFrac']} "
                        f"sel={r['Selectivity']}")
-                # Current SimilarityJoin pruning path expects PrunedVar and PrunedBounds to stay 0
-                if nt(r["PrunedVar"]) > 0 or nt(r["PrunedBounds"]) > 0:
-                    failures.append(msg + " [PrunedVar/PrunedBounds should be 0 in current Exp2 path!]")
-                    check5_pass = False
-                else:
-                    failures.append(msg)
-                    check5_pass = False
-            # Current SimilarityJoin pruning path expects PrunedVar == 0 and PrunedBounds == 0
-            if nt(r["PrunedVar"]) != 0:
-                failures.append(
-                    f"  FAIL: PrunedVar={r['PrunedVar']} (should be 0 in current Exp2 path) "
-                    f"at {r['NPairs']} uf={r['UnimodalFrac']}")
-                check5_pass = False
-            if nt(r["PrunedBounds"]) != 0:
-                failures.append(
-                    f"  FAIL: PrunedBounds={r['PrunedBounds']} (should be 0 in current Exp2 path) "
-                    f"at {r['NPairs']} uf={r['UnimodalFrac']}")
+                failures.append(msg)
                 check5_pass = False
         if check5_pass:
-            print("  PASS: Pruning stat invariants hold (PrunedVar=0, PrunedBounds=0)")
+            print("  PASS: Pruning stat conservation holds")
 
     # -----------------------------------------------------------------------
     # Summary

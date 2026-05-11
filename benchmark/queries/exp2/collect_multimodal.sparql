@@ -6,5 +6,5 @@ SELECT ?jsd WHERE {
     FILTER(str(?rv1) < str(?rv2))
     FILTER(prob:modeCount(?d1) > 1)
     FILTER(prob:modeCount(?d2) > 1)
-    BIND(prob:jsdivergence(?d1, ?d2) AS ?jsd)
+    BIND(prob:jsd(?d1, ?d2) AS ?jsd)
 }

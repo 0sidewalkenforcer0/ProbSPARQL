@@ -1,5 +1,5 @@
 # Exp1 Q4 PROB: Distribution Comparison
-# Compares CT and SL distributions on the same tooth via JS-divergence.
+# Compares CT and SL distributions on the same tooth via numeric JS divergence.
 # Purpose: measure the cost of comparing two sensing modalities per tooth.
 
 PREFIX ag:   <http://example.org/ontology/anglegrinder#>
@@ -17,6 +17,6 @@ SELECT ?gear ?char ?jsd WHERE {
   ?slMeasurement a ag:SLMeasurement ;
                  cfm:representedBy ?rvSL .
   ?rvSL cfm:hasDistribution ?slDistribution .
-  BIND(prob:jsdivergence(?ctDistribution, ?slDistribution) AS ?jsd)
+  BIND(prob:jsd(?ctDistribution, ?slDistribution) AS ?jsd)
   FILTER(?jsd > 0.3)
 }

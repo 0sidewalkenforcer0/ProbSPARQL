@@ -5,7 +5,7 @@ Generate Exp1 dimension-scaling datasets with the full Exp1 graph structure.
 Design:
 - fixed scale: E5 by default
 - fixed K: 3 by default
-- varying dimensions: 1, 3, 5, 10 by default
+- varying dimensions: 1, 2, 4, 8 by default
 - preserves the entity/measurement layout needed by Q1-Q4
 - om:hasValue remains a scalar and is defined as the weighted mean of dimension 0
 """
@@ -40,7 +40,7 @@ SCALE_CONFIGS = {
     "E7": {"num_gears": 10000, "label": "Exp1 10000 gears"},
 }
 
-DEFAULT_DIMENSIONS = [1, 3, 5, 10]
+DEFAULT_DIMENSIONS = [1, 2, 4, 8]
 TEETH_PER_GEAR = 8
 CALIPER_MEASUREMENTS_PER_SPINDLE = 3
 LASER_MEASUREMENTS_PER_SPINDLE = 3

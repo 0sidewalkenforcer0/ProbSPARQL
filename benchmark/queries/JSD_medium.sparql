@@ -1,7 +1,7 @@
 # JSD_medium: Medium selectivity (~25% results)
 # Threshold: JSD > 0.15
 # Expected: ~25% of gear-tooth pairs match
-# Use case: 展示系统在中等等待时间的表现
+# Use case: numeric JSD filtering with the public prob:jsd interface
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -31,8 +31,8 @@ WHERE {
            cfm:hasProbabilisticValue ?rv_sl .
   ?rv_sl uq:hasDistribution ?dist_sl .
   
-  # Compute JSD
-  BIND(prob:jsdivergence(?dist_ct, ?dist_sl) AS ?jsd)
+  # Compute numeric JSD through the public MC10K prob:jsd interface.
+  BIND(prob:jsd(?dist_ct, ?dist_sl) AS ?jsd)
   
   # Medium filter: ~25% should pass
   FILTER(?jsd > 0.15)

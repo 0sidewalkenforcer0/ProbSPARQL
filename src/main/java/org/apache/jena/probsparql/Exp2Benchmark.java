@@ -12,24 +12,26 @@ import java.nio.file.Files;
 import java.util.*;
 
 /**
- * Experiment 2 — In-engine Filtering vs SimilarityJoin with Mixed-K Datasets
+ * Experiment 2 — In-engine Filtering vs DIVJOIN with Mixed-K Datasets
  *
- * <p>Three variants are compared in-process (same JVM, same GT_10K JSD):
+ * <p>Three variants are compared in-process (same JVM, same MC10K numeric JSD
+ * for ordinary in-engine filters):
  * <ul>
  *   <li><b>InEngine_CheapFirst</b>:
- *       SPARQL with modeCount filters before jsdivergence.</li>
+ *       SPARQL with modeCount filters before prob:jsd.</li>
  *   <li><b>InEngine_JSDFirst</b>:
- *       SPARQL with jsdivergence + threshold before modeCount filters.</li>
- *   <li><b>SimilarityJoin</b>:
- *       Uses filter-pushdown into iterator + discretized JSD lower bound pruning.</li>
+ *       SPARQL with prob:jsd + threshold before modeCount filters.</li>
+ *   <li><b>DIVJOIN</b>:
+ *       Uses the dedicated similarity-decision iterator with pruning.</li>
  * </ul>
  *
  * <p>Experimental variable: {@code unimodalFrac} — the fraction of entities with
  * K=1 (unimodal). As unimodalFrac increases, the modeCount pre-filter eliminates
- * more work before the expensive JSD computation, amplifying SimilarityJoin's advantage.
+ * more work before the expensive JSD computation, amplifying DIVJOIN's advantage.
  *
  * <p>Design: {@code N_PAIRS × UNIMODAL_FRACS × SEL_LABELS} = 45 configurations.
- * Each configuration runs WARMUP=1 + RUNS=3 for each approach; median is reported.
+ * Each configuration runs 3 warm-up iterations and 10 measured iterations for
+ * each approach by default; the median of measured runs is reported.
  * Calibration uses multimodal-only pair JSD values.
  *
  * <p>Output files (written to {@code --output-dir}):
@@ -37,8 +39,8 @@ import java.util.*;
  *   exp2_calibration.csv          — per-scale/fraction θ values
  *   exp2_inengine_cheapfirst.csv  — InEngine_CheapFirst timings
  *   exp2_inengine_jsdfirst.csv    — InEngine_JSDFirst timings
- *   exp2_similarityjoin.csv       — SimilarityJoin timings
- *   exp2_pruning_stats.csv        — per-level pruning counts for SimilarityJoin
+ *   exp2_similarityjoin.csv       — DIVJOIN timings (legacy file name)
+ *   exp2_pruning_stats.csv        — per-level pruning counts for DIVJOIN
  * </pre>
  * Usage:
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.Exp2Benchmark" \
@@ -83,7 +85,7 @@ public class Exp2Benchmark {
         String outputDir  = "benchmark/results/exp2";
         String dataDir    = "benchmark/data/exp2";
         String queryDir   = "benchmark/queries/exp2";
-        String jsdMode    = System.getProperty("probsparql.mode", "GT_1K");
+        String jsdMode    = System.getProperty("probsparql.mode", "GT_10K");
         int[] nPairsList  = DEFAULT_N_PAIRS;
         for (int i = 0; i < args.length; i++) {
             if ("--output-dir".equals(args[i]) && i + 1 < args.length) {
@@ -116,13 +118,13 @@ public class Exp2Benchmark {
         String qInEngineCheapFirstTemplate = readQueryTemplate(queryDir, "inengine_cheapfirst.sparql");
         String qInEngineJsdFirstTemplate   = readQueryTemplate(queryDir, "inengine_jsdfirst.sparql");
         String qCollectMultimodal          = readQueryTemplate(queryDir, "collect_multimodal.sparql");
-        String qSimilarityJoinTemplate     = readQueryTemplate(queryDir, "similarityjoin.sparql");
+        String qDivJoinTemplate            = readQueryTemplate(queryDir, "similarityjoin.sparql");
 
         // CSV row lists
         List<String[]> calibRows   = new ArrayList<>();
         List<String[]> inEngineCheapFirstRows = new ArrayList<>();
         List<String[]> inEngineJsdFirstRows   = new ArrayList<>();
-        List<String[]> similarityJoinRows     = new ArrayList<>();
+        List<String[]> divJoinRows            = new ArrayList<>();
         List<String[]> pruningRows = new ArrayList<>();
 
         calibRows.add(new String[]{
@@ -132,7 +134,7 @@ public class Exp2Benchmark {
             "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
         inEngineJsdFirstRows.add(new String[]{
             "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
-        similarityJoinRows.add(new String[]{
+        divJoinRows.add(new String[]{
             "NPairs", "UnimodalFrac", "Selectivity", "Theta", "Time_ms", "ResultCount"});
         pruningRows.add(new String[]{
             "NPairs", "UnimodalFrac", "Selectivity", "Theta",
@@ -185,21 +187,21 @@ public class Exp2Benchmark {
                         str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
                         fmt(rInEngineJsdFirst.timeMs), str(rInEngineJsdFirst.resultCount)});
 
-                    // ── SimilarityJoin ────────────────────────────────────
+                    // ── DIVJOIN ───────────────────────────────────────────
                     System.setProperty("probsparql.simjoin.pruning",     "true");
                     System.setProperty("probsparql.simjoin.deduplicate", "true");
                     try {
-                        TimingResult rSimilarityJoin = measureWithPruning(ds, withTheta(qSimilarityJoinTemplate, theta));
-                        System.out.printf("     SimilarityJoin (pruning=%.1f%%): %.2f ms  (%d results)%n",
-                            rSimilarityJoin.pruning != null ? rSimilarityJoin.pruning.pruningRate() * 100 : 0.0,
-                            rSimilarityJoin.timeMs, rSimilarityJoin.resultCount);
+                        TimingResult rDivJoin = measureWithPruning(ds, withTheta(qDivJoinTemplate, theta));
+                        System.out.printf("     DIVJOIN (pruning=%.1f%%): %.2f ms  (%d results)%n",
+                            rDivJoin.pruning != null ? rDivJoin.pruning.pruningRate() * 100 : 0.0,
+                            rDivJoin.timeMs, rDivJoin.resultCount);
 
-                        similarityJoinRows.add(new String[]{
+                        divJoinRows.add(new String[]{
                             str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
-                            fmt(rSimilarityJoin.timeMs), str(rSimilarityJoin.resultCount)});
+                            fmt(rDivJoin.timeMs), str(rDivJoin.resultCount)});
 
-                        if (rSimilarityJoin.pruning != null) {
-                            PruningStats ps = rSimilarityJoin.pruning;
+                        if (rDivJoin.pruning != null) {
+                            PruningStats ps = rDivJoin.pruning;
                             pruningRows.add(new String[]{
                                 str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
                                 str(ps.totalPairs), str(ps.prunedByDim), str(ps.prunedByMean),
@@ -212,7 +214,7 @@ public class Exp2Benchmark {
                         checkResultConsistency(
                             rInEngineCheapFirst,
                             rInEngineJsdFirst,
-                            rSimilarityJoin,
+                            rDivJoin,
                             nPairs, unimodalFrac, sel);
 
                     } finally {
@@ -230,7 +232,7 @@ public class Exp2Benchmark {
         writeCsv(outputDir + "/exp2_calibration.csv", calibRows);
         writeCsv(outputDir + "/exp2_inengine_cheapfirst.csv", inEngineCheapFirstRows);
         writeCsv(outputDir + "/exp2_inengine_jsdfirst.csv", inEngineJsdFirstRows);
-        writeCsv(outputDir + "/exp2_similarityjoin.csv", similarityJoinRows);
+        writeCsv(outputDir + "/exp2_similarityjoin.csv", divJoinRows);
         writeCsv(outputDir + "/exp2_pruning_stats.csv", pruningRows);
 
         System.out.println("Results written to: " + outputDir);
@@ -312,7 +314,7 @@ public class Exp2Benchmark {
     }
 
     /**
-     * Time SimilarityJoin with pruning enabled; also collect pruning stats.
+     * Time DIVJOIN with pruning enabled; also collect pruning stats.
      */
     private static TimingResult measureWithPruning(Dataset ds, String sparql) {
         Query q = QueryFactory.create(sparql);
@@ -360,16 +362,16 @@ public class Exp2Benchmark {
     private static void checkResultConsistency(
             TimingResult rInEngineCheapFirst,
             TimingResult rInEngineJsdFirst,
-            TimingResult rSimilarityJoin,
+            TimingResult rDivJoin,
             int nPairs, double unimodalFrac, String sel) {
         int inCf = rInEngineCheapFirst.resultCount;
         int inJf = rInEngineJsdFirst.resultCount;
-        int sj   = rSimilarityJoin.resultCount;
+        int dj   = rDivJoin.resultCount;
 
-        if (!(inCf == inJf && inCf == sj)) {
+        if (!(inCf == inJf && inCf == dj)) {
             System.out.printf(
-                "  [WARN] Result mismatch at nPairs=%d uf=%.1f sel=%s :: InEngine_CF=%d InEngine_JF=%d SimilarityJoin=%d%n",
-                nPairs, unimodalFrac, sel, inCf, inJf, sj);
+                "  [WARN] Result mismatch at nPairs=%d uf=%.1f sel=%s :: InEngine_CF=%d InEngine_JF=%d DIVJOIN=%d%n",
+                nPairs, unimodalFrac, sel, inCf, inJf, dj);
         }
     }
 

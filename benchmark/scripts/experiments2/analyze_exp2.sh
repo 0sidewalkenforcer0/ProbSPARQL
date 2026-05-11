@@ -6,7 +6,7 @@
 #   Tables:
 #     exp2_summary.csv       — merged timings, speedups, consistency per config
 #   Charts:
-#     exp2_speedup_vs_uf.png       — SimilarityJoin vs InEngine_CheapFirst and InEngine_JSDFirst
+#     exp2_speedup_vs_uf.png       — DIVJOIN vs InEngine_CheapFirst and InEngine_JSDFirst
 #     exp2_speedup_vs_npairs.png   — speedup vs dataset size
 #     exp2_pruning_heatmap.png     — pruning rate heatmap
 #

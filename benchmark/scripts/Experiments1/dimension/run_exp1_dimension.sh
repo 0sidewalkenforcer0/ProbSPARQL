@@ -5,8 +5,10 @@
 # Fixed:
 #   - scale = E5
 #   - K = 3
+#   - warm-up = 3 runs
+#   - measured = 10 runs
 # Variable:
-#   - d in {1,3,5,10} by default
+#   - d in {1,2,4,8} by default
 # Queries:
 #   - Q1-Q3 deterministic and probabilistic paths
 #   - Q4 legacy prob:jsdivergence and polymorphic prob:jsd
@@ -20,7 +22,7 @@ OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp1/dimension}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SCALE="${SCALE:-E5}"
 K_VALUE="${K_VALUE:-3}"
-DIMENSIONS="${DIMENSIONS:-1 3 5 10}"
+DIMENSIONS="${DIMENSIONS:-1 2 4 8}"
 WARMUP_RUNS="${WARMUP_RUNS:-3}"
 BENCHMARK_RUNS="${BENCHMARK_RUNS:-10}"
 

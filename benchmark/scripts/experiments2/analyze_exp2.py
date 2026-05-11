@@ -4,7 +4,7 @@ analyze_exp2.py — Analysis and visualization for Exp2 results
 
 Produces:
   1. Summary table across the three retained variants
-  2. Speedup-vs-unimodalFrac line chart (SimilarityJoin vs InEngine_CheapFirst / InEngine_JSDFirst)
+  2. Speedup-vs-unimodalFrac line chart (DIVJOIN vs InEngine_CheapFirst / InEngine_JSDFirst)
   3. Pruning rate vs unimodal fraction
   4. Result-count consistency check across retained variants
   5. Per-selectivity breakdown bar charts
@@ -109,14 +109,14 @@ def analyze(results_dir, output_dir):
     # -----------------------------------------------------------------------
     # 1. Result-count consistency
     # -----------------------------------------------------------------------
-    print("\n=== Result Count Consistency (InEngine_CF, InEngine_JF, SimilarityJoin) ===")
+    print("\n=== Result Count Consistency (InEngine_CF, InEngine_JF, DIVJOIN) ===")
     consistency_ok = True
     for key in all_keys:
         a_cf, a_jf = cnt_a_cf.get(key, -1), cnt_a_jf.get(key, -1)
         c = cnt_c.get(key, -1)
         if len({a_cf, a_jf, c}) != 1:
             consistency_ok = False
-            print(f"  [MISMATCH] nPairs={key[0]} uf={key[1]} sel={key[2]}: InEngine_CF={a_cf} InEngine_JF={a_jf} SimilarityJoin={c}")
+            print(f"  [MISMATCH] nPairs={key[0]} uf={key[1]} sel={key[2]}: InEngine_CF={a_cf} InEngine_JF={a_jf} DIVJOIN={c}")
     if consistency_ok:
         print("  All retained variants agree  ✓")
     else:
@@ -125,7 +125,7 @@ def analyze(results_dir, output_dir):
     # -----------------------------------------------------------------------
     # 2. Speedup summary table
     # -----------------------------------------------------------------------
-    print("\n=== Speedup Summary: SimilarityJoin vs InEngine_CF and InEngine_JF ===")
+    print("\n=== Speedup Summary: DIVJOIN vs InEngine_CF and InEngine_JF ===")
 
     # Group by (unimodalFrac, selectivity), average speedup across scales
     from collections import defaultdict
@@ -164,9 +164,9 @@ def analyze(results_dir, output_dir):
     with open(summary_path, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["NPairs", "UnimodalFrac", "Selectivity", "Theta",
-                    "InEngine_CF_ms", "InEngine_JF_ms", "SimilarityJoin_ms",
+                    "InEngine_CF_ms", "InEngine_JF_ms", "DIVJOIN_ms",
                     "SpeedupSJ_InEngine_CF", "SpeedupSJ_InEngine_JF",
-                    "InEngine_CF_results", "InEngine_JF_results", "SimilarityJoin_results",
+                    "InEngine_CF_results", "InEngine_JF_results", "DIVJOIN_results",
                     "AllEqual"])
         for key in all_keys:
             npairs, uf, sel = key
@@ -194,7 +194,7 @@ def analyze(results_dir, output_dir):
     # 4. Pruning rate table
     # -----------------------------------------------------------------------
     if ps_rows:
-        print("\n=== Pruning Rates (SimilarityJoin) ===")
+        print("\n=== Pruning Rates (DIVJOIN) ===")
         print(f"  {'NPairs':>8}  {'UnimodalFrac':>12}  {'Sel':>6}  {'PruneRate%':>10}  "
               f"{'PrunedMean':>10}  {'FullJSD':>8}")
         print("  " + "-" * 60)
@@ -212,7 +212,7 @@ def analyze(results_dir, output_dir):
 
     # --- Figure 1: Speedup vs UnimodalFrac ---
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    fig.suptitle("SimilarityJoin Speedup vs Unimodal Fraction", fontsize=13)
+    fig.suptitle("DIVJOIN Speedup vs Unimodal Fraction", fontsize=13)
 
     # Use largest scale only for clarity
     largest_npairs = max(to_int(r["NPairs"]) for r in a_cf_rows)
@@ -239,8 +239,8 @@ def analyze(results_dir, output_dir):
                         linewidth=2, markersize=8)
         ax.axhline(1.0, color="gray", linestyle="--", linewidth=1, label="breakeven")
         ax.set_xlabel("Unimodal Fraction", fontsize=11)
-        ax.set_ylabel(f"Speedup SimilarityJoin / {comp_label}", fontsize=11)
-        ax.set_title(f"SimilarityJoin vs {comp_label}  (N≈{largest_npairs} pairs)")
+        ax.set_ylabel(f"Speedup DIVJOIN / {comp_label}", fontsize=11)
+        ax.set_title(f"DIVJOIN vs {comp_label}  (N≈{largest_npairs} pairs)")
         ax.legend(title="Selectivity", fontsize=9)
         ax.set_xticks([float(u) for u in ufs])
         ax.grid(alpha=0.3)
@@ -255,7 +255,7 @@ def analyze(results_dir, output_dir):
     fig, axes = plt.subplots(1, len(ufs), figsize=(5 * len(ufs), 5), sharey=True)
     if len(ufs) == 1:
         axes = [axes]
-    fig.suptitle("SimilarityJoin vs InEngine_CheapFirst Speedup — per Unimodal Fraction", fontsize=13)
+    fig.suptitle("DIVJOIN vs InEngine_CheapFirst Speedup — per Unimodal Fraction", fontsize=13)
 
     npairs_list = sorted(set(to_int(r["NPairs"]) for r in a_cf_rows))
     for ax, uf in zip(axes, ufs):
@@ -274,7 +274,7 @@ def analyze(results_dir, output_dir):
                             label=sel, linewidth=2, markersize=7)
         ax.axhline(1.0, color="gray", linestyle="--", linewidth=1)
         ax.set_xlabel("Target Pair Count (log)", fontsize=10)
-        ax.set_ylabel("Speedup SimilarityJoin / InEngine_CF" if ax == axes[0] else "", fontsize=10)
+        ax.set_ylabel("Speedup DIVJOIN / InEngine_CF" if ax == axes[0] else "", fontsize=10)
         ax.set_title(f"UnimodalFrac={uf}")
         ax.legend(title="Sel", fontsize=8)
         ax.grid(alpha=0.3)
@@ -307,7 +307,7 @@ def analyze(results_dir, output_dir):
         ax.set_yticklabels([str(v) for v in npairs_vals])
         ax.set_xlabel("Unimodal Fraction")
         ax.set_ylabel("Target Pair Count")
-        ax.set_title(f"Pruning Rate (SimilarityJoin, sel={sel_fixed})")
+        ax.set_title(f"Pruning Rate (DIVJOIN, sel={sel_fixed})")
         for ri in range(len(npairs_vals)):
             for ci in range(len(uf_vals)):
                 val = grid[ri, ci]

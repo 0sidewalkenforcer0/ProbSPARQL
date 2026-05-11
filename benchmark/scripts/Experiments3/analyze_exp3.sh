@@ -3,8 +3,8 @@
 # analyze_exp3.sh — Analysis and visualization for Exp3
 #
 # Reads exp3_classification.csv and generates the Exp3 charts.
-# Current official dataset version corresponds to the former exp3_1_k5_n300_new
-# configuration (K=5, N=300).
+# Paper-aligned Exp3 outputs use K=5 and N=2,400 aligned pairs per
+# Easy/Medium/Hard/Mixed workload.
 #
 # Usage (from project root):
 #   bash benchmark/scripts/Experiments3/analyze_exp3.sh

@@ -25,8 +25,9 @@ import java.util.TreeMap;
  *   M5 = V5_ADAPTIVE (full adaptive pipeline)
  *
  * Ground truth: simjoin_ground_truth.csv generated alongside the TTL datasets.
- *
- * Current official dataset version corresponds to the former exp3_1_k5_n300_new run.
+ * Paper-aligned datasets contain 2,400 aligned pairs per difficulty workload,
+ * with reference JSD values estimated by the data generator using 10^6 Monte
+ * Carlo samples.
  *
  * Output CSV: benchmark/results/exp3/exp3_classification.csv
  *   columns: Method, Dataset, Accuracy, Precision, Recall, F1, MAE, RMSE, Latency_ms
@@ -43,8 +44,9 @@ public class Exp3Benchmark {
     // Experiment configuration
     // -----------------------------------------------------------------------
     private static final double THETA = 0.3;           // classification threshold
-    private static final int    EVAL_SAMPLES = 10_000; // sample budget for V1-V5 (aligns with plan §4.3)
-    private static int    repeat       = 10;     // repetitions per (method, pair); overridable via --repeat
+    private static final int    EVAL_SAMPLES = 10_000; // fixed-budget MC samples per decision
+    private static int warmup = 3;                     // discarded warm-up repeats per (method, pair)
+    private static int repeat = 10;                    // measured repeats per (method, pair)
 
     private static final String[] DATASETS = {"easy", "medium", "hard", "mixed"};
 
@@ -69,6 +71,7 @@ public class Exp3Benchmark {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("--data-dir"))       dataDir   = args[++i];
             else if (args[i].equals("--output-dir")) outputDir = args[++i];
+            else if (args[i].equals("--warmup"))      warmup    = Integer.parseInt(args[++i]);
             else if (args[i].equals("--repeat"))     repeat    = Integer.parseInt(args[++i]);
         }
         new File(outputDir).mkdirs();
@@ -78,7 +81,8 @@ public class Exp3Benchmark {
         System.out.println("Ground truth: simjoin_ground_truth.csv");
         System.out.println("Methods     : " + Arrays.toString(METHODS));
         System.out.println("Datasets    : " + Arrays.toString(DATASETS));
-        System.out.println("Repetitions : " + repeat);
+        System.out.println("Warmup      : " + warmup);
+        System.out.println("Runs        : " + repeat);
         System.out.println();
 
         // Aggregate results
@@ -168,6 +172,11 @@ public class Exp3Benchmark {
                     GMMValue g1 = leftGMMs.get(i);
                     GMMValue g2 = rightGMMs.get(i);
                     if (g1.getDimensions() != g2.getDimensions()) continue;
+
+                    for (int w = 0; w < warmup; w++) {
+                        computeJSD(g1, g2, method,
+                                EVAL_SAMPLES, stratified, sprt, bounds, adaptive);
+                    }
 
                     double[] runs = new double[repeat];
                     for (int r = 0; r < repeat; r++) {

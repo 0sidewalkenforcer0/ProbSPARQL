@@ -78,7 +78,7 @@ Element SimilarityJoinGraphPattern() { … → new ElementSimilarityJoin(pattern
 Element FuseJoinGraphPattern()       { … → new ElementFuseJoin(pattern, …)       }
 ```
 
-For `DIVJOIN`, `θ` is the similarity threshold and `α` is the one-sided tail probability passed into the sequential confidence bounds used by `V3_SPRT` and the SPRT phase of `V5_ADAPTIVE`.
+For `DIVJOIN`, `θ` is the similarity threshold and `α` is the one-sided tail probability passed into the sequential decision used by `V3_SPRT` and the adaptive decision phase of `V5_ADAPTIVE`.
 
 All four rules are incorporated in `GraphPatternNotTriples()` and in the outer `GroupGraphPatternSub()` loop (see §2.2).
 
@@ -322,7 +322,7 @@ All functions are registered via `FunctionRegistry.get().put(URI, Class)` during
 
 `prob:jsd` is the stable numerical interface. For GMM paths it uses a fixed MC-10K estimator; other supported distribution types use their own type-specific numerical implementations or a sample-based fallback.
 
-The legacy `prob:jsdivergence` wrapper still supports nine configurable V1-V5 / GT modes (via the `probsparql.mode` JVM property): fixed MC sample counts (`GT_100`, `GT_1K`, `GT_5K`, `GT_10K`), SPRT-based sequential testing (`V3_SPRT`), analytic bounds filtering (`V4_BOUNDS`), and a five-level adaptive cascade (`V5_ADAPTIVE`, the default). In V3/V4/V5, the returned score may be the by-product of a threshold-oriented similarity decision pipeline rather than a uniformly precise JSD estimator.
+The legacy `prob:jsdivergence` wrapper still supports nine configurable V1-V5 / GT modes (via the `probsparql.mode` JVM property): fixed MC sample counts (`GT_100`, `GT_1K`, `GT_5K`, `GT_10K`), sequential probability ratio testing (`V3_SPRT`), analytic bounds filtering (`V4_BOUNDS`), and a five-level adaptive cascade (`V5_ADAPTIVE`, the default). In V3/V4/V5, the returned score may be the by-product of a threshold-oriented similarity decision pipeline rather than a uniformly precise JSD estimator.
 
 Histogram literals now use the multidimensional schema
 `{"dimensions":d,"edges":[...],"weights":[...]}` as the canonical form.  The

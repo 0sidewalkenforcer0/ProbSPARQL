@@ -57,8 +57,8 @@ Measure the runtime overhead of probabilistic execution relative to deterministi
 
 ### Notes
 
-- `q4.sparql` is the active legacy `prob:jsdivergence` path used when evaluating the adaptive JSD implementation in the permutation supplement.
-- Variant queries such as `q4_jsd.sparql` are retained only for controlled comparisons.
+- `q4.sparql` uses the public numeric `prob:jsd` interface for distribution comparison.
+- Legacy `prob:jsdivergence` variants should be kept only when explicitly evaluating the adaptive similarity stack.
 
 ## Experiment 2: In-Engine Filtering vs DIVJOIN
 
@@ -83,7 +83,7 @@ Measure the benefit of a dedicated similarity-join operator over ordinary in-eng
 
 - `InEngine_CheapFirst`
 - `InEngine_JSDFirst`
-- `SimilarityJoin`
+- `DIVJOIN`
 
 ### Notes
 
