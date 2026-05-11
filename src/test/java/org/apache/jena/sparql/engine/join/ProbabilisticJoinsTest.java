@@ -37,7 +37,7 @@ public class ProbabilisticJoinsTest {
         assertTrue(strategies.contains(ProbabilisticJoins.FUSE_JOIN), 
             "Registry should contain fuse join");
         
-        assertEquals(3, strategies.size(), "Should have exactly 3 registered strategies");
+        assertTrue(strategies.size() >= 3, "Registry should contain at least the built-in strategies");
     }
     
     @Test

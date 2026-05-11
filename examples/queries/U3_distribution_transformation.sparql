@@ -34,4 +34,4 @@ WHERE {
   # Power distribution: P = ω × τ
   BIND(prob:multiply(?gmmSpeed, ?gmmTorque) AS ?powerDist)
 }
-ORDER BY DESC(?speedRadPerSec)
+ORDER BY ?motor

@@ -38,4 +38,4 @@ WHERE {
   # Filter: JS divergence > 0.2
   FILTER(?jsDivergence > 0.2)
 }
-ORDER BY DESC(?jsDivergence)
+ORDER BY ?gearLabel

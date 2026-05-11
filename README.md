@@ -126,7 +126,8 @@ ProbSPARQL includes a Fuseki-based HTTP server for remote SPARQL queries.
 ### Start the Server
 
 ```bash
-mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki"
+mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
+  -Dexec.args="3030 examples/data/angle-grinder-instances.ttl"
 ```
 
 **Server URLs:**
@@ -136,15 +137,7 @@ mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuse
 | SPARQL Update | `http://localhost:3030/probsparql/update` |
 | Web UI | `http://localhost:3030/` |
 
-### Load Sample Data
-
-In a new terminal:
-
-```bash
-curl -X POST "http://localhost:3030/probsparql" \
-  -H "Content-Type: text/turtle" \
-  --data-binary @examples/data/angle-grinder-instances.ttl
-```
+The command above starts the endpoint on port `3030` and preloads the sample RDF data used by the examples.
 
 ### Execute a Test Query
 
@@ -170,35 +163,20 @@ Press `Ctrl+C` in the server terminal.
 
 ## Usage Examples
 
-### Java API
+### Java CLI
 
-```java
-import org.apache.jena.probsparql.ProbSPARQL;
-import org.apache.jena.probsparql.QueryRunner;
-
-// Initialize ProbSPARQL extensions
-ProbSPARQL.init();
-
-// Execute a query
-QueryRunner.runQuery(
-    "examples/data/angle-grinder-instances.ttl",
-    "examples/queries/U1_probabilistic_thresholding.sparql"
-);
+```bash
+mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.QueryRunner" \
+  -Dexec.args="examples/data/angle-grinder-instances.ttl examples/queries/U1_probabilistic_thresholding.sparql"
 ```
 
 ### Python Client
 
-```python
-from examples.client_example import ProbSPARQLClient
+With the Fuseki endpoint running:
 
-client = ProbSPARQLClient("http://localhost:3030/probsparql")
-results = client.query("""
-    PREFIX prob: <http://probsparql.org/function#>
-    SELECT ?rv (prob:mean(?dist) AS ?mean)
-    WHERE { ?rv <http://example.org/ontology/uncertainty#hasDistribution> ?dist }
-    LIMIT 5
-""")
-print(results)
+```bash
+pip install SPARQLWrapper
+python examples/client_example.py
 ```
 
 ### Example SPARQL Queries
@@ -212,17 +190,15 @@ The `examples/queries/` directory contains ready-to-use queries:
 | `U3_distribution_transformation.sparql` | Scale, shift, and transform distributions |
 | `U4_distribution_manipulation.sparql` | Extract mean, std, quantiles |
 | `U5_similarityjoin_test.sparql` | DIVJOIN operator examples |
-| `U6_fusejoin_comparison.sparql` | FUSEJOIN (Bayesian fusion) examples |
-| `U7_complex_filter_pattern.sparql` | Complex nested graph pattern with probabilistic filter |
 
 ### Run All Example Queries
 
-A convenience script is provided to run all U1-U7 queries:
+A convenience script is provided to run the maintained U1-U5 examples:
 
 ```bash
 cd examples/queries
 
-# Run all queries (U1-U7)
+# Run all maintained examples (U1-U5)
 ./run_all_queries.sh
 
 # Run a single query
@@ -286,20 +262,6 @@ Benchmark support functions such as `prob:jsdMode` and `prob:lastDivJoinStats` a
 ---
 
 ## Special Operators
-
-### FUSEJOIN - Bayesian Fusion Join
-
-Performs Bayesian fusion on compatible distributions:
-
-```sparql
-PREFIX uq: <http://example.org/ontology/uncertainty#>
-
-SELECT ?sensor ?posterior WHERE {
-  { ?sensor uq:hasPriorDistribution ?prior . }
-  FUSEJOIN(?prior, ?measurement, 0.1, ?posterior)
-  { ?sensor uq:hasMeasurement ?measurement . }
-}
-```
 
 ### DIVJOIN - Similarity Filter
 
@@ -389,13 +351,17 @@ ProbSPARQL/
 │   ├── datatypes/               # GMM, histogram, and Dirichlet datatypes
 │   ├── functions/               # SPARQL function implementations
 │   ├── propertyfunctions/       # Property function implementations
-│   ├── algebra/                 # FUSEJOIN/DIVJOIN operators
+│   ├── algebra/                 # Custom query operators
 │   ├── engine/                  # Query engine extensions
 │   └── server/                  # Fuseki HTTP server
 ├── examples/
 │   ├── data/                    # Sample RDF data files
 │   ├── queries/                 # Sample SPARQL queries
 │   └── ontologies/              # Ontology definitions
+├── benchmark/
+│   ├── README.md                # Current benchmark implementation
+│   ├── queries/                 # Experiment query workloads
+│   └── scripts/                 # Data generation and remote run scripts
 ├── jena/                        # Modified Apache Jena source
 └── pom.xml                      # Maven build configuration
 ```

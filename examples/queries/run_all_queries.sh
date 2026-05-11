@@ -1,10 +1,10 @@
 #!/bin/zsh
 #
 # ProbSPARQL Query Runner
-# Runs all U1-U6 example queries against the sample data
+# Runs maintained U1-U5 example queries against the sample data
 #
 # Usage:
-#   ./run_all_queries.sh           # Run all queries (U1-U6)
+#   ./run_all_queries.sh           # Run maintained queries (U1-U5)
 #   ./run_all_queries.sh U1        # Run only U1
 #   ./run_all_queries.sh U1 U3 U5  # Run U1, U3, and U5
 #
@@ -43,7 +43,7 @@ get_description() {
         U3) echo "Distribution Transformation (scale, shift, linear)" ;;
         U4) echo "Distribution Manipulation (mean, std, fuse)" ;;
         U5) echo "DIVJOIN (similarity filtering)" ;;
-        U6) echo "FUSEJOIN (Bayesian fusion)" ;;
+        U6) echo "Experimental FUSEJOIN (legacy Bayesian fusion)" ;;
         *) echo "Unknown" ;;
     esac
 }
@@ -52,7 +52,7 @@ print_header() {
     echo ""
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║${NC}  ${GREEN}ProbSPARQL Query Runner${NC}                                       ${BLUE}║${NC}"
-    echo -e "${BLUE}║${NC}  Running example queries U1-U6                                 ${BLUE}║${NC}"
+    echo -e "${BLUE}║${NC}  Running maintained example queries U1-U5                      ${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -110,8 +110,9 @@ echo -e "${BLUE}Project root:${NC} $PROJECT_ROOT"
 
 # Determine which queries to run
 if [[ $# -eq 0 ]]; then
-    # Run all queries
-    QUERIES_TO_RUN=(U1 U2 U3 U4 U5 U6)
+    # Run maintained README examples. U6 remains available explicitly as an
+    # experimental legacy query but is not part of the default smoke test.
+    QUERIES_TO_RUN=(U1 U2 U3 U4 U5)
 else
     # Run specified queries
     QUERIES_TO_RUN=("$@")

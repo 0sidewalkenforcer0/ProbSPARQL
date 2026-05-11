@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class GMMDataLoadingTest {
     
     private static final String DATA_FILE = "examples/data/angle-grinder-instances.ttl";
+    private static final String UQ_NS = "http://example.org/ontology/uncertainty#";
+    private static final String EX_NS = "http://example.org/data/";
     
     @BeforeAll
     static void setUp() {
@@ -51,15 +53,11 @@ class GMMDataLoadingTest {
         String dataPath = Paths.get(DATA_FILE).toAbsolutePath().toString();
         Model model = RDFDataMgr.loadModel(dataPath);
         
-        // Define namespaces
-        String uqNS = "http://example.org/ontology/uncertainty#";
-        String exNS = "http://example.org/data/";
-        
-        Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
-        Resource rv_toothlength_001 = model.createResource(exNS + "rv_toothlength_001");
+        Property hasDistribution = model.createProperty(UQ_NS + "hasDistribution");
+        Resource rv = model.createResource(EX_NS + "rv_ct_001");
         
         // Get the GMM literal
-        Statement stmt = rv_toothlength_001.getProperty(hasDistribution);
+        Statement stmt = rv.getProperty(hasDistribution);
         assertNotNull(stmt, "Should have hasDistribution property");
         
         Literal gmmLiteral = stmt.getLiteral();
@@ -71,12 +69,12 @@ class GMMDataLoadingTest {
         assertInstanceOf(GMMValue.class, value);
         
         GMMValue gmm = (GMMValue) value;
-        assertEquals(1, gmm.getNComponents(), "Should have 1 component (single Gaussian)");
+        assertEquals(2, gmm.getNComponents(), "Should have 2 components");
         assertEquals(1, gmm.getDimensions(), "Should be 1-dimensional");
         assertEquals("full", gmm.getCovarianceType());
         
         double[] weights = gmm.getWeights();
-        assertArrayEquals(new double[]{1.0}, weights, 1e-9);
+        assertArrayEquals(new double[]{0.25, 0.75}, weights, 1e-9);
         
         System.out.println("Successfully extracted GMM: " + gmm);
     }
@@ -86,10 +84,8 @@ class GMMDataLoadingTest {
         String dataPath = Paths.get(DATA_FILE).toAbsolutePath().toString();
         Model model = RDFDataMgr.loadModel(dataPath);
         
-        String uqNS = "http://example.org/ontology/uncertainty#";
-        
-        Resource RandomVariable = model.createResource(uqNS + "RandomVariable");
-        Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
+        Resource RandomVariable = model.createResource(UQ_NS + "RandomVariable");
+        Property hasDistribution = model.createProperty(UQ_NS + "hasDistribution");
         
         // Find all RandomVariable instances
         ResIterator iter = model.listSubjectsWithProperty(
@@ -117,7 +113,7 @@ class GMMDataLoadingTest {
             }
         }
         
-        assertEquals(8, count, "Should have exactly 8 random variables");
+        assertEquals(32, count, "Should have exactly 32 random variables in the current sample data");
     }
     
     @Test
@@ -125,42 +121,32 @@ class GMMDataLoadingTest {
         String dataPath = Paths.get(DATA_FILE).toAbsolutePath().toString();
         Model model = RDFDataMgr.loadModel(dataPath);
         
-        String exNS = "http://example.org/data/";
-        String uqNS = "http://example.org/ontology/uncertainty#";
+        GMMValue gmm = getGMM(model, "rv_ct_001");
         
-        Resource rv = model.createResource(exNS + "rv_toothlength_001");
-        Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
-        
-        Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
-        GMMValue gmm = (GMMValue) gmmLit.getValue();
-        
-        assertEquals(1, gmm.getNComponents());
+        assertEquals(2, gmm.getNComponents());
         
         double[][] means = gmm.getMeans();
-        assertEquals(9.2, means[0][0], 1e-9);
+        assertEquals(9.05, means[0][0], 1e-9);
+        assertEquals(9.15, means[1][0], 1e-9);
         
         double[][][] covariances = gmm.getCovariances();
-        assertEquals(0.04, covariances[0][0][0], 1e-9);
+        assertEquals(0.09, covariances[0][0][0], 1e-9);
+        assertEquals(0.04, covariances[1][0][0], 1e-9);
     }
     
     @Test
-    void testSingleGaussian() {
+    void testStructuredLightDistribution() {
         String dataPath = Paths.get(DATA_FILE).toAbsolutePath().toString();
         Model model = RDFDataMgr.loadModel(dataPath);
         
-        String exNS = "http://example.org/data/";
-        String uqNS = "http://example.org/ontology/uncertainty#";
+        GMMValue gmm = getGMM(model, "rv_sl_002");
         
-        Resource rv = model.createResource(exNS + "rv_toothlength_002");
-        Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
-        
-        Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
-        GMMValue gmm = (GMMValue) gmmLit.getValue();
-        
-        assertEquals(1, gmm.getNComponents(), "Should be single Gaussian");
-        assertArrayEquals(new double[]{1.0}, gmm.getWeights(), 1e-9);
+        assertEquals(2, gmm.getNComponents(), "Should be bimodal");
+        assertArrayEquals(new double[]{0.75, 0.25}, gmm.getWeights(), 1e-9);
         assertEquals(9.6, gmm.getMeans()[0][0], 1e-9);
-        assertEquals(0.09, gmm.getCovariances()[0][0][0], 1e-9);
+        assertEquals(9.75, gmm.getMeans()[1][0], 1e-9);
+        assertEquals(0.06, gmm.getCovariances()[0][0][0], 1e-9);
+        assertEquals(0.12, gmm.getCovariances()[1][0][0], 1e-9);
     }
     
     @Test
@@ -168,19 +154,26 @@ class GMMDataLoadingTest {
         String dataPath = Paths.get(DATA_FILE).toAbsolutePath().toString();
         Model model = RDFDataMgr.loadModel(dataPath);
         
-        String exNS = "http://example.org/data/";
-        String uqNS = "http://example.org/ontology/uncertainty#";
+        GMMValue gmm = getGMM(model, "rv_ct_002");
         
-        Resource rv = model.createResource(exNS + "rv_toothlength_003");
-        Property hasDistribution = model.createProperty(uqNS + "hasDistribution");
-        
-        Literal gmmLit = rv.getProperty(hasDistribution).getLiteral();
-        GMMValue gmm = (GMMValue) gmmLit.getValue();
-        
-        assertEquals(1, gmm.getNComponents(), "Should have 1 component");
-        assertArrayEquals(new double[]{1.0}, gmm.getWeights(), 1e-9);
+        assertEquals(3, gmm.getNComponents(), "Should have 3 components");
+        assertArrayEquals(new double[]{0.3, 0.6, 0.1}, gmm.getWeights(), 1e-9);
         
         double[][] means = gmm.getMeans();
-        assertEquals(10.5, means[0][0], 1e-9);
+        assertEquals(9.75, means[0][0], 1e-9);
+        assertEquals(9.8, means[1][0], 1e-9);
+        assertEquals(9.9, means[2][0], 1e-9);
+    }
+
+    private GMMValue getGMM(Model model, String localName) {
+        Resource rv = model.createResource(EX_NS + localName);
+        Property hasDistribution = model.createProperty(UQ_NS + "hasDistribution");
+
+        Statement stmt = rv.getProperty(hasDistribution);
+        assertNotNull(stmt, localName + " should have hasDistribution property");
+
+        Literal gmmLit = stmt.getLiteral();
+        assertEquals(GMMDatatype.URI, gmmLit.getDatatypeURI());
+        return (GMMValue) gmmLit.getValue();
     }
 }

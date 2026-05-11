@@ -31,4 +31,4 @@ WHERE {
   # Filter: P(X < 9.8mm) >= 0.9
   FILTER(?probability >= 0.9)
 }
-ORDER BY DESC(?probability)
+ORDER BY ?gearLabel
