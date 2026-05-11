@@ -1,44 +1,23 @@
 package org.apache.jena.probsparql;
 
-import org.apache.jena.datatypes.TypeMapper;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.*;
-import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Exp 4.1 — Polymorphic Dispatch Verification
+ * Exp 4.1 — Polymorphic dispatch verification over remote Fuseki endpoints.
  *
- * <p>Verifies that a single SPARQL query with {@code prob:mean}, {@code prob:std},
- * {@code prob:map}, {@code prob:cdf}, {@code prob:jsd} works unchanged on
- * GMM, Histogram, and Dirichlet literals.</p>
- *
- * <p>For each (function, type) combination, runs the query on a small in-memory
- * dataset and records: function, type, result count, any error, and whether
- * the result is in a plausible range.</p>
- *
- * <p>Output CSV: {@code exp4_dispatch.csv}
- * <pre>Function,Type,ResultCount,Status,Sample</pre>
- *
- * Usage:
- *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.Exp4DispatchTest"
- *   Optional: --output-dir benchmark/results/exp4
+ * <p>Each dataset must already be loaded on the remote server. The benchmark
+ * verifies that the same polymorphic SPARQL functions execute for GMM,
+ * Histogram, and Dirichlet literals.</p>
  */
 public class Exp4DispatchTest {
-
-    private static final int N = 10;   // small dataset for qualitative check
-
-    private static final String NS_EX   = "http://example.org/data/";
-    private static final String NS_UQ   = "http://example.org/ontology/uncertainty#";
-    private static final String NS_PROB = "http://probsparql.org/function#";
-    private static final String NS_CFM  = "http://example.org/ontology/cfm#";
-
-    // --------------------------------------------------------------------
-    // Queries — use polymorphic URIs (same text for all types)
-    // --------------------------------------------------------------------
 
     private static final String Q_MEAN = """
         PREFIX uq:   <http://example.org/ontology/uncertainty#>
@@ -72,6 +51,14 @@ public class Exp4DispatchTest {
             BIND(prob:cdf(?dist, 15.0) AS ?v)
         }""";
 
+    private static final String Q_CDF_DIR = """
+        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX prob: <http://probsparql.org/function#>
+        SELECT ?e ?v WHERE {
+            ?e uq:hasDistribution ?dist .
+            BIND(prob:cdf(?dist, 0.4) AS ?v)
+        }""";
+
     private static final String Q_JSD = """
         PREFIX uq:   <http://example.org/ontology/uncertainty#>
         PREFIX prob: <http://probsparql.org/function#>
@@ -91,210 +78,98 @@ public class Exp4DispatchTest {
             BIND(prob:jsd(?d1, ?d2) AS ?v)
         } LIMIT 5""";
 
-    // --------------------------------------------------------------------
-
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
         String outputDir = "benchmark/results/exp4";
-        for (int i = 0; i < args.length; i++)
-            if (args[i].equals("--output-dir")) outputDir = args[++i];
+        String endpointTemplate = null;
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "--endpoint-template" -> endpointTemplate = args[++i];
+                case "--output-dir" -> outputDir = args[++i];
+                default -> System.err.println("Unknown flag: " + args[i]);
+            }
+        }
+        if (endpointTemplate == null || endpointTemplate.isBlank()) {
+            throw new IllegalArgumentException("Missing required --endpoint-template");
+        }
+
         new File(outputDir).mkdirs();
 
         System.out.println("=== Exp 4.1: Polymorphic Dispatch Verification ===");
-        System.out.println();
+        System.out.printf("Endpoint template: %s%n%n", endpointTemplate);
+
+        String gmmEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, "exp4_dispatch_gmm_K3");
+        String histEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, "exp4_dispatch_hist_B50");
+        String dirEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, "exp4_dispatch_dir_k4");
 
         List<String[]> rows = new ArrayList<>();
         rows.add(new String[]{"Function", "DistType", "ResultCount", "Status", "SampleResult"});
 
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
-
-        Dataset gmmDs  = buildGmmDataset(N, 3, rng);
-        Dataset histDs = buildHistDataset(N, 50, rng);
-        Dataset dirDs  = buildDirPairDataset(N, 4, rng);
-
-        // Single-distribution functions: mean, std, map, cdf
         for (String[] spec : new String[][]{
-                {"prob:mean",  Q_MEAN},
-                {"prob:std",   Q_STD},
-                {"prob:map",   Q_MAP},
-                {"prob:cdf",   Q_CDF}}) {
-            String fn = spec[0];
-            String qry = spec[1];
-            testQuery(fn, "GMM(K=3)",    gmmDs,  qry, rows);
-            testQuery(fn, "Hist(B=50)",  histDs, qry, rows);
+                {"prob:mean", Q_MEAN},
+                {"prob:std", Q_STD},
+                {"prob:map", Q_MAP},
+                {"prob:cdf", Q_CDF}}) {
+            testQuery(spec[0], "GMM(K=3)", gmmEndpoint, spec[1], rows);
+            testQuery(spec[0], "Hist(B=50)", histEndpoint, spec[1], rows);
         }
-        // CDF for Dirichlet (marginal dim 0)
-        testQuery("prob:cdf", "Dir(k=4)", dirDs, Q_CDF.replace("15.0", "0.4"), rows);
-        // Mean, std, map for Dirichlet
-        testQuery("prob:mean", "Dir(k=4)", dirDs, Q_MEAN, rows);
-        testQuery("prob:std",  "Dir(k=4)", dirDs, Q_STD,  rows);
-        testQuery("prob:map",  "Dir(k=4)", dirDs, Q_MAP,  rows);
 
-        // JSD: same-type
-        testQuery("prob:jsd", "GMM↔GMM",   gmmDs,  Q_JSD,     rows);
-        testQuery("prob:jsd", "Hist↔Hist", histDs, Q_JSD,     rows);
-        testQuery("prob:jsd", "Dir↔Dir",   dirDs,  Q_JSD_DIR, rows);
+        testQuery("prob:mean", "Dir(k=4)", dirEndpoint, Q_MEAN, rows);
+        testQuery("prob:std", "Dir(k=4)", dirEndpoint, Q_STD, rows);
+        testQuery("prob:map", "Dir(k=4)", dirEndpoint, Q_MAP, rows);
+        testQuery("prob:cdf", "Dir(k=4)", dirEndpoint, Q_CDF_DIR, rows);
 
-        gmmDs.close(); histDs.close(); dirDs.close();
+        testQuery("prob:jsd", "GMM<->GMM", gmmEndpoint, Q_JSD, rows);
+        testQuery("prob:jsd", "Hist<->Hist", histEndpoint, Q_JSD, rows);
+        testQuery("prob:jsd", "Dir<->Dir", dirEndpoint, Q_JSD_DIR, rows);
 
         writeCsv(outputDir + "/exp4_dispatch.csv", rows);
-        System.out.println("\nResults → " + outputDir + "/exp4_dispatch.csv");
+        System.out.println("\nResults -> " + outputDir + "/exp4_dispatch.csv");
     }
 
-    // --------------------------------------------------------------------
-
-    private static void testQuery(String fn, String distType, Dataset ds,
-                                   String sparql, List<String[]> rows) {
+    private static void testQuery(String fn, String distType, String endpoint,
+                                  String sparql, List<String[]> rows) {
+        QueryFactory.create(sparql);
         String status = "OK";
-        int count = 0;
-        String sample = "";
+        int[] count = {0};
+        String[] sample = {""};
         try {
-            Query q = QueryFactory.create(sparql);
-            try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-                ResultSet rs = qe.execSelect();
-                while (rs.hasNext()) {
-                    QuerySolution row = rs.next();
-                    count++;
-                    if (count == 1) {
-                        // collect first non-null value
-                        for (String var : rs.getResultVars()) {
-                            if (row.get(var) != null && !var.equals("e") && !var.equals("e1") && !var.equals("e2")) {
-                                sample = row.get(var).toString();
-                                break;
-                            }
-                        }
-                    }
+            RemoteBenchmarkClient.forEachSolution(endpoint, sparql, row -> {
+                count[0]++;
+                if (count[0] == 1) {
+                    sample[0] = sampleValue(row);
                 }
-            }
+            });
         } catch (Exception e) {
             status = "ERROR: " + e.getMessage();
         }
-        String line = String.format("  %-12s  %-12s  n=%3d  %s  sample=%s", fn, distType, count, status, sample);
-        System.out.println(line);
-        rows.add(new String[]{fn, distType, String.valueOf(count), status, sample});
+        System.out.printf("  %-12s  %-12s  n=%3d  %s  sample=%s%n",
+                fn, distType, count[0], status, sample[0]);
+        rows.add(new String[]{fn, distType, String.valueOf(count[0]), status, sample[0]});
     }
 
-    // --------------------------------------------------------------------
-    // Dataset builders
-    // --------------------------------------------------------------------
-
-    private static Dataset buildGmmDataset(int n, int k, ThreadLocalRandom rng) {
-        Model m = ModelFactory.createDefaultModel();
-        Property hasDist = m.createProperty(NS_UQ + "hasDistribution");
-        for (int i = 1; i <= n; i++) {
-            Resource e = m.createResource(NS_EX + "gmm_" + i);
-            e.addProperty(hasDist, m.createTypedLiteral(makeGmmJson(k, rng), NS_UQ + "gmmLiteral"));
+    private static String sampleValue(QuerySolution row) {
+        for (String var : List.of("v", "meanComposition", "prob", "divergence")) {
+            if (row.contains(var)) {
+                return row.get(var).toString();
+            }
         }
-        return DatasetFactory.create(m);
-    }
-
-    private static Dataset buildHistDataset(int n, int B, ThreadLocalRandom rng) {
-        Model m = ModelFactory.createDefaultModel();
-        Property hasDist = m.createProperty(NS_UQ + "hasDistribution");
-        for (int i = 1; i <= n; i++) {
-            Resource e = m.createResource(NS_EX + "hist_" + i);
-            e.addProperty(hasDist, m.createTypedLiteral(makeHistJson(B, rng), NS_UQ + "histLiteral"));
+        java.util.Iterator<String> vars = row.varNames();
+        while (vars.hasNext()) {
+            String var = vars.next();
+            if (!var.equals("e") && !var.equals("e1") && !var.equals("e2") && row.get(var) != null) {
+                return row.get(var).toString();
+            }
         }
-        return DatasetFactory.create(m);
+        return "";
     }
-
-    /** Builds a dataset where each entity has measured + expected Dirichlet. */
-    private static Dataset buildDirPairDataset(int n, int k, ThreadLocalRandom rng) {
-        Model m = ModelFactory.createDefaultModel();
-        Property hasDist     = m.createProperty(NS_UQ + "hasDistribution");
-        Property hasMeasured = m.createProperty(NS_CFM + "hasMeasuredComposition");
-        Property hasExpected = m.createProperty(NS_CFM + "hasExpectedComposition");
-        for (int i = 1; i <= n; i++) {
-            Resource e = m.createResource(NS_EX + "dir_" + i);
-            String alphaM = makeDirJson(k, rng);
-            String alphaE = makeDirJson(k, rng);
-            e.addProperty(hasDist,     m.createTypedLiteral(alphaM, NS_UQ + "dirichletLiteral"));
-            e.addProperty(hasMeasured, m.createTypedLiteral(alphaM, NS_UQ + "dirichletLiteral"));
-            e.addProperty(hasExpected, m.createTypedLiteral(alphaE, NS_UQ + "dirichletLiteral"));
-        }
-        return DatasetFactory.create(m);
-    }
-
-    // --------------------------------------------------------------------
-    // Literal builders
-    // --------------------------------------------------------------------
-
-    private static String makeGmmJson(int k, ThreadLocalRandom rng) {
-        double[] w = new double[k];
-        double wSum = 0;
-        for (int i = 0; i < k; i++) { w[i] = rng.nextDouble(0.1, 1.0); wSum += w[i]; }
-        StringBuilder sb = new StringBuilder("{\"n_components\":" + k + ",\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[");
-        for (int i = 0; i < k; i++) { if (i > 0) sb.append(","); sb.append(String.format("%.6f", w[i] / wSum)); }
-        sb.append("],\"means\":[");
-        for (int i = 0; i < k; i++) { if (i > 0) sb.append(","); sb.append(String.format("[%.4f]", rng.nextDouble(13.0, 17.0))); }
-        sb.append("],\"covariances\":[");
-        for (int i = 0; i < k; i++) { if (i > 0) sb.append(","); sb.append(String.format("[%.6f]", rng.nextDouble(0.001, 0.1))); }
-        sb.append("]}");
-        return sb.toString();
-    }
-
-    // Fixed bin range shared by ALL in-memory histograms — required for pairwise JSD compatibility
-    private static final double HIST_LO = 5.0, HIST_HI = 25.0;
-
-    private static String makeHistJson(int B, ThreadLocalRandom rng) {
-        int[] counts = new int[B];
-        for (int i = 0; i < B; i++) { counts[i] = rng.nextInt(1, 50); }
-        double total = 0.0;
-        for (int c : counts) total += c;
-        StringBuilder sb = new StringBuilder("{\"bins\":[");
-        double width = (HIST_HI - HIST_LO) / B;
-        for (int i = 0; i <= B; i++) {
-            if (i > 0) sb.append(",");
-            sb.append(String.format("%.4f", HIST_LO + i * width));
-        }
-        sb.append("],\"weights\":[");
-        double[] weights = roundedWeights(counts, total);
-        for (int i = 0; i < B; i++) {
-            if (i > 0) sb.append(",");
-            sb.append(String.format("%.6f", weights[i]));
-        }
-        sb.append("]}");
-        return sb.toString();
-    }
-
-    private static double[] roundedWeights(int[] counts, double total) {
-        int n = counts.length;
-        double[] weights = new double[n];
-        double sum = 0.0;
-        for (int i = 0; i < n - 1; i++) {
-            weights[i] = Math.round((counts[i] / total) * 1_000_000.0) / 1_000_000.0;
-            sum += weights[i];
-        }
-        weights[n - 1] = Math.round((1.0 - sum) * 1_000_000.0) / 1_000_000.0;
-        return weights;
-    }
-
-    private static String makeDirJson(int k, ThreadLocalRandom rng) {
-        StringBuilder sb = new StringBuilder("{\"alphas\":[");
-        for (int i = 0; i < k; i++) {
-            if (i > 0) sb.append(",");
-            sb.append(String.format("%.4f", rng.nextDouble(0.5, 5.0)));
-        }
-        sb.append("]}");
-        return sb.toString();
-    }
-
-    // --------------------------------------------------------------------
-    // CSV writer
-    // --------------------------------------------------------------------
 
     private static void writeCsv(String path, List<String[]> rows) throws IOException {
         try (PrintWriter pw = new PrintWriter(new FileWriter(path))) {
             for (String[] row : rows) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < row.length; i++) {
-                    if (i > 0) sb.append(",");
-                    sb.append(row[i].replace(",", ";"));
-                }
-                pw.println(sb);
+                pw.println(String.join(",", row));
             }
         }
-        System.out.println("CSV written: " + path);
     }
 }

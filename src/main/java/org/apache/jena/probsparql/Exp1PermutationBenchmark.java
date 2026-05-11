@@ -1,13 +1,6 @@
 package org.apache.jena.probsparql;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,8 +24,9 @@ import java.util.Map;
  * </ul>
  * while keeping the deterministic baseline unchanged.</p>
  *
- * <p>The benchmark runs both probabilistic conditions in the same JVM and
- * alternates execution order per iteration to reduce run-to-run drift.</p>
+ * <p>The benchmark runs both probabilistic conditions via remote Fuseki query
+ * endpoints and alternates execution order per iteration to reduce run-to-run
+ * drift.</p>
  */
 public class Exp1PermutationBenchmark {
 
@@ -57,10 +51,9 @@ public class Exp1PermutationBenchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String dataDir = "benchmark/data/exp1/component";
-        String permutedDataDir = "benchmark/data/exp1/permutation";
         String queryDir = "benchmark/queries/exp1/permutation";
         String outputDir = "benchmark/results/exp1/permutation";
+        String endpointTemplate = null;
         String scale = DEFAULT_SCALE;
         String q4Variant = DEFAULT_Q4_VARIANT;
         List<Integer> kValues = new ArrayList<>();
@@ -68,8 +61,7 @@ public class Exp1PermutationBenchmark {
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "--data-dir" -> dataDir = args[++i];
-                case "--permuted-data-dir" -> permutedDataDir = args[++i];
+                case "--endpoint-template" -> endpointTemplate = args[++i];
                 case "--query-dir" -> queryDir = args[++i];
                 case "--output-dir" -> outputDir = args[++i];
                 case "--scale" -> scale = args[++i];
@@ -85,17 +77,19 @@ public class Exp1PermutationBenchmark {
                 default -> System.err.println("Unknown flag: " + args[i]);
             }
         }
+        if (endpointTemplate == null || endpointTemplate.isBlank()) {
+            throw new IllegalArgumentException("Missing required --endpoint-template");
+        }
 
         new File(outputDir).mkdirs();
 
         System.out.println("=== Exp1: GMM Permutation Invariance ===");
-        System.out.printf("Data dir  : %s%n", dataDir);
-        System.out.printf("Perm dir  : %s%n", permutedDataDir);
-        System.out.printf("Query dir : %s%n", queryDir);
-        System.out.printf("Scale     : %s%n", scale);
-        System.out.printf("K values  : %s%n", kValues);
-        System.out.printf("Q4 variant: %s%n", q4Variant);
-        System.out.printf("Warmup    : %d   Benchmark: %d runs%n", WARMUP_RUNS, BENCHMARK_RUNS);
+        System.out.printf("Endpoint template : %s%n", endpointTemplate);
+        System.out.printf("Query dir         : %s%n", queryDir);
+        System.out.printf("Scale             : %s%n", scale);
+        System.out.printf("K values          : %s%n", kValues);
+        System.out.printf("Q4 variant        : %s%n", q4Variant);
+        System.out.printf("Warmup            : %d   Benchmark: %d runs%n", WARMUP_RUNS, BENCHMARK_RUNS);
         System.out.println();
 
         List<String[]> rawRows = new ArrayList<>();
@@ -106,14 +100,13 @@ public class Exp1PermutationBenchmark {
                 "Original_ms", "Original_iqr_ms", "Permuted_ms", "Permuted_iqr_ms",
                 "PermutedOverOriginal", "OriginalCount", "PermutedCount", "CountsMatch"});
 
-        String detPath = dataDir + "/exp1_" + scale + "_det.ttl";
-        Model detModel = RDFDataMgr.loadModel(detPath);
-        Dataset detDs = DatasetFactory.create(detModel);
+        String detDataset = "exp1_" + scale + "_det";
+        String detEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, detDataset);
 
         Map<String, TimingAndCount> detResults = new LinkedHashMap<>();
         for (String qid : DET_QUERY_IDS) {
-            Query q = loadQuery(queryDir + "/det/" + qid.toLowerCase() + ".sparql");
-            TimingAndCount result = runSingleCondition(detDs, q);
+            String q = loadQuery(queryDir + "/det/" + qid.toLowerCase() + ".sparql");
+            TimingAndCount result = runSingleCondition(detEndpoint, q);
             detResults.put(qid, result);
             for (int r = 0; r < BENCHMARK_RUNS; r++) {
                 rawRows.add(row(scale, "DET", qid, QUERY_LABELS.get(qid), "DET",
@@ -121,19 +114,17 @@ public class Exp1PermutationBenchmark {
             }
             System.out.printf("  %-2s DET        median=%8.3f ms%n", qid, medianMs(result.times));
         }
-        detDs.close();
-        detModel.close();
         System.out.println();
 
         for (int k : kValues) {
-            String origPath = dataDir + "/exp1_" + scale + "_K" + k + ".ttl";
-            String permPath = permutedDataDir + "/exp1_" + scale + "_K" + k + "_permuted.ttl";
+            String origDataset = "exp1_" + scale + "_K" + k;
+            String permDataset = "exp1_" + scale + "_K" + k + "_permuted";
+            String origEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, origDataset);
+            String permEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, permDataset);
 
             System.out.printf("── K=%d ───────────────────────────────────────────%n", k);
-            Model origModel = RDFDataMgr.loadModel(origPath);
-            Model permModel = RDFDataMgr.loadModel(permPath);
-            Dataset origDs = DatasetFactory.create(origModel);
-            Dataset permDs = DatasetFactory.create(permModel);
+            System.out.printf("  original endpoint: %s%n", origEndpoint);
+            System.out.printf("  permuted endpoint: %s%n", permEndpoint);
 
             for (String qid : PROB_QUERY_IDS) {
                 String qPath = queryDir + "/prob/" + qid.toLowerCase() + ".sparql";
@@ -145,8 +136,8 @@ public class Exp1PermutationBenchmark {
                                 "Unknown --q4-variant: " + q4Variant + " (expected legacy or poly)");
                     };
                 }
-                Query q = loadQuery(qPath);
-                PairedTiming paired = runPairedConditions(origDs, permDs, q);
+                String q = loadQuery(qPath);
+                PairedTiming paired = runPairedConditions(origEndpoint, permEndpoint, q);
 
                 double origMed = medianMs(paired.original.times);
                 double permMed = medianMs(paired.permuted.times);
@@ -184,10 +175,6 @@ public class Exp1PermutationBenchmark {
                 System.out.printf("  %-2s  orig=%8.3f ms  perm=%8.3f ms  ratio=%s  counts=%s%n",
                         qid, origMed, permMed, ratio, countsMatch ? "match" : "DIFF");
             }
-            origDs.close();
-            permDs.close();
-            origModel.close();
-            permModel.close();
             System.out.println();
         }
 
@@ -198,32 +185,34 @@ public class Exp1PermutationBenchmark {
                 outputDir + "/exp1_permutation_summary.csv");
     }
 
-    private static Query loadQuery(String path) throws IOException {
-        return QueryFactory.create(Files.readString(Path.of(path)));
+    private static String loadQuery(String path) throws IOException {
+        String sparql = Files.readString(Path.of(path));
+        QueryFactory.create(sparql);
+        return sparql;
     }
 
-    private static TimingAndCount runSingleCondition(Dataset ds, Query q) {
-        for (int i = 0; i < WARMUP_RUNS; i++) execCount(ds, q);
+    private static TimingAndCount runSingleCondition(String endpoint, String sparql) {
+        for (int i = 0; i < WARMUP_RUNS; i++) execCount(endpoint, sparql);
 
         long[] times = new long[BENCHMARK_RUNS];
         int resultCount = -1;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             long t0 = System.nanoTime();
-            int count = execCount(ds, q);
+            int count = execCount(endpoint, sparql);
             times[i] = System.nanoTime() - t0;
             if (resultCount < 0) resultCount = count;
         }
         return new TimingAndCount(times, resultCount);
     }
 
-    private static PairedTiming runPairedConditions(Dataset originalDs, Dataset permutedDs, Query q) {
+    private static PairedTiming runPairedConditions(String originalEndpoint, String permutedEndpoint, String sparql) {
         for (int i = 0; i < WARMUP_RUNS; i++) {
             if ((i % 2) == 0) {
-                execCount(originalDs, q);
-                execCount(permutedDs, q);
+                execCount(originalEndpoint, sparql);
+                execCount(permutedEndpoint, sparql);
             } else {
-                execCount(permutedDs, q);
-                execCount(originalDs, q);
+                execCount(permutedEndpoint, sparql);
+                execCount(originalEndpoint, sparql);
             }
         }
 
@@ -235,22 +224,22 @@ public class Exp1PermutationBenchmark {
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             if ((i % 2) == 0) {
                 long t0 = System.nanoTime();
-                int c0 = execCount(originalDs, q);
+                int c0 = execCount(originalEndpoint, sparql);
                 originalTimes[i] = System.nanoTime() - t0;
                 if (originalCount < 0) originalCount = c0;
 
                 long t1 = System.nanoTime();
-                int c1 = execCount(permutedDs, q);
+                int c1 = execCount(permutedEndpoint, sparql);
                 permutedTimes[i] = System.nanoTime() - t1;
                 if (permutedCount < 0) permutedCount = c1;
             } else {
                 long t1 = System.nanoTime();
-                int c1 = execCount(permutedDs, q);
+                int c1 = execCount(permutedEndpoint, sparql);
                 permutedTimes[i] = System.nanoTime() - t1;
                 if (permutedCount < 0) permutedCount = c1;
 
                 long t0 = System.nanoTime();
-                int c0 = execCount(originalDs, q);
+                int c0 = execCount(originalEndpoint, sparql);
                 originalTimes[i] = System.nanoTime() - t0;
                 if (originalCount < 0) originalCount = c0;
             }
@@ -262,16 +251,8 @@ public class Exp1PermutationBenchmark {
         );
     }
 
-    private static int execCount(Dataset ds, Query q) {
-        int n = 0;
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            var rs = qe.execSelect();
-            while (rs.hasNext()) {
-                rs.next();
-                n++;
-            }
-        }
-        return n;
+    private static int execCount(String endpoint, String sparql) {
+        return RemoteBenchmarkClient.execCount(endpoint, sparql);
     }
 
     private static double medianMs(long[] arr) {

@@ -1,10 +1,7 @@
 package org.apache.jena.probsparql;
 
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.probsparql.functions.thresholding.CDF;
 
@@ -26,8 +23,8 @@ import java.util.Set;
  *   FILTER(prob:cdf(?d, 9.8) >= 0.9)
  *   OPTIONAL { ?gear :ctMeasurement ?ctDist . ?gear :lightMeasurement ?lightDist . }
  *
- * <p>B fetches all rows first, including the OPTIONAL expansion, and only then
- * applies the cdf threshold in Java.
+ * <p>B fetches all rows from the remote Fuseki endpoint first, including the
+ * OPTIONAL expansion, and only then applies the cdf threshold in Java.
  */
 public class Exp5Benchmark {
 
@@ -40,31 +37,41 @@ public class Exp5Benchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String dataPath = "benchmark/data/exp5/exp5_gears_5000.ttl";
         String queryDir = "benchmark/queries/exp5";
         String outputDir = "benchmark/results/exp5";
+        String endpointTemplate = null;
+        String datasetName = null;
 
         for (int i = 0; i < args.length; i++) {
-            if ("--data".equals(args[i]) && i + 1 < args.length) dataPath = args[++i];
+            if ("--endpoint-template".equals(args[i]) && i + 1 < args.length) endpointTemplate = args[++i];
+            else if ("--dataset".equals(args[i]) && i + 1 < args.length) datasetName = args[++i];
             else if ("--query-dir".equals(args[i]) && i + 1 < args.length) queryDir = args[++i];
             else if ("--output-dir".equals(args[i]) && i + 1 < args.length) outputDir = args[++i];
             else if ("--warmup".equals(args[i]) && i + 1 < args.length) WARMUP_RUNS = Integer.parseInt(args[++i]);
             else if ("--runs".equals(args[i]) && i + 1 < args.length) BENCHMARK_RUNS = Integer.parseInt(args[++i]);
         }
+        if (endpointTemplate == null || endpointTemplate.isBlank()) {
+            throw new IllegalArgumentException("Missing required --endpoint-template");
+        }
+        if (datasetName == null || datasetName.isBlank()) {
+            throw new IllegalArgumentException("Missing required --dataset");
+        }
 
         new File(outputDir).mkdirs();
-        Dataset ds = loadTtl(dataPath);
+        String endpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, datasetName);
 
         String qA = readFile(queryDir + "/inengine_early_filter.sparql");
         String qB = readFile(queryDir + "/postprocessing_fetch_all.sparql");
+        QueryFactory.create(qA);
+        QueryFactory.create(qB);
 
         for (int i = 0; i < WARMUP_RUNS; i++) {
-            executeQuery(ds, qA);
-            executeLateFilter(ds, qB);
+            executeQuery(endpoint, qA);
+            executeLateFilter(endpoint, qB);
         }
 
-        TimingResult a = measureQuery(ds, qA);
-        LateFilterResult b = measureLateFilter(ds, qB);
+        TimingResult a = measureQuery(endpoint, qA);
+        LateFilterResult b = measureLateFilter(endpoint, qB);
 
         List<String[]> rows = new ArrayList<>();
         rows.add(new String[]{
@@ -84,6 +91,7 @@ public class Exp5Benchmark {
         writeCsv(outputDir + "/exp5_summary.csv", rows);
 
         System.out.println("=== Exp5: In-engine vs Post-processing ===");
+        System.out.printf("Endpoint: %s%n", endpoint);
         System.out.printf("InEngine_EarlyFilter        median=%.3f ms  rows=%d gears=%d%n",
             a.medianMs, a.rowsReturned, a.distinctGears);
         System.out.printf("PostProcessing_LateFilter   median=%.3f ms  rows=%d gears=%d  fetchedRows=%d fetchedGears=%d%n",
@@ -91,20 +99,13 @@ public class Exp5Benchmark {
         System.out.println("Results → " + outputDir + "/exp5_summary.csv");
     }
 
-    private static Dataset loadTtl(String path) {
-        Model m = ModelFactory.createDefaultModel();
-        RDFDataMgr.read(m, path);
-        return DatasetFactory.create(m);
-    }
-
-    private static TimingResult measureQuery(Dataset ds, String sparql) {
-        Query q = QueryFactory.create(sparql);
+    private static TimingResult measureQuery(String endpoint, String sparql) {
         long[] times = new long[BENCHMARK_RUNS];
         int rows = 0;
         int gears = 0;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             long t0 = System.nanoTime();
-            QueryStats stats = executeQuery(ds, q);
+            QueryStats stats = executeQuery(endpoint, sparql);
             times[i] = System.nanoTime() - t0;
             rows = stats.rows;
             gears = stats.distinctGears;
@@ -113,13 +114,12 @@ public class Exp5Benchmark {
         return new TimingResult(ms(times[BENCHMARK_RUNS / 2]), ms(iqr(times)), rows, gears);
     }
 
-    private static LateFilterResult measureLateFilter(Dataset ds, String sparql) {
-        Query q = QueryFactory.create(sparql);
+    private static LateFilterResult measureLateFilter(String endpoint, String sparql) {
         long[] times = new long[BENCHMARK_RUNS];
         LateFilterStats last = null;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             long t0 = System.nanoTime();
-            last = executeLateFilter(ds, q);
+            last = executeLateFilter(endpoint, sparql);
             times[i] = System.nanoTime() - t0;
         }
         Arrays.sort(times);
@@ -133,50 +133,30 @@ public class Exp5Benchmark {
         );
     }
 
-    private static QueryStats executeQuery(Dataset ds, String sparql) {
-        return executeQuery(ds, QueryFactory.create(sparql));
+    private static QueryStats executeQuery(String endpoint, String sparql) {
+        RemoteBenchmarkClient.QueryStats stats = RemoteBenchmarkClient.execStats(endpoint, sparql, "gear");
+        return new QueryStats(stats.rows(), stats.distinct());
     }
 
-    private static QueryStats executeQuery(Dataset ds, Query q) {
-        int rows = 0;
-        Set<String> gears = new LinkedHashSet<>();
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) {
-                QuerySolution sol = rs.next();
-                rows++;
-                if (sol.contains("gear")) gears.add(sol.get("gear").toString());
-            }
-        }
-        return new QueryStats(rows, gears.size());
-    }
-
-    private static LateFilterStats executeLateFilter(Dataset ds, String sparql) {
-        return executeLateFilter(ds, QueryFactory.create(sparql));
-    }
-
-    private static LateFilterStats executeLateFilter(Dataset ds, Query q) {
+    private static LateFilterStats executeLateFilter(String endpoint, String sparql) {
         int rowsBefore = 0;
         int rowsAfter = 0;
         Set<String> gearsBefore = new LinkedHashSet<>();
         Set<String> gearsAfter = new LinkedHashSet<>();
 
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) {
-                QuerySolution sol = rs.next();
-                rowsBefore++;
-                String gear = sol.get("gear").toString();
-                gearsBefore.add(gear);
+        final int[] rowCounts = {rowsBefore, rowsAfter};
+        RemoteBenchmarkClient.forEachSolution(endpoint, sparql, sol -> {
+            rowCounts[0]++;
+            String gear = sol.get("gear").toString();
+            gearsBefore.add(gear);
 
-                Node dNode = sol.get("d").asNode();
-                if (cdf(dNode, CDF_POINT) >= CDF_THRESHOLD) {
-                    rowsAfter++;
-                    gearsAfter.add(gear);
-                }
+            Node dNode = sol.get("d").asNode();
+            if (cdf(dNode, CDF_POINT) >= CDF_THRESHOLD) {
+                rowCounts[1]++;
+                gearsAfter.add(gear);
             }
-        }
-        return new LateFilterStats(rowsBefore, gearsBefore.size(), rowsAfter, gearsAfter.size());
+        });
+        return new LateFilterStats(rowCounts[0], gearsBefore.size(), rowCounts[1], gearsAfter.size());
     }
 
     private static double cdf(Node distNode, double point) {

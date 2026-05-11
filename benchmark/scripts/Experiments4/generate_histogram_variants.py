@@ -153,7 +153,7 @@ def main() -> None:
     parser.add_argument("--samples", type=int, default=SAMPLES,
                         help="MC samples drawn per GMM (default: 10000)")
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
-    parser.add_argument("--input-dir",  default=os.path.join(os.path.dirname(__file__), "../data"))
+    parser.add_argument("--input-dir",  default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data"))
     parser.add_argument("--output-dir", default=None)
     args = parser.parse_args()
 

@@ -16,6 +16,18 @@ public class PruningStats {
     public long computedFullJSD  = 0;   // L5: fell through to MC sampling
     public long resultCount      = 0;   // pairs that passed (JSD <= theta)
 
+    public PruningStats() {}
+
+    public PruningStats(PruningStats other) {
+        this.totalPairs       = other.totalPairs;
+        this.prunedByDim      = other.prunedByDim;
+        this.prunedByMean     = other.prunedByMean;
+        this.prunedByVariance = other.prunedByVariance;
+        this.prunedByBounds   = other.prunedByBounds;
+        this.computedFullJSD  = other.computedFullJSD;
+        this.resultCount      = other.resultCount;
+    }
+
     public void reset() {
         totalPairs       = 0;
         prunedByDim      = 0;

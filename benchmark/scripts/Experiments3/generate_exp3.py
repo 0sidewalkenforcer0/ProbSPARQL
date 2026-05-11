@@ -292,10 +292,14 @@ def write_ttl(pairs, output_path, dataset_label):
 
             f.write(f"ex:left_{idx} a prob:LeftEntity ;\n")
             f.write(f'    rdfs:label "Left Entity {idx}" ;\n')
+            f.write(f"    prob:pairIndex {i + 1} ;\n")
+            f.write(f"    prob:referenceJSD {jsd:.10f} ;\n")
             f.write(f'    prob:hasGMM "{left_escaped}"^^uq:gmmLiteral .\n\n')
 
             f.write(f"ex:right_{idx} a prob:RightEntity ;\n")
             f.write(f'    rdfs:label "Right Entity {idx}" ;\n')
+            f.write(f"    prob:pairIndex {i + 1} ;\n")
+            f.write(f"    prob:referenceJSD {jsd:.10f} ;\n")
             f.write(f'    prob:hasGMM "{right_escaped}"^^uq:gmmLiteral .\n\n')
 
     print(f"  Wrote {output_path} ({len(pairs)} pairs)")

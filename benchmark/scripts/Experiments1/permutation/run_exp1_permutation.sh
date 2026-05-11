@@ -6,6 +6,12 @@
 #   Compare Exp1 query latency on semantically equivalent GMM literals whose
 #   mixture-component order is permuted.
 #
+# Execution:
+#   Runs from this machine against remote Fuseki HTTP endpoints. Original,
+#   permuted, and deterministic datasets must already be loaded on the Fujitsu
+#   server with service names matching the endpoint template's {dataset}
+#   placeholder.
+#
 # Setup:
 #   - Scale fixed to E5
 #   - K values fixed to 3, 5, 10  (K=1 skipped: no non-trivial permutation)
@@ -20,11 +26,12 @@
 #   bash benchmark/scripts/Experiments1/permutation/run_exp1_permutation.sh
 #
 # Optional env vars:
+#   ENDPOINT_TEMPLATE — required, e.g. https://fujitsu:3030/{dataset}/query
 #   OUTPUT_ROOT  — result root directory
 #   SKIP_BUILD   — set to 1 to skip Maven compile
 #   SCALE        — default E5
 #   K_VALUES     — default "3 5 10"
-#   Q4_VARIANT   — default legacy; set to poly to use prob:jsd
+#   Q4_VARIANT   — default poly; set to legacy to use prob:jsdivergence
 # =============================================================================
 set -euo pipefail
 
@@ -33,17 +40,15 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
 
 OUTPUT_ROOT="${OUTPUT_ROOT:-${PROJECT_ROOT}/benchmark/results/exp1/permutation}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
+ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
 SCALE="${SCALE:-E5}"
 K_VALUES="${K_VALUES:-3 5 10}"
-Q4_VARIANT="${Q4_VARIANT:-legacy}"
+Q4_VARIANT="${Q4_VARIANT:-poly}"
 
 WARMUP_RUNS=3
 BENCHMARK_RUNS=10
 
-DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/component"
-PERM_DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/permutation"
 QUERY_DIR="${PROJECT_ROOT}/benchmark/queries/exp1/permutation"
-PERM_SCRIPT="${SCRIPT_DIR}/generate_exp1_permutation.py"
 # ── Java 21 resolution ──────────────────────────────────────────────────────
 if [[ -z "${JAVA_HOME:-}" ]]; then
     if command -v /usr/libexec/java_home &>/dev/null; then
@@ -60,8 +65,7 @@ echo "=================================================================="
 echo "  Exp1 Sub-Experiment — GMM Permutation Invariance"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
-echo "  Data dir     : $DATA_DIR"
-echo "  Perm dir     : $PERM_DATA_DIR"
+echo "  Endpoint tpl : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "  Output root  : $OUTPUT_ROOT"
 echo "  Scale        : $SCALE"
 echo "  K values     : $K_VALUES"
@@ -74,61 +78,28 @@ echo
 cd "$PROJECT_ROOT"
 mkdir -p "$OUTPUT_ROOT"
 
-# ── Step 0: Build ───────────────────────────────────────────────────────────
+if [[ -z "${ENDPOINT_TEMPLATE}" ]]; then
+    echo "ERROR: ENDPOINT_TEMPLATE is required, e.g. https://fujitsu:3030/{dataset}/query" >&2
+    exit 1
+fi
+
+# ── Step 1: Build ───────────────────────────────────────────────────────────
 if [[ "${SKIP_BUILD}" != "1" ]]; then
-    echo "[0/4] Building with Maven (skipping tests)..."
+    echo "[1/2] Building with Maven (skipping tests)..."
     mvn -q package -DskipTests
     echo "      Build complete."
 else
-    echo "[0/4] Build skipped (SKIP_BUILD=1)."
+    echo "[1/2] Build skipped (SKIP_BUILD=1)."
 fi
 
-# ── Step 1: Validate source datasets ────────────────────────────────────────
+# ── Step 2: Run paired benchmark in one JVM ─────────────────────────────────
 echo
-echo "[1/4] Checking source Exp1 datasets..."
-for k in ${K_VALUES}; do
-    src="${DATA_DIR}/exp1_${SCALE}_K${k}.ttl"
-    if [[ ! -f "$src" ]]; then
-        echo "ERROR: missing source dataset: $src"
-        exit 1
-    fi
-done
-if [[ ! -f "${DATA_DIR}/exp1_${SCALE}_det.ttl" ]]; then
-    echo "ERROR: missing deterministic dataset: ${DATA_DIR}/exp1_${SCALE}_det.ttl"
-    exit 1
-fi
-echo "      Source datasets present."
-
-# ── Step 2: Generate permuted datasets if needed ────────────────────────────
-echo
-echo "[2/4] Checking / generating permuted GMM datasets..."
-NEED_PERMUTE=0
-for k in ${K_VALUES}; do
-    if [[ ! -f "${PERM_DATA_DIR}/exp1_${SCALE}_K${k}_permuted.ttl" ]]; then
-        NEED_PERMUTE=1
-    fi
-done
-
-if [[ "$NEED_PERMUTE" == "1" ]]; then
-    python3 "$PERM_SCRIPT" \
-        --scales "$SCALE" \
-        --ks ${K_VALUES} \
-        --input-dir "$DATA_DIR" \
-        --output-dir "$PERM_DATA_DIR"
-    echo "      Permuted datasets generated."
-else
-    echo "      Permuted datasets already exist — skipping generation."
-fi
-
-# ── Step 3: Run paired benchmark in one JVM ─────────────────────────────────
-echo
-echo "[3/4] Running paired permutation benchmark..."
+echo "[2/2] Running paired permutation benchmark over remote endpoints..."
 mkdir -p "$OUTPUT_ROOT"
 
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.Exp1PermutationBenchmark" \
-    -Dexec.args="--data-dir ${DATA_DIR} \
-                 --permuted-data-dir ${PERM_DATA_DIR} \
+    -Dexec.args="--endpoint-template ${ENDPOINT_TEMPLATE} \
                  --query-dir ${QUERY_DIR} \
                  --output-dir ${OUTPUT_ROOT} \
                  --scale ${SCALE} \

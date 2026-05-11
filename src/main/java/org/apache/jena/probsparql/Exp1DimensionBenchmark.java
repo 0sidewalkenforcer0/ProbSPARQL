@@ -1,14 +1,6 @@
 package org.apache.jena.probsparql;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -26,8 +18,9 @@ import java.util.Map;
 /**
  * Exp1 supplement: fixed scale E5, fixed K=3, varying GMM dimension d in
  * {1, 2, 4, 8}.
- * Runs Q1-Q3 with deterministic and probabilistic paths on the same multidimensional
- * datasets, plus two Q4 probabilistic variants.
+ * Runs Q1-Q3 and two Q4 probabilistic variants against remote Fuseki query
+ * endpoints. Endpoint names are derived from the dataset ids
+ * exp1_{scale}_K{k}_D{d}.
  */
 public class Exp1DimensionBenchmark {
 
@@ -41,9 +34,9 @@ public class Exp1DimensionBenchmark {
     public static void main(String[] args) throws Exception {
         ProbSPARQL.init();
 
-        String dataDir = "benchmark/data/exp1/dimension";
         String queryDir = "benchmark/queries/exp1/dimension";
         String outputDir = "benchmark/results/exp1/dimension";
+        String endpointTemplate = null;
         String scale = DEFAULT_SCALE;
         int k = DEFAULT_K;
         List<Integer> dimensions = new ArrayList<>();
@@ -51,7 +44,7 @@ public class Exp1DimensionBenchmark {
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "--data-dir" -> dataDir = args[++i];
+                case "--endpoint-template" -> endpointTemplate = args[++i];
                 case "--query-dir" -> queryDir = args[++i];
                 case "--output-dir" -> outputDir = args[++i];
                 case "--scale" -> scale = args[++i];
@@ -67,6 +60,9 @@ public class Exp1DimensionBenchmark {
                 default -> System.err.println("Unknown flag: " + args[i]);
             }
         }
+        if (endpointTemplate == null || endpointTemplate.isBlank()) {
+            throw new IllegalArgumentException("Missing required --endpoint-template");
+        }
 
         new File(outputDir).mkdirs();
         List<String[]> rawRows = new ArrayList<>();
@@ -78,45 +74,40 @@ public class Exp1DimensionBenchmark {
         System.out.printf("Dimensions : %s%n", dimensions);
         System.out.printf("Warmup     : %d%n", WARMUP_RUNS);
         System.out.printf("Runs       : %d%n", BENCHMARK_RUNS);
-        System.out.printf("Data dir   : %s%n", dataDir);
+        System.out.printf("Endpoint   : %s%n", endpointTemplate);
         System.out.printf("Query dir  : %s%n", queryDir);
         System.out.printf("Output dir : %s%n", outputDir);
         System.out.println();
 
         for (int d : dimensions) {
-            String ttl = dataDir + "/exp1_" + scale + "_K" + k + "_D" + d + ".ttl";
-            System.out.printf("Loading D=%d : %s%n", d, ttl);
-
-            Model model = RDFDataMgr.loadModel(ttl);
-            Dataset ds = DatasetFactory.create(model);
+            String dataset = "exp1_" + scale + "_K" + k + "_D" + d;
+            String endpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, dataset);
+            System.out.printf("D=%d endpoint: %s%n", d, endpoint);
 
             Map<String, Double> detMedians = new HashMap<>();
 
             for (String qid : List.of("Q1", "Q2", "Q3")) {
-                Query detQuery = loadQuery(queryDir + "/det/" + qid.toLowerCase() + ".sparql");
-                RunResult det = runTimed(ds, detQuery);
+                String detQuery = loadQuery(queryDir + "/det/" + qid.toLowerCase() + ".sparql");
+                RunResult det = runTimed(endpoint, detQuery);
                 detMedians.put(qid, median(det.timesNs));
                 addRows(rawRows, sumRows, scale, k, d, qid, "DET", "STD", det, "—");
             }
 
-            Query q1Prob = loadQuery(queryDir + "/prob/q1.sparql");
-            Query q2Prob = loadQueryWithReplacement(
+            String q1Prob = loadQuery(queryDir + "/prob/q1.sparql");
+            String q2Prob = loadQueryWithReplacement(
                     queryDir + "/prob/q2.sparql",
                     "__CDF_POINT__",
                     cdfPointLiteral(d)
             );
-            Query q3Prob = loadQuery(queryDir + "/prob/q3.sparql");
-            Query q4Legacy = loadQuery(queryDir + "/prob/q4.sparql");
-            Query q4Jsd = loadQuery(queryDir + "/prob/q4_jsd.sparql");
+            String q3Prob = loadQuery(queryDir + "/prob/q3.sparql");
+            String q4Legacy = loadQuery(queryDir + "/prob/q4.sparql");
+            String q4Jsd = loadQuery(queryDir + "/prob/q4_jsd.sparql");
 
-            addProbRows(rawRows, sumRows, scale, k, d, "Q1", "STD", runTimed(ds, q1Prob), detMedians.get("Q1"));
-            addProbRows(rawRows, sumRows, scale, k, d, "Q2", "STD", runTimed(ds, q2Prob), detMedians.get("Q2"));
-            addProbRows(rawRows, sumRows, scale, k, d, "Q3", "STD", runTimed(ds, q3Prob), detMedians.get("Q3"));
-            addRows(rawRows, sumRows, scale, k, d, "Q4", "PROB", "JSDIVERGENCE", runTimed(ds, q4Legacy), "—");
-            addRows(rawRows, sumRows, scale, k, d, "Q4", "PROB", "JSD", runTimed(ds, q4Jsd), "—");
-
-            ds.close();
-            model.close();
+            addProbRows(rawRows, sumRows, scale, k, d, "Q1", "STD", runTimed(endpoint, q1Prob), detMedians.get("Q1"));
+            addProbRows(rawRows, sumRows, scale, k, d, "Q2", "STD", runTimed(endpoint, q2Prob), detMedians.get("Q2"));
+            addProbRows(rawRows, sumRows, scale, k, d, "Q3", "STD", runTimed(endpoint, q3Prob), detMedians.get("Q3"));
+            addRows(rawRows, sumRows, scale, k, d, "Q4", "PROB", "JSDIVERGENCE", runTimed(endpoint, q4Legacy), "—");
+            addRows(rawRows, sumRows, scale, k, d, "Q4", "PROB", "JSD", runTimed(endpoint, q4Jsd), "—");
         }
 
         try (PrintWriter pw = new PrintWriter(new FileWriter(outputDir + "/exp1_dimension_raw.csv"))) {
@@ -187,13 +178,17 @@ public class Exp1DimensionBenchmark {
         });
     }
 
-    private static Query loadQuery(String path) throws IOException {
-        return QueryFactory.create(Files.readString(Path.of(path)));
+    private static String loadQuery(String path) throws IOException {
+        String sparql = Files.readString(Path.of(path));
+        QueryFactory.create(sparql);
+        return sparql;
     }
 
-    private static Query loadQueryWithReplacement(String path, String placeholder, String replacement) throws IOException {
+    private static String loadQueryWithReplacement(String path, String placeholder, String replacement) throws IOException {
         String sparql = Files.readString(Path.of(path));
-        return QueryFactory.create(sparql.replace(placeholder, replacement));
+        String replaced = sparql.replace(placeholder, replacement);
+        QueryFactory.create(replaced);
+        return replaced;
     }
 
     private static String cdfPointLiteral(int d) {
@@ -207,28 +202,20 @@ public class Exp1DimensionBenchmark {
         return sb.toString();
     }
 
-    private static RunResult runTimed(Dataset ds, Query q) {
-        for (int i = 0; i < WARMUP_RUNS; i++) drain(ds, q);
+    private static RunResult runTimed(String endpoint, String sparql) {
+        for (int i = 0; i < WARMUP_RUNS; i++) drain(endpoint, sparql);
         long[] times = new long[BENCHMARK_RUNS];
         int count = 0;
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             long t0 = System.nanoTime();
-            count = drain(ds, q);
+            count = drain(endpoint, sparql);
             times[i] = System.nanoTime() - t0;
         }
         return new RunResult(times, count);
     }
 
-    private static int drain(Dataset ds, Query q) {
-        int count = 0;
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) {
-                rs.next();
-                count++;
-            }
-        }
-        return count;
+    private static int drain(String endpoint, String sparql) {
+        return RemoteBenchmarkClient.execCount(endpoint, sparql);
     }
 
     private static double median(long[] arr) {

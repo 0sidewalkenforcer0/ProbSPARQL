@@ -354,7 +354,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--output-dir",
-        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "exp1", "component"),
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data", "exp1", "component"),
         help="Output directory for exp1_{scale}_K{k}.ttl files",
     )
     args = parser.parse_args()

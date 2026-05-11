@@ -7,12 +7,14 @@ Creates two TTL files used to evaluate the sample-based cross-type JSD fallback:
   1. exp4_crosstype_gmm_hist.ttl  — 100 entity pairs, each pair has:
        :e_NNN cfm:hasDistA ?gmm        (uq:gmmLiteral,   K=3)
        :e_NNN cfm:hasDistB ?hist       (uq:histLiteral, dimensions+edges+weights)
+       :e_NNN cfm:refSameTypeJSD ?x    (reference JSD for accuracy reporting)
        The histogram is derived from the same underlying GMM (same source dist),
        so the true GMM↔Hist JSD should be close to zero.
 
   2. exp4_crosstype_dir_hist.ttl  — 100 entity pairs, each pair has:
        :e_NNN cfm:hasDistA ?dir        (uq:dirichletLiteral, alphas length = 4)
        :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral, dimensions+edges+weights)
+       :e_NNN cfm:refSameTypeJSD ?x    (reference JSD for accuracy reporting)
        The histogram is built from 1-D marginal samples of the Dirichlet.
 
 The ground-truth JSD for each pair is recorded in a companion CSV:
@@ -160,6 +162,7 @@ def generate_gmm_hist_pairs(n, B, rng, output_path, gt_rows):
         g.add((uri, CFM.hasDistB,     Literal(hist_json, datatype=HIST_DT)))
         g.add((uri, CFM.pairType,     Literal("gmm_hist")))
         g.add((uri, CFM.pairIndex,    Literal(i)))
+        g.add((uri, CFM.refSameTypeJSD, Literal(round(ref_jsd, 6))))
 
         gt_rows.append({"entity": f"crossGH_{i:04d}", "pair_type": "gmm_hist",
                         "pair_idx": i, "ref_same_type_jsd": round(ref_jsd, 6)})
@@ -199,6 +202,7 @@ def generate_dir_hist_pairs(n, B, rng, output_path, gt_rows):
         g.add((uri, CFM.hasDistB,     Literal(hist_json, datatype=HIST_DT)))
         g.add((uri, CFM.pairType,     Literal("dir_hist")))
         g.add((uri, CFM.pairIndex,    Literal(i)))
+        g.add((uri, CFM.refSameTypeJSD, Literal(round(ref_jsd, 6))))
 
         gt_rows.append({"entity": f"crossDH_{i:04d}", "pair_type": "dir_hist",
                         "pair_idx": i, "ref_same_type_jsd": round(ref_jsd, 6)})

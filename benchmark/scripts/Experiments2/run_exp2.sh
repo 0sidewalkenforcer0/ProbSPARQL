@@ -1,36 +1,41 @@
 #!/usr/bin/env bash
 # =============================================================================
-# run_exp2.sh — Full overnight run for Experiment 2
+# run_exp2.sh — Full remote run for Experiment 2
 #
 # Experiment 2: In-engine Filtering vs DIVJOIN with Mixed-K Datasets
 #   Three-way comparison across:
 #     InEngine_CheapFirst
 #     InEngine_JSDFirst
 #     DIVJOIN
-#   across:
-#     N_PAIRS ∈ {100, 500, 1000, 5000, 10000}
+#   default workload:
+#     N_PAIRS = 5000
 #     unimodalFrac ∈ {0.2, 0.5, 0.8}
 #     selectivity ∈ {10pct, 50pct, 90pct}
-#   = 45 total configurations
+#   = 9 total configurations
 #
 # Full configuration:
 #   Warmup : 3 runs  (discarded for JIT warm-up)
 #   Measure: 10 runs (median of 10 reported)
-#   Mode   : GT_10K  (10,000-sample Monte Carlo JSD — high accuracy)
+#   Numeric JSD filters use prob:jsd; DIVJOIN uses the server-side adaptive
+#   similarity evaluator and exposes pruning stats through prob:lastDivJoinStats.
 #
 # Estimated runtime: depends on machine speed
-#   (GT_10K at n=10000 runs 3 variants × 45 configs)
+#   Increase NPAIRS with a comma-separated list after loading matching remote
+#   services named exp2_npairs_<N>_uf_0p2/0p5/0p8.
 #
 # Usage (from project root):
 #   bash benchmark/scripts/Experiments2/run_exp2.sh
 #
 # Optional env vars:
-#   OUTPUT_DIR   — override result directory (default: benchmark/results/exp2)
-#   DATASET_DIR  — override persisted dataset directory (default: benchmark/data/exp2)
-#   QUERY_DIR    — override query directory (default: benchmark/queries/exp2)
-#   SKIP_BUILD   — set to 1 to skip Maven package step
-#   MODE         — JSD mode override (default: GT_10K)
-#   NPAIRS       — comma-separated target pair counts (default: 5000)
+#   ENDPOINT_TEMPLATE — required, e.g. https://fujitsu:3030/{dataset}/query
+#   OUTPUT_DIR        — override result directory (default: benchmark/results/exp2)
+#   QUERY_DIR         — override query directory (default: benchmark/queries/exp2)
+#   SKIP_BUILD        — set to 1 to skip Maven package step
+#   NPAIRS            — comma-separated target pair counts (default: 5000)
+#
+# Required server JVM properties for pruning stats:
+#   -Dprobsparql.simjoin.pruning=true
+#   -Dprobsparql.simjoin.deduplicate=true
 # =============================================================================
 set -euo pipefail
 
@@ -38,10 +43,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp2}"
-DATASET_DIR="${DATASET_DIR:-${PROJECT_ROOT}/benchmark/data/exp2}"
 QUERY_DIR="${QUERY_DIR:-${PROJECT_ROOT}/benchmark/queries/exp2}"
+ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
-MODE="${MODE:-GT_10K}"
 NPAIRS="${NPAIRS:-5000}"
 
 WARMUP_RUNS=3
@@ -64,10 +68,9 @@ echo "  Experiment 2 — In-engine Filtering vs DIVJOIN  [FULL RUN]"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
 echo "  Output dir   : $OUTPUT_DIR"
-echo "  Dataset dir  : $DATASET_DIR"
+echo "  Endpoint tpl : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "  Query dir    : $QUERY_DIR"
 echo "  Java home    : $JAVA_HOME"
-echo "  JSD mode     : $MODE"
 echo "  NPairs       : $NPAIRS"
 echo "  Warmup       : $WARMUP_RUNS"
 echo "  Runs         : $BENCHMARK_RUNS"
@@ -78,43 +81,26 @@ echo
 
 cd "$PROJECT_ROOT"
 mkdir -p "$OUTPUT_DIR"
-mkdir -p "$DATASET_DIR"
+
+if [[ -z "${ENDPOINT_TEMPLATE}" ]]; then
+    echo "ERROR: ENDPOINT_TEMPLATE is required, e.g. https://fujitsu:3030/{dataset}/query" >&2
+    exit 1
+fi
 
 # ── Step 1: Build ───────────────────────────────────────────────────────────
 if [[ "${SKIP_BUILD}" != "1" ]]; then
-    echo "[1/4] Building with Maven (skipping tests)..."
+    echo "[1/3] Building with Maven (skipping tests)..."
     mvn -q package -DskipTests
     echo "      Build complete."
 else
-    echo "[1/4] Build skipped (SKIP_BUILD=1)."
-fi
-
-# ── Step 1b: Check / generate persisted datasets ───────────────────────────
-echo
-echo "[1b/4] Checking persisted Exp2 datasets..."
-missing=0
-IFS=',' read -r -a npair_items <<< "$NPAIRS"
-for np in "${npair_items[@]}"; do
-    for uf in 0p2 0p5 0p8; do
-        if [[ ! -f "${DATASET_DIR}/exp2_npairs_${np}_uf_${uf}.ttl" ]]; then
-            missing=1
-        fi
-    done
-done
-if [[ "$missing" -eq 0 ]]; then
-    echo "      Dataset files exist — skipping generation."
-else
-    echo "      Generating persisted Exp2 datasets..."
-    python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments2/generate_exp2.py" \
-        --output-dir "${DATASET_DIR}" \
-        --npairs "${npair_items[@]}"
-    echo "      Dataset generation complete."
+    echo "[1/3] Build skipped (SKIP_BUILD=1)."
 fi
 
 # ── Step 2: Run benchmark ───────────────────────────────────────────────────
 echo
-echo "[2/4] Running Exp2Benchmark (mode=$MODE, warmup=$WARMUP_RUNS, runs=$BENCHMARK_RUNS)..."
+echo "[2/3] Running Exp2Benchmark over remote endpoints (warmup=$WARMUP_RUNS, runs=$BENCHMARK_RUNS)..."
 echo "      Selected nPairs=${NPAIRS}; 3 variants over 3 unimodalFrac × 3 selectivity."
+echo "      Remote services must be named exp2_npairs_<N>_uf_0p2/0p5/0p8."
 echo "      Progress is logged to: ${OUTPUT_DIR}/exp2_run.log"
 echo
 
@@ -123,14 +109,11 @@ START_EPOCH=$(date +%s)
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.Exp2Benchmark" \
     "-Dexec.args=--output-dir ${OUTPUT_DIR} \
-                 --data-dir ${DATASET_DIR} \
+                 --endpoint-template ${ENDPOINT_TEMPLATE} \
                  --query-dir ${QUERY_DIR} \
                  --npairs ${NPAIRS} \
-                 --mode ${MODE} \
                  --warmup ${WARMUP_RUNS} \
                  --runs ${BENCHMARK_RUNS}" \
-    -Dprobsparql.simjoin.pruning=true \
-    -Dprobsparql.simjoin.deduplicate=true \
     2>&1 | tee "${OUTPUT_DIR}/exp2_run.log"
 
 END_EPOCH=$(date +%s)
@@ -140,7 +123,7 @@ echo "      Benchmark completed in ${ELAPSED}s  ($(date))"
 
 # ── Step 3: Validate ────────────────────────────────────────────────────────
 echo
-echo "[3/4] Validating results (recall / consistency checks)..."
+echo "[3/3] Validating results (recall / consistency checks)..."
 
 if python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments2/validate_exp2.py" \
         --results-dir "$OUTPUT_DIR" \
@@ -152,7 +135,7 @@ fi
 
 # ── Step 4: Run analysis ────────────────────────────────────────────────────
 echo
-echo "[4/4] Running analysis (summary tables + charts)..."
+echo "[post] Running analysis (summary tables + charts)..."
 python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments2/analyze_exp2.py" \
     --results-dir "$OUTPUT_DIR" \
     --output-dir  "$OUTPUT_DIR" \

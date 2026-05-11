@@ -10,11 +10,13 @@ package org.apache.jena.probsparql.exp2;
 public final class Exp2PruningHolder {
 
     private static final ThreadLocal<PruningStats> SLOT = new ThreadLocal<>();
+    private static volatile PruningStats lastStats = null;
 
     private Exp2PruningHolder() {}
 
     public static void set(PruningStats stats) {
         SLOT.set(stats);
+        lastStats = stats == null ? null : new PruningStats(stats);
     }
 
     /** Returns the most recently stored stats, or {@code null} if none. */
@@ -22,7 +24,17 @@ public final class Exp2PruningHolder {
         return SLOT.get();
     }
 
+    /** Returns the latest stats published by any query execution on this JVM. */
+    public static PruningStats getLast() {
+        PruningStats stats = lastStats;
+        return stats == null ? null : new PruningStats(stats);
+    }
+
     public static void clear() {
         SLOT.remove();
+    }
+
+    public static void clearLast() {
+        lastStats = null;
     }
 }

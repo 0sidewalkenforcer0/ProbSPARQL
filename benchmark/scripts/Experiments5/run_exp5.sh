@@ -22,16 +22,21 @@
 # Optional-side structure:
 #   a gear either has both optional measurements or neither
 #
+# Execution:
+#   Runs from this machine against remote Fuseki HTTP endpoints. The Exp5
+#   datasets must already be loaded on the Fujitsu server with service names
+#   matching exp5_gears_${N_GEARS}_pass_${PASS_LABEL}.
+#
 # Usage:
 #   bash benchmark/scripts/Experiments5/run_exp5.sh
 #
 # Optional env vars:
-#   DATA_DIR          — output directory for generated TTL datasets
+#   ENDPOINT_TEMPLATE — required, e.g. https://fujitsu:3030/{dataset}/query
 #   OUTPUT_DIR        — result directory
 #   QUERY_DIR         — directory containing Exp5 query files
+#   SKIP_BUILD        — set to 1 to skip Maven compile
 #   N_GEARS           — number of gear entities per dataset
 #   PASS_FRACS        — quoted space-separated list, e.g. "0.1 0.5 0.9"
-#   OPT_PRESENT_FRAC  — fraction of gears with both OPTIONAL-side measurements
 #   WARMUP            — warmup runs per configuration
 #   RUNS              — timed runs per configuration
 # =============================================================================
@@ -40,12 +45,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
-DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data/exp5}"
 OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp5}"
 QUERY_DIR="${QUERY_DIR:-${PROJECT_ROOT}/benchmark/queries/exp5}"
+ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
+SKIP_BUILD="${SKIP_BUILD:-0}"
 N_GEARS="${N_GEARS:-1_000_000}"
 PASS_FRACS="${PASS_FRACS:-0.01 0.05 0.1 0.3}"
-OPT_PRESENT_FRAC="${OPT_PRESENT_FRAC:-0.7}"
 WARMUP="${WARMUP:-3}"
 RUNS="${RUNS:-10}"
 
@@ -61,17 +66,30 @@ fi
 export PATH="$JAVA_HOME/bin:$PATH"
 export JAVA_TOOL_OPTIONS="-Duser.language=en -Duser.country=US"
 
-mkdir -p "${DATA_DIR}" "${OUTPUT_DIR}"
+mkdir -p "${OUTPUT_DIR}"
 MASTER_SUMMARY="${OUTPUT_DIR}/exp5_summary_all.csv"
 
 echo "=== Exp5: In-engine vs Post-processing ==="
-echo "Data dir   : ${DATA_DIR}"
 echo "Output dir : ${OUTPUT_DIR}"
+echo "Endpoint   : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "Java home  : ${JAVA_HOME}"
 echo "N_GEARS    : ${N_GEARS}"
 echo "PASS_FRACS : ${PASS_FRACS}"
-echo "OPTIONAL   : both-or-neither, present=${OPT_PRESENT_FRAC}"
 echo
+
+if [[ -z "${ENDPOINT_TEMPLATE}" ]]; then
+  echo "ERROR: ENDPOINT_TEMPLATE is required, e.g. https://fujitsu:3030/{dataset}/query" >&2
+  exit 1
+fi
+
+cd "$PROJECT_ROOT"
+
+if [[ "${SKIP_BUILD}" != "1" ]]; then
+  echo "[1/2] Building with Maven (skipping tests)..."
+  mvn -q package -DskipTests
+else
+  echo "[1/2] Build skipped (SKIP_BUILD=1)."
+fi
 
 # ── Aggregate summary init ──────────────────────────────────────────────────
 printf "PassFrac,Method,MedianMs,IQRMs,RowsReturned,DistinctGears,FetchedRowsBeforeFilter,DistinctGearsBeforeFilter\n" > "${MASTER_SUMMARY}"
@@ -80,36 +98,24 @@ printf "PassFrac,Method,MedianMs,IQRMs,RowsReturned,DistinctGears,FetchedRowsBef
 for PASS_FRAC in ${PASS_FRACS}; do
   PASS_LABEL="${PASS_FRAC/./p}"
   DATASET_NAME="exp5_gears_${N_GEARS}_pass_${PASS_LABEL}"
-  TTL_PATH="${DATA_DIR}/${DATASET_NAME}.ttl"
   RUN_OUTPUT_DIR="${OUTPUT_DIR}/pass_${PASS_LABEL}"
 
   echo "── pass_frac=${PASS_FRAC} ─────────────────────────────"
+  echo "Dataset service: ${DATASET_NAME}"
 
-  # ── Step 1: Generate dataset if missing ──────────────────────────────────
-  if [[ ! -f "${TTL_PATH}" ]]; then
-    echo "[1/2] Generating dataset..."
-    python3 "${PROJECT_ROOT}/benchmark/scripts/Experiments5/generate_exp5.py" \
-      --output-dir "${DATA_DIR}" \
-      --name "${DATASET_NAME}" \
-      --n-gears "${N_GEARS}" \
-      --pass-frac "${PASS_FRAC}" \
-      --opt-present-frac "${OPT_PRESENT_FRAC}"
-  else
-    echo "[1/2] Dataset exists — skipping generation."
-  fi
-
-  # ── Step 2: Run Java benchmark ───────────────────────────────────────────
-  echo "[2/2] Running Java benchmark..."
+  # ── Run Java benchmark ───────────────────────────────────────────────────
+  echo "[2/2] Running Java benchmark over remote endpoint..."
   mkdir -p "${RUN_OUTPUT_DIR}"
   mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.Exp5Benchmark" \
-    -Dexec.args="--data ${TTL_PATH} \
+    -Dexec.args="--endpoint-template ${ENDPOINT_TEMPLATE} \
+                 --dataset ${DATASET_NAME} \
                  --query-dir ${QUERY_DIR} \
                  --output-dir ${RUN_OUTPUT_DIR} \
                  --warmup ${WARMUP} \
                  --runs ${RUNS}"
 
-  # ── Step 3: Append per-run summary into aggregate CSV ────────────────────
+  # ── Append per-run summary into aggregate CSV ────────────────────────────
   if [[ -f "${RUN_OUTPUT_DIR}/exp5_summary.csv" ]]; then
     tail -n +2 "${RUN_OUTPUT_DIR}/exp5_summary.csv" | while IFS= read -r line; do
       printf "%s,%s\n" "${PASS_FRAC}" "${line}" >> "${MASTER_SUMMARY}"

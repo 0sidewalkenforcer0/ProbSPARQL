@@ -3,9 +3,9 @@
 # run_exp1_component.sh — Component-complexity run for Experiment 1
 #
 # Experiment 1: System Overhead — ProbSPARQL vs Deterministic SPARQL
-#   Compares query latency across 4 default dataset scales (E1, E3, E5, E7)
-#   and 4 GMM complexities (K=1,3,5,10) for 3 deterministic and 4
-#   probabilistic queries.
+#   Executes query workloads through remote Fuseki HTTP endpoints. Each logical
+#   dataset must already be loaded on the server with a service name matching
+#   the endpoint template's {dataset} placeholder.
 #
 # Full configuration:
 #   Warmup : 3 runs  (default in ScalabilityBenchmark)
@@ -18,9 +18,10 @@
 #   bash benchmark/scripts/Experiments1/component/run_exp1_component.sh
 #
 # Optional env vars:
-#   OUTPUT_DIR   — override result output directory
-#   SKIP_BUILD   — set to 1 to skip Maven compile step
-#   SCALES       — space-separated scales to generate/run (default: E1 E3 E5 E7)
+#   ENDPOINT_TEMPLATE — required, e.g. https://fujitsu:3030/{dataset}/query
+#   OUTPUT_DIR        — override result output directory
+#   SKIP_BUILD        — set to 1 to skip Maven compile step
+#   SCALES            — space-separated scales to run (default: E1 E3 E5 E7)
 # =============================================================================
 set -euo pipefail
 
@@ -30,6 +31,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
 OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp1/component}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SCALES="${SCALES:-E1 E3 E5 E7}"
+ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
 
 WARMUP_RUNS=3
 BENCHMARK_RUNS=10
@@ -51,6 +53,7 @@ echo "  Experiment 1 — System Overhead (DET vs PROB)  [FULL RUN]"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
 echo "  Output dir   : $OUTPUT_DIR"
+echo "  Endpoint tpl : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "  Java home    : $JAVA_HOME"
 echo "  Warmup       : $WARMUP_RUNS"
 echo "  Runs         : $BENCHMARK_RUNS"
@@ -61,50 +64,25 @@ echo
 
 cd "$PROJECT_ROOT"
 
+if [[ -z "${ENDPOINT_TEMPLATE}" ]]; then
+    echo "ERROR: ENDPOINT_TEMPLATE is required, e.g. https://fujitsu:3030/{dataset}/query" >&2
+    exit 1
+fi
+
 # ── Step 1: Build ───────────────────────────────────────────────────────────
 if [[ "${SKIP_BUILD}" != "1" ]]; then
-    echo "[1/3] Building with Maven (skipping tests)..."
+    echo "[1/2] Building with Maven (skipping tests)..."
     mvn -q package -DskipTests
     echo "      Build complete."
 else
-    echo "[1/3] Build skipped (SKIP_BUILD=1)."
+    echo "[1/2] Build skipped (SKIP_BUILD=1)."
 fi
 
 mkdir -p "$OUTPUT_DIR"
 
-# ── Step 2: Generate experiment data (idempotent) ───────────────────────────
+# ── Step 2: Run ScalabilityBenchmark ────────────────────────────────────────
 echo
-echo "[2/3] Checking / generating exp1 datasets..."
-DATA_DIR="${PROJECT_ROOT}/benchmark/data/exp1/component"
-SCRIPTS_DIR="${PROJECT_ROOT}/benchmark/scripts/Experiments1/component"
-
-read -r -a SCALE_LIST <<< "$SCALES"
-FIRST_SCALE="${SCALE_LIST[0]}"
-
-if [[ ! -f "${DATA_DIR}/exp1_${FIRST_SCALE}_K1.ttl" ]]; then
-    echo "      Generating probabilistic exp1 datasets..."
-    python3 "${SCRIPTS_DIR}/generate_exp1_component_probabilistic.py" \
-        --scales ${SCALES} \
-        --output-dir "${DATA_DIR}"
-    echo "      Probabilistic datasets generated."
-else
-    echo "      Probabilistic datasets exist — skipping generation."
-fi
-
-if [[ ! -f "${DATA_DIR}/exp1_${FIRST_SCALE}_det.ttl" ]]; then
-    echo "      Generating deterministic exp1 datasets..."
-    python3 "${SCRIPTS_DIR}/generate_exp1_component_deterministic.py" \
-        --scales ${SCALES} \
-        --input-dir  "${DATA_DIR}" \
-        --output-dir "${DATA_DIR}"
-    echo "      Deterministic datasets generated."
-else
-    echo "      Deterministic datasets exist — skipping generation."
-fi
-
-# ── Step 3: Run ScalabilityBenchmark ────────────────────────────────────────
-echo
-echo "[3/3] Running ScalabilityBenchmark (warmup=$WARMUP_RUNS, runs=$BENCHMARK_RUNS)..."
+echo "[2/2] Running ScalabilityBenchmark over remote endpoints (warmup=$WARMUP_RUNS, runs=$BENCHMARK_RUNS)..."
 echo "      This will take a while — ${SCALES} × 4 K-values × 7 queries..."
 echo
 
@@ -112,7 +90,7 @@ START_EPOCH=$(date +%s)
 
 mvn -q exec:java \
     -Dexec.mainClass="org.apache.jena.probsparql.ScalabilityBenchmark" \
-    -Dexec.args="--data-dir ${PROJECT_ROOT}/benchmark/data/exp1/component \
+    -Dexec.args="--endpoint-template ${ENDPOINT_TEMPLATE} \
                  --query-dir ${PROJECT_ROOT}/benchmark/queries/exp1/component \
                  --output-dir ${OUTPUT_DIR} \
                  --warmup ${WARMUP_RUNS} \

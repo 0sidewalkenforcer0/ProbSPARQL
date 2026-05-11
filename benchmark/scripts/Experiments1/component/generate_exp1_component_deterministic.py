@@ -81,7 +81,7 @@ def main() -> None:
                         help="Exp1 scale labels to process, e.g. E1 E3 E5")
     parser.add_argument("--k-source", type=int, default=3, dest="k_source",
                         help="Which probabilistic K variant to use as source (default: 3)")
-    parser.add_argument("--input-dir", default=os.path.join(os.path.dirname(__file__), "..", "..", "data", "exp1", "main"),
+    parser.add_argument("--input-dir", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data", "exp1", "component"),
                         help="Directory containing source probabilistic TTL files")
     parser.add_argument("--output-dir", default=None,
                         help="Directory for output TTL files (defaults to input-dir)")

@@ -67,9 +67,13 @@ public class SimilarityEvaluator {
     }
 
     public SimilarityEvaluator(double decisionThreshold, double alpha, double beta) {
+        this(System.getProperty("probsparql.mode", JSDivergenceConfig.MODE), decisionThreshold, alpha, beta);
+    }
+
+    public SimilarityEvaluator(String mode, double decisionThreshold, double alpha, double beta) {
         validateTailProbability("alpha", alpha);
         validateTailProbability("beta", beta);
-        this.mode = System.getProperty("probsparql.mode", JSDivergenceConfig.MODE);
+        this.mode = mode;
         this.decisionThreshold = decisionThreshold;
         this.alpha = alpha;
         this.beta = beta;

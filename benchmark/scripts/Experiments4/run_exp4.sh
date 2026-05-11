@@ -2,16 +2,28 @@
 # =============================================================================
 # run_exp4.sh — Full Pipeline for Experiment 4 (Generalization)
 #
-# Runs all five sub-experiments sequentially:
+# Runs all five sub-experiments sequentially against remote Fuseki endpoints.
+# All required Exp4 datasets must already be loaded on the Fujitsu server.
+#
+# Required remote service names:
+#   exp4_dispatch_gmm_K3, exp4_dispatch_hist_B50, exp4_dispatch_dir_k4
+#   exp4_micro_gmm_K3
+#   exp4_micro_hist_B20, exp4_micro_hist_B50, exp4_micro_hist_B100
+#   exp4_micro_dir_k4, exp4_micro_dir_k10, exp4_micro_dir_k20
+#   exp4_crosstype_gmm_hist, exp4_crosstype_dir_hist
+#   exp1_E3_K3, exp1_E5_K3, exp1_E7_K3
+#   exp4_E3_hist_B50, exp4_E3_hist_B100
+#   exp4_E5_hist_B50, exp4_E5_hist_B100
+#   exp4_E7_hist_B50, exp4_E7_hist_B100
+#   exp4_dirichlet
 #
 #   Phase 0 — Maven build (once)
-#   Phase 1 — Python dataset generation (histogram + Dirichlet + cross-type)
-#   Phase 2 — Exp 4.1  Exp4DispatchTest     (polymorphic dispatch verification)
-#   Phase 3 — Exp 4.2  Exp4MicroBenchmark   (per-operation latency)
-#   Phase 4 — Exp 4.3  Exp4CrossTypeJSD     (cross-type JSD accuracy)
-#   Phase 5 — Exp 4.4  Exp4EndToEnd         (end-to-end Q2 Filter/Q4 JSD GMM vs Hist)
-#   Phase 6 — Exp 4.5  Exp4DirichletDemo    (Dirichlet qualitative demo)
-#   Phase 7 — Analysis  analyze_exp4.py     (charts + console tables)
+#   Phase 1 — Exp 4.1  Exp4DispatchTest     (polymorphic dispatch verification)
+#   Phase 2 — Exp 4.2  Exp4MicroBenchmark   (remote per-operation latency)
+#   Phase 3 — Exp 4.3  Exp4CrossTypeJSD     (remote cross-type JSD)
+#   Phase 4 — Exp 4.4  Exp4EndToEnd         (remote end-to-end Q2/Q4)
+#   Phase 5 — Exp 4.5  Exp4DirichletDemo    (remote Dirichlet qualitative demo)
+#   Phase 6 — Analysis  analyze_exp4.py     (charts + console tables)
 #
 # All results → benchmark/results/exp4/
 #
@@ -19,12 +31,10 @@
 #   bash benchmark/scripts/Experiments4/run_exp4.sh
 #
 # Optional env vars:
-#   OUTPUT_DIR  — override result directory  (default: benchmark/results/exp4)
-#   DATA_DIR    — override data directory    (default: benchmark/data)
-#   SKIP_BUILD  — set to 1 to skip Maven compile
-#   SKIP_DATA   — set to 1 to skip Python dataset generation
-#   FORCE_DATA  — set to 1 to force regenerating all Exp4 datasets
-#   JAVA_HOME   — override Java 21 home
+#   ENDPOINT_TEMPLATE — required, e.g. https://fujitsu:3030/{dataset}/query
+#   OUTPUT_DIR        — override result directory  (default: benchmark/results/exp4)
+#   SKIP_BUILD        — set to 1 to skip Maven compile
+#   JAVA_HOME         — override Java 21 home
 # =============================================================================
 set -euo pipefail
 
@@ -32,10 +42,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp4}"
-DATA_DIR="${DATA_DIR:-${PROJECT_ROOT}/benchmark/data}"
+ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
-SKIP_DATA="${SKIP_DATA:-0}"
-FORCE_DATA="${FORCE_DATA:-0}"
 
 # ── Java 21 resolution ──────────────────────────────────────────────────────
 if [[ -z "${JAVA_HOME:-}" ]]; then
@@ -61,11 +69,11 @@ done
 TOTAL_START=$SECONDS
 
 echo "=================================================================="
-echo "  Experiment 4 — Generalization (FULL OVERNIGHT RUN)"
+echo "  Experiment 4 — Generalization (REMOTE FUSEKI RUN)"
 echo "=================================================================="
 echo "  Project root : $PROJECT_ROOT"
 echo "  Output dir   : $OUTPUT_DIR"
-echo "  Data dir     : $DATA_DIR"
+echo "  Endpoint tpl : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "  Java home    : $JAVA_HOME"
 echo "  Python bin   : ${PYTHON_BIN:-NONE}"
 echo "  Start time   : $(date)"
@@ -75,63 +83,16 @@ echo
 cd "$PROJECT_ROOT"
 mkdir -p "$OUTPUT_DIR"
 
+if [[ -z "${ENDPOINT_TEMPLATE}" ]]; then
+    echo "ERROR: ENDPOINT_TEMPLATE is required, e.g. https://fujitsu:3030/{dataset}/query" >&2
+    exit 1
+fi
+
 # ── Phase 0: Build ──────────────────────────────────────────────────────────
 if [[ "${SKIP_BUILD}" != "1" ]]; then
     echo ">>> Phase 0: Building with Maven..."
     mvn -q package -DskipTests
     echo "    Build complete."
-fi
-
-# ── Phase 1: Dataset generation ─────────────────────────────────────────────
-if [[ "${SKIP_DATA}" != "1" ]]; then
-    echo
-    echo ">>> Phase 1: Checking / generating datasets..."
-
-    if [[ -z "$PYTHON_BIN" ]]; then
-        echo "    WARNING: Python with numpy+rdflib not found — skipping dataset generation."
-        echo "    Pre-generated datasets must already be present in $DATA_DIR/exp4/"
-    else
-        EXP4_DATA_DIR="${DATA_DIR}/exp4"
-        mkdir -p "$EXP4_DATA_DIR"
-
-        HIST_MISSING=0
-        for scale in E3 E5 E7; do
-            for bins in 50 100; do
-                if [[ ! -s "${EXP4_DATA_DIR}/exp4_${scale}_hist_B${bins}.ttl" ]]; then
-                    HIST_MISSING=1
-                fi
-            done
-        done
-        if [[ "${FORCE_DATA}" == "1" || "${HIST_MISSING}" == "1" ]]; then
-            echo "    1a. Histogram datasets from exp1 K=3 files..."
-            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_histogram_datasets.py" \
-                --input-dir  "${DATA_DIR}/exp1" \
-                --output-dir "${EXP4_DATA_DIR}"
-        else
-            echo "    1a. Histogram datasets already present — skip."
-        fi
-
-        if [[ "${FORCE_DATA}" == "1" || ! -s "${EXP4_DATA_DIR}/exp4_dirichlet.ttl" ]]; then
-            echo "    1b. Dirichlet dataset (100 components, k=4)..."
-            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_dirichlet_dataset.py" \
-                --output-dir "${EXP4_DATA_DIR}"
-        else
-            echo "    1b. Dirichlet dataset already present — skip."
-        fi
-
-        if [[ "${FORCE_DATA}" == "1" \
-           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_gmm_hist.ttl" \
-           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_dir_hist.ttl" \
-           || ! -s "${EXP4_DATA_DIR}/exp4_crosstype_gt.csv" ]]; then
-            echo "    1c. Cross-type JSD pairs (100 GMM↔Hist + 100 Dir↔Hist)..."
-            "$PYTHON_BIN" "${SCRIPT_DIR}/generate_crosstype_pairs.py" \
-                --output-dir "${EXP4_DATA_DIR}"
-        else
-            echo "    1c. Cross-type datasets already present — skip."
-        fi
-
-        echo "    Dataset check complete."
-    fi
 fi
 
 # ── Helper: run a Java benchmark class ─────────────────────────────────────
@@ -143,29 +104,29 @@ run_java() {
     echo ">>> ${phase_label}: ${class}..."
     local t0=$SECONDS
     mvn -q exec:java -Dexec.mainClass="org.apache.jena.probsparql.${class}" \
-        -Dexec.args="--output-dir ${OUTPUT_DIR} --data-dir ${DATA_DIR} $*" \
+        -Dexec.args="--output-dir ${OUTPUT_DIR} --endpoint-template ${ENDPOINT_TEMPLATE} $*" \
         2>&1 | tee "${OUTPUT_DIR}/${class}.log" | grep -E "^  |^---|^=|^>>>" || true
     echo "    Done in $(( SECONDS - t0 ))s."
 }
 
-# ── Phase 2: Exp 4.1 Dispatch verification ──────────────────────────────────
-run_java "Exp4DispatchTest"  "Phase 2 (Exp 4.1)"
+# ── Phase 1: Exp 4.1 Dispatch verification ──────────────────────────────────
+run_java "Exp4DispatchTest"  "Phase 1 (Exp 4.1)"
 
-# ── Phase 3: Exp 4.2 Micro-benchmark ────────────────────────────────────────
-run_java "Exp4MicroBenchmark" "Phase 3 (Exp 4.2)"
+# ── Phase 2: Exp 4.2 Micro-benchmark ────────────────────────────────────────
+run_java "Exp4MicroBenchmark" "Phase 2 (Exp 4.2)"
 
-# ── Phase 4: Exp 4.3 Cross-type JSD accuracy ────────────────────────────────
-run_java "Exp4CrossTypeJSD"  "Phase 4 (Exp 4.3)"
+# ── Phase 3: Exp 4.3 Cross-type JSD accuracy ────────────────────────────────
+run_java "Exp4CrossTypeJSD"  "Phase 3 (Exp 4.3)"
 
-# ── Phase 5: Exp 4.4 End-to-end performance ─────────────────────────────────
-run_java "Exp4EndToEnd"      "Phase 5 (Exp 4.4)"
+# ── Phase 4: Exp 4.4 End-to-end performance ─────────────────────────────────
+run_java "Exp4EndToEnd"      "Phase 4 (Exp 4.4)"
 
-# ── Phase 6: Exp 4.5 Dirichlet demonstration ────────────────────────────────
-run_java "Exp4DirichletDemo" "Phase 6 (Exp 4.5)"
+# ── Phase 5: Exp 4.5 Dirichlet demonstration ────────────────────────────────
+run_java "Exp4DirichletDemo" "Phase 5 (Exp 4.5)"
 
-# ── Phase 7: Analysis ───────────────────────────────────────────────────────
+# ── Phase 6: Analysis ───────────────────────────────────────────────────────
 echo
-echo ">>> Phase 7: Analysis..."
+echo ">>> Phase 6: Analysis..."
 if [[ -z "$PYTHON_BIN" ]]; then
     echo "    WARNING: Python not available — skipping analysis."
 else

@@ -20,6 +20,8 @@ import org.apache.jena.probsparql.functions.thresholding.LogPDF;
 import org.apache.jena.probsparql.functions.thresholding.LogCDF;
 import org.apache.jena.probsparql.functions.comparison.KLDivergence;
 import org.apache.jena.probsparql.functions.comparison.JSDivergence;
+import org.apache.jena.probsparql.functions.comparison.JSDMode;
+import org.apache.jena.probsparql.functions.comparison.LastDivJoinStats;
 import org.apache.jena.probsparql.functions.transformation.Scale;
 import org.apache.jena.probsparql.functions.transformation.Shift;
 import org.apache.jena.probsparql.functions.transformation.LinearTransform;
@@ -132,9 +134,11 @@ public class ProbSPARQL {
         functionRegistry.put(JSDivergence.URI, JSDivergence.class);
         functionRegistry.put(HistogramJSD.URI, HistogramJSD.class);
         functionRegistry.put(PolyJSD.URI, PolyJSD.class);   // polymorphic prob:jsd
+        functionRegistry.put(JSDMode.URI, JSDMode.class);   // benchmark mode-specific GMM JSD
+        functionRegistry.put(LastDivJoinStats.URI, LastDivJoinStats.class);
         functionRegistry.put(SameTerm.URI, SameTerm.class);
         functionRegistry.put(SameDistribution.URI, SameDistribution.class);
-        logger.info("Registered {} comparison functions", 6);
+        logger.info("Registered {} comparison functions", 8);
         
         // Category 3: Probabilistic Transformation Operators
         functionRegistry.put(Scale.URI, Scale.class);
@@ -180,7 +184,7 @@ public class ProbSPARQL {
         logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and DIVJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (27 functions + 2 property functions + 3 join strategies + FUSEJOIN/DIVJOIN syntax)", NAME);
+        logger.info("{} initialization complete (29 functions + 2 property functions + 3 join strategies + FUSEJOIN/DIVJOIN syntax)", NAME);
     }
     
     /**

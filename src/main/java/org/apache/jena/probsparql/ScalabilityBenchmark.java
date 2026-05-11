@@ -1,8 +1,6 @@
 package org.apache.jena.probsparql;
 
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.query.QueryFactory;
 
 import java.io.*;
 import java.nio.file.*;
@@ -11,14 +9,13 @@ import java.util.*;
 /**
  * Exp 1: System Overhead — ProbSPARQL vs Deterministic SPARQL
  *
- * <p>Loads pre-generated TTL datasets and SPARQL query files from disk, executes
- * them in-process using the standard Jena {@code QueryExecutionFactory}, and
- * records per-run wall-clock times. No HTTP / Fuseki overhead is included.
+ * <p>Executes SPARQL query files against remote Fuseki query endpoints and
+ * records per-run wall-clock times including HTTP query/result transfer.
  *
  * <h3>Dataset naming convention</h3>
  * <pre>
- *   benchmark/data/exp1/component/exp1_{scale}_K{k}.ttl   — probabilistic (uq:gmmLiteral)
- *   benchmark/data/exp1/component/exp1_{scale}_det.ttl     — deterministic (xsd:double)
+ *   exp1_{scale}_K{k}   — probabilistic (uq:gmmLiteral)
+ *   exp1_{scale}_det     — deterministic (xsd:double)
  * </pre>
  *
  * <h3>Query files</h3>
@@ -36,8 +33,9 @@ import java.util.*;
  * <h3>Usage</h3>
  * <pre>
  *   mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.ScalabilityBenchmark"
- *   # Optional flags:
- *   #   --data-dir   benchmark/data/exp1/component
+ *   # Required:
+ *   #   --endpoint-template https://fujitsu.example.org/{dataset}/query
+ *   # Optional:
  *   #   --query-dir  benchmark/queries/exp1/component
  *   #   --output-dir benchmark/results/exp1/component
  *   #   --scales     E1 E3 E5 E7
@@ -60,9 +58,9 @@ public class ScalabilityBenchmark {
         ProbSPARQL.init();
 
         // Defaults
-        String dataDir   = "benchmark/data/exp1/component";
         String queryDir  = "benchmark/queries/exp1/component";
         String outputDir = "benchmark/results/exp1/component";
+        String endpointTemplate = null;
         List<String>  scales  = new ArrayList<>(Arrays.asList(DEFAULT_SCALES));
         List<Integer> kValues = new ArrayList<>();
         for (int k : DEFAULT_K_VALUES) kValues.add(k);
@@ -70,7 +68,7 @@ public class ScalabilityBenchmark {
         // Parse CLI flags
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
-                case "--data-dir"   -> dataDir   = args[++i];
+                case "--endpoint-template" -> endpointTemplate = args[++i];
                 case "--query-dir"  -> queryDir  = args[++i];
                 case "--output-dir" -> outputDir = args[++i];
                 case "--scales"  -> {
@@ -86,15 +84,18 @@ public class ScalabilityBenchmark {
                 default -> System.err.println("Unknown flag: " + args[i]);
             }
         }
+        if (endpointTemplate == null || endpointTemplate.isBlank()) {
+            throw new IllegalArgumentException("Missing required --endpoint-template");
+        }
 
         new File(outputDir).mkdirs();
 
         System.out.println("=== Exp 1: System Overhead (DET vs PROB) ===");
-        System.out.printf("Data dir  : %s%n", dataDir);
-        System.out.printf("Query dir : %s%n", queryDir);
-        System.out.printf("Warmup    : %d   Benchmark: %d runs%n", WARMUP_RUNS, BENCHMARK_RUNS);
-        System.out.printf("Scales    : %s%n", scales);
-        System.out.printf("K values  : %s%n", kValues);
+        System.out.printf("Endpoint template : %s%n", endpointTemplate);
+        System.out.printf("Query dir         : %s%n", queryDir);
+        System.out.printf("Warmup            : %d   Benchmark: %d runs%n", WARMUP_RUNS, BENCHMARK_RUNS);
+        System.out.printf("Scales            : %s%n", scales);
+        System.out.printf("K values          : %s%n", kValues);
         System.out.println();
 
         // Accumulate rows for both output files
@@ -111,15 +112,14 @@ public class ScalabilityBenchmark {
             System.out.printf("─── Scale: %s ───────────────────────────────────────%n", scale);
 
             // ---- DET dataset (once per scale) ----
-            String detTtl = dataDir + "/exp1_" + scale + "_det.ttl";
-            System.out.printf("  Loading DET : %s%n", detTtl);
-            Model   detModel = RDFDataMgr.loadModel(detTtl);
-            Dataset detDs    = DatasetFactory.create(detModel);
+            String detDataset = "exp1_" + scale + "_det";
+            String detEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, detDataset);
+            System.out.printf("  DET endpoint : %s%n", detEndpoint);
 
             for (String qid : detQueryIds) {
                 String sparqlPath = queryDir + "/det/" + qid.toLowerCase() + ".sparql";
-                Query  query      = loadQuery(sparqlPath);
-                long[] times      = runTimed(detDs, query);
+                String query      = loadQuery(sparqlPath);
+                long[] times      = runTimed(detEndpoint, query);
                 double medMs      = median(times);
                 double iqrMs      = iqr(times);
 
@@ -131,20 +131,17 @@ public class ScalabilityBenchmark {
                 sumRows.add(sumRow(scale, "DET", qid, "DET", medMs, iqrMs, "1.00"));
                 System.out.printf("    %-2s DET  : median=%7.3f ms%n", qid, medMs);
             }
-            detDs.close();
-            detModel.close();
 
             // ---- PROB datasets (once per K) ----
             for (int k : kValues) {
-                String probTtl = dataDir + "/exp1_" + scale + "_K" + k + ".ttl";
-                System.out.printf("  Loading PROB K=%d : %s%n", k, probTtl);
-                Model   probModel = RDFDataMgr.loadModel(probTtl);
-                Dataset probDs    = DatasetFactory.create(probModel);
+                String probDataset = "exp1_" + scale + "_K" + k;
+                String probEndpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, probDataset);
+                System.out.printf("  PROB K=%d endpoint : %s%n", k, probEndpoint);
 
                 for (String qid : probQueryIds) {
                     String sparqlPath = queryDir + "/prob/" + qid.toLowerCase() + ".sparql";
-                    Query  query      = loadQuery(sparqlPath);
-                    long[] times      = runTimed(probDs, query);
+                    String query      = loadQuery(sparqlPath);
+                    long[] times      = runTimed(probEndpoint, query);
                     double medMs      = median(times);
                     double iqrMs      = iqr(times);
 
@@ -164,8 +161,6 @@ public class ScalabilityBenchmark {
                     System.out.printf("    %-2s K=%-2d PROB: median=%7.3f ms  ratio=%s%n",
                                       qid, k, medMs, ratioStr);
                 }
-                probDs.close();
-                probModel.close();
             }
             System.out.println();
         }
@@ -190,31 +185,29 @@ public class ScalabilityBenchmark {
     // Query loading
     // -----------------------------------------------------------------------
 
-    private static Query loadQuery(String path) throws IOException {
+    private static String loadQuery(String path) throws IOException {
         String sparql = Files.readString(Path.of(path));
-        return QueryFactory.create(sparql);
+        QueryFactory.create(sparql);
+        return sparql;
     }
 
     // -----------------------------------------------------------------------
     // Timing
     // -----------------------------------------------------------------------
 
-    private static long[] runTimed(Dataset ds, Query q) {
-        for (int i = 0; i < WARMUP_RUNS; i++) drain(ds, q);
+    private static long[] runTimed(String endpoint, String sparql) {
+        for (int i = 0; i < WARMUP_RUNS; i++) drain(endpoint, sparql);
         long[] times = new long[BENCHMARK_RUNS];
         for (int i = 0; i < BENCHMARK_RUNS; i++) {
             long t0 = System.nanoTime();
-            drain(ds, q);
+            drain(endpoint, sparql);
             times[i] = System.nanoTime() - t0;
         }
         return times;
     }
 
-    private static void drain(Dataset ds, Query q) {
-        try (QueryExecution qe = QueryExecutionFactory.create(q, ds)) {
-            ResultSet rs = qe.execSelect();
-            while (rs.hasNext()) rs.next();
-        }
+    private static void drain(String endpoint, String sparql) {
+        RemoteBenchmarkClient.execCount(endpoint, sparql);
     }
 
     // -----------------------------------------------------------------------
