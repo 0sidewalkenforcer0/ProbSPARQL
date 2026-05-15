@@ -5,15 +5,19 @@ Generate Cross-Type Distribution Pairs for Experiment 4 (Sub-experiment 4.3)
 Creates two TTL files used to evaluate the sample-based cross-type JSD fallback:
 
   1. exp4_crosstype_gmm_hist.ttl  — 100 entity pairs, each pair has:
-       :e_NNN cfm:hasDistA ?gmm        (uq:gmmLiteral,   K=3)
-       :e_NNN cfm:hasDistB ?hist       (uq:histLiteral, dimensions+edges+weights)
+       :e_NNN cfm:hasMeasurementA ?mA .
+       ?mA cfm:representedBy ?rvA .
+       ?rvA cfm:hasDistribution ?gmm        (uq:gmmLiteral,   K=3)
+       :e_NNN cfm:hasMeasurementB ?mB .
+       ?mB cfm:representedBy ?rvB .
+       ?rvB cfm:hasDistribution ?hist       (uq:histLiteral, dimensions+edges+weights)
        :e_NNN cfm:refSameTypeJSD ?x    (reference JSD for accuracy reporting)
        The histogram is derived from the same underlying GMM (same source dist),
        so the true GMM↔Hist JSD should be close to zero.
 
   2. exp4_crosstype_dir_hist.ttl  — 100 entity pairs, each pair has:
-       :e_NNN cfm:hasDistA ?dir        (uq:dirichletLiteral, alphas length = 4)
-       :e_NNN cfm:hasDistB ?hist_1d    (uq:histLiteral, dimensions+edges+weights)
+       same measurement/RV shape with a Dirichlet distribution on side A and a
+       histogram distribution on side B
        :e_NNN cfm:refSameTypeJSD ?x    (reference JSD for accuracy reporting)
        The histogram is built from 1-D marginal samples of the Dirichlet.
 
@@ -133,6 +137,10 @@ def generate_gmm_hist_pairs(n, B, rng, output_path, gt_rows):
 
     for i in range(1, n + 1):
         uri = EX[f"crossGH_{i:04d}"]
+        meas_a = EX[f"crossGH_{i:04d}_gmm_measurement"]
+        meas_b = EX[f"crossGH_{i:04d}_hist_measurement"]
+        rv_a = EX[f"crossGH_{i:04d}_gmm_rv"]
+        rv_b = EX[f"crossGH_{i:04d}_hist_rv"]
 
         # Random K-component GMM (1-D, diag)
         raw_w  = rng.uniform(0.5, 2.0, size=K_GMM)
@@ -158,8 +166,16 @@ def generate_gmm_hist_pairs(n, B, rng, output_path, gt_rows):
         ref_jsd    = hist_jsd_exact(hist_json, hist2_json)
 
         g.add((uri, RDF.type,         CFM.CrossTypePair))
-        g.add((uri, CFM.hasDistA,     Literal(gmm_json,  datatype=GMM_DT)))
-        g.add((uri, CFM.hasDistB,     Literal(hist_json, datatype=HIST_DT)))
+        g.add((uri, CFM.hasMeasurementA, meas_a))
+        g.add((uri, CFM.hasMeasurementB, meas_b))
+        g.add((meas_a, RDF.type, CFM.Measurement))
+        g.add((meas_b, RDF.type, CFM.Measurement))
+        g.add((meas_a, CFM.representedBy, rv_a))
+        g.add((meas_b, CFM.representedBy, rv_b))
+        g.add((rv_a, RDF.type, CFM.RandomVariable))
+        g.add((rv_b, RDF.type, CFM.RandomVariable))
+        g.add((rv_a, CFM.hasDistribution, Literal(gmm_json,  datatype=GMM_DT)))
+        g.add((rv_b, CFM.hasDistribution, Literal(hist_json, datatype=HIST_DT)))
         g.add((uri, CFM.pairType,     Literal("gmm_hist")))
         g.add((uri, CFM.pairIndex,    Literal(i)))
         g.add((uri, CFM.refSameTypeJSD, Literal(round(ref_jsd, 6))))
@@ -182,6 +198,10 @@ def generate_dir_hist_pairs(n, B, rng, output_path, gt_rows):
 
     for i in range(1, n + 1):
         uri = EX[f"crossDH_{i:04d}"]
+        meas_a = EX[f"crossDH_{i:04d}_dir_measurement"]
+        meas_b = EX[f"crossDH_{i:04d}_hist_measurement"]
+        rv_a = EX[f"crossDH_{i:04d}_dir_rv"]
+        rv_b = EX[f"crossDH_{i:04d}_hist_rv"]
 
         # Random Dirichlet
         alpha = rng.uniform(0.5, 5.0, size=K_DIR).tolist()
@@ -198,8 +218,16 @@ def generate_dir_hist_pairs(n, B, rng, output_path, gt_rows):
         ref_jsd      = hist_jsd_exact(hist_json, hist2_json)
 
         g.add((uri, RDF.type,         CFM.CrossTypePair))
-        g.add((uri, CFM.hasDistA,     Literal(dir_json,  datatype=DIR_DT)))
-        g.add((uri, CFM.hasDistB,     Literal(hist_json, datatype=HIST_DT)))
+        g.add((uri, CFM.hasMeasurementA, meas_a))
+        g.add((uri, CFM.hasMeasurementB, meas_b))
+        g.add((meas_a, RDF.type, CFM.Measurement))
+        g.add((meas_b, RDF.type, CFM.Measurement))
+        g.add((meas_a, CFM.representedBy, rv_a))
+        g.add((meas_b, CFM.representedBy, rv_b))
+        g.add((rv_a, RDF.type, CFM.RandomVariable))
+        g.add((rv_b, RDF.type, CFM.RandomVariable))
+        g.add((rv_a, CFM.hasDistribution, Literal(dir_json,  datatype=DIR_DT)))
+        g.add((rv_b, CFM.hasDistribution, Literal(hist_json, datatype=HIST_DT)))
         g.add((uri, CFM.pairType,     Literal("dir_hist")))
         g.add((uri, CFM.pairIndex,    Literal(i)))
         g.add((uri, CFM.refSameTypeJSD, Literal(round(ref_jsd, 6))))

@@ -20,51 +20,58 @@ import java.util.List;
 public class Exp4DispatchTest {
 
     private static final String Q_MEAN = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e ?v WHERE {
-            ?e uq:hasDistribution ?dist .
+            ?e cfm:hasProbabilisticValue ?rv .
+            ?rv cfm:hasDistribution ?dist .
             BIND(prob:mean(?dist) AS ?v)
         }""";
 
     private static final String Q_STD = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e ?v WHERE {
-            ?e uq:hasDistribution ?dist .
+            ?e cfm:hasProbabilisticValue ?rv .
+            ?rv cfm:hasDistribution ?dist .
             BIND(prob:std(?dist) AS ?v)
         }""";
 
     private static final String Q_MAP = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e ?v WHERE {
-            ?e uq:hasDistribution ?dist .
+            ?e cfm:hasProbabilisticValue ?rv .
+            ?rv cfm:hasDistribution ?dist .
             BIND(prob:map(?dist) AS ?v)
         }""";
 
     private static final String Q_CDF = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e ?v WHERE {
-            ?e uq:hasDistribution ?dist .
+            ?e cfm:hasProbabilisticValue ?rv .
+            ?rv cfm:hasDistribution ?dist .
             BIND(prob:cdf(?dist, 15.0) AS ?v)
         }""";
 
     private static final String Q_CDF_DIR = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e ?v WHERE {
-            ?e uq:hasDistribution ?dist .
+            ?e cfm:hasProbabilisticValue ?rv .
+            ?rv cfm:hasDistribution ?dist .
             BIND(prob:cdf(?dist, 0.4) AS ?v)
         }""";
 
     private static final String Q_JSD = """
-        PREFIX uq:   <http://example.org/ontology/uncertainty#>
+        PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?e1 ?e2 ?v WHERE {
-            ?e1 uq:hasDistribution ?d1 .
-            ?e2 uq:hasDistribution ?d2 .
+            ?e1 cfm:hasProbabilisticValue ?rv1 .
+            ?rv1 cfm:hasDistribution ?d1 .
+            ?e2 cfm:hasProbabilisticValue ?rv2 .
+            ?rv2 cfm:hasDistribution ?d2 .
             FILTER(str(?e1) < str(?e2))
             BIND(prob:jsd(?d1, ?d2) AS ?v)
         } LIMIT 5""";

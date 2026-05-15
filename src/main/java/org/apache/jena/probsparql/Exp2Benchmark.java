@@ -19,9 +19,10 @@ import java.util.Locale;
  * Experiment 2 — In-engine filtering vs DIVJOIN over remote Fuseki endpoints.
  *
  * <p>The benchmark client runs locally and sends SPARQL queries to a preloaded
- * Fuseki service for each configuration. DIVJOIN pruning statistics are exposed
- * by the server through {@code prob:lastDivJoinStats(...)} after an instrumented
- * DIVJOIN run.</p>
+ * Fuseki service for each configuration. The workload compares CT measurement
+ * distributions against SL measurement distributions in an Exp1-style graph.
+ * DIVJOIN pruning statistics are exposed by the server through
+ * {@code prob:lastDivJoinStats(...)} after an instrumented DIVJOIN run.</p>
  */
 public class Exp2Benchmark {
 
@@ -101,16 +102,16 @@ public class Exp2Benchmark {
                 "FullJSD", "ResultCount", "PruningRate"});
 
         for (int nPairs : nPairsList) {
-            int n = (int) Math.ceil((1.0 + Math.sqrt(1.0 + 8.0 * nPairs)) / 2.0);
+            int n = (int) Math.ceil(Math.sqrt(nPairs));
 
             for (double unimodalFrac : UNIMODAL_FRACS) {
                 String datasetName = datasetName(nPairs, unimodalFrac);
                 String endpoint = RemoteBenchmarkClient.endpointFor(endpointTemplate, datasetName);
-                int actualPairs = n * (n - 1) / 2;
+                int actualPairs = n * n;
                 int nMultimodal = n - (int) (n * unimodalFrac);
-                int multimodalPairs = nMultimodal * (nMultimodal - 1) / 2;
+                int multimodalPairs = nMultimodal * nMultimodal;
 
-                System.out.printf("==== dataset=%s  nPairs≈%d  n=%d  unimodalFrac=%.1f ====%n",
+                System.out.printf("==== dataset=%s  targetPairs=%d  ct=%d sl=%d  unimodalFrac=%.1f ====%n",
                         datasetName, nPairs, n, unimodalFrac);
 
                 double[] thetas = calibrate(endpoint, qCollectMultimodal);

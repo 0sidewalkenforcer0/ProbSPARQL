@@ -7,6 +7,8 @@ Design:
 - fixed K: 3 by default
 - varying dimensions: 1, 2, 4, 8 by default
 - preserves the entity/measurement layout needed by Q1-Q4
+- each benchmark sample is an independent angle grinder unit with one crown
+  gear, one motor, and one spindle
 - om:hasValue remains a scalar and is defined as the weighted mean of dimension 0
 """
 
@@ -27,6 +29,7 @@ CFM = Namespace("http://example.org/ontology/cfm#")
 OM = Namespace("http://example.org/ontology/om#")
 UQ = Namespace("http://example.org/ontology/uncertainty#")
 EX = Namespace("http://example.org/data/")
+BENCH = Namespace("http://example.org/benchmark/exp1#")
 
 GMM_DATATYPE = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
 
@@ -190,6 +193,7 @@ class DatasetBuilder:
         g.bind("om", OM)
         g.bind("uq", UQ)
         g.bind("ex", EX)
+        g.bind("bench", BENCH)
 
     def _add_measurement(
         self,
@@ -232,21 +236,34 @@ class DatasetBuilder:
         self._bind(g)
         start = time.time()
 
-        grinder_uri = EX["anglegrinder_2"]
-        g.add((grinder_uri, RDF.type, AG.AngleGrinder))
-        g.add((grinder_uri, RDFS.label, Literal("Angle Grinder 2", lang="en")))
+        dataset_uri = EX[f"exp1_{scale}_K{target_k}_D{dimensions}"]
+        g.add((dataset_uri, RDF.type, BENCH.Exp1BenchmarkDataset))
+        g.add((dataset_uri, RDFS.label, Literal(
+            f"Exp1 {scale} K={target_k} D={dimensions}", lang="en"
+        )))
+        g.add((dataset_uri, BENCH.scale, Literal(scale)))
+        g.add((dataset_uri, BENCH.nComponents, Literal(target_k, datatype=XSD.integer)))
+        g.add((dataset_uri, BENCH.dimensions, Literal(dimensions, datatype=XSD.integer)))
+        g.add((dataset_uri, BENCH.unitCount, Literal(cfg.gear_count, datatype=XSD.integer)))
+        g.add((dataset_uri, BENCH.teethPerGear, Literal(TEETH_PER_GEAR, datatype=XSD.integer)))
 
         for gear_local in range(1, cfg.gear_count + 1):
+            grinder_uri = EX[f"anglegrinder_k{target_k}_d{dimensions}_{gear_local:06d}"]
             gear_uri = EX[f"ag2_gear_{gear_local:06d}"]
             motor_uri = EX[f"ag2_motor_{gear_local:06d}"]
             spindle_uri = EX[f"ag2_spindle_{gear_local:06d}"]
 
+            g.add((grinder_uri, RDF.type, AG.AngleGrinder))
             g.add((gear_uri, RDF.type, AG.CrownGear))
             g.add((motor_uri, RDF.type, AG.Motor))
             g.add((spindle_uri, RDF.type, AG.Spindle))
+            g.add((grinder_uri, RDFS.label, Literal(
+                f"Angle Grinder K{target_k} D{dimensions}-{gear_local:06d}", lang="en"
+            )))
             g.add((gear_uri, RDFS.label, Literal(f"Crown Gear 2-{gear_local:06d}", lang="en")))
             g.add((motor_uri, RDFS.label, Literal(f"Motor 2-{gear_local:06d}", lang="en")))
             g.add((spindle_uri, RDFS.label, Literal(f"Spindle 2-{gear_local:06d}", lang="en")))
+            g.add((dataset_uri, BENCH.hasUnit, grinder_uri))
             g.add((grinder_uri, AG.hasPart, gear_uri))
             g.add((grinder_uri, AG.hasPart, motor_uri))
             g.add((grinder_uri, AG.hasPart, spindle_uri))
@@ -337,7 +354,7 @@ class DatasetBuilder:
             "scale": scale,
             "k": target_k,
             "dimensions": dimensions,
-            "total_grinders": 1,
+            "total_grinders": num_gears,
             "total_gears": num_gears,
             "teeth_per_gear": TEETH_PER_GEAR,
             "triple_count": len(g),

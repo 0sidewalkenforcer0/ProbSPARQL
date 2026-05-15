@@ -5,7 +5,9 @@ Exp3 Data Generator
 Generates 4 TTL datasets (easy/medium/hard/mixed) with controlled JSD values
 for the Exp3 classification benchmark with threshold θ=0.3.
 
-Each dataset contains N LeftEntity + N RightEntity pairs.
+Each dataset contains N independent angle-grinder tooth pairs. For each pair,
+one crown-gear tooth characteristic has a CT measurement and an SL measurement;
+the two measurement distributions are the controlled GMM pair.
 JSD is controlled via rejection sampling. Accepted pairs store a high-precision
 reference JSD estimated with 10^6 Monte Carlo samples by default, matching the
 supplementary-material benchmark protocol.
@@ -264,6 +266,8 @@ def gmm_to_json(weights, means, covariances):
 TTL_HEADER = """\
 @prefix ex:   <http://example.org/data/> .
 @prefix prob: <http://example.org/prob#> .
+@prefix ag:   <http://example.org/ontology/anglegrinder#> .
+@prefix cfm:  <http://example.org/ontology/cfm#> .
 @prefix uq:   <http://example.org/ontology/uncertainty#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
@@ -290,17 +294,31 @@ def write_ttl(pairs, output_path, dataset_label):
             left_escaped = left_json.replace("\\", "\\\\").replace('"', '\\"')
             right_escaped = right_json.replace("\\", "\\\\").replace('"', '\\"')
 
-            f.write(f"ex:left_{idx} a prob:LeftEntity ;\n")
-            f.write(f'    rdfs:label "Left Entity {idx}" ;\n')
-            f.write(f"    prob:pairIndex {i + 1} ;\n")
-            f.write(f"    prob:referenceJSD {jsd:.10f} ;\n")
-            f.write(f'    prob:hasGMM "{left_escaped}"^^uq:gmmLiteral .\n\n')
+            f.write(f"ex:exp3_grinder_{idx} a ag:AngleGrinder ;\n")
+            f.write(f"    ag:hasPart ex:exp3_gear_{idx} .\n\n")
 
-            f.write(f"ex:right_{idx} a prob:RightEntity ;\n")
-            f.write(f'    rdfs:label "Right Entity {idx}" ;\n')
+            f.write(f"ex:exp3_gear_{idx} a ag:CrownGear ;\n")
+            f.write(f'    rdfs:label "Exp3 Crown Gear {idx}" ;\n')
+            f.write(f"    cfm:hasLengthCharacteristic ex:exp3_toothchar_{idx} .\n\n")
+
+            f.write(f"ex:exp3_toothchar_{idx} a cfm:MeasurableCharacteristics ;\n")
+            f.write(f'    rdfs:label "Exp3 Tooth Length Characteristic {idx}" ;\n')
             f.write(f"    prob:pairIndex {i + 1} ;\n")
             f.write(f"    prob:referenceJSD {jsd:.10f} ;\n")
-            f.write(f'    prob:hasGMM "{right_escaped}"^^uq:gmmLiteral .\n\n')
+            f.write(
+                f"    cfm:measuresCharacteristicBy ex:exp3_ct_measurement_{idx}, "
+                f"ex:exp3_sl_measurement_{idx} .\n\n"
+            )
+
+            f.write(f"ex:exp3_ct_measurement_{idx} a ag:CTMeasurement ;\n")
+            f.write(f"    cfm:representedBy ex:exp3_ct_rv_{idx} .\n")
+            f.write(f"ex:exp3_ct_rv_{idx} a cfm:RandomVariable ;\n")
+            f.write(f'    cfm:hasDistribution "{left_escaped}"^^uq:gmmLiteral .\n\n')
+
+            f.write(f"ex:exp3_sl_measurement_{idx} a ag:SLMeasurement ;\n")
+            f.write(f"    cfm:representedBy ex:exp3_sl_rv_{idx} .\n")
+            f.write(f"ex:exp3_sl_rv_{idx} a cfm:RandomVariable ;\n")
+            f.write(f'    cfm:hasDistribution "{right_escaped}"^^uq:gmmLiteral .\n\n')
 
     print(f"  Wrote {output_path} ({len(pairs)} pairs)")
 

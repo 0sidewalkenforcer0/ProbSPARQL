@@ -1,11 +1,15 @@
-PREFIX uq:   <http://example.org/ontology/uncertainty#>
+PREFIX ag:   <http://example.org/ontology/anglegrinder#>
+PREFIX cfm:  <http://example.org/ontology/cfm#>
 PREFIX prob: <http://probsparql.org/function#>
-SELECT ?rv1 ?rv2 WHERE {
-    ?rv1 uq:hasDistribution ?d1 .
-    ?rv2 uq:hasDistribution ?d2 .
+SELECT ?rvCT ?rvSL WHERE {
+    ?ctMeasurement a ag:CTMeasurement ;
+        cfm:representedBy ?rvCT .
+    ?rvCT cfm:hasDistribution ?d1 .
+    ?slMeasurement a ag:SLMeasurement ;
+        cfm:representedBy ?rvSL .
+    ?rvSL cfm:hasDistribution ?d2 .
     BIND(prob:jsd(?d1, ?d2) AS ?jsd)
     FILTER(?jsd <= __THETA__)
-    FILTER(str(?rv1) < str(?rv2))
     FILTER(prob:modeCount(?d1) > 1)
     FILTER(prob:modeCount(?d2) > 1)
 }
