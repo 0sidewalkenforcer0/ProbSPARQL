@@ -17,12 +17,13 @@ import os
 import random
 
 from rdflib import Graph, Literal, Namespace, URIRef
-from rdflib.namespace import RDF
+from rdflib.namespace import RDF, RDFS
 
 
 CFM = Namespace("http://example.org/ontology/cfm#")
 UQ = Namespace("http://example.org/ontology/uncertainty#")
 EX = Namespace("http://example.org/data/")
+BENCH = Namespace("http://example.org/benchmark/exp4#")
 
 GMM_DT = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
 HIST_DT = URIRef("http://example.org/ontology/uncertainty#histLiteral")
@@ -74,6 +75,8 @@ def graph():
     g.bind("cfm", CFM)
     g.bind("uq", UQ)
     g.bind("ex", EX)
+    g.bind("bench", BENCH)
+    g.bind("rdfs", RDFS)
     return g
 
 
@@ -86,20 +89,37 @@ def write_graph(g, output_dir, name):
 
 def add_has_distribution_dataset(output_dir, name, n, datatype, literal_fn, rng):
     g = graph()
-    has_dist = UQ.hasDistribution
+    dataset_uri = EX[name]
+    g.add((dataset_uri, RDF.type, BENCH.Exp4OperationDataset))
+    g.add((dataset_uri, RDFS.label, Literal(f"Exp4 operation dataset {name}")))
+    g.add((dataset_uri, BENCH.entityCount, Literal(n)))
     for i in range(1, n + 1):
-        e = EX[f"{name}_{i:06d}"]
-        g.add((e, has_dist, Literal(literal_fn(), datatype=datatype)))
+        e = EX[f"{name}_component_{i:06d}"]
+        rv = EX[f"{name}_rv_{i:06d}"]
+        g.add((dataset_uri, BENCH.hasEntity, e))
+        g.add((e, RDF.type, CFM.Component))
+        g.add((e, CFM.hasProbabilisticValue, rv))
+        g.add((rv, RDF.type, CFM.RandomVariable))
+        g.add((rv, CFM.hasDistribution, Literal(literal_fn(), datatype=datatype)))
     write_graph(g, output_dir, name)
 
 
 def add_dir_dispatch_dataset(output_dir, name, n, k, rng):
     g = graph()
+    dataset_uri = EX[name]
+    g.add((dataset_uri, RDF.type, BENCH.Exp4OperationDataset))
+    g.add((dataset_uri, RDFS.label, Literal(f"Exp4 Dirichlet dispatch dataset {name}")))
+    g.add((dataset_uri, BENCH.entityCount, Literal(n)))
     for i in range(1, n + 1):
-        e = EX[f"{name}_{i:06d}"]
+        e = EX[f"{name}_component_{i:06d}"]
+        rv = EX[f"{name}_rv_{i:06d}"]
         measured = make_dir(k, rng)
         expected = make_dir(k, rng)
-        g.add((e, UQ.hasDistribution, Literal(measured, datatype=DIR_DT)))
+        g.add((dataset_uri, BENCH.hasEntity, e))
+        g.add((e, RDF.type, CFM.Component))
+        g.add((e, CFM.hasProbabilisticValue, rv))
+        g.add((rv, RDF.type, CFM.RandomVariable))
+        g.add((rv, CFM.hasDistribution, Literal(measured, datatype=DIR_DT)))
         g.add((e, CFM.hasMeasuredComposition, Literal(measured, datatype=DIR_DT)))
         g.add((e, CFM.hasExpectedComposition, Literal(expected, datatype=DIR_DT)))
     write_graph(g, output_dir, name)

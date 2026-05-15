@@ -37,29 +37,43 @@ public class Exp3Benchmark {
     };
 
     private static final String REF_QUERY = """
-        PREFIX p: <http://example.org/prob#>
+        PREFIX p:   <http://example.org/prob#>
+        PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+        PREFIX cfm: <http://example.org/ontology/cfm#>
         SELECT ?idx ?trueJSD WHERE {
-          ?left a p:LeftEntity ;
+          ?gear a ag:CrownGear ;
+                cfm:hasLengthCharacteristic ?char .
+          ?char a cfm:MeasurableCharacteristics ;
                 p:pairIndex ?idx ;
                 p:referenceJSD ?trueJSD ;
-                p:hasGMM ?d1 .
-          ?right a p:RightEntity ;
-                 p:pairIndex ?idx ;
-                 p:hasGMM ?d2 .
+                cfm:measuresCharacteristicBy ?ctMeasurement, ?slMeasurement .
+          ?ctMeasurement a ag:CTMeasurement ;
+                         cfm:representedBy ?rvCT .
+          ?rvCT cfm:hasDistribution ?d1 .
+          ?slMeasurement a ag:SLMeasurement ;
+                         cfm:representedBy ?rvSL .
+          ?rvSL cfm:hasDistribution ?d2 .
         }
         ORDER BY ?idx""";
 
     private static final String MODE_QUERY_TEMPLATE = """
-        PREFIX p:  <http://example.org/prob#>
-        PREFIX fn: <http://probsparql.org/function#>
+        PREFIX p:   <http://example.org/prob#>
+        PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+        PREFIX cfm: <http://example.org/ontology/cfm#>
+        PREFIX fn:  <http://probsparql.org/function#>
         SELECT ?idx ?trueJSD ?estJSD WHERE {
-          ?left a p:LeftEntity ;
+          ?gear a ag:CrownGear ;
+                cfm:hasLengthCharacteristic ?char .
+          ?char a cfm:MeasurableCharacteristics ;
                 p:pairIndex ?idx ;
                 p:referenceJSD ?trueJSD ;
-                p:hasGMM ?d1 .
-          ?right a p:RightEntity ;
-                 p:pairIndex ?idx ;
-                 p:hasGMM ?d2 .
+                cfm:measuresCharacteristicBy ?ctMeasurement, ?slMeasurement .
+          ?ctMeasurement a ag:CTMeasurement ;
+                         cfm:representedBy ?rvCT .
+          ?rvCT cfm:hasDistribution ?d1 .
+          ?slMeasurement a ag:SLMeasurement ;
+                         cfm:representedBy ?rvSL .
+          ?rvSL cfm:hasDistribution ?d2 .
           BIND(fn:jsdMode(?d1, ?d2, "__MODE__") AS ?estJSD)
         }
         ORDER BY ?idx""";

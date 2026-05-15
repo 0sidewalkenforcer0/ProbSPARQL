@@ -9,12 +9,9 @@
 #     PostProcessing) late filter after fetching OPTIONAL-side data
 #
 # Query shape:
-#   ?gear :toothLength ?d .
+#   Exp1-style CrownGear -> length characteristic -> CT random variable.
 #   FILTER(prob:cdf(?d, 9.8) >= 0.9)
-#   OPTIONAL {
-#     ?gear :ctMeasurement ?ctDist .
-#     ?gear :lightMeasurement ?lightDist .
-#   }
+#   OPTIONAL expands to SL and laser follow-up measurements.
 #
 # This script sweeps:
 #   PASS_FRACS = 0.01 / 0.05 / 0.1 / 0.3
@@ -49,7 +46,8 @@ OUTPUT_DIR="${OUTPUT_DIR:-${PROJECT_ROOT}/benchmark/results/exp5}"
 QUERY_DIR="${QUERY_DIR:-${PROJECT_ROOT}/benchmark/queries/exp5}"
 ENDPOINT_TEMPLATE="${ENDPOINT_TEMPLATE:-}"
 SKIP_BUILD="${SKIP_BUILD:-0}"
-N_GEARS="${N_GEARS:-1_000_000}"
+N_GEARS="${N_GEARS:-1000000}"
+N_GEARS_LABEL="${N_GEARS//_/}"
 PASS_FRACS="${PASS_FRACS:-0.01 0.05 0.1 0.3}"
 WARMUP="${WARMUP:-3}"
 RUNS="${RUNS:-10}"
@@ -73,7 +71,7 @@ echo "=== Exp5: In-engine vs Post-processing ==="
 echo "Output dir : ${OUTPUT_DIR}"
 echo "Endpoint   : ${ENDPOINT_TEMPLATE:-<required>}"
 echo "Java home  : ${JAVA_HOME}"
-echo "N_GEARS    : ${N_GEARS}"
+echo "N_GEARS    : ${N_GEARS_LABEL}"
 echo "PASS_FRACS : ${PASS_FRACS}"
 echo
 
@@ -97,7 +95,7 @@ printf "PassFrac,Method,MedianMs,IQRMs,RowsReturned,DistinctGears,FetchedRowsBef
 # ── Sweep PASS_FRAC configurations ──────────────────────────────────────────
 for PASS_FRAC in ${PASS_FRACS}; do
   PASS_LABEL="${PASS_FRAC/./p}"
-  DATASET_NAME="exp5_gears_${N_GEARS}_pass_${PASS_LABEL}"
+  DATASET_NAME="exp5_gears_${N_GEARS_LABEL}_pass_${PASS_LABEL}"
   RUN_OUTPUT_DIR="${OUTPUT_DIR}/pass_${PASS_LABEL}"
 
   echo "── pass_frac=${PASS_FRAC} ─────────────────────────────"

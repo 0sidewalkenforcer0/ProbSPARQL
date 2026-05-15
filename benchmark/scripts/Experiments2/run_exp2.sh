@@ -2,7 +2,7 @@
 # =============================================================================
 # run_exp2.sh — Full remote run for Experiment 2
 #
-# Experiment 2: In-engine Filtering vs DIVJOIN with Mixed-K Datasets
+# Experiment 2: In-engine Filtering vs DIVJOIN with Exp1-style CT-vs-SL datasets
 #   Three-way comparison across:
 #     InEngine_CheapFirst
 #     InEngine_JSDFirst

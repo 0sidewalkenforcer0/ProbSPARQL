@@ -4,14 +4,27 @@
 #   The cdf filter is intentionally not applied in SPARQL; it must be evaluated
 #   afterwards in external/manual post-processing.
 
-PREFIX : <http://example.org/exp5#>
+PREFIX ag:  <http://example.org/ontology/anglegrinder#>
+PREFIX cfm: <http://example.org/ontology/cfm#>
 
-SELECT ?gear ?d ?ctDist ?lightDist
+SELECT ?gear ?d ?slDist ?lightDist
 WHERE {
-  ?gear :toothLength ?d .
+  ?gear a ag:CrownGear ;
+        cfm:hasLengthCharacteristic ?char .
+  ?char cfm:measuresCharacteristicBy ?ctMeasurement .
+  ?ctMeasurement a ag:CTMeasurement ;
+                 cfm:representedBy ?rv .
+  ?rv cfm:hasDistribution ?d .
 
   OPTIONAL {
-    ?gear :ctMeasurement ?ctDist .
-    ?gear :lightMeasurement ?lightDist .
+    ?char cfm:measuresCharacteristicBy ?slMeasurement .
+    ?slMeasurement a ag:SLMeasurement ;
+                   cfm:representedBy ?rvSL .
+    ?rvSL cfm:hasDistribution ?slDist .
+
+    ?char cfm:measuresCharacteristicBy ?lightMeasurement .
+    ?lightMeasurement a ag:LaserMeasurement ;
+                      cfm:representedBy ?rvLight .
+    ?rvLight cfm:hasDistribution ?lightDist .
   }
 }

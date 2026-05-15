@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Generate Exp1 probabilistic datasets with one grinder archetype per file.
+Generate Exp1 probabilistic datasets with independent grinder units.
 
 Design goals:
 1. Use predicate names aligned with the architecture diagram.
-2. Keep grinder identity aligned with K: grinder1→K=1, grinder2→K=3,
-   grinder3→K=5, grinder4→K=10.
+2. Keep GMM component complexity aligned with K while avoiding unrealistic
+   one-machine-to-many-gears structure.
 3. Preserve the original scale-based benchmark structure and numeric generation
    style as closely as practical.
 
@@ -16,12 +16,11 @@ Output files keep the existing Exp1 naming convention for compatibility:
   exp1_{scale}_K10.ttl
 
 Semantics of the per-file K:
-  Each file contains exactly one grinder instance. Its grinder id is determined
-  by the target K:
-    K=1  -> anglegrinder_1
-    K=3  -> anglegrinder_2
-    K=5  -> anglegrinder_3
-    K=10 -> anglegrinder_4
+  Each file contains one synthetic benchmark dataset. The file's K controls the
+  GMM component count for all generated distributions. Each benchmark sample is
+  represented as an independent angle grinder unit with exactly one crown gear,
+  one motor, and one spindle, mirroring the independent-entity layout used by
+  benchmark/multiDdata while preserving the Exp1 query schema.
 """
 
 import argparse
@@ -41,6 +40,7 @@ CFM = Namespace("http://example.org/ontology/cfm#")
 OM = Namespace("http://example.org/ontology/om#")
 UQ = Namespace("http://example.org/ontology/uncertainty#")
 EX = Namespace("http://example.org/data/")
+BENCH = Namespace("http://example.org/benchmark/exp1#")
 
 GMM_DATATYPE = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
 
@@ -156,6 +156,7 @@ class DatasetBuilder:
         g.bind("om", OM)
         g.bind("uq", UQ)
         g.bind("ex", EX)
+        g.bind("bench", BENCH)
 
     def _single_grinder_config(self, num_gears: int, target_k: int) -> GrinderConfig:
         grinder_idx = FILE_K_VALUES.index(target_k) + 1
@@ -203,22 +204,32 @@ class DatasetBuilder:
         rng = np.random.default_rng(self.seed + target_k * 1000 + cfg.grinder_idx * 100)
         gmm_gen = GMMGenerator(rng, forced_k=cfg.k_value)
 
-        grinder_uri = EX[f"anglegrinder_{cfg.grinder_idx}"]
-        g.add((grinder_uri, RDF.type, AG.AngleGrinder))
-        g.add((grinder_uri, RDFS.label, Literal(f"Angle Grinder {cfg.grinder_idx}", lang="en")))
+        dataset_uri = EX[f"exp1_{scale}_K{target_k}"]
+        g.add((dataset_uri, RDF.type, BENCH.Exp1BenchmarkDataset))
+        g.add((dataset_uri, RDFS.label, Literal(f"Exp1 {scale} K={target_k}", lang="en")))
+        g.add((dataset_uri, BENCH.scale, Literal(scale)))
+        g.add((dataset_uri, BENCH.nComponents, Literal(target_k, datatype=XSD.integer)))
+        g.add((dataset_uri, BENCH.unitCount, Literal(cfg.gear_count, datatype=XSD.integer)))
+        g.add((dataset_uri, BENCH.teethPerGear, Literal(TEETH_PER_GEAR, datatype=XSD.integer)))
 
         for gear_local in range(1, cfg.gear_count + 1):
             total_gears += 1
+            grinder_uri = EX[f"anglegrinder_k{cfg.k_value}_{gear_local:06d}"]
             gear_uri = EX[f"ag{cfg.grinder_idx}_gear_{gear_local:06d}"]
             motor_uri = EX[f"ag{cfg.grinder_idx}_motor_{gear_local:06d}"]
             spindle_uri = EX[f"ag{cfg.grinder_idx}_spindle_{gear_local:06d}"]
 
+            g.add((grinder_uri, RDF.type, AG.AngleGrinder))
             g.add((gear_uri, RDF.type, AG.CrownGear))
             g.add((motor_uri, RDF.type, AG.Motor))
             g.add((spindle_uri, RDF.type, AG.Spindle))
+            g.add((grinder_uri, RDFS.label, Literal(
+                f"Angle Grinder K{cfg.k_value}-{gear_local:06d}", lang="en"
+            )))
             g.add((gear_uri, RDFS.label, Literal(f"Crown Gear {cfg.grinder_idx}-{gear_local:06d}", lang="en")))
             g.add((motor_uri, RDFS.label, Literal(f"Motor {cfg.grinder_idx}-{gear_local:06d}", lang="en")))
             g.add((spindle_uri, RDFS.label, Literal(f"Spindle {cfg.grinder_idx}-{gear_local:06d}", lang="en")))
+            g.add((dataset_uri, BENCH.hasUnit, grinder_uri))
             g.add((grinder_uri, AG.hasPart, gear_uri))
             g.add((grinder_uri, AG.hasPart, motor_uri))
             g.add((grinder_uri, AG.hasPart, spindle_uri))
@@ -313,12 +324,12 @@ class DatasetBuilder:
         metadata = {
             "scale": scale,
             "target_k": target_k,
-            "grinder_id": cfg.grinder_idx,
+            "grinder_model_id": cfg.grinder_idx,
             "grinder_k_values": [target_k],
             "dominant_target_k": target_k,
             "dominant_gear_count": num_gears,
             "support_gear_count_each": 0,
-            "total_grinders": 1,
+            "total_grinders": total_gears,
             "total_gears": total_gears,
             "triple_count": len(g),
             "generation_time_seconds": round(time.time() - start, 2),

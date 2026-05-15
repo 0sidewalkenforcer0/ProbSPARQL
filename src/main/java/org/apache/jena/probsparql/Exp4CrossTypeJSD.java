@@ -24,9 +24,13 @@ public class Exp4CrossTypeJSD {
         PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
         SELECT ?pair ?idx ?ref ?jsd WHERE {
-            ?pair cfm:hasDistA ?dA ;
-                  cfm:hasDistB ?dB ;
+            ?pair cfm:hasMeasurementA ?mA ;
+                  cfm:hasMeasurementB ?mB ;
                   cfm:pairIndex ?idx .
+            ?mA cfm:representedBy ?rvA .
+            ?rvA cfm:hasDistribution ?dA .
+            ?mB cfm:representedBy ?rvB .
+            ?rvB cfm:hasDistribution ?dB .
             OPTIONAL { ?pair cfm:refSameTypeJSD ?ref . }
             BIND(prob:jsd(?dA, ?dB) AS ?jsd)
         }

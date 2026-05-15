@@ -18,10 +18,13 @@ import java.util.Set;
 /**
  * Exp5 — In-engine early probabilistic filter vs post-processing late filter.
  *
- * <p>A uses the query-internal early filter:
- *   ?gear :toothLength ?d .
+ * <p>A uses the query-internal early filter over the CT tooth-length
+ * distribution in an Exp1-style measurement graph:
+ *   ?gear cfm:hasLengthCharacteristic ?char .
+ *   ?ctMeasurement a ag:CTMeasurement ; cfm:representedBy ?rv .
+ *   ?rv cfm:hasDistribution ?d .
  *   FILTER(prob:cdf(?d, 9.8) >= 0.9)
- *   OPTIONAL { ?gear :ctMeasurement ?ctDist . ?gear :lightMeasurement ?lightDist . }
+ *   OPTIONAL { SL / laser follow-up measurement distributions }
  *
  * <p>B fetches all rows from the remote Fuseki endpoint first, including the
  * OPTIONAL expansion, and only then applies the cdf threshold in Java.

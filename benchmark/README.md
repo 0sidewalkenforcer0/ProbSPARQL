@@ -72,12 +72,16 @@ robustness and dimensionality.
 ## Experiment 2: In-Engine Filtering vs DIVJOIN
 
 Experiment 2 compares ordinary in-engine filtering plans with the dedicated
-`DIVJOIN` similarity-decision operator.
+`DIVJOIN` similarity-decision operator over Exp1-style CT-vs-SL measurement
+pairs.
 
 - Runner: `benchmark/scripts/Experiments2/run_exp2.sh`
 - Java class: `org.apache.jena.probsparql.Exp2Benchmark`
 - Queries: `benchmark/queries/exp2`
 - Compared plans: `InEngine_CheapFirst`, `InEngine_JSDFirst`, `DIVJOIN`
+- Data model: independent crown-gear tooth characteristics with CT and SL
+  random-variable measurements; candidate pairs are the CT set crossed with
+  the SL set.
 - Default target pair count: `5000`
 - Unimodal fractions: `0.2`, `0.5`, `0.8`
 - Selectivity thresholds: calibrated from remote data at the 10%, 50%, and 90% percentiles
@@ -98,7 +102,7 @@ not concurrent.
 ## Experiment 3: Divergence Decision Methods
 
 Experiment 3 evaluates the GMM JSD strategy stack in a controlled classification
-setting.
+setting using Exp1-style tooth CT/SL measurement pairs.
 
 - Runner: `benchmark/scripts/Experiments3/run_exp3.sh`
 - Java class: `org.apache.jena.probsparql.Exp3Benchmark`
@@ -107,7 +111,7 @@ setting.
 - Workloads: `easy`, `medium`, `hard`, `mixed`
 - Expected aligned pairs per workload: `2400`
 - Remote services: `simjoin_easy`, `simjoin_medium`, `simjoin_hard`, `simjoin_mixed`
-- Reference JSD: embedded in the TTL datasets as `prob:referenceJSD`
+- Reference JSD: embedded on each tooth characteristic as `prob:referenceJSD`
 - Mode dispatch: `prob:jsdMode(?d1, ?d2, "V3_SPRT")` and analogous mode strings
 - Outputs: `benchmark/results/exp3/exp3_classification.csv`, `exp3_per_pair.csv`
 
@@ -130,6 +134,8 @@ Active sub-experiments:
 - Microbenchmark: compares per-operation latency for GMM, histogram, and Dirichlet services.
 - Cross-type JSD: evaluates GMM-histogram and Dirichlet-histogram comparisons.
 - End-to-end queries: runs Q2 filtering and Q4 JSD workloads over GMM and histogram variants.
+- Dispatch/micro/cross-type datasets use realistic component/measurement or
+  random-variable wrappers instead of bare distribution literals.
 - Dirichlet demo: qualitative checks for Dirichlet query support.
 
 Required remote service names are documented in
@@ -141,6 +147,8 @@ Experiment 5 compares where probabilistic filtering is executed:
 
 - In-engine early filtering: `FILTER(prob:cdf(?d, 9.8) >= 0.9)` executes in Fuseki.
 - Post-processing late filtering: the client fetches candidates and applies the same CDF predicate in Java.
+- Data model: Exp1-style crown-gear tooth CT distributions with optional SL and
+  laser follow-up measurements.
 
 Details:
 
