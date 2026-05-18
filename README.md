@@ -127,7 +127,7 @@ ProbSPARQL includes a Fuseki-based HTTP server for remote SPARQL queries.
 
 ```bash
 mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
-  -Dexec.args="3030 examples/data/angle-grinder-instances.ttl"
+  -Dexec.args="3030 examples/data/factory-instances.ttl"
 ```
 
 **Server URLs:**
@@ -137,7 +137,7 @@ mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuse
 | SPARQL Update | `http://localhost:3030/probsparql/update` |
 | Web UI | `http://localhost:3030/` |
 
-The command above starts the endpoint on port `3030` and preloads the sample RDF data used by the examples.
+The command above starts the endpoint on port `3030` and preloads the factory demo RDF data used by the Web UI.
 
 ### Execute a Test Query
 
@@ -146,7 +146,7 @@ curl -X POST "http://localhost:3030/probsparql/query" \
   -H "Content-Type: application/sparql-query" \
   -H "Accept: application/json" \
   --data 'PREFIX prob: <http://probsparql.org/function#>
-PREFIX uq: <http://example.org/ontology/uncertainty#>
+PREFIX uq: <http://example.org/uncertainty#>
 SELECT ?rv (prob:mean(?dist) AS ?mean) (prob:std(?dist) AS ?stddev)
 WHERE {
   ?rv uq:hasDistribution ?dist .

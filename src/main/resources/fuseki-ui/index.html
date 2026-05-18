@@ -1024,8 +1024,6 @@ PREFIX cfm: <http://example.org/circularfactorymeasure#>
 SELECT ?triples ?types ?predicates ?randomVariables
 WHERE {
   { SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o } }
-  { SELECT (COUNT(DISTINCT ?type) AS ?types) WHERE { ?s a ?type } }
-  { SELECT (COUNT(DISTINCT ?p) AS ?predicates) WHERE { ?s ?p ?o } }
   { SELECT (COUNT(?rv) AS ?randomVariables) WHERE { 
       ?rv a ?rvType . 
       FILTER(?rvType = cfm:RandomVariable || ?rvType = <http://example.org/ontology/uncertainty#RandomVariable>)
@@ -1037,8 +1035,15 @@ WHERE {
   ?s a ?type .
 }
 GROUP BY ?type
-ORDER BY DESC(?count)
+ORDER BY ?count
 LIMIT 20`,
+      predicates: `SELECT ?p (COUNT(?s) AS ?count)
+WHERE {
+  ?s ?p ?o .
+}
+GROUP BY ?p
+ORDER BY ?count
+LIMIT 50`,
       triples: `SELECT ?s ?p ?o
 WHERE {
   ?s ?p ?o .
@@ -1154,12 +1159,17 @@ LIMIT 60`
         const statsJson = await sparql(datasetQueries.stats);
         const stats = statsJson.results.bindings[0] || {};
         tripleCountNode.textContent = valueOf(stats, "triples");
-        classCountNode.textContent = valueOf(stats, "types");
-        predicateCountNode.textContent = valueOf(stats, "predicates");
         rvCountNode.textContent = valueOf(stats, "randomVariables");
 
         const typeJson = await sparql(datasetQueries.types);
-        renderTable(typeResultNode, typeJson);
+        const typeCount = renderTable(typeResultNode, typeJson);
+        classCountNode.textContent = String(typeCount);
+
+        const predicateJson = await sparql(datasetQueries.predicates);
+        const predicateBindings = predicateJson.results && Array.isArray(predicateJson.results.bindings)
+          ? predicateJson.results.bindings
+          : [];
+        predicateCountNode.textContent = String(predicateBindings.length);
 
         const tripleJson = await sparql(datasetQueries.triples);
         renderTable(tripleResultNode, tripleJson);
@@ -1415,21 +1425,21 @@ LIMIT 60`
 
     function graphRootQuery() {
       return `PREFIX ag: <http://example.org/anglegrinder#>
-SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(DISTINCT ?o) AS ?relationCount)
+SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(?o) AS ?relationCount)
 WHERE {
   ?s a ag:AngleGrinder .
   OPTIONAL { ?s a ?type }
   OPTIONAL { ?s ?p ?o }
 }
 GROUP BY ?s
-ORDER BY DESC(?relationCount)
+ORDER BY ?relationCount
 LIMIT ${graphLimit()}`;
     }
 
     function graphFallbackRootQuery() {
       return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX cfm: <http://example.org/circularfactorymeasure#>
-SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(DISTINCT ?o) AS ?relationCount)
+SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(?o) AS ?relationCount)
 WHERE {
   ?s ?p ?o .
   FILTER(isIRI(?s))
@@ -1440,7 +1450,7 @@ WHERE {
   OPTIONAL { ?s a ?type }
 }
 GROUP BY ?s
-ORDER BY DESC(?relationCount)
+ORDER BY ?relationCount
 LIMIT ${graphLimit()}`;
     }
 
