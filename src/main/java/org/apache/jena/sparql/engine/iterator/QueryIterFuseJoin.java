@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Query iterator for FuseJoin operation with nested loop join semantics.
+ * Query iterator for legacy FuseJoin operation with nested loop join semantics.
  * 
  * New relational semantics:
  * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
@@ -36,7 +36,11 @@ import java.util.List;
  *      - Fuse the two GMMs
  *      - Add fused result to merged binding as ?resultVar
  *      - Yield the binding
+ *
+ * @deprecated Retained for older prototype queries only. The paper benchmarks
+ *             use DIVJOIN / QueryIterSimilarityJoin instead.
  */
+@Deprecated
 public class QueryIterFuseJoin extends QueryIter {
     private final Var leftVar;
     private final Var rightVar;

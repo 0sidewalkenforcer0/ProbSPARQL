@@ -75,7 +75,6 @@ public class ProbSPARQL {
     public static final String VERSION = "1.0.0-SNAPSHOT";
     public static final String NAME = "ProbSPARQL";
     
-    // Context symbols for FUSEJOIN metadata
     public static final Symbol FUSEJOIN_LEFT_VAR = Symbol.create("http://probsparql.org/fusejoin#leftVar");
     public static final Symbol FUSEJOIN_RIGHT_VAR = Symbol.create("http://probsparql.org/fusejoin#rightVar");
     public static final Symbol FUSEJOIN_TOLERANCE = Symbol.create("http://probsparql.org/fusejoin#tolerance");
@@ -172,19 +171,22 @@ public class ProbSPARQL {
         // Initialize the registry-based join framework (similar to Distances.java)
         // This provides algebra-level join operators with extensible strategies
         logger.info("Initialized probabilistic join framework:");
-        logger.info("  - Available strategies: {}", ProbabilisticJoins.getRegisteredStrategies());
+        logger.info("  - Available active strategies: [{}, {}]",
+                ProbabilisticJoins.EXACT_JOIN, ProbabilisticJoins.FUZZY_JOIN);
         for (String strategyURI : ProbabilisticJoins.getRegisteredStrategies()) {
+            if (ProbabilisticJoins.FUSE_JOIN.equals(strategyURI)) {
+                continue;
+            }
             ProbabilisticJoins.ProbJoinFunc func = ProbabilisticJoins.getJoinStrategy(strategyURI);
             logger.info("    {} : {}", strategyURI, func.getDescription());
         }
         
-        // Category 7: Register QueryEngineProbabilistic for FUSEJOIN support
-        // This engine uses AlgebraGeneratorProbabilistic to handle ElementFuseJoin
+        // Category 7: Register QueryEngineProbabilistic for DIVJOIN support.
         QueryEngineRegistry.addFactory(new QueryEngineProbabilistic.Factory());
-        logger.info("Registered QueryEngineProbabilistic for FUSEJOIN and DIVJOIN syntax support");
+        logger.info("Registered QueryEngineProbabilistic for DIVJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (29 functions + 2 property functions + 3 join strategies + FUSEJOIN/DIVJOIN syntax)", NAME);
+        logger.info("{} initialization complete (29 functions + 2 property functions + DIVJOIN syntax)", NAME);
     }
     
     /**

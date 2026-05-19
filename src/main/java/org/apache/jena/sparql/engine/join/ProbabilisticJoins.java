@@ -17,7 +17,7 @@ import org.apache.jena.sparql.expr.NodeValue;
  * 
  * <p>This class provides a framework for probabilistic joins similar to how
  * {@code Distances.java} provides distance metrics for similarity joins.
- * It supports multiple join strategies (exact, fuzzy, fuse) with a unified
+ * It supports multiple join strategies with a unified
  * interface for compatibility checking and distribution fusion.</p>
  * 
  * <p><b>Architecture Inspiration:</b> This design mirrors the registry pattern
@@ -28,7 +28,6 @@ import org.apache.jena.sparql.expr.NodeValue;
  * <ul>
  *   <li><b>exactJoin</b>: JS divergence ≈ 0 (identical distributions)</li>
  *   <li><b>fuzzyJoin</b>: JS divergence &lt; tolerance (similar distributions)</li>
- *   <li><b>fuseJoin</b>: N-way fusion with pairwise compatibility (all pairs JS &lt; tolerance)</li>
  * </ul>
  * 
  * <h3>Usage Example:</h3>

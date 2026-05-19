@@ -14,10 +14,9 @@ import org.apache.jena.sparql.engine.iterator.QueryIterSimilarityJoinFilter;
 
 /**
  * OpExecutor extension for probabilistic operators.
- * Handles execution of custom algebra operators like OpFuseJoin and OpSimilarityJoin.
+ * Handles execution of custom algebra operators like OpSimilarityJoin.
  * 
  * Updated for new relational semantics (dual-input nested loop join):
- * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
  * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  */
 public class OpExecutorProbabilistic extends OpExecutor {
@@ -32,7 +31,7 @@ public class OpExecutorProbabilistic extends OpExecutor {
      */
     @Override
     protected QueryIterator exec(Op op, QueryIterator input) {
-        // Intercept OpFuseJoin before dispatcher sees it
+        // Intercept OpFuseJoin before dispatcher sees it.
         if (op instanceof OpFuseJoin) {
             return execute((OpFuseJoin) op, input);
         }

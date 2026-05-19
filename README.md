@@ -17,6 +17,7 @@ ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data wi
 - [Available Functions](#available-functions)
 - [Special Operators](#special-operators)
 - [Probabilistic Data Formats](#probabilistic-data-formats)
+- [Benchmark Reproduction](#benchmark-reproduction)
 - [Project Structure](#project-structure)
 - [License](#license)
 
@@ -338,6 +339,38 @@ For multidimensional histograms, `prob:cdf` / `prob:histcdf` interpret the secon
 ### Dirichlet Literals
 
 Dirichlet literals use datatype `uq:dirichletLiteral` and are supported by the polymorphic datatype layer for the current comparison and manipulation functions used in the prototype.
+
+---
+
+## Benchmark Reproduction
+
+The paper experiments are reproduced by the scripts under `benchmark/scripts/`.
+Before running a benchmark, set the Fuseki endpoint template. The `{dataset}`
+placeholder is replaced by the logical service name expected by each script:
+
+```bash
+export ENDPOINT_TEMPLATE='http://<host>:3030/{dataset}/query'
+```
+
+If the project has already been built, skip repeated Maven builds with:
+
+```bash
+export SKIP_BUILD=1
+```
+
+| Benchmark experiment | Data preparation script(s) | Run command |
+|----------------------|----------------------------|-------------|
+| Distribution-complexity overhead | `python3 benchmark/scripts/Experiments1/component/generate_exp1_component_deterministic.py`<br>`python3 benchmark/scripts/Experiments1/component/generate_exp1_component_probabilistic.py` | `bash benchmark/scripts/Experiments1/component/run_exp1_component.sh` |
+| Filter Pushdown | `python3 benchmark/scripts/Experiments5/generate_exp5.py` | `bash benchmark/scripts/Experiments5/run_exp5.sh` |
+| Post-Processing baseline | `python3 benchmark/scripts/Experiments5/generate_exp5.py` | `bash benchmark/scripts/Experiments5/run_exp5.sh` |
+| Divergence-decision strategy | `python3 benchmark/scripts/Experiments3/generate_exp3.py` | `bash benchmark/scripts/Experiments3/run_exp3.sh` |
+| End-to-End Divergence-Join | `python3 benchmark/scripts/Experiments2/generate_exp2.py` | `bash benchmark/scripts/Experiments2/run_exp2.sh` |
+| Dimensionality Scaling for GMM | `python3 benchmark/scripts/Experiments1/dimension/generate_exp1_dimension.py` | `bash benchmark/scripts/Experiments1/dimension/run_exp1_dimension.sh` |
+| Datatype Extensibility | `python3 benchmark/scripts/Experiments4/generate_dispatch_micro_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_variants.py`<br>`python3 benchmark/scripts/Experiments4/generate_crosstype_pairs.py`<br>`python3 benchmark/scripts/Experiments4/generate_dirichlet_dataset.py` | `bash benchmark/scripts/Experiments4/run_exp4.sh` |
+
+For Experiment 5, use the `InEngine` rows in `benchmark/results/exp5/exp5_summary_all.csv` for Filter Pushdown and the `PostProcessing` rows for the post-processing baseline. For End-to-End Divergence-Join, use the DIVJOIN/similarity-join outputs under `benchmark/results/exp2/`.
+
+Generated TTL datasets must be loaded into Fuseki services using the service names expected by each runner before the run scripts are executed.
 
 ---
 

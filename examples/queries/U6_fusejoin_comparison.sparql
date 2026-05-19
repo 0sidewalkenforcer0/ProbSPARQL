@@ -8,6 +8,11 @@ PREFIX uq: <http://example.org/ontology/uncertainty#>
 PREFIX prob: <http://probsparql.org/function#>
 PREFIX ex: <http://example.org/data/>
 
+# Deprecated legacy prototype query.
+# FUSEJOIN is retained for backward compatibility only and is not part of the
+# maintained examples or paper benchmark suite. Use U5 DIVJOIN for the active
+# divergence-join example.
+#
 # Comparison: FUSEJOIN vs DIVJOIN
 # FUSEJOIN creates a fused distribution when JS divergence <= tolerance
 # DIVJOIN keeps original distributions when JS divergence <= tolerance

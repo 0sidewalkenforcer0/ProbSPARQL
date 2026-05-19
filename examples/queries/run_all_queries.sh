@@ -1,7 +1,7 @@
 #!/bin/zsh
 #
 # ProbSPARQL Query Runner
-# Runs maintained U1-U5 example queries against the sample data
+# Runs maintained U1-U5 example queries against the sample data.
 #
 # Usage:
 #   ./run_all_queries.sh           # Run maintained queries (U1-U5)
@@ -31,7 +31,6 @@ get_query_file() {
         U3) echo "U3_distribution_transformation.sparql" ;;
         U4) echo "U4_distribution_manipulation.sparql" ;;
         U5) echo "U5_similarityjoin_test.sparql" ;;
-        U6) echo "U6_fusejoin_comparison.sparql" ;;
         *) echo "" ;;
     esac
 }
@@ -43,7 +42,6 @@ get_description() {
         U3) echo "Distribution Transformation (scale, shift, linear)" ;;
         U4) echo "Distribution Manipulation (mean, std, fuse)" ;;
         U5) echo "DIVJOIN (similarity filtering)" ;;
-        U6) echo "Experimental FUSEJOIN (legacy Bayesian fusion)" ;;
         *) echo "Unknown" ;;
     esac
 }
@@ -110,8 +108,7 @@ echo -e "${BLUE}Project root:${NC} $PROJECT_ROOT"
 
 # Determine which queries to run
 if [[ $# -eq 0 ]]; then
-    # Run maintained README examples. U6 remains available explicitly as an
-    # experimental legacy query but is not part of the default smoke test.
+    # Run maintained README examples.
     QUERIES_TO_RUN=(U1 U2 U3 U4 U5)
 else
     # Run specified queries
@@ -130,7 +127,7 @@ for query_id in "${QUERIES_TO_RUN[@]}"; do
     # Validate query ID
     if [[ -z "$(get_query_file $query_id)" ]]; then
         echo -e "${RED}✗ Unknown query: $query_id${NC}"
-        echo "  Valid queries: U1, U2, U3, U4, U5, U6"
+        echo "  Valid queries: U1, U2, U3, U4, U5"
         ((FAILED++))
         continue
     fi

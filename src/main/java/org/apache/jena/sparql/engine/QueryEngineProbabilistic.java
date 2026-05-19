@@ -11,11 +11,11 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.syntax.*;
 
 /**
- * Custom query engine for ProbSPARQL that handles FUSEJOIN and DIVJOIN operations.
+ * Custom query engine for ProbSPARQL DIVJOIN operations.
  * 
  * This engine integrates seamlessly with Jena's query execution pipeline:
- * 1. Uses AlgebraGeneratorProbabilistic to compile ElementSimilarityJoin/ElementFuseJoin
- *    into OpSimilarityJoin/OpFuseJoin operators
+ * 1. Uses AlgebraGeneratorProbabilistic to compile ElementSimilarityJoin into
+ *    OpSimilarityJoin operators.
  * 2. Registers OpExecutorProbabilistic to execute these custom operators
  * 
  * Supports both relational and legacy semantics:
@@ -32,9 +32,7 @@ public class QueryEngineProbabilistic extends QueryEngineMain {
     
     @Override
     protected Op createOp(Query query) {
-        // Use AlgebraGeneratorProbabilistic with context to ensure proper compilation
-        // This ensures ElementSimilarityJoin and ElementFuseJoin are properly compiled
-        // into OpSimilarityJoin and OpFuseJoin operators
+        // Use AlgebraGeneratorProbabilistic with context to ensure proper compilation.
         Op op = new org.apache.jena.sparql.algebra.AlgebraGeneratorProbabilistic(super.context).compile(query);
         return op;
     }
@@ -57,7 +55,7 @@ public class QueryEngineProbabilistic extends QueryEngineMain {
         private boolean containsProbSPARQLElements(Element element) {
             if (element == null) return false;
             
-            // Check if this element is a ProbSPARQL element
+            // Check if this element is a ProbSPARQL element.
             if (element instanceof ElementSimilarityJoin || element instanceof ElementFuseJoin) {
                 return true;
             }

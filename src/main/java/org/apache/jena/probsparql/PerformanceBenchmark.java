@@ -29,8 +29,7 @@ public class PerformanceBenchmark {
         "U2_probabilistic_comparison.sparql",
         "U3_distribution_transformation.sparql",
         "U4_distribution_manipulation.sparql",
-        "U5_similarityjoin_test.sparql",
-        "U6_fusejoin_comparison.sparql"
+        "U5_similarityjoin_test.sparql"
     };
     
     private static final String[] QUERY_DESCRIPTIONS = {
@@ -38,8 +37,7 @@ public class PerformanceBenchmark {
         "Probabilistic Comparison (JS/KL)",
         "Distribution Transformation",
         "Distribution Manipulation",
-        "DIVJOIN",
-        "FUSEJOIN"
+        "DIVJOIN"
     };
     
     public static void main(String[] args) throws IOException {

@@ -23,7 +23,13 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
  * - rightOp: generates the right table (same as leftOp in legacy mode)
  * - Join condition: JS(?leftVar, ?rightVar) <= tolerance
  * - If satisfied: performs Bayesian fusion and binds to resultVar
+ *
+ * @deprecated Legacy operator retained for backward compatibility with older
+ *             prototype queries. It is not used by the paper benchmarks; use
+ *             DIVJOIN / {@link OpSimilarityJoin} for active divergence-join
+ *             experiments.
  */
+@Deprecated
 public class OpFuseJoin extends OpBase {
     private final Op leftOp;    // Left table operation
     private final Op rightOp;   // Right table operation

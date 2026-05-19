@@ -9,7 +9,7 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 /**
- * Demonstration of FUSEJOIN algebra operator for Bayesian fusion.
+ * Demonstration of the legacy FUSEJOIN algebra operator for Bayesian fusion.
  * 
  * This example shows how to use the FUSEJOIN operator in SPARQL queries
  * to perform probabilistic fusion of GMM distributions based on 
@@ -17,7 +17,11 @@ import org.apache.jena.vocabulary.RDFS;
  * 
  * Note: This example assumes JavaCC grammar modifications have been applied
  * to Apache Jena's sparql_11.jj file to support FUSEJOIN syntax.
+ *
+ * @deprecated Legacy prototype demo retained for archival compatibility. It is
+ *             not part of the maintained examples or paper benchmarks.
  */
+@Deprecated
 public class FuseJoinDemo {
     
     private static final String UQ_NS = "http://uncertainty.org/";

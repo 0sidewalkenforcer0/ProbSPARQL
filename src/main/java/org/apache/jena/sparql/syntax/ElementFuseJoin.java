@@ -13,7 +13,13 @@ import org.apache.jena.sparql.util.NodeIsomorphismMap;
  * - rightPattern generates the right table
  * - The join condition is based on JS divergence between leftVar and rightVar
  * - If JS <= tolerance, Bayesian fusion is performed and bound to resultVar
+ *
+ * @deprecated Legacy syntax element retained for backward compatibility with
+ *             older prototype queries. It is not used by the paper benchmarks;
+ *             use DIVJOIN / {@link ElementSimilarityJoin} for active
+ *             divergence-join experiments.
  */
+@Deprecated
 public class ElementFuseJoin extends Element {
     private final Element leftPattern;   // Left table pattern
     private final Element rightPattern;  // Right table pattern

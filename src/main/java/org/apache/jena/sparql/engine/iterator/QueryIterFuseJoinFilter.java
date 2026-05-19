@@ -29,7 +29,11 @@ import java.util.Iterator;
  *    - Pass the binding through
  * 
  * This is a filter-and-transform operation, NOT a join. All variables are already bound.
+ *
+ * @deprecated Retained for older prototype queries only. The paper benchmarks
+ *             use DIVJOIN / QueryIterSimilarityJoin instead.
  */
+@Deprecated
 public class QueryIterFuseJoinFilter extends QueryIter {
     private final QueryIterator input;
     private final Var leftVar;

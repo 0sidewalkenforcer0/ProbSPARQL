@@ -12,17 +12,14 @@ import java.util.Deque;
 
 /**
  * Algebra generator extension for probabilistic syntax elements.
- * Extends Jena's AlgebraGenerator to handle ElementFuseJoin and ElementSimilarityJoin.
+ * Extends Jena's AlgebraGenerator to handle ElementSimilarityJoin.
  * 
  * This generator integrates seamlessly with Jena's compilation process:
- * - When JavaCC parser produces ElementSimilarityJoin/ElementFuseJoin nodes,
- *   this generator compiles them into OpSimilarityJoin/OpFuseJoin operators.
+ * - When JavaCC parser produces ElementSimilarityJoin nodes, this generator
+ *   compiles them into OpSimilarityJoin operators.
  * - Supports both relational semantics (binary join) and legacy filter semantics.
  * 
  * Relational semantics:
- * { leftPattern } FUSEJOIN(?leftVar, ?rightVar, tolerance, ?resultVar) { rightPattern }
- *   -> OpFuseJoin(leftOp, rightOp, leftVar, rightVar, tolerance, resultVar)
- * 
  * { leftPattern } DIVJOIN(?leftVar, ?rightVar, tolerance, tailProbability) { rightPattern }
  *   -> OpSimilarityJoin(leftOp, rightOp, leftVar, rightVar, tolerance, tailProbability)
  * 
