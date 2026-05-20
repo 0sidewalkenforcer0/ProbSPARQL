@@ -345,11 +345,49 @@ Dirichlet literals use datatype `uq:dirichletLiteral` and are supported by the p
 ## Benchmark Reproduction
 
 The paper experiments are reproduced by the scripts under `benchmark/scripts/`.
-Before running a benchmark, set the Fuseki endpoint template. The `{dataset}`
-placeholder is replaced by the logical service name expected by each script:
+Use the following three-step workflow: generate TTL datasets, start Fuseki and
+load those datasets as services, then run the benchmark clients.
+
+### 1. Generate benchmark data
+
+Run the relevant generator scripts from the project root. They write TTL files
+under `benchmark/data`.
+
+| Benchmark data | Generation command(s) |
+|----------------|-----------------------|
+| Exp1 component | `python3 benchmark/scripts/Experiments1/component/generate_exp1_component_probabilistic.py`<br>`python3 benchmark/scripts/Experiments1/component/generate_exp1_component_deterministic.py` |
+| Exp1 dimension | `python3 benchmark/scripts/Experiments1/dimension/generate_exp1_dimension.py` |
+| Exp1 permutation | `python3 benchmark/scripts/Experiments1/permutation/generate_exp1_permutation.py` |
+| Exp2 divergence join | `python3 benchmark/scripts/Experiments2/generate_exp2.py` |
+| Exp3 divergence decision | `python3 benchmark/scripts/Experiments3/generate_exp3.py` |
+| Exp4 datatype extensibility | `python3 benchmark/scripts/Experiments4/generate_dispatch_micro_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_variants.py`<br>`python3 benchmark/scripts/Experiments4/generate_crosstype_pairs.py`<br>`python3 benchmark/scripts/Experiments4/generate_dirichlet_dataset.py` |
+| Exp5 execution placement | `python3 benchmark/scripts/Experiments5/generate_exp5.py` |
+
+### 2. Start Fuseki and load the data
+
+Start a benchmark Fuseki server from the project root. This loads every prepared
+TTL file under `benchmark/data` as a separate Fuseki service using the TTL
+filename as the service name:
 
 ```bash
-export ENDPOINT_TEMPLATE='http://<host>:3030/{dataset}/query'
+mvn exec:java \
+  -Dprobsparql.simjoin.pruning=true \
+  -Dprobsparql.simjoin.deduplicate=true \
+  -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
+  -Dexec.args="3030 --benchmark-data benchmark/data"
+```
+
+For example, `benchmark/data/exp3/simjoin_easy.ttl` is exposed as:
+
+```text
+http://localhost:3030/simjoin_easy/query
+```
+
+Then, in another shell, set the Fuseki endpoint template. The `{dataset}`
+placeholder is replaced by the logical service name expected by each runner:
+
+```bash
+export ENDPOINT_TEMPLATE='http://localhost:3030/{dataset}/query'
 ```
 
 If the project has already been built, skip repeated Maven builds with:
@@ -358,19 +396,21 @@ If the project has already been built, skip repeated Maven builds with:
 export SKIP_BUILD=1
 ```
 
-| Benchmark experiment | Data preparation script(s) | Run command |
-|----------------------|----------------------------|-------------|
-| Distribution-complexity overhead | `python3 benchmark/scripts/Experiments1/component/generate_exp1_component_deterministic.py`<br>`python3 benchmark/scripts/Experiments1/component/generate_exp1_component_probabilistic.py` | `bash benchmark/scripts/Experiments1/component/run_exp1_component.sh` |
-| Filter Pushdown | `python3 benchmark/scripts/Experiments5/generate_exp5.py` | `bash benchmark/scripts/Experiments5/run_exp5.sh` |
-| Post-Processing baseline | `python3 benchmark/scripts/Experiments5/generate_exp5.py` | `bash benchmark/scripts/Experiments5/run_exp5.sh` |
-| Divergence-decision strategy | `python3 benchmark/scripts/Experiments3/generate_exp3.py` | `bash benchmark/scripts/Experiments3/run_exp3.sh` |
-| End-to-End Divergence-Join | `python3 benchmark/scripts/Experiments2/generate_exp2.py` | `bash benchmark/scripts/Experiments2/run_exp2.sh` |
-| Dimensionality Scaling for GMM | `python3 benchmark/scripts/Experiments1/dimension/generate_exp1_dimension.py` | `bash benchmark/scripts/Experiments1/dimension/run_exp1_dimension.sh` |
-| Datatype Extensibility | `python3 benchmark/scripts/Experiments4/generate_dispatch_micro_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_datasets.py`<br>`python3 benchmark/scripts/Experiments4/generate_histogram_variants.py`<br>`python3 benchmark/scripts/Experiments4/generate_crosstype_pairs.py`<br>`python3 benchmark/scripts/Experiments4/generate_dirichlet_dataset.py` | `bash benchmark/scripts/Experiments4/run_exp4.sh` |
+### 3. Run benchmark clients
+
+Run the benchmark scripts from another shell after setting `ENDPOINT_TEMPLATE`.
+
+| Benchmark experiment | Run command |
+|----------------------|-------------|
+| Distribution-complexity overhead | `bash benchmark/scripts/Experiments1/component/run_exp1_component.sh` |
+| Dimensionality scaling for GMM | `bash benchmark/scripts/Experiments1/dimension/run_exp1_dimension.sh` |
+| GMM permutation invariance | `bash benchmark/scripts/Experiments1/permutation/run_exp1_permutation.sh` |
+| End-to-end divergence join | `bash benchmark/scripts/Experiments2/run_exp2.sh` |
+| Divergence-decision strategy | `bash benchmark/scripts/Experiments3/run_exp3.sh` |
+| Datatype extensibility | `bash benchmark/scripts/Experiments4/run_exp4.sh` |
+| Filter pushdown and post-processing baseline | `bash benchmark/scripts/Experiments5/run_exp5.sh` |
 
 For Experiment 5, use the `InEngine` rows in `benchmark/results/exp5/exp5_summary_all.csv` for Filter Pushdown and the `PostProcessing` rows for the post-processing baseline. For End-to-End Divergence-Join, use the DIVJOIN/similarity-join outputs under `benchmark/results/exp2/`.
-
-Generated TTL datasets must be loaded into Fuseki services using the service names expected by each runner before the run scripts are executed.
 
 ---
 

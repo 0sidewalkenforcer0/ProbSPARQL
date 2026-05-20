@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ProbSPARQL Fuseki Server - HTTP SPARQL Endpoint with Probabilistic Extensions
@@ -130,6 +134,64 @@ public class ProbSPARQLFuseki {
         logger.info("Press Ctrl+C to stop the server");
         logger.info("════════════════════════════════════════════════════════════════");
     }
+
+    /**
+     * Start a Fuseki server with one service per benchmark TTL file.
+     *
+     * <p>Each entry maps a Fuseki service name, for example {@code exp1_E5_K3},
+     * to one or more RDF files loaded into that service's default graph.</p>
+     *
+     * @param port HTTP port
+     * @param serviceFiles map from service name to RDF files
+     */
+    public void startServices(int port, Map<String, List<String>> serviceFiles) {
+        logger.info("╔════════════════════════════════════════════════════════════════╗");
+        logger.info("║  ProbSPARQL Benchmark Fuseki Server                            ║");
+        logger.info("╚════════════════════════════════════════════════════════════════╝");
+        logger.info("");
+
+        logger.info("Initializing ProbSPARQL extensions...");
+        ProbSPARQL.init();
+        logger.info("✓ ProbSPARQL extensions registered");
+        logger.info("");
+
+        int cores = Runtime.getRuntime().availableProcessors();
+        int minThreads = Math.max(4, cores);
+        int maxThreads = Integer.getInteger("PROBSPARQL_MAX_THREADS", Math.max(50, cores * 8));
+        logger.info("Jetty thread pool: min={}, max={} (cores={})", minThreads, maxThreads, cores);
+
+        FusekiServer.Builder builder = FusekiServer.create()
+            .port(port)
+            .numServerThreads(minThreads, maxThreads)
+            .staticFileBase(STATIC_UI_DIR);
+
+        for (Map.Entry<String, List<String>> entry : serviceFiles.entrySet()) {
+            String serviceName = entry.getKey();
+            Dataset dataset = DatasetFactory.createTxnMem();
+            Model defaultModel = dataset.getDefaultModel();
+
+            logger.info("Loading service /{} ...", serviceName);
+            for (String dataFile : entry.getValue()) {
+                File file = new File(dataFile);
+                if (!file.exists()) {
+                    throw new IllegalArgumentException("RDF file not found for service /" + serviceName + ": " + dataFile);
+                }
+                logger.info("  Loading: {}", dataFile);
+                RDFDataMgr.read(defaultModel, dataFile);
+            }
+            logger.info("  ✓ /{} loaded {} triples", serviceName, defaultModel.size());
+            builder.add("/" + serviceName, dataset);
+        }
+
+        server = builder.build();
+        server.start();
+
+        logger.info("");
+        logger.info("Benchmark Fuseki server started on port {}", port);
+        logger.info("Services loaded: {}", serviceFiles.keySet());
+        logger.info("Query URL pattern: http://localhost:{}/{{dataset}}/query", port);
+        logger.info("Press Ctrl+C to stop the server");
+    }
     
     /**
      * Stop the Fuseki server
@@ -161,6 +223,7 @@ public class ProbSPARQLFuseki {
     public static void main(String[] args) {
         int port = DEFAULT_PORT;
         String[] dataFiles = null;
+        Map<String, List<String>> serviceFiles = null;
         
         // Parse command line arguments
         if (args.length > 0) {
@@ -176,10 +239,46 @@ public class ProbSPARQLFuseki {
                 port = DEFAULT_PORT;
             }
         }
+
+        if (dataFiles != null && dataFiles.length > 0) {
+            List<String> legacyDataFiles = new ArrayList<>();
+            for (int i = 0; i < dataFiles.length; i++) {
+                String arg = dataFiles[i];
+                if ("--benchmark-data".equals(arg)) {
+                    if (i + 1 >= dataFiles.length) {
+                        throw new IllegalArgumentException("--benchmark-data requires a directory");
+                    }
+                    if (serviceFiles == null) {
+                        serviceFiles = new LinkedHashMap<>();
+                    }
+                    collectBenchmarkTtlFiles(new File(dataFiles[++i]), serviceFiles);
+                } else if ("--dataset".equals(arg)) {
+                    if (i + 1 >= dataFiles.length) {
+                        throw new IllegalArgumentException("--dataset requires name=path");
+                    }
+                    if (serviceFiles == null) {
+                        serviceFiles = new LinkedHashMap<>();
+                    }
+                    addDatasetSpec(dataFiles[++i], serviceFiles);
+                } else if (arg.startsWith("--dataset=")) {
+                    if (serviceFiles == null) {
+                        serviceFiles = new LinkedHashMap<>();
+                    }
+                    addDatasetSpec(arg.substring("--dataset=".length()), serviceFiles);
+                } else {
+                    legacyDataFiles.add(arg);
+                }
+            }
+            dataFiles = legacyDataFiles.isEmpty() ? null : legacyDataFiles.toArray(String[]::new);
+        }
         
         // Start server
         ProbSPARQLFuseki fuseki = new ProbSPARQLFuseki();
-        fuseki.start(port, dataFiles);
+        if (serviceFiles != null && !serviceFiles.isEmpty()) {
+            fuseki.startServices(port, serviceFiles);
+        } else {
+            fuseki.start(port, dataFiles);
+        }
         
         // Add shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -193,5 +292,36 @@ public class ProbSPARQLFuseki {
         } catch (InterruptedException e) {
             logger.info("Server interrupted");
         }
+    }
+
+    private static void collectBenchmarkTtlFiles(File dir, Map<String, List<String>> serviceFiles) {
+        if (!dir.exists()) {
+            throw new IllegalArgumentException("Benchmark data directory not found: " + dir);
+        }
+        if (!dir.isDirectory()) {
+            throw new IllegalArgumentException("Benchmark data path is not a directory: " + dir);
+        }
+        File[] files = dir.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (file.isDirectory()) {
+                collectBenchmarkTtlFiles(file, serviceFiles);
+            } else if (file.isFile() && file.getName().endsWith(".ttl")) {
+                String serviceName = file.getName().substring(0, file.getName().length() - ".ttl".length());
+                serviceFiles.computeIfAbsent(serviceName, k -> new ArrayList<>()).add(file.getPath());
+            }
+        }
+    }
+
+    private static void addDatasetSpec(String spec, Map<String, List<String>> serviceFiles) {
+        int eq = spec.indexOf('=');
+        if (eq <= 0 || eq == spec.length() - 1) {
+            throw new IllegalArgumentException("--dataset must be name=path, got: " + spec);
+        }
+        String serviceName = spec.substring(0, eq);
+        String path = spec.substring(eq + 1);
+        serviceFiles.computeIfAbsent(serviceName, k -> new ArrayList<>()).add(path);
     }
 }
