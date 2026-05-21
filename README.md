@@ -372,7 +372,7 @@ filename as the service name:
 ```bash
 mvn exec:java \
   -Dprobsparql.simjoin.pruning=true \
-  -Dprobsparql.simjoin.deduplicate=true \
+  -Dprobsparql.simjoin.deduplicate=false \
   -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
   -Dexec.args="3030 --benchmark-data benchmark/data"
 ```

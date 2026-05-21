@@ -76,6 +76,22 @@ public class PolyJSD extends FunctionBase2 {
             return NodeValue.makeDouble(sampleBasedJSD(dir1, dir2, N_SAMPLES));
         }
 
+        if (DirichletDatatype.URI.equals(type1) && HistogramDatatype.URI.equals(type2)) {
+            DirichletValue dir = extractDirichlet(d1Node, "first");
+            HistogramValue hist = extractHistogram(d2Node, "second");
+            if (hist.getDimensions() == 1) {
+                return NodeValue.makeDouble(sampleBasedJSD(new DirichletMarginal(dir, 0), hist, N_SAMPLES));
+            }
+        }
+
+        if (HistogramDatatype.URI.equals(type1) && DirichletDatatype.URI.equals(type2)) {
+            HistogramValue hist = extractHistogram(d1Node, "first");
+            DirichletValue dir = extractDirichlet(d2Node, "second");
+            if (hist.getDimensions() == 1) {
+                return NodeValue.makeDouble(sampleBasedJSD(hist, new DirichletMarginal(dir, 0), N_SAMPLES));
+            }
+        }
+
         // --- Cross-type: universal sample-based fallback ---
         Sampleable s1 = extractSampleable(d1Node, "first");
         Sampleable s2 = extractSampleable(d2Node, "second");
@@ -195,6 +211,30 @@ public class PolyJSD extends FunctionBase2 {
         if (value instanceof GMMValue gmm) return gmm.getDimensions();
         if (value instanceof HistogramValue histogram) return histogram.getDimensions();
         if (value instanceof DirichletValue dirichlet) return dirichlet.getDimensions();
+        if (value instanceof DirichletMarginal) return 1;
         throw new IllegalArgumentException("Unsupported Sampleable implementation: " + value.getClass().getName());
+    }
+
+    private static final class DirichletMarginal implements Sampleable {
+        private final DirichletValue dirichlet;
+        private final int dim;
+
+        private DirichletMarginal(DirichletValue dirichlet, int dim) {
+            this.dirichlet = dirichlet;
+            this.dim = dim;
+        }
+
+        @Override
+        public double[][] sample(int n) {
+            return dirichlet.sampleMarginal(n, dim);
+        }
+
+        @Override
+        public double logPdf(double[] x) {
+            if (x.length != 1) {
+                throw new IllegalArgumentException("Dirichlet marginal expects one-dimensional samples");
+            }
+            return dirichlet.marginalLogPdf(x[0], dim);
+        }
     }
 }

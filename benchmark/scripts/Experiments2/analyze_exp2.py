@@ -109,18 +109,20 @@ def analyze(results_dir, output_dir):
     # -----------------------------------------------------------------------
     # 1. Result-count consistency
     # -----------------------------------------------------------------------
-    print("\n=== Result Count Consistency (InEngine_CF, InEngine_JF, DIVJOIN) ===")
+    print("\n=== Result Count Drift (InEngine_CF, InEngine_JF, DIVJOIN) ===")
     consistency_ok = True
     for key in all_keys:
         a_cf, a_jf = cnt_a_cf.get(key, -1), cnt_a_jf.get(key, -1)
         c = cnt_c.get(key, -1)
         if len({a_cf, a_jf, c}) != 1:
             consistency_ok = False
-            print(f"  [MISMATCH] nPairs={key[0]} uf={key[1]} sel={key[2]}: InEngine_CF={a_cf} InEngine_JF={a_jf} DIVJOIN={c}")
+            baseline = max(a_cf, a_jf, c, 1)
+            rel_drift = (max(a_cf, a_jf, c) - min(a_cf, a_jf, c)) / baseline
+            print(f"  [DRIFT] nPairs={key[0]} uf={key[1]} sel={key[2]}: InEngine_CF={a_cf} InEngine_JF={a_jf} DIVJOIN={c} maxRelDiff={rel_drift:.2%}")
     if consistency_ok:
         print("  All retained variants agree  ✓")
     else:
-        print("  [WARN] Mismatches found across retained variants.")
+        print("  [WARN] Count drift found across retained variants; this is expected for sampling-based threshold decisions.")
 
     # -----------------------------------------------------------------------
     # 2. Speedup summary table
@@ -167,7 +169,7 @@ def analyze(results_dir, output_dir):
                     "InEngine_CF_ms", "InEngine_JF_ms", "DIVJOIN_ms",
                     "SpeedupSJ_InEngine_CF", "SpeedupSJ_InEngine_JF",
                     "InEngine_CF_results", "InEngine_JF_results", "DIVJOIN_results",
-                    "AllEqual"])
+                    "AllEqual", "MaxResultRelDiff"])
         for key in all_keys:
             npairs, uf, sel = key
             # Get theta from a_rows
@@ -184,10 +186,11 @@ def analyze(results_dir, output_dir):
             ca_jf = cnt_a_jf.get(key, 0)
             cc = cnt_c.get(key, 0)
             consistent = int(len({ca_cf, ca_jf, cc}) == 1)
+            result_rel_diff = (max(ca_cf, ca_jf, cc) - min(ca_cf, ca_jf, cc)) / max(max(ca_cf, ca_jf, cc), 1)
             w.writerow([npairs, uf, sel, f"{theta:.6f}",
                         f"{ta_cf:.3f}", f"{ta_jf:.3f}", f"{tc:.3f}",
                         f"{sca_cf:.4f}", f"{sca_jf:.4f}",
-                        ca_cf, ca_jf, cc, consistent])
+                        ca_cf, ca_jf, cc, consistent, f"{result_rel_diff:.6f}"])
     print(f"\nWrote: {summary_path}")
 
     # -----------------------------------------------------------------------

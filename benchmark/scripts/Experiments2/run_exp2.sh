@@ -35,7 +35,7 @@
 #
 # Required server JVM properties for pruning stats:
 #   -Dprobsparql.simjoin.pruning=true
-#   -Dprobsparql.simjoin.deduplicate=true
+#   -Dprobsparql.simjoin.deduplicate=false
 # =============================================================================
 set -euo pipefail
 

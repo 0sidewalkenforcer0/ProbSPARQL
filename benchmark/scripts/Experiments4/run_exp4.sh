@@ -103,9 +103,16 @@ run_java() {
     echo
     echo ">>> ${phase_label}: ${class}..."
     local t0=$SECONDS
+    set +e
     mvn -q exec:java -Dexec.mainClass="org.apache.jena.probsparql.${class}" \
         -Dexec.args="--output-dir ${OUTPUT_DIR} --endpoint-template ${ENDPOINT_TEMPLATE} $*" \
-        2>&1 | tee "${OUTPUT_DIR}/${class}.log" | grep -E "^  |^---|^=|^>>>" || true
+        2>&1 | tee "${OUTPUT_DIR}/${class}.log" | grep -E "^  |^---|^=|^>>>"
+    local mvn_status=${PIPESTATUS[0]}
+    set -e
+    if [[ $mvn_status -ne 0 ]]; then
+        echo "    ERROR: ${class} failed; see ${OUTPUT_DIR}/${class}.log" >&2
+        return "$mvn_status"
+    fi
     echo "    Done in $(( SECONDS - t0 ))s."
 }
 

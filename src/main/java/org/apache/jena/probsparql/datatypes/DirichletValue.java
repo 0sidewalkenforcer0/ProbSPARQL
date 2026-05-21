@@ -122,6 +122,43 @@ public class DirichletValue implements Sampleable {
         return regularizedIncompleteBeta(x, a, b);
     }
 
+    /**
+     * Draw samples from one marginal component X_dim. The marginal follows
+     * Beta(alpha_dim, alpha_sum - alpha_dim).
+     *
+     * @param n   number of samples
+     * @param dim dimension index (0-based)
+     * @return double[n][1] samples for use with one-dimensional estimators
+     */
+    public double[][] sampleMarginal(int n, int dim) {
+        validateDim(dim);
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        double[][] out = new double[n][1];
+        double a = alphas[dim];
+        double b = sumAlphas() - a;
+        for (int i = 0; i < n; i++) {
+            double ga = sampleGamma(rng, a);
+            double gb = sampleGamma(rng, b);
+            out[i][0] = ga / (ga + gb);
+        }
+        return out;
+    }
+
+    /**
+     * Log-density of one marginal component. X_dim ~ Beta(alpha_dim,
+     * alpha_sum - alpha_dim).
+     */
+    public double marginalLogPdf(double x, int dim) {
+        validateDim(dim);
+        if (x <= 0.0 || x >= 1.0) {
+            return Double.NEGATIVE_INFINITY;
+        }
+        double a = alphas[dim];
+        double b = sumAlphas() - a;
+        double logBeta = logGamma(a) + logGamma(b) - logGamma(a + b);
+        return (a - 1.0) * Math.log(x) + (b - 1.0) * Math.log(1.0 - x) - logBeta;
+    }
+
     // -----------------------------------------------------------------------
     // Sampleable
     // -----------------------------------------------------------------------
@@ -222,6 +259,12 @@ public class DirichletValue implements Sampleable {
         double sum = 0.0;
         for (double a : alphas) sum += a;
         return sum;
+    }
+
+    private void validateDim(int dim) {
+        if (dim < 0 || dim >= getDimensions()) {
+            throw new IllegalArgumentException("dim must be in [0, dimensions), got: " + dim);
+        }
     }
 
     /**

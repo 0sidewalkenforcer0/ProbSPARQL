@@ -23,7 +23,7 @@ public class Exp4CrossTypeJSD {
     private static final String Q_CROSS = """
         PREFIX cfm:  <http://example.org/ontology/cfm#>
         PREFIX prob: <http://probsparql.org/function#>
-        SELECT ?pair ?idx ?ref ?jsd WHERE {
+        SELECT ?pair ?idx ?jsd WHERE {
             ?pair cfm:hasMeasurementA ?mA ;
                   cfm:hasMeasurementB ?mB ;
                   cfm:pairIndex ?idx .
@@ -31,7 +31,6 @@ public class Exp4CrossTypeJSD {
             ?rvA cfm:hasDistribution ?dA .
             ?mB cfm:representedBy ?rvB .
             ?rvB cfm:hasDistribution ?dB .
-            OPTIONAL { ?pair cfm:refSameTypeJSD ?ref . }
             BIND(prob:jsd(?dA, ?dB) AS ?jsd)
         }
         ORDER BY ?idx""";
@@ -84,9 +83,6 @@ public class Exp4CrossTypeJSD {
             double jsd = sol.getLiteral("jsd").getDouble();
             int idx = sol.getLiteral("idx").getInt();
             double ref = Double.NaN;
-            if (sol.contains("ref") && sol.get("ref").isLiteral()) {
-                ref = sol.getLiteral("ref").getDouble();
-            }
             collected.add(new PairRow(idx, ref, jsd));
         });
         long totalNs = System.nanoTime() - queryStart;

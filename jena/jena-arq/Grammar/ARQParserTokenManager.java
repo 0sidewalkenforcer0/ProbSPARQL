@@ -59,6 +59,7 @@ private Token tryDivJoinToken(Token specialToken)
    if (curChar != 'D' && curChar != 'd')
       return null;
 
+   final int firstChar = curChar;
    final String rest = "IVJOIN";
    int consumed = 0;
    try
@@ -70,6 +71,7 @@ private Token tryDivJoinToken(Token specialToken)
          if (Character.toUpperCase((char)curChar) != rest.charAt(i))
          {
             input_stream.backup(consumed);
+            curChar = firstChar;
             return null;
          }
       }
@@ -81,6 +83,7 @@ private Token tryDivJoinToken(Token specialToken)
          if (!isDivJoinBoundary(curChar))
          {
             input_stream.backup(consumed);
+            curChar = firstChar;
             return null;
          }
          input_stream.backup(1);
@@ -101,6 +104,7 @@ private Token tryDivJoinToken(Token specialToken)
    catch(java.io.IOException e)
    {
       input_stream.backup(consumed);
+      curChar = firstChar;
       return null;
    }
 }

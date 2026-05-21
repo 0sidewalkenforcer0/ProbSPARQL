@@ -62,6 +62,30 @@ class SimilarityJoinSyntaxTest {
     }
 
     @Test
+    void testStandardOrderByDescParsesWithExtendedSyntax() {
+        Query query = QueryFactory.create("""
+            SELECT ?s WHERE {
+              ?s ?p ?o .
+            }
+            ORDER BY DESC(?s)
+            LIMIT 10
+            """, Syntax.syntaxARQ);
+
+        assertNotNull(query);
+    }
+
+    @Test
+    void testStandardCountDistinctParsesWithExtendedSyntax() {
+        Query query = QueryFactory.create("""
+            SELECT (COUNT(DISTINCT ?s) AS ?n) WHERE {
+              ?s ?p ?o .
+            }
+            """, Syntax.syntaxARQ);
+
+        assertNotNull(query);
+    }
+
+    @Test
     void testLegacySimilarityJoinKeywordIsRejected() {
         String queryString = """
             PREFIX ex: <http://example.org/>

@@ -129,7 +129,7 @@ start_local_fuseki() {
 
   mvn -q exec:java \
     -Dprobsparql.simjoin.pruning=true \
-    -Dprobsparql.simjoin.deduplicate=true \
+    -Dprobsparql.simjoin.deduplicate=false \
     -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki" \
     -Dexec.args="${FUSEKI_PORT} --benchmark-data ${BENCHMARK_DATA_DIR}" \
     >"${FUSEKI_LOG}" 2>&1 &
