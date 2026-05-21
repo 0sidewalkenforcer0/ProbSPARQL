@@ -112,7 +112,7 @@ public class Exp2Benchmark {
                 int multimodalPairs = nMultimodal * nMultimodal;
 
                 System.out.printf("==== dataset=%s  targetPairs=%d  ct=%d sl=%d  unimodalFrac=%.1f ====%n",
-                        datasetName, nPairs, n, unimodalFrac);
+                        datasetName, nPairs, n, n, unimodalFrac);
 
                 double[] thetas = calibrate(endpoint, qCollectMultimodal);
                 System.out.printf("  Calib: theta10=%.4f theta50=%.4f theta90=%.4f%n",
