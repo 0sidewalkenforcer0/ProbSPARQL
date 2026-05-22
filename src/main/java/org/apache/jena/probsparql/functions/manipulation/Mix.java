@@ -2,11 +2,14 @@ package org.apache.jena.probsparql.functions.manipulation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase3;
 
 /**
- * SPARQL function to create a weighted mixture of two GMMs.
+ * SPARQL function to create a weighted mixture of two GMMs or same-grid Histograms.
  * 
  * <p>For GMM1 and GMM2 with mixing weight α ∈ [0,1], creates:</p>
  * <pre>
@@ -19,6 +22,9 @@ import org.apache.jena.sparql.function.FunctionBase3;
  *   <li>Means: [μ1_1, ..., μ1_K1, μ2_1, ..., μ2_K2]</li>
  *   <li>Covariances: [Σ1_1, ..., Σ1_K1, Σ2_1, ..., Σ2_K2]</li>
  * </ul>
+ *
+ * <p>For Histograms, both arguments must use the same grid. The result keeps
+ * the grid and computes α * mass1 + (1-α) * mass2 for each cell.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -37,17 +43,15 @@ public class Mix extends FunctionBase3 {
     public static final String URI = "http://probsparql.org/function#mix";
     
     /**
-     * Create weighted mixture of two GMMs.
+     * Create weighted mixture of two GMMs or same-grid Histograms.
      * 
-     * @param gmm1Node First GMM
-     * @param gmm2Node Second GMM
+     * @param dist1Node First distribution
+     * @param dist2Node Second distribution
      * @param alphaNode Mixing weight α ∈ [0,1]
-     * @return Mixed GMM
+     * @return Mixed distribution literal
      */
     @Override
-    public NodeValue exec(NodeValue gmm1Node, NodeValue gmm2Node, NodeValue alphaNode) {
-        GMMValue gmm1 = extractGMM(gmm1Node, "first");
-        GMMValue gmm2 = extractGMM(gmm2Node, "second");
+    public NodeValue exec(NodeValue dist1Node, NodeValue dist2Node, NodeValue alphaNode) {
         double alpha = extractDouble(alphaNode, "weight");
         
         // Validate mixing weight
@@ -55,7 +59,19 @@ public class Mix extends FunctionBase3 {
             throw new IllegalArgumentException(
                 "Mixing weight must be in [0,1], got: " + alpha);
         }
-        
+
+        Object value1 = dist1Node.asNode().getLiteralValue();
+        Object value2 = dist2Node.asNode().getLiteralValue();
+        if (value1 instanceof HistogramValue hist1 && value2 instanceof HistogramValue hist2) {
+            HistogramValue mixed = HistogramOperations.mix(hist1, hist2, alpha);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                mixed.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm1 = extractGMM(dist1Node, "first");
+        GMMValue gmm2 = extractGMM(dist2Node, "second");
         // Validate compatibility
         if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(

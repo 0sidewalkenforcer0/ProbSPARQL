@@ -2,11 +2,14 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the product of two independent GMMs.
+ * SPARQL function to compute product-style combination for GMMs or Histograms.
  * 
  * <p>For Z = X * Y where X ~ GMM1 and Y ~ GMM2 are independent distributions,
  * this function computes an approximation using moment matching.</p>
@@ -18,6 +21,9 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * <p>The result is a single Gaussian component (K=1) that approximates the product distribution.
  * This is commonly used for uncertainty propagation in multiplicative operations,
  * such as computing power from speed × torque.</p>
+ *
+ * <p>For same-grid Histograms, this performs pointwise cell-mass multiplication
+ * followed by normalization.</p>
  * 
  * <p><b>Limitations:</b></p>
  * <ul>
@@ -55,17 +61,26 @@ public class Multiply extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#multiply";
     
     /**
-     * Compute product of two independent GMMs using moment matching.
+     * Compute product of two independent GMMs or same-grid Histograms.
      * 
-     * @param gmm1Node First GMM (X)
-     * @param gmm2Node Second GMM (Y)
-     * @return GMM approximation of Z = X * Y
+     * @param dist1Node First distribution
+     * @param dist2Node Second distribution
+     * @return Product distribution literal
      */
     @Override
-    public NodeValue exec(NodeValue gmm1Node, NodeValue gmm2Node) {
-        GMMValue gmm1 = extractGMM(gmm1Node, "first");
-        GMMValue gmm2 = extractGMM(gmm2Node, "second");
-        
+    public NodeValue exec(NodeValue dist1Node, NodeValue dist2Node) {
+        Object value1 = dist1Node.asNode().getLiteralValue();
+        Object value2 = dist2Node.asNode().getLiteralValue();
+        if (value1 instanceof HistogramValue hist1 && value2 instanceof HistogramValue hist2) {
+            HistogramValue product = HistogramOperations.multiply(hist1, hist2);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                product.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm1 = extractGMM(dist1Node, "first");
+        GMMValue gmm2 = extractGMM(dist2Node, "second");
         if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
                 "multiply() requires matching dimensions. Got d1=" + gmm1.getDimensions() +

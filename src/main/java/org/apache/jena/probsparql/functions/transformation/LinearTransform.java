@@ -2,20 +2,24 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase3;
 
 /**
- * SPARQL function to apply a linear transformation to a GMM.
+ * SPARQL function to apply a linear transformation to a GMM or Histogram.
  * 
- * <p>For Y = a * X + b where X ~ GMM, the result is:</p>
+ * <p>For Y = a * X + b where X is a GMM, the result is:</p>
  * <ul>
  *   <li>Means: μ_Y = a * μ_X + b</li>
  *   <li>Covariances: Σ_Y = a² * Σ_X</li>
  *   <li>Weights: unchanged</li>
  * </ul>
  * 
- * <p>This is equivalent to scale(shift(gmm, b/a), a) but more efficient.</p>
+ * <p>For a Histogram, the affine transform is applied to bin edges while
+ * preserving probability masses.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -33,19 +37,28 @@ public class LinearTransform extends FunctionBase3 {
     public static final String URI = "http://probsparql.org/function#linearTransform";
     
     /**
-     * Apply linear transformation Y = a*X + b to a GMM.
+     * Apply linear transformation Y = a*X + b to a GMM or Histogram.
      * 
-     * @param gmmNode NodeValue containing GMM literal
+     * @param distNode NodeValue containing a GMM or Histogram literal
      * @param scaleNode NodeValue containing scale factor a
      * @param offsetNode NodeValue containing offset b
-     * @return Transformed GMM as a new GMM literal
+     * @return Transformed distribution literal of the same datatype
      */
     @Override
-    public NodeValue exec(NodeValue gmmNode, NodeValue scaleNode, NodeValue offsetNode) {
-        GMMValue gmm = extractGMM(gmmNode);
+    public NodeValue exec(NodeValue distNode, NodeValue scaleNode, NodeValue offsetNode) {
         double a = extractNumeric(scaleNode, "scale factor");
         double b = extractNumeric(offsetNode, "offset");
-        
+
+        Object value = distNode.asNode().getLiteralValue();
+        if (value instanceof HistogramValue histogram) {
+            HistogramValue transformed = HistogramOperations.affine(histogram, a, b);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                transformed.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm = extractGMM(distNode);
         GMMValue transformedGMM = linearTransform(gmm, a, b);
         
         org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(

@@ -240,7 +240,7 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 | `prob:scale(?gmm, ?factor)` | Scale a GMM distribution | `prob:scale(?dist, 2.0)` |
 | `prob:shift(?gmm, ?offset)` | Shift a GMM distribution | `prob:shift(?dist, 1.0)` |
 | `prob:linearTransform(?gmm, ?a, ?b)` | Linear transform (ax + b) | `prob:linearTransform(?dist, 2.0, 1.0)` |
-| `prob:marginal(?gmm, ?dim)` | Extract one marginal dimension | `prob:marginal(?dist, 0)` |
+| `prob:marginal(?dist, ?dims)` | Extract one or more marginal dimensions; accepts `0` or `"[0,2]"` | `prob:marginal(?dist, "[0,2]")` |
 | `prob:joint(?gmm1, ?gmm2)` | Build an independent joint distribution | `prob:joint(?d1, ?d2)` |
 | `prob:convolve(?gmm1, ?gmm2)` | Convolve two GMM distributions | `prob:convolve(?d1, ?d2)` |
 | `prob:multiply(?gmm1, ?gmm2)` | Approximate product distribution | `prob:multiply(?d1, ?d2)` |

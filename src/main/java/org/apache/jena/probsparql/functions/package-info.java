@@ -26,7 +26,7 @@
  * <p>Transform and propagate distributions:</p>
  * <ul>
  *   <li>{@code prob:convolve(?gmm1, ?gmm2)} - Convolution (planned)</li>
- *   <li>{@code prob:marginalize(?gmm, ?dims)} - Marginalization (planned)</li>
+ *   <li>{@code prob:marginal(?dist, ?dims)} - Marginalization over one or more dimensions</li>
  *   <li>{@code prob:scale(?gmm, ?factor)} - Scaling (planned)</li>
  * </ul>
  * 

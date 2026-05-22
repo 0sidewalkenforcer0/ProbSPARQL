@@ -2,11 +2,14 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the convolution of two GMMs.
+ * SPARQL function to compute the convolution of two GMMs or 1-D Histograms.
  * 
  * <p>For Z = X + Y where X ~ GMM1 and Y ~ GMM2 are independent,
  * the sum Z follows a GMM with:</p>
@@ -19,6 +22,9 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * 
  * <p>This represents the distribution of the sum of two independent
  * random variables, which is fundamental for uncertainty propagation.</p>
+ *
+ * <p>For Histograms, the current implementation supports only 1-D equal-width
+ * grids and applies discrete convolution over cell masses.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -37,17 +43,26 @@ public class Convolve extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#convolve";
     
     /**
-     * Compute convolution (sum) of two independent GMMs.
+     * Compute convolution (sum) of two independent GMMs or 1-D Histograms.
      * 
-     * @param gmm1Node First GMM (X)
-     * @param gmm2Node Second GMM (Y)
-     * @return Convolution GMM representing Z = X + Y
+     * @param dist1Node First distribution
+     * @param dist2Node Second distribution
+     * @return Convolution distribution literal
      */
     @Override
-    public NodeValue exec(NodeValue gmm1Node, NodeValue gmm2Node) {
-        GMMValue gmm1 = extractGMM(gmm1Node, "first");
-        GMMValue gmm2 = extractGMM(gmm2Node, "second");
-        
+    public NodeValue exec(NodeValue dist1Node, NodeValue dist2Node) {
+        Object value1 = dist1Node.asNode().getLiteralValue();
+        Object value2 = dist2Node.asNode().getLiteralValue();
+        if (value1 instanceof HistogramValue hist1 && value2 instanceof HistogramValue hist2) {
+            HistogramValue convolved = HistogramOperations.convolve1D(hist1, hist2);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                convolved.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm1 = extractGMM(dist1Node, "first");
+        GMMValue gmm2 = extractGMM(dist2Node, "second");
         // Validate compatibility
         if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(

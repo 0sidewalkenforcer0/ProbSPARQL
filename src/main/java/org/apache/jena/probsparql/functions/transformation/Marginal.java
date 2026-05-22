@@ -2,29 +2,36 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the marginal distribution of a GMM.
+ * SPARQL function to compute the marginal distribution of a GMM or Histogram.
  * 
- * <p>Extracts a subset of dimensions from a multivariate GMM.
- * Currently supports extracting a single dimension for 1D marginals.</p>
+ * <p>Extracts one or more dimensions from a multivariate GMM or Histogram.
+ * The second argument may be a numeric dimension index, e.g. {@code 0}, or a
+ * JSON-array string of dimension indices, e.g. {@code "[0,2]"}.</p>
  * 
- * <p>For a GMM with d dimensions, marginalizing over dimension i gives:</p>
+ * <p>For a GMM with d dimensions, marginalizing over selected dimensions gives:</p>
  * <ul>
  *   <li>K components (unchanged)</li>
  *   <li>Weights: unchanged</li>
- *   <li>Means: μ_i for each component</li>
- *   <li>Covariances: Σ_ii for each component</li>
+ *   <li>Means: selected entries of μ for each component</li>
+ *   <li>Covariances: selected covariance submatrix for each component</li>
  * </ul>
+ *
+ * <p>For a multidimensional Histogram, this sums probability masses over all
+ * non-selected dimensions and returns a lower-dimensional Histogram.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
  * PREFIX prob: &lt;http://probsparql.org/function#&gt;
  * SELECT ?marginalDist WHERE {
  *   ?var uq:hasDistribution ?gmm .
- *   BIND(prob:marginal(?gmm, 0) AS ?marginalDist)
+ *   BIND(prob:marginal(?gmm, "[0,2]") AS ?marginalDist)
  * }
  * </pre>
  * 
@@ -35,18 +42,27 @@ public class Marginal extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#marginal";
     
     /**
-     * Compute marginal distribution over specified dimension.
+     * Compute marginal distribution over specified dimensions.
      * 
-     * @param gmmNode NodeValue containing GMM literal
-     * @param dimNode NodeValue containing dimension index (0-based)
-     * @return Marginal GMM (1-dimensional)
+     * @param distNode NodeValue containing a GMM or Histogram literal
+     * @param dimNode NodeValue containing dimension index or JSON array of indices (0-based)
+     * @return Marginal distribution literal of the same datatype
      */
     @Override
-    public NodeValue exec(NodeValue gmmNode, NodeValue dimNode) {
-        GMMValue gmm = extractGMM(gmmNode);
-        int dimension = extractDimension(dimNode, gmm.getDimensions());
-        
-        GMMValue marginalGMM = computeMarginal(gmm, dimension);
+    public NodeValue exec(NodeValue distNode, NodeValue dimNode) {
+        Object value = distNode.asNode().getLiteralValue();
+        if (value instanceof HistogramValue histogram) {
+            int[] dimensions = extractDimensions(dimNode, histogram.getDimensions());
+            HistogramValue marginal = HistogramOperations.marginal(histogram, dimensions);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                marginal.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm = extractGMM(distNode);
+        int[] dimensions = extractDimensions(dimNode, gmm.getDimensions());
+        GMMValue marginalGMM = computeMarginal(gmm, dimensions);
         
         org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
             marginalGMM.toJSON(), GMMDatatype.INSTANCE
@@ -71,85 +87,116 @@ public class Marginal extends FunctionBase2 {
         return (GMMValue) value;
     }
     
-    /**
-     * Extract dimension index from NodeValue.
-     */
-    private int extractDimension(NodeValue node, int maxDim) {
-        if (!node.isNumber()) {
+    private int[] extractDimensions(NodeValue node, int maxDim) {
+        int[] dimensions;
+        if (node.isNumber()) {
+            dimensions = new int[]{node.getInteger().intValue()};
+        } else if (node.isString()) {
+            dimensions = parseDimensionArray(node.getString());
+        } else {
             throw new IllegalArgumentException(
-                "Second argument must be a numeric dimension index");
+                "Second argument must be a numeric dimension index or JSON array string");
         }
-        
-        int dim = node.getInteger().intValue();
-        
-        if (dim < 0 || dim >= maxDim) {
-            throw new IllegalArgumentException(
-                "Dimension index " + dim + " out of range [0, " + (maxDim - 1) + "]");
+
+        if (dimensions.length == 0) {
+            throw new IllegalArgumentException("At least one marginal dimension must be selected");
         }
-        
-        return dim;
+        boolean[] seen = new boolean[maxDim];
+        for (int dim : dimensions) {
+            if (dim < 0 || dim >= maxDim) {
+                throw new IllegalArgumentException(
+                    "Dimension index " + dim + " out of range [0, " + (maxDim - 1) + "]");
+            }
+            if (seen[dim]) {
+                throw new IllegalArgumentException("Duplicate marginal dimension: " + dim);
+            }
+            seen[dim] = true;
+        }
+        return dimensions;
+    }
+
+    private int[] parseDimensionArray(String text) {
+        String trimmed = text.trim();
+        if (!trimmed.startsWith("[") || !trimmed.endsWith("]")) {
+            throw new IllegalArgumentException("Dimension selection must be a JSON array, e.g. \"[0,2]\"");
+        }
+        String content = trimmed.substring(1, trimmed.length() - 1).trim();
+        if (content.isEmpty()) {
+            return new int[0];
+        }
+        String[] parts = content.split(",");
+        int[] dimensions = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            dimensions[i] = Integer.parseInt(parts[i].trim());
+        }
+        return dimensions;
     }
     
     /**
-     * Compute marginal distribution over specified dimension.
+     * Compute marginal distribution over specified dimensions.
      */
-    private GMMValue computeMarginal(GMMValue gmm, int dim) {
+    private GMMValue computeMarginal(GMMValue gmm, int[] dimensions) {
         int K = gmm.getNComponents();
         int d = gmm.getDimensions();
         String covType = gmm.getCovarianceType();
         
-        // For 1D GMMs, marginal is the GMM itself
-        if (d == 1) {
-            if (dim != 0) {
-                throw new IllegalArgumentException("For 1D GMM, dimension must be 0");
-            }
+        if (isIdentitySelection(dimensions, d)) {
             return gmm;
         }
-        
+
+        int outDimensions = dimensions.length;
         double[] weights = gmm.getWeights().clone();
         
-        // Extract means for specified dimension
-        double[][] means = new double[K][1];
+        // Extract means for selected dimensions.
+        double[][] means = new double[K][outDimensions];
         for (int k = 0; k < K; k++) {
-            means[k][0] = gmm.getMeans()[k][dim];
+            for (int outDim = 0; outDim < outDimensions; outDim++) {
+                means[k][outDim] = gmm.getMeans()[k][dimensions[outDim]];
+            }
         }
         
-        // Extract covariances for specified dimension
+        // Extract covariance submatrix for selected dimensions.
         double[][][] covariances = new double[K][][];
         for (int k = 0; k < K; k++) {
-            covariances[k] = extractCovarianceElement(
-                gmm.getCovariances()[k], dim, covType, d
-            );
+            covariances[k] = extractCovarianceSubmatrix(gmm.getCovariances()[k], dimensions, covType);
         }
         
-        // Marginal is always 1D with full covariance (1x1 matrix)
-        return new GMMValue(K, 1, "full", weights, means, covariances);
+        return new GMMValue(K, outDimensions, "full", weights, means, covariances);
     }
     
-    /**
-     * Extract covariance element for marginal dimension.
-     */
-    private double[][] extractCovarianceElement(double[][] cov, int dim, 
-                                                String covType, int d) {
-        double variance;
-        
+    private double[][] extractCovarianceSubmatrix(double[][] cov, int[] dimensions, String covType) {
+        int outDimensions = dimensions.length;
+        double[][] out = new double[outDimensions][outDimensions];
+        for (int i = 0; i < outDimensions; i++) {
+            for (int j = 0; j < outDimensions; j++) {
+                out[i][j] = covarianceAt(cov, dimensions[i], dimensions[j], covType);
+            }
+        }
+        return out;
+    }
+
+    private double covarianceAt(double[][] cov, int row, int col, String covType) {
         switch (covType) {
             case "full":
-                variance = cov[dim][dim];
-                break;
-                
+                return cov[row][col];
             case "diag":
-                variance = cov[0][dim];
-                break;
-                
+                return row == col ? cov[0][row] : 0.0;
             case "spherical":
-                variance = cov[0][0]; // Same for all dimensions
-                break;
-                
+                return row == col ? cov[0][0] : 0.0;
             default:
                 throw new IllegalStateException("Unknown covariance type: " + covType);
         }
-        
-        return new double[][] {{variance}};
+    }
+
+    private boolean isIdentitySelection(int[] dimensions, int sourceDimensions) {
+        if (dimensions.length != sourceDimensions) {
+            return false;
+        }
+        for (int i = 0; i < dimensions.length; i++) {
+            if (dimensions[i] != i) {
+                return false;
+            }
+        }
+        return true;
     }
 }

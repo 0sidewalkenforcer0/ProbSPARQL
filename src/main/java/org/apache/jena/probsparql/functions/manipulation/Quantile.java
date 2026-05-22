@@ -1,22 +1,26 @@
 package org.apache.jena.probsparql.functions.manipulation;
 
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute quantiles of a 1D GMM.
+ * SPARQL function to compute univariate quantiles.
  * 
- * <p>For a 1D GMM and probability q ∈ [0,1], finds the value x such that:</p>
+ * <p>For a 1D GMM or Histogram and probability q ∈ [0,1], finds the value x such that:</p>
  * <pre>
  * P(X ≤ x) = q
  * </pre>
  * 
- * <p>Uses numerical root finding (bisection method) to solve the CDF equation.</p>
+ * <p>GMM and Dirichlet marginal quantiles use numerical root finding. Histogram
+ * quantiles use inverse CDF over the piecewise-uniform bins.</p>
  * 
- * <p>Only supports 1D GMMs. For multivariate distributions, quantiles
- * are not uniquely defined.</p>
+ * <p>For Dirichlet, this returns the marginal quantile of dimension 0. General
+ * multivariate quantiles are not uniquely defined and are not supported.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -38,29 +42,37 @@ public class Quantile extends FunctionBase2 {
     private static final double SQRT_2PI = Math.sqrt(2.0 * Math.PI);
     
     /**
-     * Compute quantile of a 1D GMM.
+     * Compute univariate quantile.
      * 
-     * @param gmmNode GMM distribution (must be 1D)
+     * @param distNode Distribution literal
      * @param qNode Probability q ∈ [0,1]
      * @return Quantile value x such that P(X ≤ x) = q
      */
     @Override
-    public NodeValue exec(NodeValue gmmNode, NodeValue qNode) {
-        GMMValue gmm = extractGMM(gmmNode);
+    public NodeValue exec(NodeValue distNode, NodeValue qNode) {
         double q = extractDouble(qNode, "quantile probability");
-        
-        // Validate 1D
-        if (gmm.getDimensions() != 1) {
-            throw new IllegalArgumentException(
-                "Quantile function only supports 1D GMMs. Got d=" + gmm.getDimensions());
-        }
-        
+
         // Validate probability range
         if (q < 0 || q > 1) {
             throw new IllegalArgumentException(
                 "Quantile probability must be in [0,1], got: " + q);
         }
-        
+
+        Object value = distNode.asNode().getLiteralValue();
+        if (value instanceof HistogramValue histogram) {
+            return NodeValue.makeDouble(HistogramOperations.quantile(histogram, q));
+        }
+        if (value instanceof DirichletValue dirichlet) {
+            return NodeValue.makeDouble(computeDirichletMarginalQuantile(dirichlet, q, 0));
+        }
+
+        GMMValue gmm = extractGMM(distNode);
+        // Validate 1D
+        if (gmm.getDimensions() != 1) {
+            throw new IllegalArgumentException(
+                "Quantile function only supports 1D GMMs. Got d=" + gmm.getDimensions());
+        }
+
         // Handle edge cases
         if (q == 0.0) {
             return NodeValue.makeDouble(Double.NEGATIVE_INFINITY);
@@ -72,6 +84,30 @@ public class Quantile extends FunctionBase2 {
         double quantileValue = computeQuantile(gmm, q);
         
         return NodeValue.makeDouble(quantileValue);
+    }
+
+    private double computeDirichletMarginalQuantile(DirichletValue dirichlet, double q, int dim) {
+        if (q == 0.0) {
+            return 0.0;
+        }
+        if (q == 1.0) {
+            return 1.0;
+        }
+        double lower = 0.0;
+        double upper = 1.0;
+        for (int i = 0; i < MAX_ITERATIONS; i++) {
+            double mid = 0.5 * (lower + upper);
+            double cdf = dirichlet.marginalCdf(mid, dim);
+            if (Math.abs(cdf - q) < TOLERANCE) {
+                return mid;
+            }
+            if (cdf < q) {
+                lower = mid;
+            } else {
+                upper = mid;
+            }
+        }
+        return 0.5 * (lower + upper);
     }
     
     /**

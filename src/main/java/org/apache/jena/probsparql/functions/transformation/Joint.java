@@ -2,11 +2,14 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the joint distribution of two independent GMMs.
+ * SPARQL function to compute the joint distribution of two independent GMMs or Histograms.
  * 
  * <p>For independent random variables X ~ GMM1 and Y ~ GMM2, 
  * the joint distribution (X, Y) is a GMM with:</p>
@@ -17,6 +20,9 @@ import org.apache.jena.sparql.function.FunctionBase2;
  *   <li>Means: μ_ij = [μ1_i; μ2_j] (concatenation)</li>
  *   <li>Covariances: Σ_ij = block-diagonal [Σ1_i, 0; 0, Σ2_j]</li>
  * </ul>
+ *
+ * <p>For Histograms, the result is an independent product grid with concatenated
+ * dimensions and outer-product cell masses.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -35,17 +41,26 @@ public class Joint extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#joint";
     
     /**
-     * Compute joint distribution of two independent GMMs.
+     * Compute joint distribution of two independent GMMs or Histograms.
      * 
-     * @param gmm1Node First GMM
-     * @param gmm2Node Second GMM
-     * @return Joint GMM with d1+d2 dimensions
+     * @param dist1Node First distribution
+     * @param dist2Node Second distribution
+     * @return Joint distribution with d1+d2 dimensions
      */
     @Override
-    public NodeValue exec(NodeValue gmm1Node, NodeValue gmm2Node) {
-        GMMValue gmm1 = extractGMM(gmm1Node, "first");
-        GMMValue gmm2 = extractGMM(gmm2Node, "second");
-        
+    public NodeValue exec(NodeValue dist1Node, NodeValue dist2Node) {
+        Object value1 = dist1Node.asNode().getLiteralValue();
+        Object value2 = dist2Node.asNode().getLiteralValue();
+        if (value1 instanceof HistogramValue hist1 && value2 instanceof HistogramValue hist2) {
+            HistogramValue joint = HistogramOperations.independentJoint(hist1, hist2);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                joint.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm1 = extractGMM(dist1Node, "first");
+        GMMValue gmm2 = extractGMM(dist2Node, "second");
         GMMValue jointGMM = computeJoint(gmm1, gmm2);
         
         org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(

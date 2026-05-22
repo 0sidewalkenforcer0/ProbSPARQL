@@ -13,7 +13,7 @@
  *   <li>{@link org.apache.jena.probsparql.functions.transformation.LinearTransform} - 
  *       Linear transformation: {@code prob:linearTransform(?gmm, ?a, ?b)}</li>
  *   <li>{@link org.apache.jena.probsparql.functions.transformation.Marginal} - 
- *       Marginal distribution: {@code prob:marginal(?gmm, ?dimension)}</li>
+ *       Marginal distribution: {@code prob:marginal(?dist, ?dimensionOrDimensions)}</li>
  *   <li>{@link org.apache.jena.probsparql.functions.transformation.Joint} - 
  *       Joint distribution: {@code prob:joint(?gmm1, ?gmm2)}</li>
  *   <li>{@link org.apache.jena.probsparql.functions.transformation.Convolve} - 

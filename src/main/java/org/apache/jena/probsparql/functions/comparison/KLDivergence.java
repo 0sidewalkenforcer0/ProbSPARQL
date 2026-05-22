@@ -1,13 +1,18 @@
 package org.apache.jena.probsparql.functions.comparison;
 
+import org.apache.jena.probsparql.datatypes.DirichletValue;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
+import org.apache.jena.probsparql.datatypes.Sampleable;
+import org.apache.jena.probsparql.functions.DistributionSupport;
 import org.apache.jena.probsparql.utils.MatrixUtils;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to compute the Kullback-Leibler (KL) divergence between two GMMs.
+ * SPARQL function to compute the Kullback-Leibler (KL) divergence between supported distributions.
  * 
  * <p>KL divergence measures how one probability distribution diverges from another.
  * It is asymmetric: D_KL(P||Q) ≠ D_KL(Q||P)</p>
@@ -16,17 +21,16 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * <pre>
  * PREFIX prob: &lt;http://probsparql.org/function#&gt;
  * SELECT ?divergence WHERE {
- *   ?var1 uq:hasDistribution ?gmm1 .
- *   ?var2 uq:hasDistribution ?gmm2 .
- *   BIND(prob:kldivergence(?gmm1, ?gmm2) AS ?divergence)
+ *   ?var1 uq:hasDistribution ?dist1 .
+ *   ?var2 uq:hasDistribution ?dist2 .
+ *   BIND(prob:kldivergence(?dist1, ?dist2) AS ?divergence)
  * }
  * </pre>
  * 
- * <p>For GMMs, we use Monte Carlo approximation:</p>
- * <pre>
- * D_KL(P||Q) ≈ (1/N) Σ(i=1 to N) [log(p(x_i)) - log(q(x_i))]
- * </pre>
- * where x_i ~ P (samples drawn from first GMM).
+ * <p>GMM uses the original Monte Carlo estimator. Same-grid Histogram uses exact
+ * discrete KL over cell masses. Dirichlet-Dirichlet uses the closed-form KL.
+ * Cross-type Sampleable distributions fall back to sampling from the first
+ * argument and evaluating both log densities.</p>
  * 
  * @author ProbSPARQL Team
  */
@@ -38,17 +42,38 @@ public class KLDivergence extends FunctionBase2 {
     private static final java.util.Random random = new java.util.Random(42); // Fixed seed for reproducibility
     
     /**
-     * Compute KL divergence D_KL(gmm1 || gmm2).
+     * Compute KL divergence D_KL(dist1 || dist2).
      * 
-     * @param gmm1Node First GMM (P in D_KL(P||Q))
-     * @param gmm2Node Second GMM (Q in D_KL(P||Q))
+     * @param dist1Node First distribution (P in D_KL(P||Q))
+     * @param dist2Node Second distribution (Q in D_KL(P||Q))
      * @return KL divergence value (non-negative)
      */
     @Override
-    public NodeValue exec(NodeValue gmm1Node, NodeValue gmm2Node) {
-        GMMValue gmm1 = extractGMM(gmm1Node, "first");
-        GMMValue gmm2 = extractGMM(gmm2Node, "second");
-        
+    public NodeValue exec(NodeValue dist1Node, NodeValue dist2Node) {
+        Object value1 = dist1Node.asNode().getLiteralValue();
+        Object value2 = dist2Node.asNode().getLiteralValue();
+
+        if (value1 instanceof HistogramValue hist1 && value2 instanceof HistogramValue hist2) {
+            return NodeValue.makeDouble(HistogramOperations.klDivergence(hist1, hist2));
+        }
+
+        if (value1 instanceof DirichletValue dir1 && value2 instanceof DirichletValue dir2) {
+            return NodeValue.makeDouble(dirichletKL(dir1, dir2));
+        }
+
+        if (value1 instanceof Sampleable sampleable1 && value2 instanceof Sampleable sampleable2
+                && !(value1 instanceof GMMValue && value2 instanceof GMMValue)) {
+            if (DistributionSupport.dimensions(sampleable1) != DistributionSupport.dimensions(sampleable2)) {
+                throw new IllegalArgumentException(
+                    "Distributions must have same dimensionality. Got d1="
+                        + DistributionSupport.dimensions(sampleable1)
+                        + ", d2=" + DistributionSupport.dimensions(sampleable2));
+            }
+            return NodeValue.makeDouble(sampleBasedKL(sampleable1, sampleable2, DEFAULT_SAMPLES));
+        }
+
+        GMMValue gmm1 = extractGMM(dist1Node, "first");
+        GMMValue gmm2 = extractGMM(dist2Node, "second");
         // Validate compatibility
         if (gmm1.getDimensions() != gmm2.getDimensions()) {
             throw new IllegalArgumentException(
@@ -102,6 +127,85 @@ public class KLDivergence extends FunctionBase2 {
         }
         
         return sum / numSamples;
+    }
+
+    private double sampleBasedKL(Sampleable p, Sampleable q, int numSamples) {
+        double[][] samples = p.sample(numSamples);
+        double sum = 0.0;
+        for (double[] sample : samples) {
+            double logP = p.logPdf(sample);
+            double logQ = q.logPdf(sample);
+            if (Double.isInfinite(logP)) {
+                continue;
+            }
+            if (Double.isInfinite(logQ)) {
+                return Double.POSITIVE_INFINITY;
+            }
+            sum += logP - logQ;
+        }
+        return Math.max(0.0, sum / numSamples);
+    }
+
+    private double dirichletKL(DirichletValue p, DirichletValue q) {
+        double[] alpha = p.getAlphas();
+        double[] beta = q.getAlphas();
+        if (alpha.length != beta.length) {
+            throw new IllegalArgumentException(
+                "Dirichlet dimensions must match. Got d1=" + alpha.length + ", d2=" + beta.length);
+        }
+        double alphaSum = p.getAlphasSum();
+        double betaSum = q.getAlphasSum();
+        double kl = logBeta(beta, betaSum) - logBeta(alpha, alphaSum);
+        double digammaAlphaSum = digamma(alphaSum);
+        for (int i = 0; i < alpha.length; i++) {
+            kl += (alpha[i] - beta[i]) * (digamma(alpha[i]) - digammaAlphaSum);
+        }
+        return Math.max(0.0, kl);
+    }
+
+    private double logBeta(double[] values, double sum) {
+        double out = 0.0;
+        for (double value : values) {
+            out += logGamma(value);
+        }
+        return out - logGamma(sum);
+    }
+
+    private double digamma(double x) {
+        double result = 0.0;
+        while (x < 7.0) {
+            result -= 1.0 / x;
+            x += 1.0;
+        }
+        double inv = 1.0 / x;
+        double inv2 = inv * inv;
+        return result + Math.log(x) - 0.5 * inv - inv2 * (1.0 / 12.0 - inv2 * (1.0 / 120.0 - inv2 / 252.0));
+    }
+
+    private double logGamma(double a) {
+        double[] c = {
+            0.99999999999999709182,
+            57.156235665862923517,
+            -59.597960355475491248,
+            14.136097974741747174,
+            -0.49191381609762019978,
+            0.33994649984811888699e-4,
+            0.46523628927048575665e-4,
+            -0.98374475304879564677e-4,
+            0.15808870322491248884e-3,
+            -0.21026444172410488319e-3,
+            0.21743961811521264320e-3,
+            -0.16431810653676389022e-3,
+            0.84418223983852743293e-4,
+            -0.26190838401581408670e-4,
+            0.36899182659531622704e-5
+        };
+        double x = c[0];
+        for (int i = 1; i < c.length; i++) {
+            x += c[i] / (a + i);
+        }
+        double t = a + 607.0 / 128.0 + 0.5;
+        return 0.5 * Math.log(2.0 * Math.PI) + (a + 0.5) * Math.log(t) - t + Math.log(x / a);
     }
     
     /**

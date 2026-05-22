@@ -2,18 +2,24 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to scale a GMM by a constant factor.
+ * SPARQL function to scale a GMM or Histogram by a constant factor.
  * 
- * <p>For Y = c * X where X ~ GMM, the result is:</p>
+ * <p>For Y = c * X where X is a GMM, the result is:</p>
  * <ul>
  *   <li>Means: μ_Y = c * μ_X</li>
  *   <li>Covariances: Σ_Y = c² * Σ_X</li>
  *   <li>Weights: unchanged</li>
  * </ul>
+ *
+ * <p>For a Histogram, the bin edges are scaled and the probability masses are
+ * preserved. Negative scales reverse the bin order consistently.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -31,17 +37,26 @@ public class Scale extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#scale";
     
     /**
-     * Scale a GMM by a constant factor.
+     * Scale a GMM or Histogram by a constant factor.
      * 
-     * @param gmmNode NodeValue containing GMM literal
+     * @param distNode NodeValue containing a GMM or Histogram literal
      * @param scaleNode NodeValue containing scale factor (numeric)
-     * @return Scaled GMM as a new GMM literal
+     * @return Scaled distribution literal of the same datatype
      */
     @Override
-    public NodeValue exec(NodeValue gmmNode, NodeValue scaleNode) {
-        GMMValue gmm = extractGMM(gmmNode);
+    public NodeValue exec(NodeValue distNode, NodeValue scaleNode) {
         double scaleFactor = extractScaleFactor(scaleNode);
-        
+
+        Object value = distNode.asNode().getLiteralValue();
+        if (value instanceof HistogramValue histogram) {
+            HistogramValue scaled = HistogramOperations.affine(histogram, scaleFactor, 0.0);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                scaled.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm = extractGMM(distNode);
         GMMValue scaledGMM = scaleGMM(gmm, scaleFactor);
         
         org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(

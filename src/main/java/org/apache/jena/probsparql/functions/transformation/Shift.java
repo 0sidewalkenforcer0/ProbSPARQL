@@ -2,18 +2,24 @@ package org.apache.jena.probsparql.functions.transformation;
 
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
+import org.apache.jena.probsparql.datatypes.HistogramDatatype;
+import org.apache.jena.probsparql.datatypes.HistogramOperations;
+import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
 /**
- * SPARQL function to shift a GMM by a constant offset.
+ * SPARQL function to shift a GMM or Histogram by a constant offset.
  * 
- * <p>For Y = X + b where X ~ GMM, the result is:</p>
+ * <p>For Y = X + b where X is a GMM, the result is:</p>
  * <ul>
  *   <li>Means: μ_Y = μ_X + b</li>
  *   <li>Covariances: Σ_Y = Σ_X (unchanged)</li>
  *   <li>Weights: unchanged</li>
  * </ul>
+ *
+ * <p>For a Histogram, the bin edges are shifted and the probability masses are
+ * preserved.</p>
  * 
  * <p>Usage in SPARQL:</p>
  * <pre>
@@ -31,17 +37,26 @@ public class Shift extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#shift";
     
     /**
-     * Shift a GMM by a constant offset.
+     * Shift a GMM or Histogram by a constant offset.
      * 
-     * @param gmmNode NodeValue containing GMM literal
+     * @param distNode NodeValue containing a GMM or Histogram literal
      * @param offsetNode NodeValue containing shift offset (numeric)
-     * @return Shifted GMM as a new GMM literal
+     * @return Shifted distribution literal of the same datatype
      */
     @Override
-    public NodeValue exec(NodeValue gmmNode, NodeValue offsetNode) {
-        GMMValue gmm = extractGMM(gmmNode);
+    public NodeValue exec(NodeValue distNode, NodeValue offsetNode) {
         double offset = extractOffset(offsetNode);
-        
+
+        Object value = distNode.asNode().getLiteralValue();
+        if (value instanceof HistogramValue histogram) {
+            HistogramValue shifted = HistogramOperations.affine(histogram, 1.0, offset);
+            org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
+                shifted.toString(), HistogramDatatype.INSTANCE
+            );
+            return NodeValue.makeNode(node);
+        }
+
+        GMMValue gmm = extractGMM(distNode);
         GMMValue shiftedGMM = shiftGMM(gmm, offset);
         
         org.apache.jena.graph.Node node = org.apache.jena.graph.NodeFactory.createLiteralDT(
