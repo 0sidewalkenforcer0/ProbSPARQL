@@ -49,6 +49,18 @@ class HistogramDatatypeTest {
         throw new AssertionError("Expected DatatypeFormatException for mismatched weight length");
     }
 
+    @Test
+    void testTinyNegativeRoundingResidualIsClamped() {
+        String json = """
+            {"dimensions":1,"edges":[[0.0,1.0,2.0,3.0]],"weights":[0.500001,0.5,-0.000001]}
+            """;
+
+        HistogramValue histogram = (HistogramValue) HistogramDatatype.INSTANCE.parse(json);
+
+        assertEquals(1, histogram.getDimensions());
+        assertArrayEquals(new double[]{0.5000005, 0.4999995, 0.0}, histogram.getWeights(), 1e-7);
+    }
+
     private HistogramValue parse2DHistogram() {
         String json = """
             {"dimensions":2,"edges":[[0.0,1.0,2.0],[0.0,10.0,20.0]],"weights":[0.1,0.2,0.3,0.4]}

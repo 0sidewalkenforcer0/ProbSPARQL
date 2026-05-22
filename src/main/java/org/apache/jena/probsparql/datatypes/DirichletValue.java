@@ -296,7 +296,7 @@ public class DirichletValue implements Sampleable {
             return Math.log(Math.PI / Math.sin(Math.PI * a)) - logGamma(1.0 - a);
         }
         double x = a - 1.0;
-        double t = x + 14.5;  // g + 0.5
+        double t = x + 607.0 / 128.0 + 0.5;
         double s = c[0];
         for (int i = 1; i < c.length; i++) s += c[i] / (x + i);
         return 0.5 * Math.log(2.0 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(s);
@@ -337,11 +337,17 @@ public class DirichletValue implements Sampleable {
         if (x >= 1.0) return 1.0;
         // Use symmetry relation for better convergence
         if (x > (a + 1.0) / (a + b + 2.0)) {
-            return 1.0 - regularizedIncompleteBeta(1.0 - x, b, a);
+            return clampProbability(1.0 - regularizedIncompleteBeta(1.0 - x, b, a));
         }
         double lbeta = logGamma(a) + logGamma(b) - logGamma(a + b);
         double front = Math.exp(a * Math.log(x) + b * Math.log(1.0 - x) - lbeta) / a;
-        return front * betaContinuedFraction(x, a, b);
+        return clampProbability(front * betaContinuedFraction(x, a, b));
+    }
+
+    private static double clampProbability(double value) {
+        if (value < 0.0) return 0.0;
+        if (value > 1.0) return 1.0;
+        return value;
     }
 
     /** Lentz's continued-fraction expansion for the regularized incomplete Beta. */

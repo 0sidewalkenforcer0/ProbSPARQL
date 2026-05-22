@@ -30,6 +30,7 @@ public class HistogramDatatype extends BaseDatatype {
 
     private static final String[] REQUIRED_FIELDS_NEW = {"dimensions", "edges", "weights"};
     private static final String[] REQUIRED_FIELDS_OLD = {"bins", "weights"};
+    private static final double WEIGHT_EPSILON = 1e-5;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -202,15 +203,23 @@ public class HistogramDatatype extends BaseDatatype {
                     "weights[" + i + "] must be numeric");
             }
             weights[i] = elem.asDouble();
-            if (weights[i] < 0.0) {
+            if (weights[i] < -WEIGHT_EPSILON) {
                 throw new DatatypeFormatException(lexicalForm, this,
                     "weights[" + i + "] must be non-negative");
             }
+            if (weights[i] < 0.0) {
+                weights[i] = 0.0;
+            }
             sum += weights[i];
         }
-        if (Math.abs(sum - 1.0) > 1e-6) {
+        if (Math.abs(sum - 1.0) > WEIGHT_EPSILON) {
             throw new DatatypeFormatException(lexicalForm, this,
                 "weights must sum to 1.0 within tolerance; got: " + sum);
+        }
+        if (sum != 1.0) {
+            for (int i = 0; i < weights.length; i++) {
+                weights[i] /= sum;
+            }
         }
         return weights;
     }
