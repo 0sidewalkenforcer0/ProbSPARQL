@@ -17,6 +17,7 @@ target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
+.m2-local/
 
 # Logs
 *.log

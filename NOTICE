@@ -1,0 +1,17 @@
+ProbSPARQL
+Copyright 2026 The ProbSPARQL Authors
+
+This software accompanies the paper:
+
+ProbSPARQL: Querying Knowledge Graphs with Multi-dimensional, Uncertain Numeric Data
+
+Authors:
+Jingcheng Wu, Ratan Bahadur Thapa, Daniel Hernandez, Hongkuan Zhou, and Steffen Staab
+
+Affiliations:
+Institute for Artificial Intelligence, University of Stuttgart, Germany
+Bosch Corporate Research, Renningen, Germany
+Web and Internet Science Research Group, University of Southampton, United Kingdom
+
+This project includes a modified Apache Jena source tree under jena/.
+See jena/LICENSE and jena/NOTICE for Apache Jena licensing and attribution notices.

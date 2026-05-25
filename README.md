@@ -1,5 +1,12 @@
 # ProbSPARQL: Querying Knowledge Graphs with Multi-dimensional, Uncertain Numeric Data
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+![Java](https://img.shields.io/badge/Java-21%2B-orange.svg)
+![Maven](https://img.shields.io/badge/Maven-3.6%2B-blue.svg)
+![SPARQL](https://img.shields.io/badge/SPARQL-1.1-green.svg)
+![Apache Jena](https://img.shields.io/badge/Apache%20Jena-6.0.0--SNAPSHOT-red.svg)
+![Status](https://img.shields.io/badge/status-research%20prototype-yellow.svg)
+
 **Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals**
 
 ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data with distribution-valued literals. The current prototype supports Gaussian mixture models (GMMs), multidimensional histograms, and Dirichlet distributions, with polymorphic numerical comparison through `prob:jsd`.
@@ -466,4 +473,4 @@ mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuse
 
 ## License
 
-Apache License 2.0
+This project is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
