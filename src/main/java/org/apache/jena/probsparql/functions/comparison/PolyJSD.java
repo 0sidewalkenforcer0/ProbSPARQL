@@ -121,7 +121,7 @@ public class PolyJSD extends FunctionBase2 {
         // return a different realisation of the same quantity.
         GMMValue first = p;
         GMMValue second = q;
-        if (!inCanonicalOrder(p, q)) {
+        if (!DistributionSeeds.inCanonicalOrder(p, q)) {
             first = q;
             second = p;
         }
@@ -148,18 +148,6 @@ public class PolyJSD extends FunctionBase2 {
         return sum / n;
     }
 
-    /**
-     * Deterministic total order on GMM operands, so symmetric estimators can be made
-     * order-independent. Falls back to the serialised form on hash collision.
-     */
-    private static boolean inCanonicalOrder(GMMValue p, GMMValue q) {
-        int h1 = p.hashCode();
-        int h2 = q.hashCode();
-        if (h1 != h2) {
-            return h1 <= h2;
-        }
-        return p.toJSON().compareTo(q.toJSON()) <= 0;
-    }
 
     // -----------------------------------------------------------------------
     // Universal sample-based JSD fallback
@@ -176,12 +164,24 @@ public class PolyJSD extends FunctionBase2 {
      * </ol>
      */
     public static double sampleBasedJSD(Sampleable s1, Sampleable s2, int n) {
+        // JSD is symmetric, and 0.5*KL(s1||M) + 0.5*KL(s2||M) is symmetric in the two
+        // operands, but they consume the shared random stream in argument order. Fixing
+        // that order makes the estimate itself order-independent, not merely unbiased.
+        if (!DistributionSeeds.inCanonicalOrder(s1, s2)) {
+            Sampleable swap = s1;
+            s1 = s2;
+            s2 = swap;
+        }
         return sampleBasedJSD(s1, s2, n, DistributionSeeds.rngForPair(s1, s2));
     }
 
     /**
      * As {@link #sampleBasedJSD(Sampleable, Sampleable, int)}, with an explicit random
      * source so the estimate is reproducible.
+     *
+     * <p>This overload samples {@code s1} before {@code s2}, so a caller that needs
+     * {@code f(a,b) == f(b,a)} must fix the operand order itself; the single-argument
+     * form above does that via {@link DistributionSeeds#inCanonicalOrder}.</p>
      */
     public static double sampleBasedJSD(Sampleable s1, Sampleable s2, int n, java.util.Random rng) {
         int half = n / 2;

@@ -262,7 +262,7 @@ public class SimilarityEvaluator {
     private double computeMC(GMMValue p, GMMValue q, int numSamples) {
         GMMValue first = p;
         GMMValue second = q;
-        if (!inCanonicalOrder(p, q)) {
+        if (!org.apache.jena.probsparql.functions.DistributionSeeds.inCanonicalOrder(p, q)) {
             first = q;
             second = p;
         }
@@ -274,19 +274,6 @@ public class SimilarityEvaluator {
         return 0.5 * klFirstM + 0.5 * klSecondM;
     }
 
-    /**
-     * Total order on operands used to make symmetric estimators order-independent.
-     * Falls back to the serialised form when hash codes collide so the ordering is
-     * still deterministic.
-     */
-    private static boolean inCanonicalOrder(GMMValue p, GMMValue q) {
-        int h1 = p.hashCode();
-        int h2 = q.hashCode();
-        if (h1 != h2) {
-            return h1 <= h2;
-        }
-        return p.toJSON().compareTo(q.toJSON()) <= 0;
-    }
 
     private GMMValue createMixture(GMMValue p, GMMValue q) {
         return GMMMixture.equalWeight(p, q);

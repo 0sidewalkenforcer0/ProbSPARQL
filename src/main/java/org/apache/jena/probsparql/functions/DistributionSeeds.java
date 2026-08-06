@@ -58,6 +58,30 @@ public final class DistributionSeeds {
     }
 
     /**
+     * Deterministic total order on two operands of a symmetric function.
+     *
+     * <p>An order-independent seed is not by itself enough to make a symmetric
+     * estimator symmetric: the operands still consume the shared random stream in call
+     * order, so swapping the arguments would draw different samples and return a
+     * different realisation of the same quantity. Estimators therefore put their
+     * operands in this order before sampling, which makes {@code f(a,b)} and
+     * {@code f(b,a)} bit-identical.</p>
+     *
+     * <p>Hash codes decide the common case; the serialised forms break ties so the
+     * order stays total and stable even on collision.</p>
+     *
+     * @return true if {@code left} should be processed first
+     */
+    public static boolean inCanonicalOrder(Object left, Object right) {
+        int h1 = left == null ? 0 : left.hashCode();
+        int h2 = right == null ? 0 : right.hashCode();
+        if (h1 != h2) {
+            return h1 <= h2;
+        }
+        return String.valueOf(left).compareTo(String.valueOf(right)) <= 0;
+    }
+
+    /**
      * A fresh RNG seeded by {@link #forOrderedPair}.
      */
     public static Random rngForOrderedPair(Object first, Object second) {
