@@ -80,7 +80,7 @@ class BoundsSoundnessTest {
     }
 
     @Test
-    void inconclusiveBoundIsRefinedRatherThanReturnedAsAnEstimate() {
+    void inconclusiveBoundIsRefinedOnTheDecisionPath() {
         System.setProperty("probsparql.mode", JSDivergenceConfig.MODE_V4_BOUNDS);
 
         // Identical distributions: the bound is 0, which cannot settle a decision.
@@ -91,8 +91,59 @@ class BoundsSoundnessTest {
             new SimilarityEvaluator(0.3, 0.05, 0.05).evaluateWithDetails(p, q);
 
         assertEquals(SimilarityEvaluator.Pathway.BOUNDS_REFINED, result.pathway(),
-            "An inconclusive bound must be refined by sampling");
+            "An inconclusive bound must be refined by sampling before it can be thresholded");
         assertTrue(result.samplesUsed() > 0, "Refinement must report the samples it consumed");
+    }
+
+    @Test
+    void scoringUsageReportsTheBoundWithoutRefining() {
+        // fn:jsdMode measures each estimator as-is, so V4 must report its bound and
+        // consume no samples even when the bound cannot settle a decision. This is what
+        // keeps the published Exp3 V4 accuracy and latency figures reproducible.
+        GMMValue p = gaussian1D(0.0, 1.0);
+        GMMValue q = gaussian1D(0.0, 1.0);
+
+        SimilarityEvaluator.EvaluationResult scored = SimilarityEvaluator
+            .forScoring(JSDivergenceConfig.MODE_V4_BOUNDS, 0.3, 0.05, 0.05)
+            .evaluateWithDetails(p, q);
+
+        assertEquals(SimilarityEvaluator.Pathway.BOUNDS, scored.pathway());
+        assertEquals(0, scored.samplesUsed(), "Scoring V4 must not sample");
+    }
+
+    @Test
+    void scoringAndDecisionAgreeWhenTheBoundIsConclusive() {
+        // The two intents may only diverge where the bound is inconclusive.
+        GMMValue p = gaussian1D(0.0, 1.0);
+        GMMValue q = gaussian1D(50.0, 1.0);
+
+        SimilarityEvaluator.EvaluationResult scored = SimilarityEvaluator
+            .forScoring(JSDivergenceConfig.MODE_V4_BOUNDS, 0.05, 0.05, 0.05)
+            .evaluateWithDetails(p, q);
+        SimilarityEvaluator.EvaluationResult decided =
+            new SimilarityEvaluator(JSDivergenceConfig.MODE_V4_BOUNDS, 0.05, 0.05, 0.05)
+                .evaluateWithDetails(p, q);
+
+        assertEquals(SimilarityEvaluator.Pathway.BOUNDS, scored.pathway());
+        assertEquals(SimilarityEvaluator.Pathway.BOUNDS, decided.pathway());
+        assertEquals(scored.score(), decided.score(), 0.0);
+    }
+
+    @Test
+    void otherModesAreUnaffectedByUsage() {
+        // Only V4 distinguishes the two intents; every other mode returns a genuine
+        // estimate, so scoring and decision must coincide exactly.
+        GMMValue p = gaussian1D(0.0, 1.0);
+        GMMValue q = gaussian1D(1.0, 2.0);
+
+        for (String mode : new String[]{JSDivergenceConfig.MODE_V1_MC,
+                                        JSDivergenceConfig.MODE_V2_STRATIFIED,
+                                        JSDivergenceConfig.MODE_V3_SPRT,
+                                        JSDivergenceConfig.MODE_V5_ADAPTIVE}) {
+            double scored = SimilarityEvaluator.forScoring(mode, 0.3, 0.05, 0.05).evaluate(p, q);
+            double decided = new SimilarityEvaluator(mode, 0.3, 0.05, 0.05).evaluate(p, q);
+            assertEquals(scored, decided, 0.0, "Usage must not change mode " + mode);
+        }
     }
 
     @Test

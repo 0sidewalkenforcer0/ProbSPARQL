@@ -18,6 +18,22 @@ import java.util.Map;
  * <p>The benchmark sends mode-specific SPARQL queries to remote Fuseki services
  * and computes accuracy against reference JSD values embedded in the remote
  * Exp3 datasets as {@code prob:referenceJSD}.</p>
+ *
+ * <p><strong>What the V4_BOUNDS column measures.</strong> Estimates come from
+ * {@code fn:jsdMode}, which reports each mode's own estimator verbatim
+ * ({@link org.apache.jena.probsparql.functions.comparison.SimilarityEvaluator.Usage#SCORING}).
+ * Under V4 that estimator is a guaranteed <em>lower bound</em> on JSD rather than an
+ * estimate of it, and this benchmark derives classification labels by thresholding it
+ * at {@code THETA}. Thresholding a lower bound can only ever retain pairs, never drop
+ * them, so the V4 column reports recall-preserving behaviour with a precision cost that
+ * grows as the bound loosens.</p>
+ *
+ * <p>The bound is tight for the 1-D mixtures this experiment generates
+ * ({@code generate_exp3.py} emits {@code "dimensions": 1}), where 32-bin discretization
+ * loses very little, so the measured precision cost is negligible there. It is not
+ * tight in higher dimensions, where per-axis binning cannot see cross-dimension
+ * structure. A DIVJOIN query does not have this exposure: the join decision path uses
+ * {@code Usage.DECISION} and refines whenever the bound cannot settle the comparison.</p>
  */
 public class Exp3Benchmark {
 

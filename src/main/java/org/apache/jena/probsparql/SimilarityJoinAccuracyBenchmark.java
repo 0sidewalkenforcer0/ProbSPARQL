@@ -10,6 +10,7 @@ import org.apache.jena.sparql.engine.QueryEngineProbabilistic;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.BindingFactory;
 import org.apache.jena.probsparql.functions.comparison.JSDivergenceConfig;
+import org.apache.jena.probsparql.functions.comparison.SimilarityEvaluator;
 import org.apache.jena.probsparql.datatypes.GMMDatatype;
 import org.apache.jena.probsparql.datatypes.GMMValue;
 
@@ -149,27 +150,26 @@ public class SimilarityJoinAccuracyBenchmark {
         return jsds;
     }
     
+    /**
+     * Evaluate the pair with the estimator that {@code mode} actually names.
+     *
+     * <p>Every branch of this method previously delegated to the same
+     * {@code StratifiedSampler(42)} at 5000 samples, so the mode argument had no
+     * effect and V1 through V5 produced bit-identical accuracy figures. It now
+     * dispatches through {@link SimilarityEvaluator} exactly as
+     * {@code Exp3Benchmark} does via {@code fn:jsdMode}, so the two agree.</p>
+     *
+     * <p>{@link SimilarityEvaluator.Usage#SCORING} is used because this benchmark
+     * measures the estimators themselves: under V4 the reported value is the analytic
+     * lower bound, which is the quantity whose error we want to characterise.</p>
+     */
     private static double computeJSD(GMMValue g1, GMMValue g2, String mode) {
-        switch (mode) {
-            case "GT_10K":
-                return computeWithSampler(g1, g2, 10000);
-            case "V1_MC":
-                return computeWithSampler(g1, g2, 5000);
-            case "V2_STRATIFIED":
-                return computeWithSampler(g1, g2, 5000);
-            case "V3_SPRT":
-            case "V4_BOUNDS":
-            case "V5_ADAPTIVE":
-                return computeWithSampler(g1, g2, 5000);
-            default:
-                return computeWithSampler(g1, g2, 5000);
-        }
-    }
-    
-    private static double computeWithSampler(GMMValue g1, GMMValue g2, int samples) {
-        org.apache.jena.probsparql.functions.comparison.StratifiedSampler sampler = 
-            new org.apache.jena.probsparql.functions.comparison.StratifiedSampler(42);
-        return sampler.computeJSD(g1, g2, samples);
+        return SimilarityEvaluator.forScoring(
+                mode,
+                JSDivergenceConfig.SPRT_EPSILON,
+                JSDivergenceConfig.SPRT_ALPHA,
+                JSDivergenceConfig.SPRT_BETA)
+            .evaluate(g1, g2);
     }
 
     private static double[] computeAccuracyAgainst(List<Double> est, List<Double> ref) {
