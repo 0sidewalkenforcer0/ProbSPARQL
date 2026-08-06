@@ -1,5 +1,8 @@
 package org.apache.jena.probsparql.functions;
 
+import org.apache.jena.probsparql.datatypes.DirichletValue;
+import org.apache.jena.probsparql.datatypes.GMMValue;
+
 import java.util.Random;
 
 /**
@@ -67,8 +70,13 @@ public final class DistributionSeeds {
      * operands in this order before sampling, which makes {@code f(a,b)} and
      * {@code f(b,a)} bit-identical.</p>
      *
-     * <p>Hash codes decide the common case; the serialised forms break ties so the
-     * order stays total and stable even on collision.</p>
+     * <p>For that to hold the relation must be antisymmetric on distinct operands:
+     * if both {@code inCanonicalOrder(a,b)} and {@code inCanonicalOrder(b,a)} were
+     * true, neither call would swap and the operand order would again follow the
+     * argument order. Hash codes decide the common case; on collision the tie is
+     * broken by {@link #orderingKey}, which returns a <em>complete</em> lexical form.
+     * A tie there therefore means the operands carry identical content, in which case
+     * the two orders produce identical results and either answer is correct.</p>
      *
      * @return true if {@code left} should be processed first
      */
@@ -78,7 +86,32 @@ public final class DistributionSeeds {
         if (h1 != h2) {
             return h1 <= h2;
         }
-        return String.valueOf(left).compareTo(String.valueOf(right)) <= 0;
+        return orderingKey(left).compareTo(orderingKey(right)) <= 0;
+    }
+
+    /**
+     * Tie-breaking key for {@link #inCanonicalOrder}.
+     *
+     * <p>Must distinguish any two operands that are not interchangeable, so it uses
+     * each distribution's full serialised form rather than {@code toString()}.
+     * {@code GMMValue.toString()} in particular is an abbreviated summary — it reports
+     * only the component count, dimensionality and covariance type — so two entirely
+     * different mixtures share it, and using it here would collapse the tie-break for
+     * every colliding GMM pair.</p>
+     *
+     * <p>A type reaching the fallback must have a {@code toString()} that is both
+     * complete and stable across JVM runs; an identity-hash default would make the
+     * ordering vary between runs and defeat the reproducibility this exists for.</p>
+     */
+    private static String orderingKey(Object value) {
+        if (value instanceof GMMValue gmm) {
+            return gmm.toJSON();
+        }
+        if (value instanceof DirichletValue dirichlet) {
+            return dirichlet.toJSON();
+        }
+        // HistogramValue.toString() is its complete JSON lexical form.
+        return String.valueOf(value);
     }
 
     /**

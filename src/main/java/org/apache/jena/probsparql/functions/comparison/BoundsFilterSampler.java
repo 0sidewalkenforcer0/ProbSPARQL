@@ -220,36 +220,59 @@ public class BoundsFilterSampler {
         if (d != g2.getDimensions()) {
             return 0.0;
         }
+        // GMMValue's accessors return defensive deep copies, so the parameters are
+        // snapshotted once here rather than per axis: this method sits on the V4/V5
+        // per-pair filter path, where a copy per axis would dominate its cost.
+        Params p1 = new Params(g1);
+        Params p2 = new Params(g2);
+
         double best = 0.0;
         for (int axis = 0; axis < d; axis++) {
-            best = Math.max(best, axisDiscretizedJSD(g1, g2, axis, numBins));
+            best = Math.max(best, axisDiscretizedJSD(p1, p2, axis, numBins));
         }
         return Math.max(0.0, Math.min(best, Math.log(2.0)));
     }
 
     /**
+     * One GMM's parameters, read out of the value object exactly once.
+     */
+    private static final class Params {
+        final double[] weights;
+        final double[][] means;
+        final double[][][] covariances;
+        final String covarianceType;
+        final int components;
+
+        Params(GMMValue gmm) {
+            this.weights = gmm.getWeights();
+            this.means = gmm.getMeans();
+            this.covariances = gmm.getCovariances();
+            this.covarianceType = gmm.getCovarianceType();
+            this.components = gmm.getNComponents();
+        }
+
+        /** Standard deviation of this component's marginal along {@code axis}. */
+        double sigma(int component, int axis) {
+            return Math.sqrt(marginalVariance(covariances[component], covarianceType, axis));
+        }
+    }
+
+    /**
      * DPI lower bound obtained by binning a single coordinate axis.
      */
-    private double axisDiscretizedJSD(GMMValue g1, GMMValue g2, int axis, int numBins) {
+    private double axisDiscretizedJSD(Params g1, Params g2, int axis, int numBins) {
         double lo = Double.POSITIVE_INFINITY;
         double hi = Double.NEGATIVE_INFINITY;
 
-        double[][] means1 = g1.getMeans();
-        double[][][] covs1 = g1.getCovariances();
-        String type1 = g1.getCovarianceType();
-        for (int i = 0; i < g1.getNComponents(); i++) {
-            double mu  = means1[i][axis];
-            double sig = Math.sqrt(marginalVariance(covs1[i], type1, axis));
+        for (int i = 0; i < g1.components; i++) {
+            double mu = g1.means[i][axis];
+            double sig = g1.sigma(i, axis);
             lo = Math.min(lo, mu - 4.0 * sig);
             hi = Math.max(hi, mu + 4.0 * sig);
         }
-
-        double[][] means2 = g2.getMeans();
-        double[][][] covs2 = g2.getCovariances();
-        String type2 = g2.getCovarianceType();
-        for (int i = 0; i < g2.getNComponents(); i++) {
-            double mu  = means2[i][axis];
-            double sig = Math.sqrt(marginalVariance(covs2[i], type2, axis));
+        for (int i = 0; i < g2.components; i++) {
+            double mu = g2.means[i][axis];
+            double sig = g2.sigma(i, axis);
             lo = Math.min(lo, mu - 4.0 * sig);
             hi = Math.max(hi, mu + 4.0 * sig);
         }
@@ -301,17 +324,13 @@ public class BoundsFilterSampler {
      * the cells partition the real line the masses already sum to 1, so no
      * renormalization is applied.</p>
      */
-    private double[] axisBinMass(GMMValue gmm, int axis, double[] edges, int numBins) {
-        double[] mass    = new double[numBins + 2];
-        double[] weights = gmm.getWeights();
-        double[][] means = gmm.getMeans();
-        double[][][] covs = gmm.getCovariances();
-        String covType = gmm.getCovarianceType();
+    private double[] axisBinMass(Params gmm, int axis, double[] edges, int numBins) {
+        double[] mass = new double[numBins + 2];
 
-        for (int k = 0; k < gmm.getNComponents(); k++) {
-            double mu  = means[k][axis];
-            double sig = Math.sqrt(marginalVariance(covs[k], covType, axis));
-            double w   = weights[k];
+        for (int k = 0; k < gmm.components; k++) {
+            double mu  = gmm.means[k][axis];
+            double sig = gmm.sigma(k, axis);
+            double w   = gmm.weights[k];
             double prev = normCDF(edges[0], mu, sig);
             mass[0] += w * prev;                       // underflow cell (-inf, lo)
             for (int b = 0; b < numBins; b++) {

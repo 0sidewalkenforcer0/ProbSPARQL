@@ -302,6 +302,18 @@ public class PolyJSD extends FunctionBase2 {
                 && dirichlet.equals(other.dirichlet);
         }
 
+        /**
+         * Complete and run-stable, because
+         * {@link org.apache.jena.probsparql.functions.DistributionSeeds#inCanonicalOrder}
+         * falls back to this form to break hash ties. The inherited identity-hash
+         * default would vary between JVM runs and make the operand ordering — and
+         * therefore the estimate — irreproducible.
+         */
+        @Override
+        public String toString() {
+            return "DirichletMarginal{dim=" + dim + ", " + dirichlet.toJSON() + "}";
+        }
+
         @Override
         public double logPdf(double[] x) {
             if (x.length != 1) {
