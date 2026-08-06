@@ -137,8 +137,12 @@ public class SimilarityJoinAccuracyBenchmark {
                 try {
                     double val = computeJSD(g1, g2, mode);
                     jsds.add(val);
-                } catch (Exception e) {
-                    jsds.add(0.0);
+                } catch (RuntimeException e) {
+                    // Skip rather than record 0.0: substituting a value would inject a
+                    // fabricated "identical distributions" data point into the series and
+                    // bias every accuracy statistic computed from it.
+                    System.err.println("  [WARN] SimilarityJoinAccuracyBenchmark: skipping a pair whose JSD "
+                        + "could not be computed: " + e);
                 }
             }
         }

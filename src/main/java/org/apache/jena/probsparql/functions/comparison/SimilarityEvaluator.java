@@ -19,11 +19,23 @@ import java.util.Random;
  */
 public class SimilarityEvaluator {
 
+    /**
+     * When true, V4 reports the raw DPI lower bound even when it cannot settle the
+     * decision, reproducing the historical bound-only baseline. Off by default
+     * because an inconclusive lower bound used as a decision yields systematic
+     * false positives. Enable with {@code -Dprobsparql.v4.boundsOnly=true}.
+     */
+    private static final boolean BOUNDS_ONLY =
+        Boolean.getBoolean("probsparql.v4.boundsOnly");
+
     public enum Pathway {
         MC,
         STRATIFIED,
         SPRT,
+        /** V4 decided by the analytic bound alone (conclusive reject, or bound-only mode). */
         BOUNDS,
+        /** V4 bound was inconclusive, so the pair was refined by Monte Carlo. */
+        BOUNDS_REFINED,
         ADAPTIVE_BOUNDS,
         ADAPTIVE_SPRT,
         ADAPTIVE_STRATIFIED
@@ -149,7 +161,17 @@ public class SimilarityEvaluator {
             }
             case JSDivergenceConfig.MODE_V4_BOUNDS -> {
                 double[] result = boundsSampler.computeJSDWithFilter(gmm1, gmm2, JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES);
-                yield new EvaluationResult(result[0], (int) result[1], Pathway.BOUNDS);
+                boolean conclusive = result[BoundsFilterSampler.FILTER_CONCLUSIVE] > 0.5;
+                if (conclusive || BOUNDS_ONLY) {
+                    // Conclusive reject, or the legacy bound-only baseline was requested.
+                    yield new EvaluationResult(result[BoundsFilterSampler.FILTER_BOUND],
+                        (int) result[BoundsFilterSampler.FILTER_SAMPLES], Pathway.BOUNDS);
+                }
+                // The bound could not settle the decision: a lower bound below the
+                // threshold carries no information about the true JSD, so refine.
+                yield new EvaluationResult(
+                    computeMC(gmm1, gmm2, JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES),
+                    JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES, Pathway.BOUNDS_REFINED);
             }
             case JSDivergenceConfig.MODE_V5_ADAPTIVE -> {
                 double[] result = adaptiveSampler.computeJSDAdaptive(gmm1, gmm2, JSDivergenceConfig.V5_ADAPTIVE_MAX_SAMPLES);
@@ -178,67 +200,46 @@ public class SimilarityEvaluator {
         }
     }
 
+    /**
+     * Monte Carlo JSD estimate.
+     *
+     * <p>JSD is symmetric, so the estimate must be too. {@link #pairSeed} is already
+     * order-independent, but the two operands consume the shared RNG stream in call
+     * order, so swapping the arguments would otherwise yield a different realisation
+     * of the estimate. The operands are therefore put in a canonical order before
+     * sampling, making {@code computeMC(p,q)} and {@code computeMC(q,p)} bit-identical.</p>
+     */
     private double computeMC(GMMValue p, GMMValue q, int numSamples) {
-        Random rng = new Random(pairSeed(p, q));
-        GMMValue m = createMixture(p, q);
-        double klPM = computeKLDivergence(p, m, numSamples / 2, rng);
-        double klQM = computeKLDivergence(q, m, numSamples / 2, rng);
-        return 0.5 * klPM + 0.5 * klQM;
+        GMMValue first = p;
+        GMMValue second = q;
+        if (!inCanonicalOrder(p, q)) {
+            first = q;
+            second = p;
+        }
+        Random rng = new Random(pairSeed(first, second));
+        GMMValue m = createMixture(first, second);
+        int half = numSamples / 2;
+        double klFirstM = computeKLDivergence(first, m, half, rng);
+        double klSecondM = computeKLDivergence(second, m, half, rng);
+        return 0.5 * klFirstM + 0.5 * klSecondM;
+    }
+
+    /**
+     * Total order on operands used to make symmetric estimators order-independent.
+     * Falls back to the serialised form when hash codes collide so the ordering is
+     * still deterministic.
+     */
+    private static boolean inCanonicalOrder(GMMValue p, GMMValue q) {
+        int h1 = p.hashCode();
+        int h2 = q.hashCode();
+        if (h1 != h2) {
+            return h1 <= h2;
+        }
+        return p.toJSON().compareTo(q.toJSON()) <= 0;
     }
 
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getNComponents();
-        int kQ = q.getNComponents();
-        int kM = kP + kQ;
-        int d = p.getDimensions();
-
-        double[] weightsP = p.getWeights();
-        double[] weightsQ = q.getWeights();
-        double[][] meansP = p.getMeans();
-        double[][] meansQ = q.getMeans();
-        double[][][] covariancesP = p.getCovariances();
-        double[][][] covariancesQ = q.getCovariances();
-        String covType = p.getCovarianceType();
-
-        double[] weightsM = new double[kM];
-        double[][] meansM = new double[kM][d];
-        double[][][] covariancesM = new double[kM][][];
-
-        for (int k = 0; k < kP; k++) {
-            weightsM[k] = 0.5 * weightsP[k];
-            meansM[k] = meansP[k].clone();
-            covariancesM[k] = cloneCovariance(covariancesP[k], covType);
-        }
-
-        for (int k = 0; k < kQ; k++) {
-            weightsM[kP + k] = 0.5 * weightsQ[k];
-            meansM[kP + k] = meansQ[k].clone();
-            covariancesM[kP + k] = cloneCovariance(covariancesQ[k], covType);
-        }
-
-        return new GMMValue(kM, d, covType, weightsM, meansM, covariancesM);
-    }
-
-    private double[][] cloneCovariance(double[][] cov, String covType) {
-        return switch (covType) {
-            case "full" -> {
-                int d = cov.length;
-                double[][] fullCopy = new double[d][d];
-                for (int i = 0; i < d; i++) {
-                    for (int j = 0; j < d; j++) {
-                        fullCopy[i][j] = cov[i][j];
-                    }
-                }
-                yield fullCopy;
-            }
-            case "diag" -> {
-                double[][] diagCopy = new double[1][cov[0].length];
-                System.arraycopy(cov[0], 0, diagCopy[0], 0, cov[0].length);
-                yield diagCopy;
-            }
-            case "spherical" -> new double[][] {{cov[0][0]}};
-            default -> throw new IllegalStateException("Unknown covariance type: " + covType);
-        };
+        return GMMMixture.equalWeight(p, q);
     }
 
     private double computeKLDivergence(GMMValue p, GMMValue q, int numSamples, Random rng) {

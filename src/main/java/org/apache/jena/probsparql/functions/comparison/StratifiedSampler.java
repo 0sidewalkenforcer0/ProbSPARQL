@@ -101,46 +101,7 @@ public class StratifiedSampler {
      * Create mixture distribution M = 0.5*P + 0.5*Q.
      */
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getNComponents();
-        int kQ = q.getNComponents();
-        int kM = kP + kQ;
-        int d = p.getDimensions();
-        String covType = p.getCovarianceType();
-        
-        double[] weightsM = new double[kM];
-        double[][] meansM = new double[kM][d];
-        double[][][] covariancesM = new double[kM][][];
-        
-        for (int k = 0; k < kP; k++) {
-            weightsM[k] = 0.5 * p.getWeights()[k];
-            meansM[k] = p.getMeans()[k].clone();
-            covariancesM[k] = cloneCovariance(p.getCovariances()[k], covType);
-        }
-        
-        for (int k = 0; k < kQ; k++) {
-            weightsM[kP + k] = 0.5 * q.getWeights()[k];
-            meansM[kP + k] = q.getMeans()[k].clone();
-            covariancesM[kP + k] = cloneCovariance(q.getCovariances()[k], covType);
-        }
-        
-        return new GMMValue(kM, d, covType, weightsM, meansM, covariancesM);
+        return GMMMixture.equalWeight(p, q);
     }
-    
-    private double[][] cloneCovariance(double[][] cov, String covType) {
-        if ("full".equals(covType)) {
-            int d = cov.length;
-            double[][] copy = new double[d][d];
-            for (int i = 0; i < d; i++) {
-                System.arraycopy(cov[i], 0, copy[i], 0, d);
-            }
-            return copy;
-        } else if ("diag".equals(covType)) {
-            double[][] copy = new double[1][cov[0].length];
-            System.arraycopy(cov[0], 0, copy[0], 0, cov[0].length);
-            return copy;
-        } else {
-            return new double[][] {{cov[0][0]}};
-        }
-    }
-    
+
 }
