@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Circular Factory Analytics | ProbSPARQL</title>
+  <script>
+    try { document.documentElement.dataset.theme = localStorage.getItem("probsparql_theme") === "light" ? "light" : "dark"; } catch (_) {}
+  </script>
+  <title>ProbSPARQL Pilot Interface</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap');
 
@@ -14,7 +17,7 @@
       
       --bg-page: #0a0f1a;
       --bg-card: rgba(255, 255, 255, 0.03);
-      --bg-header: rgba(10, 15, 26, 0.8);
+      --bg-header: rgba(10, 15, 26, 0.68);
       
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -26,9 +29,9 @@
       --danger: #ef4444;
       --success: #10b981;
       
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
+      --radius-sm: 0px;
+      --radius-md: 0px;
+      --radius-lg: 0px;
       
       --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
       --font-tech: 'Space Grotesk', sans-serif;
@@ -37,7 +40,6 @@
 
     * {
       box-sizing: border-box;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
@@ -81,18 +83,23 @@
     }
 
     .system-monitor {
+      --engine-color: #f59e0b;
       text-align: right;
       padding: 8px 20px;
-      border-left: 3px solid var(--success);
-      background: rgba(16, 185, 129, 0.05);
-      border-radius: 0 4px 4px 0;
+      border-left: 3px solid var(--engine-color);
+      background: color-mix(in srgb, var(--engine-color) 5%, transparent);
+      border-radius: 0;
     }
+
+    .system-monitor[data-state="online"] { --engine-color: var(--success); }
+    .system-monitor[data-state="error"] { --engine-color: #ef4444; }
+    .system-monitor[data-state="error"] .pulse-dot { animation: none; }
 
     .monitor-label {
       font-size: 9px;
       text-transform: uppercase;
       font-weight: 800;
-      color: var(--success);
+      color: var(--engine-color);
       letter-spacing: 0.2em;
       margin-bottom: 4px;
       opacity: 0.8;
@@ -106,15 +113,15 @@
       font-size: 14px;
       font-weight: 700;
       color: #fff;
-      text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+      text-shadow: 0 0 10px var(--engine-color);
     }
 
     .pulse-dot {
       width: 10px;
       height: 10px;
-      background: var(--success);
-      border-radius: 50%;
-      box-shadow: 0 0 15px var(--success), 0 0 30px var(--success);
+      background: var(--engine-color);
+      border-radius: 0;
+      box-shadow: 0 0 15px var(--engine-color), 0 0 30px var(--engine-color);
       animation: pulse 2s infinite;
     }
 
@@ -137,7 +144,7 @@
       padding: 8px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 0;
       width: fit-content;
       backdrop-filter: blur(10px);
     }
@@ -145,7 +152,7 @@
     .tab-button {
       padding: 12px 28px;
       border: 1px solid transparent;
-      border-radius: 8px;
+      border-radius: 0;
       background: transparent;
       color: var(--text-muted);
       font-weight: 700;
@@ -193,7 +200,7 @@
       padding: 24px;
       background: var(--bg-card);
       backdrop-filter: blur(10px);
-      border-radius: var(--radius-lg);
+      border-radius: 0;
       border: 1px solid var(--border);
     }
 
@@ -211,10 +218,19 @@
       letter-spacing: 0.1em;
     }
 
+    #graphTitle, #dataUploadTitle, #queryTitle {
+      font-size: 24px;
+      font-weight: 700;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    #graphTitle, #dataUploadTitle, #queryTitle { color: #edb70e; }
+    #graphTitle, #dataUploadTitle { margin: 0; }
+
     select, input[type="number"], input[type="file"] {
       padding: 10px 16px;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      border-radius: 0;
       background: rgba(255, 255, 255, 0.02);
       color: #fff;
       font-family: var(--font-sans);
@@ -240,7 +256,7 @@
       background: rgba(255, 255, 255, 0.03);
       padding: 4px 4px 4px 16px;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 0;
       transition: all 0.3s;
       min-width: 400px;
     }
@@ -266,7 +282,7 @@
       background: var(--border-bright);
       color: #fff;
       padding: 8px 16px;
-      border-radius: 6px;
+      border-radius: 0;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
@@ -280,6 +296,7 @@
       background: var(--primary);
       color: #000;
     }
+
 
     #ttlFile {
       position: absolute;
@@ -300,7 +317,7 @@
 
     button {
       padding: 12px 30px;
-      border-radius: 8px;
+      border-radius: 0;
       font-family: var(--font-tech);
       font-weight: 700;
       text-transform: uppercase;
@@ -360,7 +377,7 @@
     .pane {
       background: var(--bg-card);
       backdrop-filter: blur(10px);
-      border-radius: 20px;
+      border-radius: 0;
       border: 1px solid var(--border);
       overflow: hidden;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -447,7 +464,7 @@
     .stat {
       background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
       padding: 30px;
-      border-radius: 20px;
+      border-radius: 0;
       border: 1px solid var(--border);
       position: relative;
       overflow: hidden;
@@ -520,6 +537,8 @@
       color: #fff;
     }
 
+    #tab-query > .graph-section { margin-bottom: 32px; }
+
     .graph-shell {
       display: grid;
       grid-template-columns: 1fr 340px;
@@ -529,7 +548,7 @@
 
     .graph-stage {
       background: #000;
-      border-radius: var(--radius-lg);
+      border-radius: 0;
       border: 1px solid var(--border);
       box-shadow: inset 0 0 50px rgba(0,0,0,1);
       overflow: hidden;
@@ -546,7 +565,7 @@
     }
 
     .graph-link {
-      stroke: rgba(237, 183, 14, 0.15);
+      stroke: rgba(237, 183, 14, 0.42);
       stroke-width: 1.5;
       stroke-dasharray: 4;
       pointer-events: none;
@@ -657,13 +676,13 @@
     .graph-detail {
       background: var(--bg-card);
       backdrop-filter: blur(10px);
-      border-radius: var(--radius-lg);
+      border-radius: 0;
       border: 1px solid var(--border);
-      padding: 30px;
+      padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 10px;
     }
 
     .graph-detail h3 {
@@ -681,7 +700,7 @@
     .detail-row {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px;
     }
 
     .detail-label {
@@ -699,10 +718,45 @@
       overflow-wrap: anywhere;
       background: rgba(255,255,255,0.03);
       padding: 12px 16px;
-      border-radius: 8px;
+      border-radius: 0;
       border: 1px solid var(--border);
       font-family: var(--font-mono);
       line-height: 1.6;
+    }
+
+    .detail-row.detail-property {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", sans-serif;
+    }
+    .detail-property > .detail-label {
+      margin: 0;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .detail-property > .detail-value {
+      min-width: 0;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.35;
+      word-break: normal;
+      overflow-wrap: anywhere;
+      color: #dbe4ef;
+    }
+
+    .graph-detail .detail-row:not(.detail-property) > .detail-value {
+      padding: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", sans-serif;
+      line-height: 1.4;
+      word-break: normal;
     }
 
     .detail-metrics {
@@ -715,7 +769,7 @@
       background: #000;
       color: #fff;
       padding: 16px 8px;
-      border-radius: 12px;
+      border-radius: 0;
       text-align: center;
       border: 1px solid var(--border);
       position: relative;
@@ -752,7 +806,7 @@
       padding: 15px;
       background: rgba(237, 183, 14, 0.05);
       border: 1px solid var(--primary-glow);
-      border-radius: 8px;
+      border-radius: 0;
     }
 
     .gmm-title {
@@ -774,7 +828,7 @@
     }
 
     .graph-link-label {
-      fill: #64748b;
+      fill: #94a3b8;
       font-size: 9px;
       font-weight: 600;
       paint-order: stroke;
@@ -788,10 +842,120 @@
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 0; }
     ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
+    /* Pilot interface: quiet surfaces, clear hierarchy and accessible controls. */
+    :root { color-scheme: dark; --bg-card: #111a28; --border: #253144; }
+    body {
+      background-image: radial-gradient(ellipse at 15% 0%, #1e2838 0%, transparent 55%);
+      background-size: 100% 900px;
+      background-repeat: no-repeat;
+    }
+    header { padding: 24px 22px 24px 54px; min-height: 110px; gap: 24px; background: var(--bg-header); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+    .header-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 11px 20px;
+      color: var(--primary);
+      background: var(--bg-card);
+      font: 700 13px var(--font-sans);
+      text-decoration: none;
+      box-shadow: var(--small-surface-shadow);
+    }
+    .header-link[href]:hover { background: var(--primary-soft); }
+    .header-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .header-link[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+    .header-left { min-width: 0; display: flex; align-items: center; gap: 8px; }
+    .header-logo { display: block; width: 72px; height: 72px; object-fit: contain; flex-shrink: 0; }
+    .header-brand-text { min-width: 0; }
+    @media (max-width: 768px) {
+      .header-left { gap: 6px; }
+      .header-logo { width: 52px; height: 52px; }
+    }
+    h1 { font-size: clamp(22px, 2.4vw, 26px); letter-spacing: -0.03em; }
+    .header-subtitle { margin: 3px 0 0; color: var(--primary); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+    .system-monitor { min-width: 172px; border-radius: 0; padding: 8px 20px; text-align: left; }
+    .monitor-value { font-size: 14px; text-shadow: none; }
+    .pulse-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 10px var(--engine-color); }
+    main { padding: 32px 40px 56px; }
+    .tabbar { gap: 4px; margin-bottom: 28px; padding: 5px; background: #0d1522; max-width: 100%; overflow-x: auto; }
+    .tab-button { padding: 12px 20px; text-transform: none; letter-spacing: 0; }
+    .tab-button.active { background: #282719; box-shadow: none; }
+    .section-intro { margin-bottom: 22px; }
+    .section-intro h2 { margin: 0 0 6px; font-family: var(--font-tech); font-size: 24px; letter-spacing: -0.03em; }
+    .section-intro p { margin: 0; color: var(--text-muted); font-size: 13px; }
+    .toolbar, .dataset-toolbar, .graph-toolbar { padding: 18px 20px; gap: 16px; border-radius: 0; flex-wrap: wrap; }
+    .dataset-toolbar {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding: 0 0 18px;
+    }
+    .control-row, .graph-controls { flex-wrap: wrap; gap: 12px; min-width: 0; }
+    select { max-width: 100%; min-width: 0; }
+    button { text-transform: none; letter-spacing: 0.01em; padding: 11px 20px; transition: background 150ms, border-color 150ms, box-shadow 150ms; }
+    button#run, button#uploadTtl, button#refreshGraph { box-shadow: 0 3px 10px #0003; }
+    button#run:hover, button#uploadTtl:hover, button#refreshGraph:hover { transform: none; background: #f5ca42; box-shadow: 0 4px 16px #edb70e25; }
+    button.secondary:hover { transform: none; border-color: #64748b; }
+    :is(button, select, input, textarea):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .file-upload-container:focus-within { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .workbench { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 20px; }
+    .pane { min-width: 0; border-radius: 0; box-shadow: 0 12px 28px #0002; }
+    .pane-title { padding: 16px 20px; color: #dde5f1; text-transform: none; letter-spacing: 0.02em; gap: 16px; }
+    .query-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: 1; }
+    textarea { width: 100%; padding: 24px; background: #0b1320; color: #b7d8ef; font-size: 13px; line-height: 1.85; min-height: 420px; tab-size: 2; }
+    .status { padding: 12px 20px; }
+    .result { background: #0e1724; min-height: 240px; }
+    .empty-state { padding: 70px 24px; text-align: center; color: var(--text-muted); }
+    .empty-state span { display: inline-grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--border); border-radius: 0; font-family: var(--font-mono); color: var(--primary); margin-bottom: 16px; }
+    .empty-state strong { display: block; color: #dbe4ef; font-size: 14px; font-weight: 600; }
+    .empty-state p { font-size: 12px; margin: 8px 0 0; }
+    .stat { border-radius: 0; padding: 24px; background: var(--bg-card); }
+    .stat-value { font-size: 32px; }
+    .stat-label { opacity: 1; color: var(--text-muted); letter-spacing: 0.08em; }
+    th { background: #172233; }
+    tbody tr:nth-child(even) { background: #ffffff02; }
+    .file-upload-container { min-width: 0; max-width: 100%; }
+
+    .query-file-badge { max-width: 360px; padding: 8px 12px; border: 1px solid #edb70e55; border-radius: 0; background: var(--primary-soft); color: var(--primary); font: 12px var(--font-mono); overflow-wrap: anywhere; }
+    /* Keep the toolbar's backdrop-filter stacking context above the panes. */
+    #tab-query > .toolbar { position: relative; z-index: 30; overflow: visible; }
+    .query-history-wrap { position: relative; }
+    .query-history-dropdown { position: absolute; top: calc(100% + 8px); right: 0; width: min(380px, calc(100vw - 80px)); z-index: 20; padding: 12px; border: 1px solid var(--border-bright); border-radius: 0; background: #111a28; box-shadow: 0 16px 40px #0008; }
+    .history-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
+    #queryHistoryList { list-style: none; margin: 12px 0 0; padding: 0; max-height: 320px; overflow: auto; }
+    #queryHistoryList button { width: 100%; display: block; text-align: left; margin: 4px 0; padding: 12px; background: #ffffff05; color: var(--text-main); font: 12px var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #queryHistoryList button:hover { background: var(--primary-soft); }
+    .history-empty { padding: 16px 0; color: var(--text-muted); font-size: 12px; }
+    @media (max-width: 768px) { .query-history-dropdown { left: 0; right: auto; } }
+
+    .workbench:has(#distributionPane:not([hidden])) { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr) 350px; }
+    #distributionPane { align-self: start; }
+    #distributionPane[hidden] { display: none; }
+    .distribution-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+    #distributionTitle { color: var(--text-muted); font: 12px/1.6 var(--font-mono); overflow-wrap: anywhere; }
+    #distributionClose { border: 0; padding: 2px 7px; font-size: 20px; background: transparent; }
+    #distributionSvg { width: 100%; background: #0b1320; border-radius: 0; }
+    #distributionSummary { margin: 0; padding: 10px 14px; border-radius: 0; background: #0003; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-muted); font: 11px/1.9 var(--font-mono); }
+    td.dist-clickable { cursor: pointer; max-width: 200px; }
+    td.dist-clickable:hover { background: rgba(237,183,14,0.07) !important; }
+    td.dist-clickable:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+    .dist-cell-inner { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11px; }
+    .dist-cell-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; box-shadow: 0 0 5px var(--primary-glow); }
+    .dist-cell-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dist-json-details summary { cursor: pointer; }
+    .dist-json-details summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+    .dist-json-details summary .dist-cell-inner { display: inline-flex; max-width: calc(100% - 20px); vertical-align: middle; }
+    .result .dist-json-full { margin: 12px 0 0; padding: 12px; max-height: 320px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; background: #0b1320; border: 1px solid var(--border); border-radius: 0; font-size: 11px; user-select: text; cursor: text; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
     @media (max-width: 1200px) {
+      .workbench:has(#distributionPane:not([hidden])) { grid-template-columns: 1fr; }
       .workbench, .dataset-grid { grid-template-columns: 1fr; }
       .graph-shell { grid-template-columns: 1fr; height: auto; }
       .graph-stage { height: 600px; }
@@ -804,28 +968,207 @@
       .toolbar, .dataset-toolbar, .graph-toolbar { flex-direction: column; align-items: stretch; }
       .control-row, .import-row, .graph-controls { flex-direction: column; align-items: stretch; }
       .stats { grid-template-columns: 1fr; }
+      header { position: static; align-items: stretch; }
+      .system-monitor { text-align: left; }
+      .tabbar { width: 100%; }
+      .tab-button { padding: 10px 14px; flex-shrink: 0; }
+      .file-upload-container { width: 100%; }
+      .file-upload-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .pane-title { flex-wrap: wrap; gap: 6px; }
+      textarea { min-height: 360px; padding: 18px; }
     }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --primary: #edb70e; --primary-soft: #fff3cc; --primary-glow: rgba(237, 183, 14, 0.25);
+      --bg-page: #eaf0fa; --bg-card: #f6f9ff; --bg-header: #f6f9ffbd;
+      --text-main: #273650; --text-muted: #5b6d89;
+      --border: #d5e0f1; --border-bright: #a9bfdf;
+      --success: #087f5b; --danger: #be2535;
+    }
+    [data-theme="light"] body { background: var(--bg-page); }
+    [data-theme="light"] h1 { background: none; -webkit-text-fill-color: var(--text-main); color: var(--text-main); }
+    [data-theme="light"] :is(.monitor-value, .pane-title, .detail-value, .gmm-component, .detail-metric, .empty-state strong, td) { color: var(--text-main); }
+    [data-theme="light"] :is(.tabbar, .result, textarea, select, select option, input[type="number"], .query-history-dropdown, .detail-metric) { background: #f6f9ff; color: var(--text-main); }
+    [data-theme="light"] textarea { color: #36567d; }
+    [data-theme="light"] :is(.tab-button.active, .tab-button:hover, #queryHistoryList button:hover) { background: var(--primary-soft); }
+    [data-theme="light"] .tab-button.active { color: var(--primary); }
+    [data-theme="light"] :is(.tab-button:hover, button.secondary:hover, tr:hover td) { color: var(--text-main); }
+    [data-theme="light"] :is(th, .pane-title, .detail-value, .result .dist-json-full, #distributionSummary) { background: #e2ebf8; }
+    [data-theme="light"] :is(.stat-value) { background: none; -webkit-text-fill-color: var(--text-main); }
+    [data-theme="light"] :is(.query-name, .result pre) { color: var(--text-muted); }
+    [data-theme="light"] :is(.graph-stage, .graph-svg) { background: #edf3fc; box-shadow: none; }
+    [data-theme="light"] .graph-detail { background: #f6f9ff; }
+    [data-theme="light"] .graph-link { stroke: #8da4bd; }
+    [data-theme="light"] .graph-node { color: var(--primary); fill: var(--primary); }
+    [data-theme="light"] .graph-node-label { fill: #a67c00; stroke: #edf3fc; }
+    [data-theme="light"] .graph-link-label { fill: #5b6d89; stroke: #edf3fc; }
+    [data-theme="light"] .graph-node.selected circle { stroke: #273650; filter: none; }
+    [data-theme="light"] .graph-node.expanded circle { stroke: #6b85a4; }
+    /* Charts retain a dark plotting surface for their fixed-color SVG marks. */
+    .graph-distribution > svg { background: #0b1320; }
+    [data-theme="light"] :is(button#run, button#uploadTtl, button#refreshGraph) { background: var(--primary); color: #273650; }
+
+    [data-theme="light"] :is(button#run, button#uploadTtl, button#refreshGraph):hover { background: #f5ca42; box-shadow: 0 4px 16px #edb70e40; }
+    [data-theme="light"] :is(.gmm-info, td.dist-clickable:hover) { background: var(--primary-soft) !important; }
+
+    /* Floating surfaces use depth and background contrast instead of outlines. */
+    :root {
+      --surface-shadow: 0 14px 36px -10px #0008, 0 4px 10px -4px #0006;
+      --small-surface-shadow: 0 5px 14px -4px #0006;
+    }
+    :root[data-theme="light"] {
+      --surface-shadow: 0 14px 36px -10px #36578030, 0 4px 10px -4px #36578020;
+      --small-surface-shadow: 0 5px 14px -4px #36578026;
+    }
+    :is(.toolbar, .graph-toolbar, .pane, .stat, .graph-stage, .graph-detail, .query-history-dropdown) {
+      border: 0;
+      border-radius: 0;
+      box-shadow: var(--surface-shadow);
+    }
+    [data-theme="light"] .graph-stage { box-shadow: var(--surface-shadow); }
+    :is(.tabbar, .system-monitor, .detail-value, .detail-metric, .gmm-info, .query-file-badge, .empty-state span, .result .dist-json-full) {
+      border: 0;
+      border-radius: 0;
+      box-shadow: var(--small-surface-shadow);
+    }
+    :is(.tab-button, button, select, input[type="number"], .file-upload-container) {
+      border: 0;
+      border-radius: 0;
+    }
+    :is(select, input[type="number"], .file-upload-container, button.secondary) {
+      box-shadow: var(--small-surface-shadow);
+    }
+    :is(.pane-title, .status, .graph-status) { border: 0; }
+    .graph-status::after, .detail-metric::after { display: none; }
+    header {
+      border-bottom: 3px solid transparent;
+      border-image: linear-gradient(90deg, #00c9ad 0%, #00b5e8 30%, #006cff 60%, #8515f5 100%) 1;
+      box-shadow: var(--small-surface-shadow);
+    }
+
+    /* Dark mode uses solid surfaces and text. */
+    :root:not([data-theme="light"]) body { background: var(--bg-page); }
+    :root:not([data-theme="light"]) :is(h1, .stat-value) {
+      background: none;
+      color: var(--text-main);
+      -webkit-text-fill-color: var(--text-main);
+    }
+    :root:not([data-theme="light"]) .graph-svg { background: #0a0f1a; }
+    .institution-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 24px 40px;
+      margin: 0 40px;
+      padding: 24px 0 28px;
+      border-top: 1px solid var(--border);
+    }
+    .institution-footer img { display: block; width: 180px; max-width: 100%; height: auto; object-fit: contain; }
+    .institution-footer .university-logo { width: 240px; }
+    :root:not([data-theme="light"]) .institution-footer img { filter: brightness(1.7) drop-shadow(0 0 1px #ffffff80); }
+    @media (max-width: 768px) {
+      .institution-footer { margin: 0 20px; gap: 20px; }
+    }
+    .dataset-toolbar .import-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 16px;
+      width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      padding: 18px 20px;
+      border: 0;
+      border-radius: 0;
+      background: color-mix(in srgb, var(--bg-card) 94%, white);
+      box-shadow: var(--surface-shadow);
+    }
+    .dataset-toolbar .import-row > * { flex: 0 0 auto; white-space: nowrap; }
+    .dataset-toolbar .import-row .file-upload-container { width: auto; }
+    #workbenchTabs,
+    .graph-section,
+    #tab-data .dataset-grid > .pane,
+    #queryWorkbench {
+      border-bottom: 3px solid transparent;
+      border-image: linear-gradient(90deg, #00c9ad 0%, #00b5e8 30%, #006cff 60%, #8515f5 100%) 1;
+    }
+    #queryToolbar { flex-flow: row nowrap; align-items: center; }
+    #queryToolbar > .control-row {
+      flex: 1 1 0;
+      min-width: 0;
+      flex-direction: row;
+      align-items: center;
+    }
+    #queryToolbar > #run { flex: 0 0 auto; white-space: nowrap; }
+    #queryToolbar #querySelect {
+      flex: 1 1 160px;
+      width: 0;
+      min-width: 0;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    #queryFileBadge {
+      flex: 0 1 200px;
+      min-width: 0;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow-wrap: normal;
+    }
+    #queryToolbar .control-row > :is(button, #queryTitle, .query-history-wrap) {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    @media (min-width: 1000px) {
+      #queryToolbar > .control-row { flex-wrap: nowrap; }
+    }
+    #queryWorkbench.is-collapsed { display: none; }
+    #queryTitle {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 12px;
+      margin: -10px 0 -10px -12px;
+      cursor: pointer;
+      user-select: none;
+    }
+    #queryTitle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    #graphTitle { cursor: pointer; }
+    #graphTitle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+    .graph-section.is-collapsed #graphControls,
+    .graph-section.is-collapsed #graphShell { display: none; }
   </style>
 </head>
 <body>
   <header>
     <div class="header-left">
-      <h1 id="mainTitle">Circular factory demostration between B02, B03, and A03</h1>
-      <p style="margin: 6px 0 0; font-size: 13px; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em;">Probabilistic Knowledge Discovery Engine</p>
+      <img class="header-logo" src="probsparql-icon.png?v=transparent-20260908" alt="ProbSPARQL logo" width="72" height="72">
+      <div class="header-brand-text">
+      <h1 id="mainTitle">ProbSPARQL Pilot Interface</h1>
+      <p class="header-subtitle">ProbSPARQL Query Workbench</p>
+      </div>
     </div>
-    <div class="header-right" style="display: flex; align-items: center; gap: 24px;">
-      <div class="system-monitor">
+    <div class="header-right" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+      <a class="header-link" href="https://github.com/0sidewalkenforcer0/ProbSPARQL" target="_blank" rel="noopener noreferrer">Code ↗</a>
+      <a id="paperLink" class="header-link" href="https://arxiv.org/abs/2607.18262" target="_blank" rel="noopener noreferrer">Paper ↗</a>
+      <button id="themeToggle" class="secondary" type="button" aria-label="Toggle day mode" aria-pressed="false">☀ Day mode</button>
+      <div id="engineMonitor" class="system-monitor" data-state="checking" role="status" aria-live="polite">
         <div class="monitor-label">Core Engine Status</div>
         <div class="monitor-value">
-          <span class="pulse-dot"></span>
-          Synchronized
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span id="engineStatusText">Checking...</span>
         </div>
       </div>
     </div>
   </header>
 
   <main>
-    <nav class="tabbar" role="tablist" aria-label="Demo sections">
+    <nav id="workbenchTabs" class="tabbar" role="tablist" aria-label="Demo sections">
       <button class="tab-button active" type="button" role="tab" data-tab="query" aria-controls="tab-query" aria-selected="true">
         <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
         Query Workbench
@@ -834,55 +1177,136 @@
         <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
         Data Assets
       </button>
-      <button class="tab-button" type="button" role="tab" data-tab="graph" aria-controls="tab-graph" aria-selected="false">
-        <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-        Knowledge Graph
-      </button>
     </nav>
 
     <section id="tab-query" class="tab-panel active" role="tabpanel">
-      <div class="toolbar">
+      <div class="section-intro">
+        <h2>Explore your knowledge.</h2>
+        <p>Choose an example or write a SPARQL query to discover insights in your data.</p>
+      </div>
+      <section id="graphSection" class="graph-section" aria-labelledby="graphTitle">
+        <div class="graph-toolbar">
+          <h2 id="graphTitle" role="button" tabindex="0" aria-expanded="true" aria-controls="graphControls graphShell">KG Visualization</h2>
+          <div id="graphControls" class="graph-controls">
+            <label for="graphLimit">Node Limit</label>
+            <input id="graphLimit" type="number" min="5" max="80" step="5" value="25">
+            <label class="check-control" for="graphLiterals" style="cursor: pointer; font-size: 12px;">
+              <input id="graphLiterals" type="checkbox">
+              Show Literals
+            </label>
+            <button id="refreshGraph" type="button">
+              <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 14"></path></svg>
+              Reload Graph
+            </button>
+            <button id="resetGraph" class="secondary" type="button">
+              <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+              Reset View
+            </button>
+          </div>
+        </div>
+
+        <div id="graphShell" class="graph-shell">
+          <div class="graph-stage">
+            <div id="graphStatus" class="status graph-status">Loading top-level nodes…</div>
+            <svg id="kgGraph" class="graph-svg" role="img" aria-label="Dataset knowledge graph">
+              <g id="kgViewport"></g>
+            </svg>
+          </div>
+          <aside id="graphDetail" class="graph-detail">
+            <h3>Node Detail</h3>
+            <div class="detail-row">
+              <div class="detail-label">Selection</div>
+              <div class="detail-value">Select a node in the graph.</div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <div id="queryToolbar" class="toolbar">
         <div class="control-row">
-          <label for="querySelect">Query</label>
-          <select id="querySelect"></select>
+          <span id="queryTitle" role="button" tabindex="0" aria-expanded="true" aria-controls="queryWorkbench">Query</span>
+          <select id="querySelect" aria-label="Query"></select>
+          <span id="queryFileBadge" class="query-file-badge" hidden></span>
+          <input id="sparqlFile" type="file" accept=".sparql,.rq" hidden>
+          <button id="addQuery" class="secondary" type="button" title="Import a .sparql or .rq file into the query list">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+            Add Query
+          </button>
+          <div class="query-history-wrap">
+            <button id="queryHistoryBtn" class="secondary" type="button" aria-expanded="false" aria-controls="queryHistoryDropdown">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+              History
+            </button>
+            <div id="queryHistoryDropdown" class="query-history-dropdown" hidden>
+              <div class="history-heading"><strong>Recent queries</strong><button id="queryHistoryClear" class="secondary" type="button">Clear All</button></div>
+              <ul id="queryHistoryList"></ul>
+            </div>
+          </div>
           <button id="reset" class="secondary" type="button">Reset</button>
         </div>
         <button id="run" type="button">
           <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Query
+          Run query
         </button>
       </div>
 
-      <section class="workbench">
-        <div class="pane">
+      <section id="queryWorkbench" class="workbench">
+        <div id="queryPane" class="pane">
           <div class="pane-title">
             <span>SPARQL</span>
             <span id="queryName" class="query-name"></span>
           </div>
-          <textarea id="query" spellcheck="false"></textarea>
+          <textarea id="query" spellcheck="false" aria-label="SPARQL query editor"></textarea>
         </div>
 
         <div class="pane">
           <div class="pane-title">Results</div>
           <div id="status" class="status">Ready</div>
           <div id="result" class="result">
-            <pre>No result</pre>
+            <div class="empty-state">
+              <span aria-hidden="true">{ }</span>
+              <strong>Your results will appear here</strong>
+              <p>Run a query to explore matching records.</p>
+            </div>
           </div>
         </div>
+      <section id="distributionPane" class="pane" hidden aria-label="Distribution preview">
+        <div class="pane-title">
+          <span>Distribution</span>
+          <button id="distributionClose" class="secondary" type="button" aria-label="Close distribution panel" title="Close panel">×</button>
+        </div>
+        <div class="distribution-body">
+          <div id="distributionTitle">Distribution</div>
+          <select id="distributionDimension" aria-label="Distribution dimension" hidden></select>
+        <svg id="distributionSvg" viewBox="0 0 700 300" role="img" aria-labelledby="distributionTitle" aria-describedby="distributionSummary"></svg>
+        <pre id="distributionSummary"></pre>
+        </div>
       </section>
+      </section>
+
+
     </section>
 
     <section id="tab-data" class="tab-panel" role="tabpanel">
+      <div class="section-intro">
+        <h2>Overview of your data</h2>
+        <p>Upload a dataset or browse your knowledge graph to explore its types, relationships, and distributions.</p>
+      </div>
       <section class="dataset">
         <div class="dataset-toolbar">
-          <h2>Data Upload</h2>
           <div class="import-row">
+            <h2 id="dataUploadTitle">Data Upload</h2>
             <div class="file-upload-container">
               <span id="fileNameLabel" class="file-upload-label">Initialize Data Stream (.TTL)</span>
               <div class="file-upload-button">Select Source</div>
               <input id="ttlFile" type="file" accept=".ttl,text/turtle">
             </div>
             
+            <label for="uploadMode">Import mode</label>
+            <select id="uploadMode">
+              <option value="append">Append to existing data</option>
+              <option value="replace">Replace existing data</option>
+            </select>
             <button id="uploadTtl" type="button">
               <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               Upload Assets
@@ -934,49 +1358,80 @@
       </section>
     </section>
 
-    <section id="tab-graph" class="tab-panel" role="tabpanel">
-      <section class="graph-section">
-        <div class="graph-toolbar">
-          <h2>KG Visualization</h2>
-          <div class="graph-controls">
-            <label for="graphLimit">Node Limit</label>
-            <input id="graphLimit" type="number" min="5" max="80" step="5" value="25">
-            <label class="check-control" for="graphLiterals" style="cursor: pointer; font-size: 12px;">
-              <input id="graphLiterals" type="checkbox">
-              Show Literals
-            </label>
-            <button id="refreshGraph" type="button">
-              <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 14"></path></svg>
-              Reload Graph
-            </button>
-            <button id="resetGraph" class="secondary" type="button">
-              <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
-              Reset View
-            </button>
-          </div>
-        </div>
-
-        <div class="graph-shell">
-          <div class="graph-stage">
-            <div id="graphStatus" class="status graph-status">Open this tab to load top-level nodes.</div>
-            <svg id="kgGraph" class="graph-svg" role="img" aria-label="Dataset knowledge graph">
-              <g id="kgViewport"></g>
-            </svg>
-          </div>
-          <aside id="graphDetail" class="graph-detail">
-            <h3>Node Detail</h3>
-            <div class="detail-row">
-              <div class="detail-label">Selection</div>
-              <div class="detail-value">Select a node in the graph.</div>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </section>
   </main>
 
+  <footer class="institution-footer" aria-label="Institutions">
+    <img src="logos/sfb-1574.png" alt="SFB 1574" loading="lazy">
+    <img src="logos/imprs-is.png" alt="IMPRS-IS" loading="lazy">
+    <img class="university-logo" src="logos/university-stuttgart.png" alt="University of Stuttgart, Germany" loading="lazy">
+  </footer>
+
+  <script src="distribution.js?v=20260910-dirichlet-beta-copy"></script>
   <script>
+    const themeToggle = document.getElementById("themeToggle");
+    function updateThemeButton() {
+      const light = document.documentElement.dataset.theme === "light";
+      themeToggle.textContent = light ? "☾ Night mode" : "☀ Day mode";
+      themeToggle.setAttribute("aria-pressed", String(light));
+    }
+    themeToggle.addEventListener("click", () => {
+      const theme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+      document.documentElement.dataset.theme = theme;
+      try { localStorage.setItem("probsparql_theme", theme); } catch (_) {}
+      updateThemeButton();
+    });
+    updateThemeButton();
     const endpoint = "/probsparql/query";
+    const engineMonitor = document.getElementById("engineMonitor");
+    const engineStatusText = document.getElementById("engineStatusText");
+    let engineCheckPending = false;
+
+    function setEngineStatus(state, label, detail) {
+      engineMonitor.dataset.state = state;
+      engineStatusText.textContent = label;
+      engineMonitor.title = detail;
+    }
+
+    async function checkEngineStatus() {
+      if (engineCheckPending) return;
+      engineCheckPending = true;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      try {
+        // An empty ASK checks query execution without scanning the dataset.
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/sparql-query",
+            "Accept": "application/sparql-results+json"
+          },
+          body: "ASK WHERE {}",
+          cache: "no-store",
+          signal: controller.signal
+        });
+        if (!response.ok) {
+          setEngineStatus("error", "Service error", `Query endpoint returned HTTP ${response.status}`);
+          return;
+        }
+        const result = await response.json();
+        if (result.boolean !== true) {
+          setEngineStatus("error", "Service error", "Query endpoint returned an unexpected health-check result");
+          return;
+        }
+        setEngineStatus("online", "Online", `Query engine responded successfully at ${new Date().toLocaleTimeString()}`);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          setEngineStatus("checking", "Timed out", "Query engine did not respond within 5 seconds; retrying automatically");
+        } else if (error instanceof SyntaxError) {
+          setEngineStatus("error", "Service error", "Query endpoint did not return valid SPARQL JSON");
+        } else {
+          setEngineStatus("error", "Unreachable", "Unable to reach the query engine; retrying automatically");
+        }
+      } finally {
+        clearTimeout(timeout);
+        engineCheckPending = false;
+      }
+    }
     const angleGrinderClassUri = "http://example.org/anglegrinder#AngleGrinder";
     const rdfTypeUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 
@@ -1055,6 +1510,7 @@ LIMIT 60`
     const resetButton = document.getElementById("reset");
     const refreshDatasetButton = document.getElementById("refreshDataset");
     const uploadTtlButton = document.getElementById("uploadTtl");
+    const uploadModeInput = document.getElementById("uploadMode");
     const ttlFileInput = document.getElementById("ttlFile");
     const fileNameLabel = document.getElementById("fileNameLabel");
 
@@ -1115,8 +1571,9 @@ LIMIT 60`
       detailRequestId: 0
     };
 
+    let lastSelectedQuery = null;
     function selectedExample() {
-      return exampleQueries.find((entry) => entry.id === querySelect.value) || exampleQueries[0];
+      return exampleQueries.find((entry) => entry.id === querySelect.value) || lastSelectedQuery || exampleQueries[0];
     }
 
     function setStatus(node, text, isError = false) {
@@ -1125,9 +1582,119 @@ LIMIT 60`
     }
 
     function setQuery(entry) {
+      lastSelectedQuery = entry;
+      querySelect.value = entry.id;
       queryInput.value = entry.query;
-      queryName.textContent = entry.source;
+      updateQuerySource();
+      const badge = document.getElementById("queryFileBadge");
+      badge.textContent = entry.source ? entry.source.split(/[\\/]/).pop() : "";
+      badge.title = entry.source || "";
+      badge.hidden = !entry.uploaded || !entry.source;
     }
+
+    function updateQuerySource() {
+      const entry = selectedExample();
+      const showSource = Boolean(entry.uploaded && entry.source && queryInput.value === entry.query);
+      queryName.textContent = showSource ? entry.source : "";
+      queryName.title = showSource ? entry.source : "";
+      queryName.hidden = !showSource;
+    }
+
+    queryInput.addEventListener("input", () => {
+      if (querySelect.value !== "manual-input") lastSelectedQuery = selectedExample();
+      let manualOption = querySelect.querySelector('option[value="manual-input"]');
+      if (!manualOption) {
+        manualOption = document.createElement("option");
+        manualOption.value = "manual-input";
+        manualOption.textContent = "Manual input";
+        manualOption.disabled = true;
+        querySelect.appendChild(manualOption);
+      }
+      querySelect.value = "manual-input";
+      queryName.textContent = "";
+      queryName.title = "";
+      queryName.hidden = true;
+      document.getElementById("queryFileBadge").hidden = true;
+    });
+
+    const historyButton = document.getElementById("queryHistoryBtn");
+    const historyDropdown = document.getElementById("queryHistoryDropdown");
+    const historyKey = "probsparql_history";
+    let queryHistory = [];
+    try {
+      const stored = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      if (Array.isArray(stored)) queryHistory = [...new Set(stored.filter(q => typeof q === "string" && q.trim()))].slice(0, 10);
+    } catch (_) { /* Keep history in memory when browser storage is unavailable. */ }
+
+    function saveQueryHistory() {
+      try { localStorage.setItem(historyKey, JSON.stringify(queryHistory)); } catch (_) {}
+    }
+
+    function toggleQueryHistory(open) {
+      historyDropdown.hidden = !open;
+      historyButton.setAttribute("aria-expanded", String(open));
+      if (open) renderQueryHistory();
+    }
+
+    function renderQueryHistory() {
+      const list = document.getElementById("queryHistoryList");
+      list.replaceChildren();
+      document.getElementById("queryHistoryClear").disabled = !queryHistory.length;
+      if (!queryHistory.length) {
+        const empty = document.createElement("li");
+        empty.className = "history-empty";
+        empty.textContent = "No successful queries yet.";
+        list.appendChild(empty);
+      }
+      queryHistory.forEach(query => {
+        const item = document.createElement("li");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = query.replace(/\s+/g, " ").trim();
+        button.title = query;
+        button.addEventListener("click", () => {
+          const existing = exampleQueries.find(entry => entry.query === query);
+          if (existing) {
+            querySelect.value = existing.id;
+            setQuery(existing);
+          } else {
+            const id = "history-restored";
+            const entry = { id, label: "Restored from history", source: "", query };
+            const index = exampleQueries.findIndex(entry => entry.id === id);
+            if (index >= 0) exampleQueries[index] = entry;
+            else {
+              exampleQueries.push(entry);
+              const option = document.createElement("option");
+              option.value = id;
+              option.textContent = entry.label;
+              querySelect.appendChild(option);
+            }
+            querySelect.value = id;
+            setQuery(entry);
+          }
+          toggleQueryHistory(false);
+          queryInput.focus();
+        });
+        item.appendChild(button);
+        list.appendChild(item);
+      });
+    }
+
+    historyButton.addEventListener("click", () => toggleQueryHistory(historyDropdown.hidden));
+    document.getElementById("queryHistoryClear").addEventListener("click", () => {
+      queryHistory = [];
+      saveQueryHistory();
+      renderQueryHistory();
+    });
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".query-history-wrap")) toggleQueryHistory(false);
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !historyDropdown.hidden) {
+        toggleQueryHistory(false);
+        historyButton.focus();
+      }
+    });
 
     function populateQuerySelect() {
       exampleQueries.forEach((entry) => {
@@ -1139,14 +1706,15 @@ LIMIT 60`
       setQuery(exampleQueries[0]);
     }
 
-    async function sparql(query) {
+    async function sparql(query, signal) {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/sparql-query",
           "Accept": "application/sparql-results+json, application/json"
         },
-        body: query
+        body: query,
+        signal
       });
       const text = await response.text();
       if (!response.ok) throw new Error(text || `HTTP ${response.status}`);
@@ -1217,24 +1785,55 @@ LIMIT 60`
       const headerRow = document.createElement("tr");
       vars.forEach((name) => {
         const th = document.createElement("th");
-        th.textContent = name;
+        th.textContent = new Map([["s", "Subject"], ["p", "Predicate"], ["o", "Object"]]).get(name) || name;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
       table.appendChild(thead);
 
       const tbody = document.createElement("tbody");
-      bindings.forEach((row) => {
+      let firstDistribution = null;
+      bindings.forEach((row, rowIndex) => {
         const tr = document.createElement("tr");
         vars.forEach((name) => {
           const td = document.createElement("td");
-          td.textContent = row[name] ? row[name].value : "";
+          const term = row[name];
+          if (target === resultNode && isDistribution(term)) {
+            const label = `?${name} · row ${rowIndex + 1}`;
+            if (!firstDistribution) firstDistribution = { term, label };
+            td.className = "dist-clickable";
+            const details = document.createElement("details");
+            details.className = "dist-json-details";
+            const summary = document.createElement("summary");
+            summary.title = "Show distribution chart and toggle full JSON";
+            summary.setAttribute("aria-label", `Show distribution chart and toggle full JSON for ${label}`);
+            const inner = document.createElement("div");
+            inner.className = "dist-cell-inner";
+            const dot = document.createElement("span");
+            dot.className = "dist-cell-indicator";
+            dot.setAttribute("aria-hidden", "true");
+            const text = document.createElement("span");
+            text.className = "dist-cell-text";
+            text.textContent = shorten(term.value, 42);
+            inner.append(dot, text);
+            summary.appendChild(inner);
+            const fullJson = document.createElement("pre");
+            fullJson.className = "dist-json-full";
+            fullJson.textContent = term.value;
+            details.append(summary, fullJson);
+            td.appendChild(details);
+            td.addEventListener("click", () => showDistribution(term, label));
+          } else td.textContent = term ? term.value : "";
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
       });
       table.appendChild(tbody);
       target.appendChild(table);
+      if (target === resultNode) {
+        if (firstDistribution) showDistribution(firstDistribution.term, firstDistribution.label);
+        else document.getElementById("distributionPane").hidden = true;
+      }
       return bindings.length;
     }
 
@@ -1245,11 +1844,13 @@ LIMIT 60`
         return;
       }
 
+      const replace = uploadModeInput.value === "replace";
       uploadTtlButton.disabled = true;
-      setStatus(tripleStatusNode, `Uploading ${file.name}...`);
+      uploadModeInput.disabled = true;
+      setStatus(tripleStatusNode, `${replace ? "Replacing data with" : "Appending"} ${file.name}...`);
       try {
-        const response = await fetch("/probsparql", {
-          method: "POST",
+        const response = await fetch("/probsparql?default", {
+          method: replace ? "PUT" : "POST",
           headers: {
             "Content-Type": "text/turtle",
             "Accept": "application/json"
@@ -1265,26 +1866,33 @@ LIMIT 60`
         ttlFileInput.value = "";
         await refreshDataset();
         graphNeedsRefresh = true;
-        if (activeTab === "graph") {
+        if (activeTab === "query") {
           await refreshGraph();
         } else {
-          setStatus(graphStatusNode, "Dataset updated. Open Knowledge Graph to reload topology.");
+          setStatus(graphStatusNode, "Dataset updated. Open Query Workbench to reload topology.");
         }
-        setStatus(tripleStatusNode, `Uploaded ${file.name}`);
+        setStatus(tripleStatusNode, `${replace ? "Replaced existing data with" : "Appended"} ${file.name}`);
       } catch (error) {
         renderFallback(tripleResultNode, error.message);
         setStatus(tripleStatusNode, "TTL upload failed", true);
       } finally {
         uploadTtlButton.disabled = false;
+        uploadModeInput.disabled = false;
       }
     }
 
     async function runQuery() {
       runButton.disabled = true;
+      document.getElementById("distributionPane").hidden = true;
       setStatus(statusNode, "Running...");
       try {
-        const json = await sparql(queryInput.value);
+        const queryText = queryInput.value;
+        const json = await sparql(queryText);
+        queryHistory = [queryText, ...queryHistory.filter(query => query !== queryText)].slice(0, 10);
+        saveQueryHistory();
+        if (!historyDropdown.hidden) renderQueryHistory();
         const count = renderTable(resultNode, json);
+        showQueryGraph(json);
         setStatus(statusNode, `${count} result row${count === 1 ? "" : "s"}`);
       } catch (error) {
         renderFallback(resultNode, error.message);
@@ -1292,6 +1900,35 @@ LIMIT 60`
       } finally {
         runButton.disabled = false;
       }
+    }
+
+    let graphViewVersion = 0;
+
+    function showQueryGraph(json) {
+      graphViewVersion++;
+      const terms = new Map();
+      const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+      bindings.forEach(row => Object.values(row).forEach(term => {
+        if (term && (term.type === "uri" || term.type === "bnode")) {
+          terms.set(`${term.type}:${term.value}`, term);
+        }
+      }));
+      clearGraphState();
+      const visible = Array.from(terms.values()).slice(0, graphLimit());
+      visible.forEach(term => { getGraphNode(term).root = true; });
+      layoutRootNodes(graphState.nodes);
+      resolveNodeCollisions(30);
+      syncGraphDOM();
+      renderGraphDetail(null);
+      if (visible.length) {
+        fitGraphToViewport();
+        startGraphSimulation(0.45);
+      }
+      graphLoaded = true;
+      graphNeedsRefresh = false;
+      setStatus(graphStatusNode, visible.length
+        ? `${visible.length} query result nodes${terms.size > visible.length ? ` shown out of ${terms.size} (Node Limit)` : ""}. Click a node to explore its connections.`
+        : "No entity nodes in query results. Reload Graph to browse the dataset.");
     }
 
     function clearGraphState() {
@@ -1438,15 +2075,14 @@ LIMIT ${graphLimit()}`;
 
     function graphFallbackRootQuery() {
       return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX cfm: <http://example.org/circularfactorymeasure#>
 SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(?o) AS ?relationCount)
 WHERE {
   ?s ?p ?o .
   FILTER(isIRI(?s))
-  FILTER(CONTAINS(STR(?s), "/data/"))
-  FILTER NOT EXISTS { ?s rdf:type cfm:Measurement }
-  FILTER NOT EXISTS { ?s rdf:type cfm:RandomVariable }
-  FILTER NOT EXISTS { ?parent ?parentPred ?s . FILTER(CONTAINS(STR(?parent), "/data/")) FILTER(?parent != ?s) }
+  FILTER NOT EXISTS { ?s rdf:type rdf:Property }
+  FILTER NOT EXISTS { ?s rdf:type <http://www.w3.org/2000/01/rdf-schema#Class> }
+  FILTER NOT EXISTS { ?s <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superClass }
+  FILTER NOT EXISTS { ?parent ?parentPred ?s . FILTER(?parent != ?s) }
   OPTIONAL { ?s a ?type }
 }
 GROUP BY ?s
@@ -1606,30 +2242,36 @@ LIMIT ${graphLimit()}`;
       });
     }
 
-    function positionNewNodes(nodes, anchor = null) {
-      if (!nodes.length) {
-        return;
-      }
-      const rect = kgGraph.getBoundingClientRect();
-      const baseRadius = anchor ? 155 : Math.max(140, Math.min(rect.width, rect.height) * 0.24);
-      const seed = anchor
-        ? Array.from(anchor.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
-        : 0;
-      const startAngle = anchor ? ((seed % 360) * Math.PI) / 180 : -Math.PI / 2;
+    function nodeClearance(node) {
+      // Reserve space for both the node and its visible label.
+      return Math.max(48, Math.min(150, String(node.label || "").length * 3.8 + 18));
+    }
 
-      nodes.forEach((node, index) => {
-        if (node.element) {
-          return;
+    function positionNewNodes(nodes, anchor = null) {
+      const fresh = [...new Set(nodes)].filter(node => !node.element);
+      const pending = new Set(fresh);
+      const occupied = graphState.nodes.filter(node => !pending.has(node));
+      const origin = anchor || { x: 0, y: 0 };
+      const center = occupied.reduce((sum, node) => ({ x: sum.x + node.x, y: sum.y + node.y }), { x: 0, y: 0 });
+      const outward = Math.atan2(origin.y - center.y / Math.max(1, occupied.length), origin.x - center.x / Math.max(1, occupied.length));
+      fresh.forEach(node => {
+        let placed = false;
+        // Search outward from the expanded node, checking all existing labels.
+        for (let ring = 0; !placed; ring++) {
+          const radius = 180 + ring * 70;
+          const slots = Math.max(12, Math.ceil(2 * Math.PI * radius / 60));
+          for (let slot = 0; slot < slots; slot++) {
+            const offset = (slot % 2 ? 1 : -1) * Math.ceil(slot / 2);
+            const angle = outward + offset * 2 * Math.PI / slots;
+            const x = origin.x + Math.cos(angle) * radius;
+            const y = origin.y + Math.sin(angle) * radius;
+            if (occupied.some(other => Math.hypot(x - other.x, y - other.y) < nodeClearance(node) + nodeClearance(other) + 16)) continue;
+            Object.assign(node, { x, y, vx: 0, vy: 0 });
+            occupied.push(node);
+            placed = true;
+            break;
+          }
         }
-        const ringIndex = Math.floor(index / 6);
-        const ringOffset = index % 6;
-        const ringSize = Math.min(6, nodes.length - ringIndex * 6);
-        const angle = startAngle + (Math.PI * 2 * ringOffset) / Math.max(1, ringSize);
-        const radius = baseRadius + ringIndex * 70;
-        node.x = (anchor ? anchor.x : 0) + Math.cos(angle) * radius;
-        node.y = (anchor ? anchor.y : 0) + Math.sin(angle) * radius;
-        node.vx = 0;
-        node.vy = 0;
       });
     }
 
@@ -1642,7 +2284,7 @@ LIMIT ${graphLimit()}`;
             let dx = b.x - a.x;
             let dy = b.y - a.y;
             let dist = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = (a.kind === "literal" || b.kind === "literal") ? 42 : 58;
+            const minDistance = nodeClearance(a) + nodeClearance(b) + 16;
             if (dist === 0) {
               dx = Math.random() - 0.5;
               dy = Math.random() - 0.5;
@@ -1786,6 +2428,35 @@ LIMIT ${graphLimit()}`;
       setGraphTransform();
     }
 
+    function appendGraphDistribution(container, term, label) {
+      const pane = document.createElement("div");
+      pane.className = "graph-distribution";
+      const title = document.createElement("div");
+      title.className = "detail-label";
+      const selector = document.createElement("select");
+      selector.setAttribute("aria-label", "Distribution dimension");
+      selector.hidden = true;
+      const svg = svgEl("svg", { viewBox: "0 0 700 300", role: "img", "aria-label": `Distribution for ${label}` });
+      svg.style.width = "100%";
+      const summary = document.createElement("pre");
+      summary.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px";
+      const details = document.createElement("details");
+      const caption = document.createElement("summary");
+      caption.textContent = "Distribution JSON";
+      const raw = document.createElement("pre");
+      raw.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto";
+      try { raw.textContent = JSON.stringify(JSON.parse(term.value), null, 2); }
+      catch (_) { raw.textContent = term.value; }
+      details.append(caption, raw);
+      pane.append(title, selector, svg, summary, details);
+      container.appendChild(pane);
+      try {
+        showDistribution(term, label, null, { pane, title, selector, svg, summary });
+      } catch (error) {
+        summary.textContent = `Could not draw distribution: ${error.message}. Refresh the page and retry.`;
+      }
+    }
+
     function renderGraphDetail(node) {
       const requestId = ++graphState.detailRequestId;
       graphDetailNode.innerHTML = "<h3>Node Detail</h3>";
@@ -1801,57 +2472,64 @@ LIMIT ${graphLimit()}`;
         ["URI", node.term.value]
       ];
       rows.forEach(([label, value]) => {
-        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">${label}</div><div class="detail-value">${value}</div></div>`;
+        const row = document.createElement("div");
+        row.className = "detail-row detail-property";
+        const heading = document.createElement("div");
+        heading.className = "detail-label";
+        heading.textContent = label;
+        const content = document.createElement("div");
+        content.className = "detail-value";
+        content.textContent = value;
+        row.append(heading, content);
+        graphDetailNode.appendChild(row);
       });
 
       if (isNumericLiteral(node.term)) {
         graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Numeric Value</div><div class="detail-value">${formatNumericValue(node.term.value)}</div></div>`;
       }
 
-      if (node.term.type === "literal" && (node.term.datatype || "").includes("gmmLiteral")) {
-        graphDetailNode.innerHTML += renderGmmSummary(node.term.value);
+      if (isDistribution(node.term)) {
+        appendGraphDistribution(graphDetailNode, node.term, node.label);
       }
 
-      if (node.term.type === "uri" && node.term.value.toLowerCase().includes("rv_")) {
-        graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution</div><div class="detail-value">Loading distribution details...</div></div>`;
-        const query = `SELECT ?p ?o
-WHERE {
-  <${node.term.value}> ?p ?o .
-}
-LIMIT 20`;
-        sparql(query).then((json) => {
-          if (graphState.detailRequestId !== requestId) {
+      if (node.term.type === "uri") {
+        const detail = document.createElement("div");
+        detail.className = "detail-row";
+        const heading = document.createElement("div");
+        heading.className = "detail-label";
+        heading.textContent = "Distribution";
+        const value = document.createElement("div");
+        value.className = "detail-value";
+        value.textContent = "Loading distribution details...";
+        detail.append(heading, value);
+        graphDetailNode.appendChild(detail);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        const query = `SELECT ?distribution WHERE {
+          ${sparqlTerm(node.term)} ?predicate ?distribution .
+          VALUES ?predicate {
+            <http://example.org/uncertainty#hasDistribution>
+            <http://example.org/ontology/uncertainty#hasDistribution>
+          }
+        } LIMIT 20`;
+        sparql(query, controller.signal).then(json => {
+          if (graphState.detailRequestId !== requestId) return;
+          const bindings = json.results?.bindings || [];
+          value.replaceChildren();
+          if (!bindings.length) {
+            value.textContent = "No distribution attached to this node.";
             return;
           }
-          const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
-          const distribution = bindings.find((row) => {
-            const predicate = row.p ? row.p.value : "";
-            return predicate.endsWith("hasDistribution");
+          bindings.forEach(row => {
+            if (!row.distribution) return;
+            appendGraphDistribution(value, row.distribution, node.label);
           });
-          const predicateValues = bindings
-            .filter((row) => row.o)
-            .slice(0, 8)
-            .map((row) => `<div class="gmm-component">${compactLabel(row.p.value)}: ${summarizeTermValue(row.o)}</div>`)
-            .join("");
-
-          if (distribution && distribution.o) {
-            const datatype = distribution.o.datatype || "";
-            if (datatype.includes("gmmLiteral")) {
-              graphDetailNode.innerHTML += renderGmmSummary(distribution.o.value);
-            } else {
-              graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution Value</div><div class="detail-value">${distribution.o.value}</div></div>`;
-            }
-          }
-
-          if (predicateValues) {
-            graphDetailNode.innerHTML += `<div class="gmm-info"><span class="gmm-title">Outgoing Properties</span>${predicateValues}</div>`;
-          }
-        }).catch(() => {
-          if (graphState.detailRequestId !== requestId) {
-            return;
-          }
-          graphDetailNode.innerHTML += `<div class="detail-row"><div class="detail-label">Distribution</div><div class="detail-value">Failed to load distribution details.</div></div>`;
-        });
+        }).catch(error => {
+          if (graphState.detailRequestId !== requestId) return;
+          value.textContent = controller.signal.aborted
+            ? "Distribution request timed out. Select the node again to retry."
+            : "Failed to load distribution details. Select the node again to retry.";
+        }).finally(() => clearTimeout(timeout));
       }
     }
 
@@ -1945,7 +2623,42 @@ LIMIT 20`;
       graphState.frame = requestAnimationFrame(tickGraph);
     }
 
+    function collapseNode(node) {
+      node.expanded = false;
+      graphState.links.forEach(link => link.owners?.delete(node.id));
+      // Only keep branches reachable from the initial graph through an expanded owner.
+      const visible = new Set(graphState.nodes.filter(item => item.root).map(item => item.id));
+      let changed = true;
+      while (changed) {
+        changed = false;
+        graphState.links.forEach(link => {
+          if (!link.root && ![...(link.owners || [])].some(id => visible.has(id) && graphState.nodeMap.get(id)?.expanded)) return;
+          for (const endpoint of [link.source, link.target]) {
+            if (!visible.has(endpoint.id)) { visible.add(endpoint.id); changed = true; }
+          }
+        });
+      }
+      graphState.links = graphState.links.filter(link => link.root || [...(link.owners || [])].some(id => visible.has(id) && graphState.nodeMap.get(id)?.expanded));
+      graphState.nodes = graphState.nodes.filter(item => visible.has(item.id));
+      graphState.nodeMap = new Map(graphState.nodes.map(item => [item.id, item]));
+      graphState.linkMap = new Map(graphState.links.map(link => [link.key, link]));
+      graphState.nodes.forEach(item => item.knownLinks.clear());
+      graphState.links.forEach(link => {
+        link.owners = new Set([...(link.owners || [])].filter(id => visible.has(id)));
+        link.source.knownLinks.add(link.key);
+        link.target.knownLinks.add(link.key);
+      });
+      syncGraphDOM();
+      selectNode(node);
+      updateGraphPositions();
+      setStatus(graphStatusNode, `${graphState.nodes.length} nodes, ${graphState.links.length} edges visible`);
+    }
+
     async function expandNode(node) {
+      if (node.expanded && !node.loading) {
+        collapseNode(node);
+        return;
+      }
       if (!isExpandable(node) || node.loading) {
         return;
       }
@@ -1961,6 +2674,7 @@ LIMIT 20`;
 
       try {
         const json = await sparql(query);
+        if (graphState.nodeMap.get(node.id) !== node) return;
         const bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
         const newNodes = [];
 
@@ -1968,9 +2682,12 @@ LIMIT 20`;
           const sourceTerm = termFromBinding(row, "s");
           const predicateTerm = termFromBinding(row, "p");
           const targetTerm = termFromBinding(row, "o");
+          if (!graphLiteralsInput.checked && ["literal", "typed-literal"].includes(targetTerm.type)) return;
           const sourceKnown = graphState.nodeMap.has(`${sourceTerm.type}:${sourceTerm.value}`);
           const targetKnown = graphState.nodeMap.has(`${targetTerm.type}:${targetTerm.value}`);
           const link = addGraphLink(sourceTerm, predicateTerm, targetTerm);
+          if (!link.owners) link.owners = new Set();
+          link.owners.add(node.id);
           if (!sourceKnown) {
             newNodes.push(link.source);
           }
@@ -1997,15 +2714,19 @@ LIMIT 20`;
     }
 
     async function refreshGraph() {
+      const version = ++graphViewVersion;
       refreshGraphButton.disabled = true;
       setStatus(graphStatusNode, "Loading Top-Level Nodes...");
 
       try {
         clearGraphState();
         let json = await sparql(graphRootQuery());
+        if (version !== graphViewVersion) return;
         let bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
+        const hasAngleGrinderRoots = bindings.length > 0;
         if (!bindings.length) {
           json = await sparql(graphFallbackRootQuery());
+          if (version !== graphViewVersion) return;
           bindings = json.results && Array.isArray(json.results.bindings) ? json.results.bindings : [];
         }
         if (!bindings.length) {
@@ -2021,7 +2742,7 @@ LIMIT 20`;
         const angleGrinderRoots = bindings
           .map((row) => termFromBinding(row, "s"))
           .filter((term) => term && term.type === "uri");
-        if (angleGrinderRoots.length) {
+        if (hasAngleGrinderRoots && angleGrinderRoots.length) {
           const classNode = getGraphNode({ type: "uri", value: angleGrinderClassUri });
           classNode.relationCount = angleGrinderRoots.length;
           angleGrinderRoots.forEach((term) => {
@@ -2032,6 +2753,8 @@ LIMIT 20`;
             );
           });
         }
+        graphState.nodes.forEach(node => { node.root = true; });
+        graphState.links.forEach(link => { link.root = true; });
         layoutRootNodes(graphState.nodes);
         resolveNodeCollisions(30);
         syncGraphDOM();
@@ -2042,6 +2765,7 @@ LIMIT 20`;
         graphNeedsRefresh = false;
         setStatus(graphStatusNode, `${graphState.nodes.length} top-level nodes loaded`);
       } catch (error) {
+        if (version !== graphViewVersion) return;
         clearGraphState();
         renderGraphDetail(null);
         setStatus(graphStatusNode, `Failed to load graph: ${error.message}`, true);
@@ -2124,10 +2848,52 @@ LIMIT 20`;
       tabPanels.forEach((panel) => {
         panel.classList.toggle("active", panel.id === `tab-${tab}`);
       });
-      if (tab === "graph" && (!graphLoaded || graphNeedsRefresh)) {
+      if (tab === "query" && (!graphLoaded || graphNeedsRefresh)) {
         refreshGraph();
       }
     }
+
+    const addQueryButton = document.getElementById("addQuery");
+    const sparqlFileInput = document.getElementById("sparqlFile");
+    addQueryButton.addEventListener("click", () => sparqlFileInput.click());
+    sparqlFileInput.addEventListener("change", async () => {
+      const file = sparqlFileInput.files && sparqlFileInput.files[0];
+      if (!file) return;
+      addQueryButton.disabled = true;
+      try {
+        if (!/\.(sparql|rq)$/i.test(file.name)) {
+          throw new Error("Choose a .sparql or .rq file.");
+        }
+        const query = await file.text();
+        if (!query.trim()) throw new Error("The query file is empty.");
+        const id = "user-" + file.name;
+        const entry = {
+          id,
+          label: file.name.replace(/\.(sparql|rq)$/i, ""),
+          source: file.name,
+          uploaded: true,
+          query
+        };
+        const existingIndex = exampleQueries.findIndex(item => item.id === id);
+        if (existingIndex >= 0) {
+          exampleQueries[existingIndex] = entry;
+        } else {
+          exampleQueries.push(entry);
+          const option = document.createElement("option");
+          option.value = id;
+          option.textContent = entry.label;
+          querySelect.appendChild(option);
+        }
+        querySelect.value = id;
+        setQuery(entry);
+        queryInput.focus({ preventScroll: true });
+      } catch (error) {
+        window.alert(`Could not import query: ${error.message}`);
+      } finally {
+        sparqlFileInput.value = "";
+        addQueryButton.disabled = false;
+      }
+    });
 
     querySelect.addEventListener("change", () => setQuery(selectedExample()));
     resetButton.addEventListener("click", () => setQuery(selectedExample()));
@@ -2135,26 +2901,115 @@ LIMIT 20`;
     uploadTtlButton.addEventListener("click", uploadTtl);
     refreshDatasetButton.addEventListener("click", refreshDataset);
     refreshGraphButton.addEventListener("click", refreshGraph);
-    resetGraphButton.addEventListener("click", fitGraphToViewport);
+    const queryToolbar = document.getElementById("queryTitle");
+    function toggleQueryWorkbench() {
+      const collapsed = document.getElementById("queryWorkbench").classList.toggle("is-collapsed");
+      queryToolbar.setAttribute("aria-expanded", String(!collapsed));
+    }
+    queryToolbar.addEventListener("click", (event) => {
+      if (event.target.closest("button, input, label, select, a, .query-history-dropdown")) return;
+      toggleQueryWorkbench();
+    });
+    queryToolbar.addEventListener("keydown", (event) => {
+      if (event.target !== queryToolbar) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleQueryWorkbench();
+      }
+    });
+    const graphToggleBar = document.getElementById("graphTitle");
+    function toggleGraphSection() {
+      const collapsed = document.getElementById("graphSection").classList.toggle("is-collapsed");
+      graphToggleBar.setAttribute("aria-expanded", String(!collapsed));
+    }
+    graphToggleBar.addEventListener("click", (event) => {
+      if (event.target.closest("button, input, label, select, a")) return;
+      toggleGraphSection();
+    });
+    graphToggleBar.addEventListener("keydown", (event) => {
+      if (event.target !== graphToggleBar) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleGraphSection();
+      }
+    });
+    resetGraphButton.addEventListener("click", () => fitGraphToViewport());
     graphLimitInput.addEventListener("change", () => {
       graphNeedsRefresh = true;
-      if (activeTab === "graph") {
+      if (activeTab === "query") {
         refreshGraph();
       }
     });
-    graphLiteralsInput.addEventListener("change", () => {
-      graphNeedsRefresh = true;
-      if (activeTab === "graph") {
-        refreshGraph();
+    let literalUpdateVersion = 0;
+    graphLiteralsInput.addEventListener("change", async () => {
+      const updateVersion = ++literalUpdateVersion;
+      const viewVersion = graphViewVersion;
+      const isLiteral = node => node.term.type === "literal" || node.term.type === "typed-literal";
+      try {
+        if (graphLiteralsInput.checked) {
+          const expanded = graphState.nodes.filter(node => node.expanded && !isLiteral(node));
+          const results = await Promise.all(expanded.map(async node => {
+            const focus = sparqlTerm(node.term);
+            if (!focus) return { node, rows: [] };
+            const json = await sparql(`SELECT ?s ?p ?o WHERE {
+              BIND(${focus} AS ?s)
+              ?s ?p ?o . FILTER(isLiteral(?o))
+            } LIMIT ${graphLimit()}`);
+            return { node, rows: json.results?.bindings || [] };
+          }));
+          if (updateVersion !== literalUpdateVersion || viewVersion !== graphViewVersion) return;
+          results.forEach(({node, rows}) => {
+            if (graphState.nodeMap.get(node.id) !== node || !node.expanded) return;
+            const added = [];
+            rows.forEach(row => {
+              const previous = new Set(graphState.nodes);
+              const link = addGraphLink(termFromBinding(row, "s"), termFromBinding(row, "p"), termFromBinding(row, "o"));
+              if (!link.owners) link.owners = new Set();
+              link.owners.add(node.id);
+              if (!previous.has(link.target)) added.push(link.target);
+            });
+            positionNewNodes(added, node);
+          });
+        } else {
+          graphState.links = graphState.links.filter(link => !isLiteral(link.source) && !isLiteral(link.target));
+          graphState.nodes = graphState.nodes.filter(node => !isLiteral(node));
+          graphState.nodeMap = new Map(graphState.nodes.map(node => [node.id, node]));
+          graphState.linkMap = new Map(graphState.links.map(link => [link.key, link]));
+          graphState.nodes.forEach(node => node.knownLinks.clear());
+          graphState.links.forEach(link => {
+            link.source.knownLinks.add(link.key);
+            link.target.knownLinks.add(link.key);
+          });
+          if (graphState.selectedNode && isLiteral(graphState.selectedNode)) {
+            graphState.selectedNode = null;
+            renderGraphDetail(null);
+          }
+        }
+        syncGraphDOM();
+        updateGraphPositions();
+        setStatus(graphStatusNode, `${graphState.nodes.length} nodes, ${graphState.links.length} edges visible`);
+      } catch (error) {
+        if (updateVersion !== literalUpdateVersion || viewVersion !== graphViewVersion) return;
+        setStatus(graphStatusNode, `Could not update literals: ${error.message}`, true);
       }
     });
     tabButtons.forEach((button) => {
       button.addEventListener("click", () => activateTab(button.dataset.tab));
     });
 
+    document.getElementById("distributionClose").addEventListener("click", () => {
+      document.getElementById("distributionPane").hidden = true;
+    });
     populateQuerySelect();
+    checkEngineStatus();
+    setInterval(checkEngineStatus, 10000);
+    window.addEventListener("online", checkEngineStatus);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) checkEngineStatus();
+    });
     refreshDataset();
     graphState.transform = { x: 0, y: 0, k: 1 };
+    activateTab("query");
   </script>
 </body>
 </html>

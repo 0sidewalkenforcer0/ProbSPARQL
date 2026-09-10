@@ -1,0 +1,7 @@
+PREFIX uq: <http://example.org/ontology/uncertainty#>
+SELECT ?rv ?type ?dist WHERE {
+  ?rv a uq:RandomVariable ; uq:hasDistribution ?dist .
+  BIND(DATATYPE(?dist) AS ?type)
+  VALUES ?type { uq:dirichletLiteral uq:histLiteral }
+}
+ORDER BY ?type ?rv
