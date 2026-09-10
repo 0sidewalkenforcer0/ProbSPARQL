@@ -8,9 +8,9 @@ PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 # R2-real: anomaly detection between repeated RMS measurements
 # under the same process condition.
-# Keep replicate pairs whose numerical Jensen-Shannon divergence exceeds 0.1.
-# This is a divergence threshold, not a significance test.
-SELECT ?condition ?cc ?temp ?sample1 ?sample2 ?jsd WHERE {
+# The filter keeps replicate pairs for which similarity cannot be accepted
+# under the divergence tolerance epsilon=0.1 and alpha=0.05.
+SELECT ?condition ?cc ?temp ?sample1 ?sample2 WHERE {
   ?condition a ex:ProcessCondition ;
              ex:carbonContent ?cc ;
              ex:temperature ?temp ;
@@ -27,7 +27,6 @@ SELECT ?condition ?cc ?temp ?sample1 ?sample2 ?jsd WHERE {
   ?measurement2 uq:representedBy ?rv2 .
   ?rv2 uq:hasDistribution ?dist2 .
 
-  BIND(prob:jsd(?dist1, ?dist2) AS ?jsd)
-  FILTER(?jsd > 0.1)
+  FILTER(!prob:divergenceTest(?dist1, ?dist2, 0.1, 0.05))
 }
 ORDER BY ?cc ?temp ?sample1 ?sample2
