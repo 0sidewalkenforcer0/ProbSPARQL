@@ -489,7 +489,7 @@ the preprint is the citable version for now:
   year          = {2026},
   eprint        = {2607.18262},
   archivePrefix = {arXiv},
-  primaryClass  = {cs.DB},
+  primaryClass  = {cs.AI},
   doi           = {10.48550/arXiv.2607.18262},
   url           = {https://arxiv.org/abs/2607.18262},
   note          = {To appear in the In-Use track of ISWC 2026}
