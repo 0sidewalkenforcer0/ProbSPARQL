@@ -180,8 +180,20 @@ public class SimilarityEvaluator {
         return evaluateWithDetails(gmm1, gmm2).score();
     }
 
-    public EvaluationResult evaluateWithDetails(GMMValue gmm1, GMMValue gmm2) {
-        validateCompatibility(gmm1, gmm2);
+    public EvaluationResult evaluateWithDetails(GMMValue left, GMMValue right) {
+        validateCompatibility(left, right);
+
+        // JSD is symmetric, so every mode below must be too. Each of them draws from a
+        // single RNG stream whose realisation depends on the order the two operands are
+        // consumed in, so the operands are put in a canonical order once, here, before
+        // any sampler sees them. computeMC canonicalises again; the operation is
+        // idempotent, so the V1 path is unaffected.
+        GMMValue gmm1 = left;
+        GMMValue gmm2 = right;
+        if (!org.apache.jena.probsparql.functions.DistributionSeeds.inCanonicalOrder(left, right)) {
+            gmm1 = right;
+            gmm2 = left;
+        }
 
         return switch (mode) {
             case JSDivergenceConfig.MODE_GT_100 ->
