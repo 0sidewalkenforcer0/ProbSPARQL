@@ -3,10 +3,10 @@
 validate_exp2.py — Validation checks for Exp2 results
 
 Checks:
-  Check 1: Report result-count drift across retained variants
+  Check 1: Result-count drift across retained variants (bounded, see DRIFT_HARD_LIMIT)
   Check 2: Calibration CSV sanity — multimodalPairs and theta ordering
   Check 3: Speedup ordering — DIVJOIN should generally beat InEngine_CF at high unimodalFrac
-  Check 4: Pruning stats conservation / DIVJOIN invariants
+  Check 4: Pruning stats conservation, DIVJOIN invariants, failed-pair count
 
 Exit code: 0 = all hard checks passed, 1 = hard failures found.
 
@@ -19,6 +19,11 @@ import csv
 import os
 import sys
 from collections import defaultdict
+
+# Result-count drift attributable to MC decisions flipping near theta should be
+# small. Beyond this fraction the explanation stops being credible and the
+# discrepancy is treated as a hard failure.
+DRIFT_HARD_LIMIT = 0.05
 
 
 def load_csv(path):
@@ -101,9 +106,24 @@ def validate(results_dir):
     else:
         warnings.append(
             f"  [WARN] Result counts differ in {mismatch_count}/{len(all_keys)} configurations "
-            f"(max relative drift={max_rel_drift:.2%}); this is expected for sampling-based "
-            "threshold decisions and is not a hard validation failure."
+            f"(max relative drift={max_rel_drift:.2%}).\n"
+            "         Cause: the variants do not share an estimator. InEngine_CF/JF evaluate\n"
+            "         prob:jsd (PolyJSD, fixed 10k pooled samples) while DIVJOIN evaluates\n"
+            "         SimilarityEvaluator in the server's probsparql.mode (sample budget and\n"
+            "         algorithm both differ). Pairs whose true JSD lies within Monte Carlo\n"
+            "         error of theta can therefore be decided differently.\n"
+            "         Both estimators are seeded from their operands, so the drift is stable\n"
+            "         across re-runs; a drift that CHANGES between runs of the same data is a\n"
+            "         genuine defect, not sampling noise. Drift concentrated away from theta,\n"
+            "         or a large absolute drift, likewise indicates a real discrepancy rather\n"
+            "         than a threshold-boundary effect."
         )
+        if max_rel_drift > DRIFT_HARD_LIMIT:
+            failures.append(
+                f"  FAIL: max result-count drift {max_rel_drift:.2%} exceeds the "
+                f"{DRIFT_HARD_LIMIT:.0%} threshold-boundary budget. A drift this large cannot "
+                "be explained by decisions flipping near theta; investigate the estimators."
+            )
 
     # -----------------------------------------------------------------------
     # Check 3: Calibration sanity — multimodalPairs > 0 when unimodalFrac < 1
@@ -162,15 +182,15 @@ def validate(results_dir):
     # -----------------------------------------------------------------------
     # Check 5: Pruning stats sanity
     # -----------------------------------------------------------------------
-    print("\n[Check 4] Pruning stats — PrunedMean + PrunedVar + PrunedBounds + "
-          "FullJSD + PrunedDim == TotalPairs")
+    print("\n[Check 4] Pruning stats — PrunedDim + PrunedDiscJSD + PrunedVar + "
+          "PrunedBounds + FullJSD == TotalPairs")
     if not ps_rows:
         warnings.append("  [WARN] exp2_pruning_stats.csv not found or empty")
     else:
         check5_pass = True
         for r in ps_rows:
             total  = nt(r["TotalPairs"])
-            summed = (nt(r["PrunedDim"]) + nt(r["PrunedMean"]) +
+            summed = (nt(r["PrunedDim"]) + nt(r.get("PrunedDiscJSD", r.get("PrunedMean", 0))) +
                       nt(r["PrunedVar"])  + nt(r["PrunedBounds"]) +
                       nt(r["FullJSD"]))
             if total > 0 and summed != total:
@@ -181,6 +201,18 @@ def validate(results_dir):
                 check5_pass = False
         if check5_pass:
             print("  PASS: Pruning stat conservation holds")
+
+        # Any pair the server could not evaluate was excluded from the result, so a
+        # non-zero count means the reported result counts understate the true answer.
+        total_failures = sum(nt(r.get("Failures", 0)) for r in ps_rows)
+        if total_failures:
+            failures.append(
+                f"  FAIL: DIVJOIN could not evaluate {total_failures} candidate pair(s); "
+                "those pairs are missing from the results. Re-run the server with "
+                "-Dprobsparql.simjoin.failOnError=true to surface the cause."
+            )
+        else:
+            print("  PASS: No failed pair evaluations reported")
 
     # -----------------------------------------------------------------------
     # Summary

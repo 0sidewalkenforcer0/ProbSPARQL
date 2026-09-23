@@ -3,65 +3,94 @@ package org.apache.jena.probsparql.functions.comparison;
 import org.apache.jena.probsparql.datatypes.GMMValue;
 
 /**
- * V4: Bounds Filter Sampler (Jensen's Inequality)
- * 
- * Uses analytical bounds to quickly reject GMM pairs that are clearly different
- * without any sampling. This is the core "Filter" in "Filter-and-Refine".
- * 
- * Jensen's Inequality provides bounds:
- * - If the means are far apart, the JSD is guaranteed to be large
- * - If the variances are small, we can bound JSD from below
- * 
+ * V4: Bounds Filter Sampler — the "Filter" in "Filter-and-Refine".
+ *
+ * <p>Computes a <em>guaranteed lower bound</em> on JSD(P‖Q) without sampling, so
+ * that pairs whose bound already exceeds the decision threshold can be rejected
+ * outright. The bound follows from the Data Processing Inequality (DPI): for any
+ * deterministic map {@code f}, {@code JSD(f(P)‖f(Q)) <= JSD(P‖Q)}. Here {@code f}
+ * is per-axis histogram binning of the exact Gaussian marginals.</p>
+ *
+ * <h2>Soundness contract</h2>
+ * <p>The bound is only usable in one direction:</p>
+ * <ul>
+ *   <li>{@code bound > threshold} ⟹ {@code JSD > threshold}. Rejecting is sound.</li>
+ *   <li>{@code bound <= threshold} says <em>nothing</em> about the true JSD, so the
+ *       pair must be refined by an estimator before a decision can be made.</li>
+ * </ul>
+ * <p>Consequently {@link #computeJSDWithFilter} reports whether its verdict is
+ * conclusive, and callers must refine when it is not. Treating an inconclusive
+ * lower bound as a JSD estimate produces systematic false positives.</p>
+ *
  * @author ProbSPARQL Team
  */
 public class BoundsFilterSampler {
     private static final int DEFAULT_BOUND_BINS = 32;
-    
+
+    /** {@link #checkBounds} result index: 1.0 if the pair can be rejected outright. */
+    public static final int CHECK_CAN_FILTER = 0;
+    /** {@link #checkBounds} result index: the guaranteed JSD lower bound. */
+    public static final int CHECK_BOUND = 1;
+    /** {@link #checkBounds} result index: 1.0 if the verdict is conclusive, 0.0 if refinement is required. */
+    public static final int CHECK_CONCLUSIVE = 2;
+
+    /** {@link #computeJSDWithFilter} result index: the guaranteed JSD lower bound. */
+    public static final int FILTER_BOUND = 0;
+    /** {@link #computeJSDWithFilter} result index: samples consumed (always 0 — this stage never samples). */
+    public static final int FILTER_SAMPLES = 1;
+    /** {@link #computeJSDWithFilter} result index: 1.0 if conclusive, 0.0 if the caller must refine. */
+    public static final int FILTER_CONCLUSIVE = 2;
+
     // Filter configuration
-    private final double boundsThreshold;  // If JSD > this, reject immediately
-    
+    private final double boundsThreshold;  // If the bound exceeds this, reject immediately
+
     // Statistics
     private int totalPairs = 0;
     private int filteredByBounds = 0;
     private int requiredSampling = 0;
-    
+
     public BoundsFilterSampler(double boundsThreshold) {
         this.boundsThreshold = boundsThreshold;
     }
-    
+
     /**
-     * Check if JSD is guaranteed to exceed threshold using analytical bounds.
-     * Returns: {canFilter, estimatedJSD, isLowerBound}
-     *   - canFilter: true if we can definitively reject (JSD > threshold)
-     *   - estimatedJSD: point estimate using bounds
-     *   - isLowerBound: true if estimatedJSD is a guaranteed lower bound
+     * Evaluate the DPI lower bound and report whether it settles the decision.
+     *
+     * @return {@code {canFilter, lowerBound, isConclusive}} where {@code canFilter}
+     *         and {@code isConclusive} are both 1.0 exactly when
+     *         {@code lowerBound > threshold}, i.e. when the pair can be soundly
+     *         rejected without sampling. When they are 0.0 the caller MUST refine:
+     *         {@code lowerBound} is not an estimate of the true JSD.
      */
     public double[] checkBounds(GMMValue p, GMMValue q) {
         totalPairs++;
 
-        // Use a conservative lower bound derived from discretization (DPI).
-        // The heuristic moment-based scores below are still available as helpers,
-        // but they are not used for definitive filtering because they are not
-        // guaranteed lower bounds.
+        // Guaranteed lower bound via discretization (DPI). The moment-based
+        // heuristics below are NOT valid bounds and are never used for filtering.
         double lowerBound = computeDiscretizedJSD(p, q, DEFAULT_BOUND_BINS);
-        
+
         if (lowerBound > boundsThreshold) {
             // Guaranteed to exceed threshold - filter out
             filteredByBounds++;
-            return new double[] {1.0, lowerBound, 1.0};  // {filter, jsd, isLowerBound}
+            return new double[] {1.0, lowerBound, 1.0};  // {filter, bound, conclusive}
         }
-        
-        // Cannot definitively filter - need sampling
+
+        // Cannot definitively filter - caller must refine by sampling
         requiredSampling++;
-        return new double[] {0.0, lowerBound, 1.0};  // {noFilter, jsd, isLowerBound}
+        return new double[] {0.0, lowerBound, 0.0};  // {noFilter, bound, inconclusive}
     }
-    
+
     /**
-     * Compute lower bound on JSD based on mean distance.
-     * 
-     * Using Pinsker's inequality and relationship between KL and mean distance:
-     * JSD >= 0.5 * ||mean1 - mean2||^2 / (var1 + var2)
+     * Heuristic score based on mean distance. <strong>NOT a valid JSD bound.</strong>
+     *
+     * <p>Retained only for diagnostic comparison. For two Gaussians with equal
+     * variance this expression is roughly twice the true JSD in the small-shift
+     * regime, so using it to prune would incorrectly discard matching pairs.
+     * It is deliberately not referenced by {@link #checkBounds}.</p>
+     *
+     * @deprecated not a lower bound; do not use for filtering
      */
+    @Deprecated
     public double computeMeanDistanceBound(GMMValue p, GMMValue q) {
         if (p.getDimensions() != 1) {
             // Only optimize for 1D case
@@ -95,8 +124,15 @@ public class BoundsFilterSampler {
     }
     
     /**
-     * Compute lower bound based on variance difference.
+     * Heuristic score based on variance ratio. <strong>NOT a valid JSD bound.</strong>
+     *
+     * <p>{@code 0.5*log(varRatio)} is unbounded and can exceed {@code log 2}, the
+     * maximum attainable JSD, so it would prune arbitrarily. Retained only for
+     * diagnostic comparison and deliberately not referenced by {@link #checkBounds}.</p>
+     *
+     * @deprecated not a lower bound; do not use for filtering
      */
+    @Deprecated
     public double computeVarianceBound(GMMValue p, GMMValue q) {
         if (p.getDimensions() != 1) {
             return 0.0;
@@ -157,65 +193,105 @@ public class BoundsFilterSampler {
     /**
      * Compute a valid lower bound on JSD(g1, g2) using discretized histogram binning.
      *
-     * By the Data Processing Inequality (DPI), for any deterministic function f:
-     *   JSD(f(P) || f(Q)) &lt;= JSD(P || Q)
+     * <p>By the Data Processing Inequality (DPI), for any deterministic function f:
+     * {@code JSD(f(P) || f(Q)) <= JSD(P || Q)}.</p>
      *
-     * We use f = histogram binning on the real line: partition [lo, hi] into
-     * numBins equal-width intervals and assign each GMM's probability mass to bins
-     * using the Gaussian CDF. This gives a computable discrete JSD that is always
-     * &lt;= the true continuous JSD.
+     * <p>For each coordinate axis {@code j} we take {@code f_j(x) = } the index of the
+     * bin containing {@code x_j}. That is a deterministic function of the sample, so
+     * each axis yields a valid lower bound; the maximum over axes is therefore also a
+     * valid lower bound and is the tightest one available from this family. The exact
+     * axis marginal of a Gaussian component is {@code N(mu_j, Sigma_jj)}, so the bin
+     * masses are computed in closed form from the normal CDF.</p>
      *
-     * Bin range: [min_mu - 4*sigma_max, max_mu + 4*sigma_max] covers virtually all
-     * mass for typical GMMs.
+     * <p>The partition covers the whole real line: bin 0 is {@code (-inf, lo)} and the
+     * last bin is {@code [hi, +inf)}. Retaining these overflow bins is what makes the
+     * result a genuine DPI bound — renormalizing away the tail mass instead would
+     * perturb P and Q by different amounts and void the guarantee.</p>
      *
-     * Complexity: O(numBins x K) ~= O(90) for numBins=30, K=3.
+     * <p>Complexity: O(d x numBins x K).</p>
      *
-     * @param g1      first GMM (must be 1D; returns 0.0 otherwise)
-     * @param g2      second GMM
-     * @param numBins number of histogram bins (30 recommended)
-     * @return valid lower bound in [0, log(2)]
+     * @param g1      first GMM
+     * @param g2      second GMM (must have the same dimensionality)
+     * @param numBins number of interior histogram bins per axis (30 recommended)
+     * @return valid lower bound in [0, log(2)]; 0.0 if the bound is unavailable
      */
     public double computeDiscretizedJSD(GMMValue g1, GMMValue g2, int numBins) {
-        if (g1.getDimensions() != 1) return 0.0;
+        int d = g1.getDimensions();
+        if (d != g2.getDimensions()) {
+            return 0.0;
+        }
+        // GMMValue's accessors return defensive deep copies, so the parameters are
+        // snapshotted once here rather than per axis: this method sits on the V4/V5
+        // per-pair filter path, where a copy per axis would dominate its cost.
+        Params p1 = new Params(g1);
+        Params p2 = new Params(g2);
 
-        // --- Compute support range covering both GMMs ---
-        double lo = Double.MAX_VALUE;
-        double hi = -Double.MAX_VALUE;
+        double best = 0.0;
+        for (int axis = 0; axis < d; axis++) {
+            best = Math.max(best, axisDiscretizedJSD(p1, p2, axis, numBins));
+        }
+        return Math.max(0.0, Math.min(best, Math.log(2.0)));
+    }
 
-        double[][] means1 = g1.getMeans();
-        double[][][] covs1 = g1.getCovariances();
-        for (int i = 0; i < g1.getNComponents(); i++) {
-            double mu  = means1[i][0];
-            double sig = Math.sqrt(covs1[i][0][0]);
+    /**
+     * One GMM's parameters, read out of the value object exactly once.
+     */
+    private static final class Params {
+        final double[] weights;
+        final double[][] means;
+        final double[][][] covariances;
+        final String covarianceType;
+        final int components;
+
+        Params(GMMValue gmm) {
+            this.weights = gmm.getWeights();
+            this.means = gmm.getMeans();
+            this.covariances = gmm.getCovariances();
+            this.covarianceType = gmm.getCovarianceType();
+            this.components = gmm.getNComponents();
+        }
+
+        /** Standard deviation of this component's marginal along {@code axis}. */
+        double sigma(int component, int axis) {
+            return Math.sqrt(marginalVariance(covariances[component], covarianceType, axis));
+        }
+    }
+
+    /**
+     * DPI lower bound obtained by binning a single coordinate axis.
+     */
+    private double axisDiscretizedJSD(Params g1, Params g2, int axis, int numBins) {
+        double lo = Double.POSITIVE_INFINITY;
+        double hi = Double.NEGATIVE_INFINITY;
+
+        for (int i = 0; i < g1.components; i++) {
+            double mu = g1.means[i][axis];
+            double sig = g1.sigma(i, axis);
+            lo = Math.min(lo, mu - 4.0 * sig);
+            hi = Math.max(hi, mu + 4.0 * sig);
+        }
+        for (int i = 0; i < g2.components; i++) {
+            double mu = g2.means[i][axis];
+            double sig = g2.sigma(i, axis);
             lo = Math.min(lo, mu - 4.0 * sig);
             hi = Math.max(hi, mu + 4.0 * sig);
         }
 
-        double[][] means2 = g2.getMeans();
-        double[][][] covs2 = g2.getCovariances();
-        for (int i = 0; i < g2.getNComponents(); i++) {
-            double mu  = means2[i][0];
-            double sig = Math.sqrt(covs2[i][0][0]);
-            lo = Math.min(lo, mu - 4.0 * sig);
-            hi = Math.max(hi, mu + 4.0 * sig);
-        }
+        if (!(hi - lo > 1e-12)) return 0.0;
 
-        if (hi - lo < 1e-12) return 0.0;
-
-        // --- Compute histogram bin edges ---
         double binWidth = (hi - lo) / numBins;
         double[] edges = new double[numBins + 1];
         for (int b = 0; b <= numBins; b++) {
             edges[b] = lo + b * binWidth;
         }
 
-        // --- Compute normalized bin probabilities for each GMM ---
-        double[] p = binMass(g1, edges, numBins);
-        double[] q = binMass(g2, edges, numBins);
+        // numBins interior cells plus two overflow cells => a partition of R
+        double[] p = axisBinMass(g1, axis, edges, numBins);
+        double[] q = axisBinMass(g2, axis, edges, numBins);
 
-        // --- Discrete JSD = 0.5 * KL(p||m) + 0.5 * KL(q||m), m = (p+q)/2 ---
+        // Discrete JSD = 0.5 * KL(p||m) + 0.5 * KL(q||m), m = (p+q)/2
         double jsd = 0.0;
-        for (int b = 0; b < numBins; b++) {
+        for (int b = 0; b < p.length; b++) {
             double pb = p[b];
             double qb = q[b];
             double mb = 0.5 * (pb + qb);
@@ -223,37 +299,51 @@ public class BoundsFilterSampler {
             if (pb > 1e-300) jsd += 0.5 * pb * Math.log(pb / mb);
             if (qb > 1e-300) jsd += 0.5 * qb * Math.log(qb / mb);
         }
-
-        return Math.max(0.0, Math.min(jsd, Math.log(2.0)));
+        return jsd;
     }
 
     /**
-     * Compute probability mass per bin for a GMM using Gaussian CDF differences.
-     * Result is normalized to sum to 1.
+     * Variance of the axis marginal of one Gaussian component, i.e. Sigma[axis][axis].
      */
-    private double[] binMass(GMMValue gmm, double[] edges, int numBins) {
-        double[] mass    = new double[numBins];
-        double[] weights = gmm.getWeights();
-        double[][] means = gmm.getMeans();
-        double[][][] covs = gmm.getCovariances();
+    private static double marginalVariance(double[][] cov, String covType, int axis) {
+        return switch (covType) {
+            case "full" -> cov[axis][axis];
+            case "diag" -> cov[0][axis];
+            case "spherical" -> cov[0][0];
+            default -> throw new IllegalStateException("Unknown covariance type: " + covType);
+        };
+    }
 
-        for (int k = 0; k < gmm.getNComponents(); k++) {
-            double mu  = means[k][0];
-            double sig = Math.sqrt(covs[k][0][0]);
-            double w   = weights[k];
+    /**
+     * Probability mass of each cell of the axis partition, using exact Gaussian
+     * marginal CDF differences.
+     *
+     * <p>The returned array has {@code numBins + 2} entries: index 0 holds
+     * {@code P(X_axis < edges[0])}, indices {@code 1..numBins} hold the interior
+     * bins, and the last entry holds {@code P(X_axis >= edges[numBins])}. Because
+     * the cells partition the real line the masses already sum to 1, so no
+     * renormalization is applied.</p>
+     */
+    private double[] axisBinMass(Params gmm, int axis, double[] edges, int numBins) {
+        double[] mass = new double[numBins + 2];
+
+        for (int k = 0; k < gmm.components; k++) {
+            double mu  = gmm.means[k][axis];
+            double sig = gmm.sigma(k, axis);
+            double w   = gmm.weights[k];
             double prev = normCDF(edges[0], mu, sig);
+            mass[0] += w * prev;                       // underflow cell (-inf, lo)
             for (int b = 0; b < numBins; b++) {
                 double curr = normCDF(edges[b + 1], mu, sig);
-                mass[b] += w * (curr - prev);
+                mass[b + 1] += w * (curr - prev);
                 prev = curr;
             }
+            mass[numBins + 1] += w * (1.0 - prev);     // overflow cell [hi, +inf)
         }
 
-        // Normalize to handle floating-point rounding
-        double sum = 0.0;
-        for (double v : mass) sum += v;
-        if (sum > 1e-10) {
-            for (int b = 0; b < numBins; b++) mass[b] /= sum;
+        // Guard against tiny negative masses from erf approximation error.
+        for (int b = 0; b < mass.length; b++) {
+            if (mass[b] < 0.0) mass[b] = 0.0;
         }
         return mass;
     }
@@ -282,23 +372,27 @@ public class BoundsFilterSampler {
     }
 
     /**
-     * Compute JSD using only the conservative lower-bound strategy.
-     * Returns: {lowerBound, samplesUsed}
+     * Run the bound-only filter stage and report whether it is conclusive.
      *
-     * This method intentionally does not fall back to sampling. It exists as a
-     * pure bound-based baseline so that V4 can be evaluated independently from
-     * the full adaptive pipeline used in V5.
+     * <p>This method performs no sampling. It returns
+     * {@code {lowerBound, samplesUsed=0, isConclusive}}; when {@code isConclusive}
+     * is 0.0 the caller must refine with an estimator before deciding, because
+     * {@code lowerBound} is a lower bound and not an estimate of the true JSD.
+     * See {@link SimilarityEvaluator} for the V4 refine step.</p>
      */
     public double[] computeJSDWithFilter(GMMValue p, GMMValue q, int defaultSamples) {
         double[] boundsResult = checkBounds(p, q);
-        return new double[] {boundsResult[1], 0};
+        return new double[] {boundsResult[CHECK_BOUND], 0, boundsResult[CHECK_CONCLUSIVE]};
     }
-    
+
     /**
-     * Simple compute JSD (for compatibility).
+     * Returns the guaranteed JSD lower bound for this pair.
+     *
+     * <p>Renamed from the former {@code computeJSD} to make clear that the result is
+     * a bound rather than a divergence estimate.</p>
      */
-    public double computeJSD(GMMValue p, GMMValue q, int samples) {
-        return computeJSDWithFilter(p, q, samples)[0];
+    public double computeLowerBound(GMMValue p, GMMValue q) {
+        return checkBounds(p, q)[CHECK_BOUND];
     }
     
     // Getters for statistics

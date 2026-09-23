@@ -6,6 +6,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramOperations;
 import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.datatypes.Sampleable;
+import org.apache.jena.probsparql.functions.DistributionSeeds;
 import org.apache.jena.probsparql.functions.DistributionSupport;
 import org.apache.jena.probsparql.utils.MatrixUtils;
 import org.apache.jena.sparql.expr.NodeValue;
@@ -39,8 +40,18 @@ public class KLDivergence extends FunctionBase2 {
     public static final String URI = "http://probsparql.org/function#kldivergence";
     
     private static final int DEFAULT_SAMPLES = 10000;
-    private static final java.util.Random random = new java.util.Random(42); // Fixed seed for reproducibility
-    
+
+    /**
+     * KL divergence is asymmetric, so the random stream is seeded from the ordered
+     * operand pair. A single shared {@code Random} instance would advance between
+     * calls and make repeated evaluation of the same expression return different
+     * values; see {@link DistributionSeeds}.
+     */
+    private static java.util.Random rngFor(Object p, Object q) {
+        return DistributionSeeds.rngForOrderedPair(p, q);
+    }
+
+
     /**
      * Compute KL divergence D_KL(dist1 || dist2).
      * 
@@ -110,11 +121,12 @@ public class KLDivergence extends FunctionBase2 {
      * D_KL(P||Q) ≈ (1/N) Σ [log(p(x_i)) - log(q(x_i))] where x_i ~ P
      */
     private double computeKLDivergence(GMMValue p, GMMValue q, int numSamples) {
+        java.util.Random random = rngFor(p, q);
         double sum = 0.0;
         
         for (int i = 0; i < numSamples; i++) {
             // Sample from P
-            double[] sample = sampleFromGMM(p);
+            double[] sample = sampleFromGMM(p, random);
             
             // Compute log(p(x))
             double logP = computeLogPDF(p, sample);
@@ -130,7 +142,7 @@ public class KLDivergence extends FunctionBase2 {
     }
 
     private double sampleBasedKL(Sampleable p, Sampleable q, int numSamples) {
-        double[][] samples = p.sample(numSamples);
+        double[][] samples = p.sample(numSamples, rngFor(p, q));
         double sum = 0.0;
         for (double[] sample : samples) {
             double logP = p.logPdf(sample);
@@ -214,8 +226,7 @@ public class KLDivergence extends FunctionBase2 {
      * 1. Select component k with probability w_k
      * 2. Sample from N(μ_k, Σ_k)
      */
-    private double[] sampleFromGMM(GMMValue gmm) {
-        int K = gmm.getNComponents();
+    private double[] sampleFromGMM(GMMValue gmm, java.util.Random random) {
         int d = gmm.getDimensions();
         double[] weights = gmm.getWeights();
         double[][] means = gmm.getMeans();
@@ -223,16 +234,16 @@ public class KLDivergence extends FunctionBase2 {
         String covType = gmm.getCovarianceType();
         
         // Select component
-        int component = sampleCategorical(weights);
+        int component = sampleCategorical(weights, random);
         
         // Sample from selected Gaussian
-        return sampleGaussian(means[component], covariances[component], covType, d);
+        return sampleGaussian(means[component], covariances[component], covType, d, random);
     }
     
     /**
      * Sample from categorical distribution.
      */
-    private int sampleCategorical(double[] weights) {
+    private int sampleCategorical(double[] weights, java.util.Random random) {
         double u = random.nextDouble();
         double cumulative = 0.0;
         
@@ -250,7 +261,7 @@ public class KLDivergence extends FunctionBase2 {
      * Sample from multivariate Gaussian using Cholesky decomposition.
      */
     private double[] sampleGaussian(double[] mean, double[][] covariance, 
-                                    String covType, int d) {
+                                    String covType, int d, java.util.Random random) {
         double[] sample = new double[d];
         
         if (d == 1) {

@@ -32,11 +32,15 @@ public class LastDivJoinStats extends FunctionBase1 {
         return switch (fieldNode.getString()) {
             case "totalPairs" -> NodeValue.makeInteger(stats.totalPairs);
             case "prunedDim" -> NodeValue.makeInteger(stats.prunedByDim);
-            case "prunedMean" -> NodeValue.makeInteger(stats.prunedByMean);
+            // "prunedMean" is the historical key for this counter, kept so existing
+            // benchmark queries keep working; it counts DPI-bound prunes, not a
+            // mean-distance bound. Prefer "prunedDiscJSD".
+            case "prunedDiscJSD", "prunedMean" -> NodeValue.makeInteger(stats.prunedByDiscretizedJSD);
             case "prunedVar", "prunedVariance" -> NodeValue.makeInteger(stats.prunedByVariance);
             case "prunedBounds" -> NodeValue.makeInteger(stats.prunedByBounds);
             case "fullJSD", "computedFullJSD" -> NodeValue.makeInteger(stats.computedFullJSD);
             case "resultCount" -> NodeValue.makeInteger(stats.resultCount);
+            case "failures", "evaluationFailures" -> NodeValue.makeInteger(stats.evaluationFailures);
             case "pruningRate" -> NodeValue.makeDouble(stats.pruningRate());
             default -> throw new IllegalArgumentException(
                 "prob:lastDivJoinStats: unknown field: " + fieldNode.getString());

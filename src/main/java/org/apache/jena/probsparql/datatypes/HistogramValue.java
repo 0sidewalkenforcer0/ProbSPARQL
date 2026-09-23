@@ -77,6 +77,12 @@ public class HistogramValue implements Sampleable {
 
         double sum = 0.0;
         for (double weight : weights) {
+            // Test finiteness explicitly: every comparison against NaN is false, so a
+            // bare `weight < 0.0` check lets NaN through and the sum check below would
+            // then also pass vacuously (|NaN - 1.0| > 1e-6 is false).
+            if (!Double.isFinite(weight)) {
+                throw new IllegalArgumentException("weights must be finite, got: " + weight);
+            }
             if (weight < 0.0) {
                 throw new IllegalArgumentException("weights must be non-negative");
             }
@@ -294,12 +300,19 @@ public class HistogramValue implements Sampleable {
 
     @Override
     public double[][] sample(int n) {
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        return sample(n, ThreadLocalRandom.current());
+    }
+
+    @Override
+    public double[][] sample(int n, java.util.Random rng) {
         double[][] samples = new double[n][dimensions];
         int[] cellIndex = new int[dimensions];
+        // Build the CDF once: sampling each cell by a linear scan over the weights
+        // would make this method O(n * cells) instead of O(cells + n log cells).
+        double[] cumulative = cumulativeWeights();
 
         for (int sampleIdx = 0; sampleIdx < n; sampleIdx++) {
-            int flat = sampleCell(rng);
+            int flat = sampleCell(cumulative, rng.nextDouble());
             unflattenIndex(flat, cellIndex);
             for (int dim = 0; dim < dimensions; dim++) {
                 double[] dimEdges = edges[dim];
@@ -358,18 +371,34 @@ public class HistogramValue implements Sampleable {
         return sb.toString();
     }
 
-    private int sampleCell(ThreadLocalRandom rng) {
-        double u = rng.nextDouble();
-        double cumulative = 0.0;
-        int flat = getBinCount() - 1;
-        for (int i = 0; i < getBinCount(); i++) {
-            cumulative += weights[i];
-            if (u <= cumulative) {
-                flat = i;
-                break;
+    /**
+     * Inclusive prefix sums of the cell masses, for inverse-CDF sampling.
+     */
+    private double[] cumulativeWeights() {
+        double[] cumulative = new double[weights.length];
+        double running = 0.0;
+        for (int i = 0; i < weights.length; i++) {
+            running += weights[i];
+            cumulative[i] = running;
+        }
+        return cumulative;
+    }
+
+    /**
+     * Locate the cell whose mass interval contains {@code u} via binary search.
+     */
+    private static int sampleCell(double[] cumulative, double u) {
+        int lo = 0;
+        int hi = cumulative.length - 1;
+        while (lo < hi) {
+            int mid = (lo + hi) >>> 1;
+            if (u <= cumulative[mid]) {
+                hi = mid;
+            } else {
+                lo = mid + 1;
             }
         }
-        return flat;
+        return lo;
     }
 
     private int[] locateCell(double[] point) {

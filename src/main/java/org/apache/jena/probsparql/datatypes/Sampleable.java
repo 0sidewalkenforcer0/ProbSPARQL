@@ -14,13 +14,32 @@ package org.apache.jena.probsparql.datatypes;
 public interface Sampleable {
 
     /**
-     * Draw {@code n} independent samples from this distribution.
+     * Draw {@code n} independent samples from this distribution using an
+     * implementation-chosen source of randomness.
+     *
+     * <p>Results are <em>not</em> reproducible across calls. Prefer
+     * {@link #sample(int, java.util.Random)} anywhere the value feeds a query
+     * result or a benchmark measurement.</p>
      *
      * @param n number of samples to draw, must be > 0
      * @return array of shape [n][d] where d is the dimensionality of the distribution;
      *         for 1-D distributions d=1 and each row holds a single value
      */
     double[][] sample(int n);
+
+    /**
+     * Draw {@code n} independent samples using a caller-supplied random source.
+     *
+     * <p>This overload exists so that sampling-based SPARQL functions can be made
+     * deterministic: seeding {@code rng} from the operands makes repeated evaluation
+     * of the same expression return the same value, which query engines are entitled
+     * to assume and which benchmark reproduction requires.</p>
+     *
+     * @param n   number of samples to draw, must be > 0
+     * @param rng random source; must not be {@code null}
+     * @return array of shape [n][d], as for {@link #sample(int)}
+     */
+    double[][] sample(int n, java.util.Random rng);
 
     /**
      * Evaluate the log-probability density (or log-probability mass) at point {@code x}.

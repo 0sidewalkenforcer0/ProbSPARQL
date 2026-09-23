@@ -67,9 +67,16 @@ public class GMMValue implements Sampleable {
             throw new IllegalArgumentException("covariances array must have length nComponents=" + nComponents);
         }
         
-        // Validate weights sum to 1.0 (with tolerance for floating point errors)
+        // Validate weights sum to 1.0 (with tolerance for floating point errors).
+        // Finiteness is checked explicitly: every comparison against NaN is false, so a
+        // bare range check lets NaN through and the sum check below would then also pass
+        // vacuously (|NaN - 1.0| > 1e-4 is false), admitting a GMM whose every density
+        // evaluation silently returns NaN.
         double weightSum = 0.0;
         for (double w : weights) {
+            if (!Double.isFinite(w)) {
+                throw new IllegalArgumentException("All weights must be finite, got: " + w);
+            }
             if (w < 0.0 || w > 1.0) {
                 throw new IllegalArgumentException("All weights must be in [0, 1], got: " + w);
             }
@@ -78,12 +85,18 @@ public class GMMValue implements Sampleable {
         if (Math.abs(weightSum - 1.0) > 1e-4) {
             throw new IllegalArgumentException("Weights must sum to 1.0, got: " + weightSum);
         }
-        
+
         // Validate means dimensions
         for (int i = 0; i < nComponents; i++) {
             if (means[i] == null || means[i].length != dimensions) {
                 throw new IllegalArgumentException(
                     "means[" + i + "] must have length dimensions=" + dimensions);
+            }
+            for (int j = 0; j < dimensions; j++) {
+                if (!Double.isFinite(means[i][j])) {
+                    throw new IllegalArgumentException(
+                        "means[" + i + "][" + j + "] must be finite, got: " + means[i][j]);
+                }
             }
         }
         
@@ -280,6 +293,10 @@ public class GMMValue implements Sampleable {
      * Validate covariances based on covariance type.
      */
     private static void validateCovariances(int K, int d, String covarianceType, double[][][] covariances) {
+        // Reject non-finite entries up front, independently of layout. The per-layout
+        // checks below use comparisons such as `<= 0.0` and symmetry tolerances, all of
+        // which evaluate to false for NaN and would therefore accept it silently.
+        requireFiniteCovariances(K, covariances);
         switch (covarianceType.toLowerCase()) {
             case "full":
                 validateFullCovariances(K, d, covariances);
@@ -296,6 +313,29 @@ public class GMMValue implements Sampleable {
         }
     }
     
+    /**
+     * Reject NaN and infinite covariance entries regardless of storage layout.
+     */
+    private static void requireFiniteCovariances(int K, double[][][] covariances) {
+        for (int i = 0; i < K; i++) {
+            if (covariances[i] == null) {
+                continue;   // shape errors are reported by the per-layout validators
+            }
+            for (int j = 0; j < covariances[i].length; j++) {
+                if (covariances[i][j] == null) {
+                    continue;
+                }
+                for (int k = 0; k < covariances[i][j].length; k++) {
+                    if (!Double.isFinite(covariances[i][j][k])) {
+                        throw new IllegalArgumentException(
+                            "covariances[" + i + "][" + j + "][" + k + "] must be finite, got: "
+                                + covariances[i][j][k]);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Validate full covariance matrices (d×d matrices).
      */
@@ -471,6 +511,18 @@ public class GMMValue implements Sampleable {
             int k = selectComponent(rng);
             // Sample from Gaussian component k
             samples[s] = sampleGaussian(rng, means[k], covariances[k], covarianceType, dimensions);
+        }
+        return samples;
+    }
+
+    /**
+     * Draw n samples using a caller-provided RNG, for reproducible estimation.
+     */
+    @Override
+    public double[][] sample(int n, Random rng) {
+        double[][] samples = new double[n][dimensions];
+        for (int s = 0; s < n; s++) {
+            samples[s] = sampleOne(rng);
         }
         return samples;
     }

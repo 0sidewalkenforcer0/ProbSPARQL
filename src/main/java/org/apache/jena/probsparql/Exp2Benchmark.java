@@ -38,14 +38,15 @@ public class Exp2Benchmark {
 
     private static final String STATS_QUERY = """
         PREFIX prob: <http://probsparql.org/function#>
-        SELECT ?totalPairs ?prunedDim ?prunedMean ?prunedVar ?prunedBounds ?fullJSD ?resultCount ?pruningRate WHERE {
+        SELECT ?totalPairs ?prunedDim ?prunedDiscJSD ?prunedVar ?prunedBounds ?fullJSD ?resultCount ?failures ?pruningRate WHERE {
           BIND(prob:lastDivJoinStats("totalPairs") AS ?totalPairs)
           BIND(prob:lastDivJoinStats("prunedDim") AS ?prunedDim)
-          BIND(prob:lastDivJoinStats("prunedMean") AS ?prunedMean)
+          BIND(prob:lastDivJoinStats("prunedDiscJSD") AS ?prunedDiscJSD)
           BIND(prob:lastDivJoinStats("prunedVar") AS ?prunedVar)
           BIND(prob:lastDivJoinStats("prunedBounds") AS ?prunedBounds)
           BIND(prob:lastDivJoinStats("fullJSD") AS ?fullJSD)
           BIND(prob:lastDivJoinStats("resultCount") AS ?resultCount)
+          BIND(prob:lastDivJoinStats("failures") AS ?failures)
           BIND(prob:lastDivJoinStats("pruningRate") AS ?pruningRate)
         }""";
 
@@ -98,8 +99,8 @@ public class Exp2Benchmark {
         divJoinRows.add(new String[]{"NPairs", "UnimodalFrac", "Selectivity", "Theta",
                 "Time_ms", "ResultCount"});
         pruningRows.add(new String[]{"NPairs", "UnimodalFrac", "Selectivity", "Theta",
-                "TotalPairs", "PrunedDim", "PrunedMean", "PrunedVar", "PrunedBounds",
-                "FullJSD", "ResultCount", "PruningRate"});
+                "TotalPairs", "PrunedDim", "PrunedDiscJSD", "PrunedVar", "PrunedBounds",
+                "FullJSD", "ResultCount", "Failures", "PruningRate"});
 
         for (int nPairs : nPairsList) {
             int n = (int) Math.ceil(Math.sqrt(nPairs));
@@ -146,9 +147,10 @@ public class Exp2Benchmark {
                     divJoinRows.add(new String[]{str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
                             fmt(divJoin.timeMs), str(divJoin.resultCount)});
                     pruningRows.add(new String[]{str(nPairs), fmt(unimodalFrac), sel, fmt(theta),
-                            str(stats.totalPairs), str(stats.prunedByDim), str(stats.prunedByMean),
+                            str(stats.totalPairs), str(stats.prunedByDim), str(stats.prunedByDiscretizedJSD),
                             str(stats.prunedByVariance), str(stats.prunedByBounds), str(stats.computedFullJSD),
-                            str(stats.resultCount), fmt(stats.pruningRate())});
+                            str(stats.resultCount), str(stats.evaluationFailures),
+                            fmt(stats.pruningRate())});
 
                     checkResultConsistency(cheap, jsdFirst, divJoin, nPairs, unimodalFrac, sel);
                 }
@@ -203,11 +205,12 @@ public class Exp2Benchmark {
         RemoteBenchmarkClient.forEachSolution(endpoint, STATS_QUERY, row -> {
             stats.totalPairs = row.getLiteral("totalPairs").getLong();
             stats.prunedByDim = row.getLiteral("prunedDim").getLong();
-            stats.prunedByMean = row.getLiteral("prunedMean").getLong();
+            stats.prunedByDiscretizedJSD = row.getLiteral("prunedDiscJSD").getLong();
             stats.prunedByVariance = row.getLiteral("prunedVar").getLong();
             stats.prunedByBounds = row.getLiteral("prunedBounds").getLong();
             stats.computedFullJSD = row.getLiteral("fullJSD").getLong();
             stats.resultCount = row.getLiteral("resultCount").getLong();
+            stats.evaluationFailures = row.getLiteral("failures").getLong();
         });
         return stats;
     }

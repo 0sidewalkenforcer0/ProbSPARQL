@@ -122,8 +122,12 @@ public class ConvergenceBenchmark {
                 try {
                     double val = sampler.computeJSD(g1, g2, samples);
                     jsds.add(val);
-                } catch (Exception e) {
-                    jsds.add(0.0);
+                } catch (RuntimeException e) {
+                    // Skip rather than record 0.0: substituting a value would inject a
+                    // fabricated "identical distributions" data point into the series and
+                    // bias every accuracy statistic computed from it.
+                    System.err.println("  [WARN] ConvergenceBenchmark: skipping a pair whose JSD "
+                        + "could not be computed: " + e);
                 }
             }
         }

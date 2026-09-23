@@ -23,11 +23,15 @@ public class DirichletValue implements Sampleable {
     private final double[] alphas;
 
     public DirichletValue(double[] alphas) {
-        int dimensions = alphas == null ? 0 : alphas.length;
-        if (dimensions < 2) throw new IllegalArgumentException("Dirichlet dimension must be at least 2");
-        if (alphas == null || alphas.length != dimensions)
-            throw new IllegalArgumentException("alphas must have length dimensions=" + dimensions);
+        if (alphas == null || alphas.length < 2) {
+            throw new IllegalArgumentException("Dirichlet dimension must be at least 2");
+        }
         for (double a : alphas) {
+            // Finiteness first: `a <= 0.0` is false for NaN, so a bare positivity
+            // check would admit NaN and every downstream density would return NaN.
+            if (!Double.isFinite(a)) {
+                throw new IllegalArgumentException("All alpha values must be finite, got: " + a);
+            }
             if (a <= 0.0) throw new IllegalArgumentException("All alpha values must be positive");
         }
         this.alphas = alphas.clone();
@@ -131,8 +135,14 @@ public class DirichletValue implements Sampleable {
      * @return double[n][1] samples for use with one-dimensional estimators
      */
     public double[][] sampleMarginal(int n, int dim) {
+        return sampleMarginal(n, dim, ThreadLocalRandom.current());
+    }
+
+    /**
+     * Draw marginal samples using a caller-provided RNG, for reproducible estimation.
+     */
+    public double[][] sampleMarginal(int n, int dim, java.util.Random rng) {
         validateDim(dim);
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
         double[][] out = new double[n][1];
         double a = alphas[dim];
         double b = sumAlphas() - a;
@@ -171,8 +181,12 @@ public class DirichletValue implements Sampleable {
      */
     @Override
     public double[][] sample(int n) {
+        return sample(n, ThreadLocalRandom.current());
+    }
+
+    @Override
+    public double[][] sample(int n, java.util.Random rng) {
         int dimensions = getDimensions();
-        ThreadLocalRandom rng = ThreadLocalRandom.current();
         double[][] out = new double[n][dimensions];
         for (int s = 0; s < n; s++) {
             double sum = 0.0;
@@ -305,7 +319,7 @@ public class DirichletValue implements Sampleable {
     /**
      * Sample from Gamma(shape, 1) using Marsaglia-Tsang method.
      */
-    private static double sampleGamma(ThreadLocalRandom rng, double shape) {
+    private static double sampleGamma(java.util.Random rng, double shape) {
         if (shape < 1.0) {
             // Boost shape and scale by U^(1/shape)
             return sampleGamma(rng, shape + 1.0) * Math.pow(rng.nextDouble(), 1.0 / shape);

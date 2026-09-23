@@ -36,6 +36,16 @@
 # Required server JVM properties for pruning stats:
 #   -Dprobsparql.simjoin.pruning=true
 #   -Dprobsparql.simjoin.deduplicate=false
+#
+# deduplicate MUST stay false for this experiment. The workload joins CTMeasurement
+# distributions against SLMeasurement distributions — two disjoint relations — so the
+# candidate set is the full |CT| x |SL| product and no pair is a duplicate or a
+# self-pair. Deduplication compares a left-table index against a right-table index,
+# which is only meaningful for a self-join; enabling it here silently drops legitimate
+# CT/SL pairs and makes DIVJOIN under-report relative to the in-engine baselines.
+#
+# Optional, for diagnosing result-count drift:
+#   -Dprobsparql.simjoin.failOnError=true   # abort instead of skipping unevaluable pairs
 # =============================================================================
 set -euo pipefail
 
