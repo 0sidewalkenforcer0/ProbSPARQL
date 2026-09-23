@@ -8,11 +8,11 @@
 ![Status](https://img.shields.io/badge/status-research%20prototype-yellow.svg)
 [![arXiv](https://img.shields.io/badge/arXiv-2607.18262-b31b1b.svg)](https://arxiv.org/abs/2607.18262)
 
-**Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals**
-
-This repository contains the implementation accompanying the paper of the same title, to appear in the
+**This repository contains the implementation accompanying the paper of the same title, to appear in the
 In-Use track of the International Semantic Web Conference (ISWC) 2026. A preprint is available at
-[arXiv:2607.18262](https://arxiv.org/abs/2607.18262).
+[arXiv:2607.18262](https://arxiv.org/abs/2607.18262).**
+
+**Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals**
 
 ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data with distribution-valued literals. The current prototype supports Gaussian mixture models (GMMs), multidimensional histograms, and Dirichlet distributions, with polymorphic numerical comparison through `prob:jsd`.
 
