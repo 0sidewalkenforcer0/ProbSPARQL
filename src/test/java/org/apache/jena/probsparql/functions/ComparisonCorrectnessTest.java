@@ -5,6 +5,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.exp2.Exp2PruningHolder;
 import org.apache.jena.probsparql.exp2.PruningStats;
+import org.apache.jena.probsparql.functions.comparison.DivergenceTest;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.probsparql.functions.comparison.JSDMode;
 import org.apache.jena.probsparql.functions.comparison.JSDivergence;
@@ -486,6 +487,119 @@ class ComparisonCorrectnessTest {
         void rejectsANonStringFieldName() {
             publish();
             assertThrows(RuntimeException.class, () -> stats.exec(num(1.0)));
+        }
+    }
+
+    @Nested
+    @DisplayName("prob:divergenceTest")
+    class DivergenceTestFn {
+        private final DivergenceTest test = new DivergenceTest();
+        private final JSDivergence jsd = new JSDivergence();
+
+        private boolean decide(GMMValue p, GMMValue q, double epsilon, double alpha) {
+            return test.exec(nv(p), nv(q), num(epsilon), num(alpha)).getBoolean();
+        }
+
+        @Test
+        void identicalDistributionsAreAcceptedEvenAtZero() {
+            // JSD(P,P) = 0, and the decision is score <= epsilon, so the boundary holds.
+            assertTrue(decide(gaussian(1.0, 2.0), gaussian(1.0, 2.0), 0.0, 0.05));
+        }
+
+        @Test
+        void disjointSupportIsRejectedBelowLog2() {
+            assertFalse(decide(gaussian(0.0, 1.0), gaussian(100.0, 1.0), 0.5, 0.05));
+        }
+
+        @Test
+        void disjointSupportIsAcceptedAboveLog2() {
+            // JSD is bounded by ln2, so no pair can be rejected at a larger threshold.
+            assertTrue(decide(gaussian(0.0, 1.0), gaussian(100.0, 1.0), LN2 + 0.1, 0.05));
+        }
+
+        @Test
+        void theDecisionIsSymmetricInItsOperandsInEveryMode() {
+            // JSD is symmetric, so the verdict must be too. Each mode draws from one RNG
+            // stream whose realisation depends on the order the operands are consumed in,
+            // so they are canonically ordered before any sampler sees them. The sampler
+            // modes are listed explicitly because the plain Monte Carlo path orders its
+            // own operands and would pass regardless.
+            String configured = System.getProperty("probsparql.mode");
+            try {
+                for (String mode : new String[]{
+                    JSDivergenceConfig.MODE_V1_MC,
+                    JSDivergenceConfig.MODE_V2_STRATIFIED,
+                    JSDivergenceConfig.MODE_V3_SPRT,
+                    JSDivergenceConfig.MODE_V4_BOUNDS,
+                    JSDivergenceConfig.MODE_V5_ADAPTIVE}) {
+                    System.setProperty("probsparql.mode", mode);
+                    for (double shift : new double[]{0.2, 0.4, 0.6, 0.8, 1.0, 1.5}) {
+                        for (double epsilon : new double[]{0.01, 0.02, 0.05, 0.1}) {
+                            assertEquals(
+                                decide(gaussian(0.0, 1.0), gaussian(shift, 1.0), epsilon, 0.05),
+                                decide(gaussian(shift, 1.0), gaussian(0.0, 1.0), epsilon, 0.05),
+                                "verdict must not depend on argument order: mode " + mode
+                                    + ", shift " + shift + ", epsilon " + epsilon);
+                        }
+                    }
+                }
+            } finally {
+                System.setProperty("probsparql.mode", configured);
+            }
+        }
+
+        @Test
+        void acceptanceIsMonotoneInTheThreshold() {
+            // The configured mode reports a plain estimate, so raising the threshold can
+            // only turn a rejection into an acceptance, never the reverse.
+            boolean seenAccepted = false;
+            for (double epsilon : new double[]{0.0, 0.01, 0.05, 0.1, 0.3, 0.5, LN2 + 0.1}) {
+                boolean accepted = decide(gaussian(0.0, 1.0), gaussian(1.0, 1.0), epsilon, 0.05);
+                if (seenAccepted) {
+                    assertTrue(accepted,
+                        "acceptance must not be lost by raising epsilon to " + epsilon);
+                }
+                seenAccepted |= accepted;
+            }
+        }
+
+        @Test
+        void bracketsTheMeasuredDivergence() {
+            GMMValue p = gaussian(0.0, 1.0);
+            GMMValue q = gaussian(1.0, 1.0);
+            double measured = jsd.exec(nv(p), nv(q)).getDouble();
+            assertTrue(decide(p, q, measured + 0.05, 0.05),
+                "a threshold above the divergence must accept");
+            assertFalse(decide(p, q, measured - 0.05, 0.05),
+                "a threshold below the divergence must reject");
+        }
+
+        @Test
+        void rejectsANonNumericThreshold() {
+            assertThrows(RuntimeException.class,
+                () -> test.exec(nv(gaussian(0.0, 1.0)), nv(gaussian(0.0, 1.0)),
+                    str("0.1"), num(0.05)));
+        }
+
+        @Test
+        void rejectsANegativeThreshold() {
+            assertThrows(RuntimeException.class,
+                () -> decide(gaussian(0.0, 1.0), gaussian(0.0, 1.0), -0.1, 0.05));
+        }
+
+        @Test
+        void rejectsATailProbabilityOutsideTheOpenLowerHalf() {
+            assertThrows(RuntimeException.class,
+                () -> decide(gaussian(0.0, 1.0), gaussian(0.0, 1.0), 0.1, 0.0));
+            assertThrows(RuntimeException.class,
+                () -> decide(gaussian(0.0, 1.0), gaussian(0.0, 1.0), 0.1, 0.5));
+        }
+
+        @Test
+        void rejectsMismatchedDimensionality() {
+            assertThrows(RuntimeException.class,
+                () -> test.exec(nv(gaussian(0.0, 1.0)), nv(gaussian2D(0.0, 0.0, 1.0, 1.0)),
+                    num(0.1), num(0.05)));
         }
     }
 }

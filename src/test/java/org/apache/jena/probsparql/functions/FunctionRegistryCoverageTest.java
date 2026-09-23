@@ -1,6 +1,7 @@
 package org.apache.jena.probsparql.functions;
 
 import org.apache.jena.probsparql.ProbSPARQL;
+import org.apache.jena.probsparql.functions.comparison.DivergenceTest;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
 import org.apache.jena.probsparql.functions.comparison.JSDMode;
 import org.apache.jena.probsparql.functions.comparison.JSDivergence;
@@ -78,6 +79,7 @@ class FunctionRegistryCoverageTest {
         EXPECTED_FUNCTIONS.put(LastDivJoinStats.URI, LastDivJoinStats.class);
         EXPECTED_FUNCTIONS.put(SameTerm.URI, SameTerm.class);
         EXPECTED_FUNCTIONS.put(SameDistribution.URI, SameDistribution.class);
+        EXPECTED_FUNCTIONS.put(DivergenceTest.URI, DivergenceTest.class);
         // Transformation
         EXPECTED_FUNCTIONS.put(Scale.URI, Scale.class);
         EXPECTED_FUNCTIONS.put(Shift.URI, Shift.class);
