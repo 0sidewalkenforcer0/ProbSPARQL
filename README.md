@@ -6,8 +6,13 @@
 ![SPARQL](https://img.shields.io/badge/SPARQL-1.1-green.svg)
 ![Apache Jena](https://img.shields.io/badge/Apache%20Jena-6.0.0--SNAPSHOT-red.svg)
 ![Status](https://img.shields.io/badge/status-research%20prototype-yellow.svg)
+[![arXiv](https://img.shields.io/badge/arXiv-2607.18262-b31b1b.svg)](https://arxiv.org/abs/2607.18262)
 
 **Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals**
+
+This repository contains the implementation accompanying the paper of the same title, to appear in the
+In-Use track of the International Semantic Web Conference (ISWC) 2026. A preprint is available at
+[arXiv:2607.18262](https://arxiv.org/abs/2607.18262).
 
 ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data with distribution-valued literals. The current prototype supports Gaussian mixture models (GMMs), multidimensional histograms, and Dirichlet distributions, with polymorphic numerical comparison through `prob:jsd`.
 
@@ -26,6 +31,7 @@ ProbSPARQL extends Apache Jena to support probabilistic queries over RDF data wi
 - [Probabilistic Data Formats](#probabilistic-data-formats)
 - [Benchmark Reproduction](#benchmark-reproduction)
 - [Project Structure](#project-structure)
+- [Citation](#citation)
 - [License](#license)
 
 ---
@@ -467,6 +473,27 @@ cd jena && mvn clean install -DskipTests
 Make sure the Fuseki server is running:
 ```bash
 mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuseki"
+```
+
+---
+
+## Citation
+
+If you use this software, please cite the paper. The proceedings entry does not exist yet, so
+the preprint is the citable version for now:
+
+```bibtex
+@misc{wu2026probsparql,
+  title         = {ProbSPARQL: Querying Knowledge Graphs with Multi-dimensional, Uncertain Numeric Data},
+  author        = {Wu, Jingcheng and Thapa, Ratan Bahadur and Hernandez, Daniel and Zhou, Hongkuan and Staab, Steffen},
+  year          = {2026},
+  eprint        = {2607.18262},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DB},
+  doi           = {10.48550/arXiv.2607.18262},
+  url           = {https://arxiv.org/abs/2607.18262},
+  note          = {To appear in the In-Use track of ISWC 2026}
+}
 ```
 
 ---
