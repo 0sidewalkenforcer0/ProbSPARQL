@@ -49,6 +49,9 @@ public class QueryIterSimilarityJoin extends QueryIter {
     private int leftIndex = 0;
     private int rightIndex = 0;
     private Binding nextBinding = null;
+
+    /** Count of candidate pairs whose divergence evaluation threw and were skipped. */
+    private final long[] failures = new long[1];
     
     /**
      * Constructor for nested loop SimilarityJoin.
@@ -155,14 +158,18 @@ public class QueryIterSimilarityJoin extends QueryIter {
                 // Compute JS divergence
                 try {
                     double jsDiv = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
-                    
+
                     if (jsDiv <= tolerance) {
                         // Return the merged binding (no fusion)
                         return merged;
                     }
-                } catch (Exception e) {
-                    // Skip pairs where JS divergence computation fails
-                    continue;
+                } catch (RuntimeException e) {
+                    // A pair that cannot be evaluated is dropped so one bad row does not
+                    // abort the whole join, but it is counted and reported: silently
+                    // discarding failures would understate recall with no trace, and a
+                    // systematic fault (e.g. an out-of-range tail probability, which
+                    // fails for every pair) would look like an empty result set.
+                    SimilarityJoinFailures.record(e, leftNode, rightNode, failures);
                 }
             }
             
@@ -213,6 +220,7 @@ public class QueryIterSimilarityJoin extends QueryIter {
     @Override
     protected void closeIterator() {
         // Tables are already materialized, no iterators to close
+        SimilarityJoinFailures.reportTotal(failures[0], "DIVJOIN");
     }
 
     @Override
@@ -229,6 +237,7 @@ public class QueryIterSimilarityJoin extends QueryIter {
         out.println("Tolerance: " + tolerance);
         out.println("Left table size: " + leftTable.size());
         out.println("Right table size: " + rightTable.size());
+        out.println("Failed pair evaluations: " + failures[0]);
         out.decIndent();
     }
 }

@@ -7,6 +7,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
 import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.datatypes.Sampleable;
+import org.apache.jena.probsparql.functions.DistributionSeeds;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.function.FunctionBase2;
 
@@ -34,6 +35,14 @@ public class PolyJSD extends FunctionBase2 {
 
     /** Sample count for MC-based JSD (Dir↔Dir, cross-type). */
     private static final int N_SAMPLES = 10_000;
+
+    /**
+     * Log-density gap used to stand in for a zero density on disjoint support.
+     * Large enough that {@code exp(-gap)} underflows to zero, so the mixture term
+     * reduces to {@code ½·S(x)} and the integrand attains its {@code log 2} limit,
+     * yet finite so {@code logSumExp} stays well-conditioned.
+     */
+    private static final double DISJOINT_SUPPORT_LOG_GAP = 700.0;
 
     // -----------------------------------------------------------------------
     // Main dispatch
@@ -107,17 +116,27 @@ public class PolyJSD extends FunctionBase2 {
     // -----------------------------------------------------------------------
 
     private double gmmJSD(GMMValue p, GMMValue q) {
-        // Create mixture M = 0.5*P + 0.5*Q
-        double jsd = 0.5 * mcKL(p, q, p, N_SAMPLES / 2) + 0.5 * mcKL(q, p, q, N_SAMPLES / 2);
-        return Math.max(0.0, jsd);
+        // JSD is symmetric, so evaluate the operands in a canonical order: otherwise
+        // swapping the arguments would consume the shared stream differently and
+        // return a different realisation of the same quantity.
+        GMMValue first = p;
+        GMMValue second = q;
+        if (!DistributionSeeds.inCanonicalOrder(p, q)) {
+            first = q;
+            second = p;
+        }
+        java.util.Random rng = DistributionSeeds.rngForPair(first, second);
+        int half = N_SAMPLES / 2;
+        double jsd = 0.5 * mcKL(first, second, half, rng) + 0.5 * mcKL(second, first, half, rng);
+        return Math.max(0.0, Math.min(jsd, Math.log(2.0)));
     }
 
     /**
-     * KL(from ‖ to+from mixture) estimated by sampling {@code n} points from {@code from}.
-     * Uses the sample-based approach: KL(P‖M) ≈ E_P[log P(x) - log M(x)].
+     * KL(from ‖ M) with M = ½(from + other), estimated by sampling {@code n} points
+     * from {@code from}: KL(P‖M) ≈ E_P[log P(x) - log M(x)].
      */
-    private double mcKL(GMMValue from, GMMValue other, GMMValue fromAgain, int n) {
-        double[][] samples = from.sample(n);
+    private double mcKL(GMMValue from, GMMValue other, int n, java.util.Random rng) {
+        double[][] samples = from.sample(n, rng);
         double sum = 0.0;
         for (double[] x : samples) {
             double logP = from.logPdf(x);
@@ -128,6 +147,7 @@ public class PolyJSD extends FunctionBase2 {
         }
         return sum / n;
     }
+
 
     // -----------------------------------------------------------------------
     // Universal sample-based JSD fallback
@@ -144,31 +164,67 @@ public class PolyJSD extends FunctionBase2 {
      * </ol>
      */
     public static double sampleBasedJSD(Sampleable s1, Sampleable s2, int n) {
+        // JSD is symmetric, and 0.5*KL(s1||M) + 0.5*KL(s2||M) is symmetric in the two
+        // operands, but they consume the shared random stream in argument order. Fixing
+        // that order makes the estimate itself order-independent, not merely unbiased.
+        if (!DistributionSeeds.inCanonicalOrder(s1, s2)) {
+            Sampleable swap = s1;
+            s1 = s2;
+            s2 = swap;
+        }
+        return sampleBasedJSD(s1, s2, n, DistributionSeeds.rngForPair(s1, s2));
+    }
+
+    /**
+     * As {@link #sampleBasedJSD(Sampleable, Sampleable, int)}, with an explicit random
+     * source so the estimate is reproducible.
+     *
+     * <p>This overload samples {@code s1} before {@code s2}, so a caller that needs
+     * {@code f(a,b) == f(b,a)} must fix the operand order itself; the single-argument
+     * form above does that via {@link DistributionSeeds#inCanonicalOrder}.</p>
+     */
+    public static double sampleBasedJSD(Sampleable s1, Sampleable s2, int n, java.util.Random rng) {
         int half = n / 2;
-        double[][] samples1 = s1.sample(half);
-        double[][] samples2 = s2.sample(half);
+        double[][] samples1 = s1.sample(half, rng);
+        double[][] samples2 = s2.sample(half, rng);
 
-        double klS1M = 0.0;
-        for (double[] x : samples1) {
+        double klS1M = averageLogRatio(s1, s2, samples1, true);
+        double klS2M = averageLogRatio(s1, s2, samples2, false);
+
+        return Math.max(0.0, Math.min(0.5 * klS1M + 0.5 * klS2M, Math.log(2.0)));
+    }
+
+    /**
+     * Monte Carlo estimate of KL(S‖M) where S is {@code s1} when {@code fromFirst} and
+     * {@code s2} otherwise, and M = ½(s1 + s2).
+     *
+     * <p>Samples at which the sampled distribution's own density is zero cannot occur
+     * except through numerical underflow; they are skipped and excluded from the
+     * divisor, since averaging over the nominal sample count instead would bias the
+     * estimate low by the fraction skipped.</p>
+     *
+     * <p>Where the <em>other</em> density is zero the mixture is locally
+     * {@code ½·S(x)}, so the integrand equals {@code log 2}. Substituting a
+     * far-smaller finite log-density reproduces that limit while keeping
+     * {@code logSumExp} well-conditioned.</p>
+     */
+    private static double averageLogRatio(Sampleable s1, Sampleable s2, double[][] samples, boolean fromFirst) {
+        double sum = 0.0;
+        int used = 0;
+        for (double[] x : samples) {
             double logP = s1.logPdf(x);
             double logQ = s2.logPdf(x);
-            if (Double.isInfinite(logP)) continue;
-            double logM = Math.log(0.5) + logSumExp(logP, Double.isInfinite(logQ) ? logP - 700 : logQ);
-            klS1M += logP - logM;
+            double logOwn = fromFirst ? logP : logQ;
+            double logOther = fromFirst ? logQ : logP;
+            if (Double.isInfinite(logOwn) || Double.isNaN(logOwn)) continue;
+            double logOtherEffective = Double.isInfinite(logOther) || Double.isNaN(logOther)
+                ? logOwn - DISJOINT_SUPPORT_LOG_GAP
+                : logOther;
+            double logM = Math.log(0.5) + logSumExp(logOwn, logOtherEffective);
+            sum += logOwn - logM;
+            used++;
         }
-        klS1M /= half;
-
-        double klS2M = 0.0;
-        for (double[] x : samples2) {
-            double logP = s1.logPdf(x);
-            double logQ = s2.logPdf(x);
-            if (Double.isInfinite(logQ)) continue;
-            double logM = Math.log(0.5) + logSumExp(Double.isInfinite(logP) ? logQ - 700 : logP, logQ);
-            klS2M += logQ - logM;
-        }
-        klS2M /= half;
-
-        return Math.max(0.0, 0.5 * klS1M + 0.5 * klS2M);
+        return used == 0 ? 0.0 : sum / used;
     }
 
     private static double logSumExp(double a, double b) {
@@ -227,6 +283,35 @@ public class PolyJSD extends FunctionBase2 {
         @Override
         public double[][] sample(int n) {
             return dirichlet.sampleMarginal(n, dim);
+        }
+
+        @Override
+        public double[][] sample(int n, java.util.Random rng) {
+            return dirichlet.sampleMarginal(n, dim, rng);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * dirichlet.hashCode() + dim;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof DirichletMarginal other
+                && dim == other.dim
+                && dirichlet.equals(other.dirichlet);
+        }
+
+        /**
+         * Complete and run-stable, because
+         * {@link org.apache.jena.probsparql.functions.DistributionSeeds#inCanonicalOrder}
+         * falls back to this form to break hash ties. The inherited identity-hash
+         * default would vary between JVM runs and make the operand ordering — and
+         * therefore the estimate — irreproducible.
+         */
+        @Override
+        public String toString() {
+            return "DirichletMarginal{dim=" + dim + ", " + dirichlet.toJSON() + "}";
         }
 
         @Override

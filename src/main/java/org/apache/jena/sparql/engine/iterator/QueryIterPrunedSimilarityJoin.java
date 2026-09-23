@@ -36,11 +36,20 @@ import java.util.List;
  */
 public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(QueryIterPrunedSimilarityJoin.class);
+
     /**
-     * When true, only emit pairs where rightIndex > leftIndex (canonical ordering),
-     * eliminating self-pairs and duplicate a→b / b→a orderings.
-     * Enabled via -Dprobsparql.simjoin.deduplicate=true.
-     * Default false so non-Exp2 queries are unaffected.
+     * When true, only emit pairs where the right table index exceeds the left table
+     * index, eliminating self-pairs and duplicate a→b / b→a orderings.
+     * Enabled via {@code -Dprobsparql.simjoin.deduplicate=true}; default false.
+     *
+     * <p><strong>Precondition:</strong> this comparison is only meaningful when the left
+     * and right patterns enumerate the <em>same</em> relation in the same order, i.e. a
+     * self-join. For a join between two distinct relations — such as the CT-vs-SL
+     * workload in Exp2 — index {@code i} on the left and index {@code j} on the right
+     * denote unrelated rows, so the filter would discard legitimate pairs and understate
+     * the result. Leave it disabled in that case.</p>
      */
     private static final boolean DEDUPLICATE =
         Boolean.getBoolean("probsparql.simjoin.deduplicate");
@@ -105,6 +114,17 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
 
     @Override
     protected void closeIterator()  {
+        if (!pruningStats.invariantHolds()) {
+            // The reported pruning rate is only meaningful when every candidate pair is
+            // accounted for at exactly one cascade level. Surface a breach loudly rather
+            // than publishing a rate derived from inconsistent counters.
+            LOG.warn("DIVJOIN pruning stats invariant violated: {}", pruningStats);
+        }
+        if (pruningStats.evaluationFailures > 0) {
+            LOG.warn("DIVJOIN: {} candidate pair(s) could not be evaluated and were excluded"
+                    + " from the result (of {} total).",
+                pruningStats.evaluationFailures, pruningStats.totalPairs);
+        }
         // Publish final stats so the Exp2 benchmark harness can retrieve them
         Exp2PruningHolder.set(pruningStats);
     }
@@ -144,8 +164,9 @@ public class QueryIterPrunedSimilarityJoin extends QueryIter {
                 if (!ProbSPARQL.supportsSimilarityLiteral(leftNode)
                     || !ProbSPARQL.supportsSimilarityLiteral(rightNode)) continue;
 
-                // Deduplication: only emit canonical (leftTableIdx < rightTableIdx) pairs
-                // to match Approach A's n*(n-1)/2 semantics and avoid self-pairs.
+                // Deduplication: only emit canonical (leftTableIdx < rightTableIdx) pairs,
+                // matching n*(n-1)/2 self-join semantics. Valid only under the
+                // same-relation precondition documented on DEDUPLICATE.
                 if (DEDUPLICATE && rightIndex - 1 <= leftIndex) continue;
 
                 boolean pass = evaluator.evaluate(leftNode, rightNode);

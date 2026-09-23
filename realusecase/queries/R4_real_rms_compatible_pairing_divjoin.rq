@@ -20,8 +20,10 @@ SELECT ?sample1 ?sample2 WHERE {
 
   { ?sample2 a ex:HardnessRmsSample ;
              ex:hasRMSCharacteristic ?char2 .
-    FILTER(STR(?sample1) < STR(?sample2))
     ?char2 im:isMeasuredBy ?measurement2 .
     ?measurement2 uq:representedBy ?rv2 .
     ?rv2 uq:hasDistribution ?dist2 . }
+
+  # Compare sample IDs after both DIVJOIN branches have bound their variables.
+  FILTER(STR(?sample1) < STR(?sample2))
 }

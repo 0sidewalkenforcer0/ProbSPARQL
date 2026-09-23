@@ -122,7 +122,11 @@ def analyze(results_dir, output_dir):
     if consistency_ok:
         print("  All retained variants agree  ✓")
     else:
-        print("  [WARN] Count drift found across retained variants; this is expected for sampling-based threshold decisions.")
+        print("  [WARN] Count drift found across retained variants.")
+        print("         Cause: InEngine_CF/JF use prob:jsd (fixed 10k samples) while DIVJOIN")
+        print("         uses SimilarityEvaluator in the server's probsparql.mode; pairs whose")
+        print("         true JSD lies within MC error of theta can be decided differently.")
+        print("         Estimates are operand-seeded, so this drift must be stable across runs.")
 
     # -----------------------------------------------------------------------
     # 2. Speedup summary table
@@ -199,12 +203,12 @@ def analyze(results_dir, output_dir):
     if ps_rows:
         print("\n=== Pruning Rates (DIVJOIN) ===")
         print(f"  {'NPairs':>8}  {'UnimodalFrac':>12}  {'Sel':>6}  {'PruneRate%':>10}  "
-              f"{'PrunedMean':>10}  {'FullJSD':>8}")
+              f"{'PrunedDiscJSD':>14}  {'FullJSD':>8}")
         print("  " + "-" * 60)
         for r in sorted(ps_rows, key=lambda x: (to_int(x["NPairs"]), x["UnimodalFrac"])):
             print(f"  {r['NPairs']:>8}  {r['UnimodalFrac']:>12}  {r['Selectivity']:>6}  "
                   f"  {to_float(r['PruningRate'])*100:>8.1f}%  "
-                  f"{r['PrunedMean']:>10}  {r['FullJSD']:>8}")
+                  f"{r.get('PrunedDiscJSD', r.get('PrunedMean','')):>14}  {r['FullJSD']:>8}")
 
     # -----------------------------------------------------------------------
     # 5. Plots (if matplotlib available)

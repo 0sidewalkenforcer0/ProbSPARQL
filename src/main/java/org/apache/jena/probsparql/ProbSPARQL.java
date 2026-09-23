@@ -8,6 +8,7 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.datatypes.HistogramDatatype;
 import org.apache.jena.probsparql.datatypes.HistogramValue;
 import org.apache.jena.probsparql.functions.comparison.HistogramJSD;
+import org.apache.jena.probsparql.functions.comparison.DivergenceTest;
 import org.apache.jena.probsparql.functions.comparison.PolyJSD;
 import org.apache.jena.probsparql.functions.comparison.SameDistribution;
 import org.apache.jena.probsparql.functions.comparison.SameTerm;
@@ -132,12 +133,13 @@ public class ProbSPARQL {
         functionRegistry.put(KLDivergence.URI, KLDivergence.class);
         functionRegistry.put(JSDivergence.URI, JSDivergence.class);
         functionRegistry.put(HistogramJSD.URI, HistogramJSD.class);
+        functionRegistry.put(DivergenceTest.URI, DivergenceTest.class);
         functionRegistry.put(PolyJSD.URI, PolyJSD.class);   // polymorphic prob:jsd
         functionRegistry.put(JSDMode.URI, JSDMode.class);   // benchmark mode-specific GMM JSD
         functionRegistry.put(LastDivJoinStats.URI, LastDivJoinStats.class);
         functionRegistry.put(SameTerm.URI, SameTerm.class);
         functionRegistry.put(SameDistribution.URI, SameDistribution.class);
-        logger.info("Registered {} comparison functions", 8);
+        logger.info("Registered {} comparison functions", 9);
         
         // Category 3: Probabilistic Transformation Operators
         functionRegistry.put(Scale.URI, Scale.class);
@@ -186,7 +188,7 @@ public class ProbSPARQL {
         logger.info("Registered QueryEngineProbabilistic for DIVJOIN syntax support");
         
         initialized = true;
-        logger.info("{} initialization complete (29 functions + 2 property functions + DIVJOIN syntax)", NAME);
+        logger.info("{} initialization complete (30 functions + 2 property functions + DIVJOIN syntax)", NAME);
     }
     
     /**

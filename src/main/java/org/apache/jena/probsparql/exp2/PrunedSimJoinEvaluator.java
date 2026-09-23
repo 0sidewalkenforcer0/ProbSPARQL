@@ -6,19 +6,28 @@ import org.apache.jena.probsparql.datatypes.GMMValue;
 import org.apache.jena.probsparql.functions.comparison.BoundsFilterSampler;
 
 /**
- * Five-level cascading pruning evaluator for the Exp2 pruned similarity join.
+ * Cascading pruning evaluator for the Exp2 pruned similarity join.
  *
+ * <p>Levels actually executed:</p>
  * <pre>
- * Level 1 — Dimensionality check         O(1)
- * Level 2 — Mean-distance lower bound    O(K)
- * Level 3 — Variance-ratio lower bound   O(K)
- * Level 4 — Combined analytic bounds     O(K)  (calls BoundsFilterSampler.checkBounds)
- * Level 5 — Full JSD (MC sampling)       O(N·K)
+ * Level 1 — Dimensionality check                O(1)
+ * Level 2 — Discretized (DPI) JSD lower bound    O(d·B·K)
+ * Level 5 — Full JSD estimation                  O(N·K)
  * </pre>
  *
- * Each level records its contribution in the supplied {@link PruningStats}.
+ * <p>Levels 3 and 4 are intentionally absent. They were to be moment-based bounds
+ * (variance ratio, mean distance), but those expressions are not valid lower bounds on
+ * JSD, so pruning with them would discard matching pairs. Their counters remain in
+ * {@link PruningStats} at zero so the results schema is stable; see
+ * {@link BoundsFilterSampler} for why they cannot be used.</p>
+ *
+ * <p>Each level records its contribution in the supplied {@link PruningStats}, which
+ * maintains the invariant that every candidate pair is counted exactly once.</p>
  */
 public class PrunedSimJoinEvaluator {
+
+    private static final org.slf4j.Logger LOG =
+        org.slf4j.LoggerFactory.getLogger(PrunedSimJoinEvaluator.class);
 
     private final double tolerance;
     private final double tailProbability;
@@ -67,32 +76,29 @@ public class PrunedSimJoinEvaluator {
         // coarsened histogram JSD exceeds the tolerance can be safely pruned.
         double discJSD = boundsChecker.computeDiscretizedJSD(g1, g2, 30);
         if (discJSD > tolerance) {
-            stats.prunedByMean++;
+            stats.prunedByDiscretizedJSD++;
             return false;
         }
 
-        // ── Level 3: (disabled — variance bound not valid for GMMs) ─────────────
-        // stats.prunedByVariance remains 0 for this run.
+        // ── Levels 3 and 4: intentionally absent (see class javadoc) ────────────
 
-        // ── Level 4: (disabled — checkBounds uses invalid bounds for GMMs) ───────
-        // stats.prunedByBounds remains 0 for this run.
-
-        // ── Level 5: full JSD computation (MC sampling) ────────────────────
-        stats.computedFullJSD++;
-        try {
-            double jsd = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
-            boolean passes = jsd <= tolerance;
-            if (passes) {
-                stats.resultCount++;
-            }
-            return passes;
-        } catch (Exception e) {
-            // If computation fails, conservatively exclude the pair
-            return false;
-        }
+        // ── Level 5: full JSD estimation ────────────────────────────────────────
+        return evaluateFull(leftNode, rightNode);
     }
 
     private boolean evaluateWithoutPruning(Node leftNode, Node rightNode) {
+        return evaluateFull(leftNode, rightNode);
+    }
+
+    /**
+     * Full JSD estimation, counted as the terminal cascade level.
+     *
+     * <p>A pair whose evaluation throws has no defined verdict. It is excluded from the
+     * result, but recorded in {@link PruningStats#evaluationFailures} rather than
+     * silently treated as a non-match: otherwise a systematic fault would be reported
+     * as a legitimate zero-result join.</p>
+     */
+    private boolean evaluateFull(Node leftNode, Node rightNode) {
         stats.computedFullJSD++;
         try {
             double jsd = ProbSPARQL.evaluateSimilarity(leftNode, rightNode, tolerance, tailProbability);
@@ -101,7 +107,10 @@ public class PrunedSimJoinEvaluator {
                 stats.resultCount++;
             }
             return passes;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            stats.evaluationFailures++;
+            LOG.warn("Similarity evaluation failed for a candidate pair; excluding it. {}",
+                e.toString());
             return false;
         }
     }

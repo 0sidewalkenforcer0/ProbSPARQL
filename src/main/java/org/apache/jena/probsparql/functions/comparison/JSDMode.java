@@ -12,6 +12,13 @@ import java.util.Set;
  * <p>This is a SPARQL-visible dispatcher for the existing V1-V5 GMM evaluator
  * stack. It avoids changing global JVM configuration per request, which would
  * be unsafe under concurrent Fuseki queries.</p>
+ *
+ * <p><strong>Reports estimators, not verdicts.</strong> The function evaluates each
+ * mode exactly as that mode computes, so a benchmark can attribute cost and error to
+ * the estimator itself. Under {@code V4_BOUNDS} that means the returned number is the
+ * analytic <em>lower bound</em> on JSD, not an estimate of it: comparing it against a
+ * threshold would retain pairs whose true JSD exceeds the threshold. Use {@code DIVJOIN}
+ * for threshold decisions — it refines when the bound is inconclusive.</p>
  */
 public class JSDMode extends FunctionBase3 {
 
@@ -42,7 +49,12 @@ public class JSDMode extends FunctionBase3 {
             throw new IllegalArgumentException("prob:jsdMode: unknown mode: " + mode);
         }
 
-        SimilarityEvaluator evaluator = new SimilarityEvaluator(
+        // Usage.SCORING: this function exists to measure each mode's own estimator, so
+        // it reports what that estimator produces — including V4's analytic bound,
+        // without the refinement step the join decision path applies. A value returned
+        // here must therefore not be compared against a threshold under V4; use
+        // DIVJOIN (or a default-constructed SimilarityEvaluator) for that.
+        SimilarityEvaluator evaluator = SimilarityEvaluator.forScoring(
             mode,
             JSDivergenceConfig.SPRT_EPSILON,
             JSDivergenceConfig.SPRT_ALPHA,

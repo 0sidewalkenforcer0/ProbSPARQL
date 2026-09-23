@@ -19,11 +19,48 @@ import java.util.Random;
  */
 public class SimilarityEvaluator {
 
+    /**
+     * Forces V4 to report its raw DPI lower bound even on the decision path,
+     * reproducing the historical bound-only behaviour end to end. Off by default;
+     * see {@link Usage} for the normal per-call-site distinction. Enable with
+     * {@code -Dprobsparql.v4.boundsOnly=true}.
+     */
+    private static final boolean BOUNDS_ONLY =
+        Boolean.getBoolean("probsparql.v4.boundsOnly");
+
+    /**
+     * What the caller intends to do with the returned score.
+     *
+     * <p>The distinction exists because V4's analytic filter produces a
+     * <em>lower bound</em>, not an estimate. The two intents need different things
+     * from it, and conflating them is what made an inconclusive bound act as a
+     * verdict:</p>
+     * <ul>
+     *   <li>{@link #SCORING} — report what this mode's own estimator produces, so a
+     *       benchmark can measure that estimator's cost and error. V4 returns its
+     *       bound without sampling.</li>
+     *   <li>{@link #DECISION} — return a value the caller may compare against the
+     *       threshold. A bound below the threshold does not imply the true JSD is
+     *       below it, so V4 refines by Monte Carlo when its bound is inconclusive.</li>
+     * </ul>
+     *
+     * <p>Only V4 distinguishes the two. V5 already refines after its bounds stage,
+     * and every other mode returns a genuine estimate, so for those the intent makes
+     * no difference.</p>
+     */
+    public enum Usage {
+        SCORING,
+        DECISION
+    }
+
     public enum Pathway {
         MC,
         STRATIFIED,
         SPRT,
+        /** V4 decided by the analytic bound alone (conclusive reject, or bound-only mode). */
         BOUNDS,
+        /** V4 bound was inconclusive, so the pair was refined by Monte Carlo. */
+        BOUNDS_REFINED,
         ADAPTIVE_BOUNDS,
         ADAPTIVE_SPRT,
         ADAPTIVE_STRATIFIED
@@ -61,6 +98,7 @@ public class SimilarityEvaluator {
     private final double decisionThreshold;
     private final double alpha;
     private final double beta;
+    private final Usage usage;
 
     public SimilarityEvaluator(double decisionThreshold) {
         this(decisionThreshold, JSDivergenceConfig.SPRT_ALPHA, JSDivergenceConfig.SPRT_BETA);
@@ -70,13 +108,35 @@ public class SimilarityEvaluator {
         this(System.getProperty("probsparql.mode", JSDivergenceConfig.MODE), decisionThreshold, alpha, beta);
     }
 
+    /**
+     * Creates an evaluator for {@link Usage#DECISION}, the safe default: every public
+     * constructor produces a score that may be compared against the threshold.
+     * Benchmarks that want to measure a mode's own estimator should use
+     * {@link #forScoring}.
+     */
     public SimilarityEvaluator(String mode, double decisionThreshold, double alpha, double beta) {
+        this(mode, decisionThreshold, alpha, beta, Usage.DECISION);
+    }
+
+    /**
+     * Evaluator that reports each mode's own estimator verbatim, including V4's
+     * bound-only behaviour. Intended for benchmark harnesses measuring the estimators
+     * themselves; not safe to threshold under V4.
+     */
+    public static SimilarityEvaluator forScoring(String mode, double decisionThreshold,
+                                                 double alpha, double beta) {
+        return new SimilarityEvaluator(mode, decisionThreshold, alpha, beta, Usage.SCORING);
+    }
+
+    public SimilarityEvaluator(String mode, double decisionThreshold, double alpha, double beta,
+                               Usage usage) {
         validateTailProbability("alpha", alpha);
         validateTailProbability("beta", beta);
         this.mode = mode;
         this.decisionThreshold = decisionThreshold;
         this.alpha = alpha;
         this.beta = beta;
+        this.usage = usage;
         this.stratifiedSampler = new StratifiedSampler(42);
         this.sprtSampler = new SPRTSampler(42,
             alpha,
@@ -120,8 +180,20 @@ public class SimilarityEvaluator {
         return evaluateWithDetails(gmm1, gmm2).score();
     }
 
-    public EvaluationResult evaluateWithDetails(GMMValue gmm1, GMMValue gmm2) {
-        validateCompatibility(gmm1, gmm2);
+    public EvaluationResult evaluateWithDetails(GMMValue left, GMMValue right) {
+        validateCompatibility(left, right);
+
+        // JSD is symmetric, so every mode below must be too. Each of them draws from a
+        // single RNG stream whose realisation depends on the order the two operands are
+        // consumed in, so the operands are put in a canonical order once, here, before
+        // any sampler sees them. computeMC canonicalises again; the operation is
+        // idempotent, so the V1 path is unaffected.
+        GMMValue gmm1 = left;
+        GMMValue gmm2 = right;
+        if (!org.apache.jena.probsparql.functions.DistributionSeeds.inCanonicalOrder(left, right)) {
+            gmm1 = right;
+            gmm2 = left;
+        }
 
         return switch (mode) {
             case JSDivergenceConfig.MODE_GT_100 ->
@@ -149,7 +221,19 @@ public class SimilarityEvaluator {
             }
             case JSDivergenceConfig.MODE_V4_BOUNDS -> {
                 double[] result = boundsSampler.computeJSDWithFilter(gmm1, gmm2, JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES);
-                yield new EvaluationResult(result[0], (int) result[1], Pathway.BOUNDS);
+                boolean conclusive = result[BoundsFilterSampler.FILTER_CONCLUSIVE] > 0.5;
+                if (conclusive || usage == Usage.SCORING || BOUNDS_ONLY) {
+                    // Conclusive reject; or the caller asked for this mode's own
+                    // estimator rather than a thresholdable value; or the bound-only
+                    // baseline was forced.
+                    yield new EvaluationResult(result[BoundsFilterSampler.FILTER_BOUND],
+                        (int) result[BoundsFilterSampler.FILTER_SAMPLES], Pathway.BOUNDS);
+                }
+                // Decision path with an inconclusive bound: a lower bound below the
+                // threshold carries no information about the true JSD, so refine.
+                yield new EvaluationResult(
+                    computeMC(gmm1, gmm2, JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES),
+                    JSDivergenceConfig.V4_BOUNDS_MAX_SAMPLES, Pathway.BOUNDS_REFINED);
             }
             case JSDivergenceConfig.MODE_V5_ADAPTIVE -> {
                 double[] result = adaptiveSampler.computeJSDAdaptive(gmm1, gmm2, JSDivergenceConfig.V5_ADAPTIVE_MAX_SAMPLES);
@@ -178,67 +262,33 @@ public class SimilarityEvaluator {
         }
     }
 
+    /**
+     * Monte Carlo JSD estimate.
+     *
+     * <p>JSD is symmetric, so the estimate must be too. {@link #pairSeed} is already
+     * order-independent, but the two operands consume the shared RNG stream in call
+     * order, so swapping the arguments would otherwise yield a different realisation
+     * of the estimate. The operands are therefore put in a canonical order before
+     * sampling, making {@code computeMC(p,q)} and {@code computeMC(q,p)} bit-identical.</p>
+     */
     private double computeMC(GMMValue p, GMMValue q, int numSamples) {
-        Random rng = new Random(pairSeed(p, q));
-        GMMValue m = createMixture(p, q);
-        double klPM = computeKLDivergence(p, m, numSamples / 2, rng);
-        double klQM = computeKLDivergence(q, m, numSamples / 2, rng);
-        return 0.5 * klPM + 0.5 * klQM;
+        GMMValue first = p;
+        GMMValue second = q;
+        if (!org.apache.jena.probsparql.functions.DistributionSeeds.inCanonicalOrder(p, q)) {
+            first = q;
+            second = p;
+        }
+        Random rng = new Random(pairSeed(first, second));
+        GMMValue m = createMixture(first, second);
+        int half = numSamples / 2;
+        double klFirstM = computeKLDivergence(first, m, half, rng);
+        double klSecondM = computeKLDivergence(second, m, half, rng);
+        return 0.5 * klFirstM + 0.5 * klSecondM;
     }
+
 
     private GMMValue createMixture(GMMValue p, GMMValue q) {
-        int kP = p.getNComponents();
-        int kQ = q.getNComponents();
-        int kM = kP + kQ;
-        int d = p.getDimensions();
-
-        double[] weightsP = p.getWeights();
-        double[] weightsQ = q.getWeights();
-        double[][] meansP = p.getMeans();
-        double[][] meansQ = q.getMeans();
-        double[][][] covariancesP = p.getCovariances();
-        double[][][] covariancesQ = q.getCovariances();
-        String covType = p.getCovarianceType();
-
-        double[] weightsM = new double[kM];
-        double[][] meansM = new double[kM][d];
-        double[][][] covariancesM = new double[kM][][];
-
-        for (int k = 0; k < kP; k++) {
-            weightsM[k] = 0.5 * weightsP[k];
-            meansM[k] = meansP[k].clone();
-            covariancesM[k] = cloneCovariance(covariancesP[k], covType);
-        }
-
-        for (int k = 0; k < kQ; k++) {
-            weightsM[kP + k] = 0.5 * weightsQ[k];
-            meansM[kP + k] = meansQ[k].clone();
-            covariancesM[kP + k] = cloneCovariance(covariancesQ[k], covType);
-        }
-
-        return new GMMValue(kM, d, covType, weightsM, meansM, covariancesM);
-    }
-
-    private double[][] cloneCovariance(double[][] cov, String covType) {
-        return switch (covType) {
-            case "full" -> {
-                int d = cov.length;
-                double[][] fullCopy = new double[d][d];
-                for (int i = 0; i < d; i++) {
-                    for (int j = 0; j < d; j++) {
-                        fullCopy[i][j] = cov[i][j];
-                    }
-                }
-                yield fullCopy;
-            }
-            case "diag" -> {
-                double[][] diagCopy = new double[1][cov[0].length];
-                System.arraycopy(cov[0], 0, diagCopy[0], 0, cov[0].length);
-                yield diagCopy;
-            }
-            case "spherical" -> new double[][] {{cov[0][0]}};
-            default -> throw new IllegalStateException("Unknown covariance type: " + covType);
-        };
+        return GMMMixture.equalWeight(p, q);
     }
 
     private double computeKLDivergence(GMMValue p, GMMValue q, int numSamples, Random rng) {
