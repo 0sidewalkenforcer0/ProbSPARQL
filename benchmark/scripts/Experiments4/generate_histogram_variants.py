@@ -4,7 +4,7 @@ Generate Histogram Variant Datasets (Exp 4 baseline)
 =====================================================
 Reads benchmark TTL files containing ``uq:gmmLiteral`` distributions and
 writes new TTL files in which each GMM is replaced by a 1-D histogram
-approximation encoded as ``uq:histLiteral``.
+approximation encoded as ``uq:histogramLiteral``.
 
 Preferred JSON schema expected by HistogramDatatype.java:
     {"dimensions":1, "edges":[[<double>, ...]], "weights":[<double>, ...]}
@@ -43,7 +43,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 UQ = Namespace("http://example.org/ontology/uncertainty#")
 GMM_DATATYPE  = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
-HIST_DATATYPE = URIRef("http://example.org/ontology/uncertainty#histLiteral")
+HIST_DATATYPE = URIRef("http://example.org/ontology/uncertainty#histogramLiteral")
 
 DEFAULT_SCALES  = ["S0", "S1", "S2", "S3", "S4"]
 DEFAULT_BINS    = [50]
@@ -56,7 +56,7 @@ RANDOM_SEED     = 42
 # ---------------------------------------------------------------------------
 
 def gmm_to_histogram(json_str: str, B: int, rng: np.random.Generator) -> str:
-    """Sample from a 1-D GMM and return a ``uq:histLiteral`` JSON string."""
+    """Sample from a 1-D GMM and return a ``uq:histogramLiteral`` JSON string."""
     obj = json.loads(json_str)
     k = obj["n_components"]
     weights = np.asarray(obj["weights"], dtype=float)

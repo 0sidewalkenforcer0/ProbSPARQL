@@ -42,7 +42,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 CFM          = Namespace("http://example.org/ontology/cfm#")
 GMM_DTYPE    = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
-HIST_DTYPE   = URIRef("http://example.org/ontology/uncertainty#histLiteral")
+HIST_DTYPE   = URIRef("http://example.org/ontology/uncertainty#histogramLiteral")
 
 DEFAULT_SCALES = ["E3", "E5", "E7"]
 DEFAULT_BINS   = [50, 100]

@@ -18,7 +18,7 @@ import java.util.Locale;
  * <p>Dispatches by RDF datatype:</p>
  * <ul>
  *   <li>{@code uq:gmmLiteral}       → weighted sum of component means</li>
- *   <li>{@code uq:histLiteral}      → weighted average of bin centres</li>
+ *   <li>{@code uq:histogramLiteral}      → weighted average of bin centres</li>
  *   <li>{@code uq:dirichletLiteral} → αᵢ / α₀, returned as JSON array</li>
  * </ul>
  *

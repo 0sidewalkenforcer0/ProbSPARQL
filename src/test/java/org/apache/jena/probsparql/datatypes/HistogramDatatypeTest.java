@@ -10,6 +10,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class HistogramDatatypeTest {
 
     @Test
+    void testPaperDatatypeUriResolvesInSparql() {
+        org.apache.jena.probsparql.ProbSPARQL.init();
+        String query = """
+            PREFIX uq: <http://example.org/ontology/uncertainty#>
+            PREFIX prob: <http://example.org/prob#>
+            SELECT ?hist WHERE {
+              BIND('{"bins":[0,1,2],"weights":[0.4,0.6]}'^^uq:histogramLiteral AS ?hist)
+            }
+            """;
+        try (var execution = org.apache.jena.query.QueryExecutionFactory.create(
+                query, org.apache.jena.rdf.model.ModelFactory.createDefaultModel())) {
+            var literal = execution.execSelect().next().getLiteral("hist");
+            assertEquals("http://example.org/ontology/uncertainty#histogramLiteral",
+                literal.getDatatypeURI());
+            assertTrue(literal.getValue() instanceof HistogramValue);
+            assertEquals(0.4, ((HistogramValue) literal.getValue()).cdf(1.0), 1e-12);
+        }
+    }
+
+    @Test
     void testLegacyOneDimensionalSchemaStillParses() {
         String legacyJson = "{\"bins\":[0.0,1.0,2.0],\"weights\":[0.4,0.6]}";
 

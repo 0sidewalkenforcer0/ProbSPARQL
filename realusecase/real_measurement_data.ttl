@@ -2981,7 +2981,7 @@ ex:c02_Sa_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasurement ;
 
 ex:c02_Sa_empiricalRV a uq:RandomVariable ;
     uq:hasDomain uq:nonNegativeDouble ;
-    uq:hasDistribution """{"bins":[33.479333,35.325533,37.171733,39.017933,40.864133,42.710333],"weights":[0.470588,0.0,0.411765,0.058824,0.058824]}"""^^uq:histLiteral .
+    uq:hasDistribution """{"bins":[33.479333,35.325533,37.171733,39.017933,40.864133,42.710333],"weights":[0.470588,0.0,0.411765,0.058824,0.058824]}"""^^uq:histogramLiteral .
 
 ex:DataC02Roughness ex:hasEmpiricalCharacteristic ex:c02_Rq_empiricalCharacteristic .
 
@@ -2995,7 +2995,7 @@ ex:c02_Rq_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasurement ;
 
 ex:c02_Rq_empiricalRV a uq:RandomVariable ;
     uq:hasDomain uq:nonNegativeDouble ;
-    uq:hasDistribution """{"bins":[42.458,45.803956,49.149911,52.495867,55.841822,59.187778],"weights":[0.352941,0.411765,0.117647,0.058824,0.058824]}"""^^uq:histLiteral .
+    uq:hasDistribution """{"bins":[42.458,45.803956,49.149911,52.495867,55.841822,59.187778],"weights":[0.352941,0.411765,0.117647,0.058824,0.058824]}"""^^uq:histogramLiteral .
 
 ex:DataC02Roughness ex:hasEmpiricalCharacteristic ex:c02_RelativeDensity_empiricalCharacteristic .
 
@@ -3009,5 +3009,5 @@ ex:c02_RelativeDensity_empiricalMeasurement a ex:EmpiricalSurfaceRoughnessMeasur
 
 ex:c02_RelativeDensity_empiricalRV a uq:RandomVariable ;
     uq:hasDomain uq:nonNegativeDouble ;
-    uq:hasDistribution """{"bins":[0.037333,0.1776,0.317867,0.458133,0.5984,0.738667],"weights":[0.588235,0.176471,0.058824,0.117647,0.058824]}"""^^uq:histLiteral .
+    uq:hasDistribution """{"bins":[0.037333,0.1776,0.317867,0.458133,0.5984,0.738667],"weights":[0.588235,0.176471,0.058824,0.117647,0.058824]}"""^^uq:histogramLiteral .
 

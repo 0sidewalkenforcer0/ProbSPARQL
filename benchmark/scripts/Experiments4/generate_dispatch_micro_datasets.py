@@ -26,7 +26,7 @@ EX = Namespace("http://example.org/data/")
 BENCH = Namespace("http://example.org/benchmark/exp4#")
 
 GMM_DT = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
-HIST_DT = URIRef("http://example.org/ontology/uncertainty#histLiteral")
+HIST_DT = URIRef("http://example.org/ontology/uncertainty#histogramLiteral")
 DIR_DT = URIRef("http://example.org/ontology/uncertainty#dirichletLiteral")
 
 

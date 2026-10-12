@@ -218,13 +218,13 @@
       letter-spacing: 0.1em;
     }
 
-    #graphTitle, #dataUploadTitle, #queryTitle {
+    #graphTitle, #dataUploadTitle, #queryTitle, #guideDistributionTitle {
       font-size: 24px;
       font-weight: 700;
       text-transform: none;
       letter-spacing: normal;
     }
-    #graphTitle, #dataUploadTitle, #queryTitle { color: #edb70e; }
+    #graphTitle, #dataUploadTitle, #queryTitle, #guideDistributionTitle { color: #edb70e; }
     #graphTitle, #dataUploadTitle { margin: 0; }
 
     select, input[type="number"], input[type="file"] {
@@ -332,13 +332,13 @@
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    button#run, button#uploadTtl, button#refreshGraph {
+    button#run, button#uploadTtl, button#refreshGraph, button#guideRefresh {
       background: var(--primary);
       color: #000;
       box-shadow: 0 0 20px var(--primary-glow);
     }
 
-    button#run:hover, button#uploadTtl:hover, button#refreshGraph:hover {
+    button#run:hover, button#uploadTtl:hover, button#refreshGraph:hover, button#guideRefresh:hover {
       transform: translateY(-2px) scale(1.02);
       box-shadow: 0 0 30px var(--primary);
     }
@@ -896,8 +896,8 @@
     .control-row, .graph-controls { flex-wrap: wrap; gap: 12px; min-width: 0; }
     select { max-width: 100%; min-width: 0; }
     button { text-transform: none; letter-spacing: 0.01em; padding: 11px 20px; transition: background 150ms, border-color 150ms, box-shadow 150ms; }
-    button#run, button#uploadTtl, button#refreshGraph { box-shadow: 0 3px 10px #0003; }
-    button#run:hover, button#uploadTtl:hover, button#refreshGraph:hover { transform: none; background: #f5ca42; box-shadow: 0 4px 16px #edb70e25; }
+    button#run, button#uploadTtl, button#refreshGraph, button#guideRefresh { box-shadow: 0 3px 10px #0003; }
+    button#run:hover, button#uploadTtl:hover, button#refreshGraph:hover, button#guideRefresh:hover { transform: none; background: #f5ca42; box-shadow: 0 4px 16px #edb70e25; }
     button.secondary:hover { transform: none; border-color: #64748b; }
     :is(button, select, input, textarea):focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
     .file-upload-container:focus-within { outline: 2px solid var(--primary); outline-offset: 3px; }
@@ -937,7 +937,7 @@
     .distribution-body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
     #distributionTitle { color: var(--text-muted); font: 12px/1.6 var(--font-mono); overflow-wrap: anywhere; }
     #distributionClose { border: 0; padding: 2px 7px; font-size: 20px; background: transparent; }
-    #distributionSvg { width: 100%; background: #0b1320; border-radius: 0; }
+    #distributionSvg { width: 100%; background: var(--distribution-bg); border-radius: 0; }
     #distributionSummary { margin: 0; padding: 10px 14px; border-radius: 0; background: #0003; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-muted); font: 11px/1.9 var(--font-mono); }
     td.dist-clickable { cursor: pointer; max-width: 200px; }
     td.dist-clickable:hover { background: rgba(237,183,14,0.07) !important; }
@@ -1006,7 +1006,7 @@
     [data-theme="light"] .graph-node.selected circle { stroke: #273650; filter: none; }
     [data-theme="light"] .graph-node.expanded circle { stroke: #6b85a4; }
     /* Charts retain a dark plotting surface for their fixed-color SVG marks. */
-    .graph-distribution > svg { background: #0b1320; }
+    .graph-distribution > svg { background: var(--distribution-bg); }
     [data-theme="light"] :is(button#run, button#uploadTtl, button#refreshGraph) { background: var(--primary); color: #273650; }
 
     [data-theme="light"] :is(button#run, button#uploadTtl, button#refreshGraph):hover { background: #f5ca42; box-shadow: 0 4px 16px #edb70e40; }
@@ -1055,21 +1055,23 @@
       -webkit-text-fill-color: var(--text-main);
     }
     :root:not([data-theme="light"]) .graph-svg { background: #0a0f1a; }
-    .institution-footer {
+    header { flex-wrap: wrap; }
+    .header-title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .header-title-row h1 { flex-shrink: 0; }
+    .institution-logos {
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 20px;
       flex-wrap: wrap;
-      gap: 24px 40px;
-      margin: 0 40px;
-      padding: 24px 0 28px;
-      border-top: 1px solid var(--border);
     }
-    .institution-footer img { display: block; width: 180px; max-width: 100%; height: auto; object-fit: contain; }
-    .institution-footer .university-logo { width: 240px; }
-    :root:not([data-theme="light"]) .institution-footer img { filter: brightness(1.7) drop-shadow(0 0 1px #ffffff80); }
+    .institution-logos img { display: block; width: 100px; height: 44px; object-fit: contain; }
+    .institution-logos .university-logo { width: 150px; }
+    :root:not([data-theme="light"]) .institution-logos img { filter: brightness(1.7) drop-shadow(0 0 1px #ffffff80); }
     @media (max-width: 768px) {
-      .institution-footer { margin: 0 20px; gap: 20px; }
+      .institution-logos { gap: 16px; }
+      .institution-logos img { width: 80px; height: 36px; }
+      .institution-logos .university-logo { width: 120px; }
     }
     .dataset-toolbar .import-row {
       display: flex;
@@ -1142,6 +1144,48 @@
     #graphTitle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
     .graph-section.is-collapsed #graphControls,
     .graph-section.is-collapsed #graphShell { display: none; }
+    .distribution-guide-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 24px; }
+    .guide-card { padding: 24px; min-width: 0; }
+    .guide-card h3 { margin: 20px 0 12px; }
+    .guide-card p, .guide-card dd { line-height: 1.7; color: var(--text-muted); }
+    .guide-card pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 16px; background: var(--bg-main); font-size: 12px; line-height: 1.7; }
+    .guide-card select { width: 100%; margin-top: 10px; }
+    .guide-datatype-url { display: flex; align-items: baseline; gap: 12px; padding: 16px; margin: 16px 0; background: #1e293b; border: 1px solid #334155; border-radius: 6px; }
+    .guide-url-label { flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #94a3b8; }
+    #guideDatatype { color: #bae6fd; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; min-width: 0; }
+    [data-theme="light"] .guide-datatype-url { background: #edf4fc; border-color: #cbd9ea; }
+    [data-theme="light"] .guide-url-label { color: #52647b; }
+    [data-theme="light"] #guideDatatype { color: #175b92; }
+    .guide-type-picker { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    #guidePlotSvg { width: 100%; background: var(--distribution-bg); }
+    .guide-jena { border-top: 3px solid var(--primary); padding-top: 8px; margin-bottom: 28px; }
+    .guide-jena ol { padding: 0; margin: 20px 0; list-style: none; }
+    .guide-jena li { position: relative; padding: 14px 18px; margin-bottom: 30px; border: 1px solid var(--border-bright); border-radius: 6px; background: var(--primary-soft); line-height: 1.6; overflow-wrap: anywhere; }
+    .guide-jena li:not(:last-child)::after { content: "↓"; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); color: var(--primary); font-size: 20px; line-height: 30px; }
+    .guide-jena li:last-child { margin-bottom: 0; border-color: var(--primary); }
+    .guide-jena li strong, .guide-jena li span { display: block; }
+    .guide-jena li span { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; margin-top: 4px; }
+    .guide-constraints { border-left: 3px solid var(--primary); padding: 0 0 16px 18px; margin-bottom: 24px; }
+    .guide-constraints summary { cursor: pointer; margin-top: 16px; }
+    .guide-card dt { font-family: var(--font-mono); margin-top: 12px; }
+    .guide-card dd { margin-left: 0; }
+    @media(max-width:900px) { .distribution-guide-grid { grid-template-columns: 1fr; } }
+    :root {
+      --distribution-bg: #0b1320;
+      --distribution-grid: #253144;
+      --distribution-axis: #64748b;
+      --distribution-label: #94a3b8;
+      --distribution-heading: #cbd5e1;
+      --distribution-accent: #edb70e;
+    }
+    :root[data-theme="light"] {
+      --distribution-bg: #edf3fc;
+      --distribution-grid: #cbd8e8;
+      --distribution-axis: #62758f;
+      --distribution-label: #52647b;
+      --distribution-heading: #273650;
+      --distribution-accent: #a67c00;
+    }
   </style>
 </head>
 <body>
@@ -1149,7 +1193,14 @@
     <div class="header-left">
       <img class="header-logo" src="probsparql-icon.png?v=transparent-20260908" alt="ProbSPARQL logo" width="72" height="72">
       <div class="header-brand-text">
+      <div class="header-title-row">
       <h1 id="mainTitle">ProbSPARQL Pilot Interface</h1>
+    <div class="institution-logos" role="group" aria-label="Institutions">
+      <img class="university-logo" src="logos/university-stuttgart.png" alt="University of Stuttgart, Germany">
+      <img src="logos/sfb-1574.png" alt="SFB 1574">
+      <img src="logos/imprs-is.png" alt="IMPRS-IS">
+    </div>
+      </div>
       <p class="header-subtitle">ProbSPARQL Query Workbench</p>
       </div>
     </div>
@@ -1177,6 +1228,10 @@
       <button class="tab-button" type="button" role="tab" data-tab="data" aria-controls="tab-data" aria-selected="false">
         <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
         Data Assets
+      </button>
+      <button class="tab-button" type="button" role="tab" data-tab="distributions" aria-controls="tab-distributions" aria-selected="false">
+        <svg style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 20h18M3 17c5 0 4-13 9-13s4 13 9 13"/></svg>
+        Distribution Guide
       </button>
     </nav>
 
@@ -1286,6 +1341,7 @@
       </section>
 
 
+
     </section>
 
     <section id="tab-data" class="tab-panel" role="tabpanel">
@@ -1359,15 +1415,53 @@
       </section>
     </section>
 
+    <section id="tab-distributions" class="tab-panel" role="tabpanel" aria-label="Distribution Guide">
+      <div class="section-intro"><h2>How distributions work</h2><p>Choose a supported distribution, inspect a data node, and see how its JSON value and RDF datatype fit together.</p></div>
+      <div class="toolbar">
+        <div class="guide-type-picker"><label id="guideDistributionTitle" for="guideType">Distribution</label><select id="guideType"><option value="gmmLiteral">GMM</option><option value="histogramLiteral">Histogram</option><option value="dirichletLiteral">Dirichlet</option></select></div>
+        <button id="guideRefresh" type="button">Refresh data nodes</button>
+      </div>
+      <p id="guideStatus" class="status" role="status"></p>
+      <div class="distribution-guide-grid">
+        <section class="pane guide-card"><h3>1. Datatype</h3><p id="guideDescription"></p><div class="guide-datatype-url"><span class="guide-url-label">URL</span><code id="guideDatatype"></code></div><p>The datatype identifies the parser ProbSPARQL uses to interpret the literal.</p>
+          <h3>2. Data value (JSON)</h3><label for="guideNode">Example data node</label><select id="guideNode"></select><p id="guideSource"></p><pre id="guideJson"></pre>
+          <section id="guidePlot" hidden aria-label="Distribution diagram">
+            <h3>Distribution diagram</h3><p id="guidePlotTitle"></p>
+            <select id="guidePlotDimension" aria-label="Distribution dimension" hidden></select>
+            <svg id="guidePlotSvg" viewBox="0 0 700 300" role="img" aria-labelledby="guidePlotTitle" aria-describedby="guidePlotSummary"></svg>
+            <pre id="guidePlotSummary"></pre>
+          </section>
+          <section class="guide-constraints" aria-labelledby="guideConstraintsTitle">
+            <h3 id="guideConstraintsTitle">Distribution constraints</h3>
+            <dl id="guideConstraints"></dl>
+          </section>
+
+        </section>
+        <section class="pane guide-card">
+          <section aria-labelledby="guideJenaTitle" class="guide-jena">
+            <h3 id="guideJenaTitle">How a distribution is registered and understood</h3>
+            <p>Datatype registration → literal interpretation → SPARQL evaluation.</p>
+            <ol id="guideJenaSteps" aria-label="Distribution registration and SPARQL interpretation flow">
+              <li><strong>1. Define the datatype</strong><span>Datatype IRI → JSON rules + Java value type</span></li>
+              <li><strong>2. Register in TypeMapper</strong><span>registerDatatype(datatype.INSTANCE)</span></li>
+              <li><strong>3. Resolve the literal IRI</strong><span>&quot;{…}&quot;^^datatype → registered datatype</span></li>
+              <li><strong>4. Parse JSON</strong><span>parse(JSON) → distribution value</span></li>
+              <li><strong>5. Bind in SPARQL</strong><span>?dist → RDF literal → NodeValue</span></li>
+              <li><strong>6. Resolve the function</strong><span>FunctionRegistry maps function IRIs to implementations, e.g. prob:mean → Mean; prob:std → Std; prob:pdf → PDF; prob:cdf → CDF; prob:jsd → PolyJSD; prob:scale → Scale; prob:sample → Sample. Supported datatypes depend on the function. Datatypes and functions are registered separately.</span></li>
+              <li><strong>7. Read and compute</strong><span>getLiteralValue() → distribution operation → result</span></li>
+            </ol>
+          </section>
+          <h3>3. Combine value and datatype</h3><p>A typed RDF literal is a quoted value followed by <code>^^</code> and its datatype IRI. JSON alone is only text; the datatype supplies its interpretation.</p><pre id="guideLiteral"></pre>
+          <h3>4. Attach it to a data node</h3><p>The random variable holds the distribution through <code>uq:hasDistribution</code>. A measurement can point to that variable through <code>uq:representedBy</code>. Its domain, when present, is a separate <code>uq:hasDomain</code> property.</p><pre id="guideRdf"></pre>
+          <p><code>uq:nonNegativeDouble</code> describes a domain; it is not a distribution datatype and does not itself truncate a Gaussian.</p>
+        </section>
+      </div>
+    </section>
   </main>
 
-  <footer class="institution-footer" aria-label="Institutions">
-    <img src="logos/sfb-1574.png" alt="SFB 1574" loading="lazy">
-    <img src="logos/imprs-is.png" alt="IMPRS-IS" loading="lazy">
-    <img class="university-logo" src="logos/university-stuttgart.png" alt="University of Stuttgart, Germany" loading="lazy">
-  </footer>
 
-  <script src="distribution.js?v=20260910-dirichlet-beta-copy"></script>
+
+  <script src="distribution.js?v=20261009-preview-fix"></script>
   <script>
     const themeToggle = document.getElementById("themeToggle");
     function updateThemeButton() {
@@ -1438,39 +1532,28 @@
 
     const exampleQueries = [
       {
-        id: "factory-hardness-cdf",
-        label: "Hardness CDF > 0.9 at 450",
-        source: "examples/queries/factory_hardness_cdf_threshold.sparql",
-        query: `# Factory demo query:
-# Return bevel gears and their temperatures when the hardness CDF at 450 exceeds 0.9.
-
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-PREFIX ag: <http://example.org/anglegrinder#>
-PREFIX cfm: <http://example.org/circularfactorymeasure#>
-PREFIX uq: <http://example.org/uncertainty#>
-PREFIX prob: <http://probsparql.org/function#>
-
-SELECT ?bevel ?bevelLabel ?temp ?hardnessCdf
-WHERE {
-  ?bevel a ag:BevelGear ;
-         rdfs:label ?bevelLabel ;
-         ag:hasHardnessCharacteristic ?hardnessChar ;
-         ag:hasTemperatureCharacteristic ?tempChar .
-
-  ?hardnessMeasurement a cfm:Measurement ;
-                       cfm:measuresCharacteristic ?hardnessChar ;
-                       cfm:hasProbabilisticValue ?hardnessRv .
-  ?hardnessRv uq:hasDistribution ?hardnessDist .
-
-  ?tempMeasurement a cfm:Measurement ;
-                   cfm:measuresCharacteristic ?tempChar ;
-                   cfm:hasValue ?temp .
-
-  BIND(prob:cdf(?hardnessDist, 450) AS ?hardnessCdf)
-  FILTER(?hardnessCdf > 0.9)
-}
-ORDER BY ?bevelLabel`
+        "id": "factory-02_measurement_coverage",
+        "label": "Factory · Measurement coverage",
+        "source": "examples/queries/factory-diagnostics/02_measurement_coverage.sparql",
+        "query": "# Coverage report for three demo inspection channels, not a regulatory checklist.\n# Presence does not certify datatype validity or measurement quality.\nPREFIX ag: <http://example.org/anglegrinder#>\nPREFIX cfm: <http://example.org/circularfactorymeasure#>\nPREFIX uq: <http://example.org/uncertainty#>\nPREFIX prob: <http://probsparql.org/function#>\n\nSELECT ?product ?part ?hasHardness ?hasRms ?hasRs ?complete\nWHERE {\n  ?product a ag:AngleGrinder ; ag:hasPart ?part .\n  ?part a ag:BevelGear .\n  BIND(EXISTS {\n    ?part ag:hasHardnessCharacteristic ?h .\n    ?hm cfm:measuresCharacteristic ?h ; cfm:hasProbabilisticValue/uq:hasDistribution ?hd .\n  } AS ?hasHardness)\n  BIND(EXISTS {\n    ?part ag:hasBarkhausenRmsCharacteristic ?r .\n    ?rm cfm:measuresCharacteristic ?r ; cfm:hasProbabilisticValue/uq:hasDistribution ?rd .\n  } AS ?hasRms)\n  BIND(EXISTS {\n    ?part ag:hasResidualStressCharacteristic ?s .\n    ?sm cfm:measuresCharacteristic ?s ; cfm:hasProbabilisticValue/uq:hasDistribution ?sd .\n  } AS ?hasRs)\n  BIND(?hasHardness && ?hasRms && ?hasRs AS ?complete)\n  # Uncomment to show only incomplete records:\n  # FILTER(!?complete)\n}\nORDER BY ?complete ?product ?part\n"
+      },
+      {
+        "id": "factory-reuse-candidates",
+        "label": "Factory · Reuse candidates",
+        "source": "examples/queries/circular-use-cases/01_reuse_candidates.sparql",
+        "query": "# Load examples/data/factory-instances.ttl.\n# Illustrative acceptance band (400, 500], not an engineering specification.\n# Edit limits and minimum probability for the actual application.\nPREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\nPREFIX ag: <http://example.org/anglegrinder#>\nPREFIX cfm: <http://example.org/circularfactorymeasure#>\nPREFIX uq: <http://example.org/uncertainty#>\nPREFIX prob: <http://probsparql.org/function#>\n\nSELECT ?product ?part ?label ?pAccepted ?dist\nWHERE {\n  VALUES (?lower ?upper ?minProbability) { (400 500 0.95) }\n  ?part a ag:BevelGear ;\n        rdfs:label ?label ;\n        ag:hasHardnessCharacteristic ?characteristic .\n  ?measurement cfm:measuresCharacteristic ?characteristic ;\n               cfm:hasProbabilisticValue ?rv .\n  ?rv uq:hasDistribution ?dist .\n  OPTIONAL { ?product ag:hasPart ?part . }\n  BIND(prob:cdf(?dist, ?upper) - prob:cdf(?dist, ?lower) AS ?pAccepted)\n  FILTER(?pAccepted >= ?minProbability)\n}\nORDER BY DESC(?pAccepted) ?part\n"
+      },
+      {
+        "id": "factory-03_same_context_hardness_comparison",
+        "label": "Factory · Same-context hardness comparison",
+        "source": "examples/queries/factory-diagnostics/03_same_context_hardness_comparison.sparql",
+        "query": "# Equal recorded CC and temperature; these are NOT asserted to be replicate measurements.\n# Assumes comparable hardness scales in this single Factory demo file.\nPREFIX ag: <http://example.org/anglegrinder#>\nPREFIX cfm: <http://example.org/circularfactorymeasure#>\nPREFIX uq: <http://example.org/uncertainty#>\nPREFIX prob: <http://probsparql.org/function#>\n\nSELECT ?product1 ?part1 ?product2 ?part2 ?cc1 ?temp1 ?hardnessJsd\n       ?hardnessDist1 ?hardnessDist2\nWHERE {\n  {\n    ?product1 a ag:AngleGrinder ; ag:hasPart ?part1 .\n    ?part1 a ag:BevelGear ; ag:hasHardnessCharacteristic ?hc1 ;\n           ag:hasCarbonContentCharacteristic ?ccChar1 ;\n           ag:hasTemperatureCharacteristic ?tempChar1 .\n    ?hm1 cfm:measuresCharacteristic ?hc1 ;\n         cfm:hasProbabilisticValue/uq:hasDistribution ?hardnessDist1 .\n    ?ccm1 cfm:measuresCharacteristic ?ccChar1 ; cfm:hasValue ?cc1 .\n    ?tm1 cfm:measuresCharacteristic ?tempChar1 ; cfm:hasValue ?temp1 .\n  }\n  {\n    ?product2 a ag:AngleGrinder ; ag:hasPart ?part2 .\n    ?part2 a ag:BevelGear ; ag:hasHardnessCharacteristic ?hc2 ;\n           ag:hasCarbonContentCharacteristic ?ccChar2 ;\n           ag:hasTemperatureCharacteristic ?tempChar2 .\n    ?hm2 cfm:measuresCharacteristic ?hc2 ;\n         cfm:hasProbabilisticValue/uq:hasDistribution ?hardnessDist2 .\n    ?ccm2 cfm:measuresCharacteristic ?ccChar2 ; cfm:hasValue ?cc2 .\n    ?tm2 cfm:measuresCharacteristic ?tempChar2 ; cfm:hasValue ?temp2 .\n  }\n  FILTER(STR(?part1) < STR(?part2))\n  FILTER(?cc1 = ?cc2 && ?temp1 = ?temp2)\n  BIND(prob:jsd(?hardnessDist1, ?hardnessDist2) AS ?hardnessJsd)\n}\nORDER BY DESC(?hardnessJsd) ?part1 ?part2\n"
+      },
+      {
+        "id": "factory-04_hardness_matching_crosscheck",
+        "label": "Factory · Cross-property comparison",
+        "source": "examples/queries/factory-diagnostics/04_hardness_matching_crosscheck.sparql",
+        "query": "# Exploratory matching: epsilon=0.1, alpha=0.05; not assembly certification.\n# Equal CC; return temperatures for context. No joint probability assumption.\n# Assumes comparable measurement scales in this single Factory demo file.\nPREFIX ag: <http://example.org/anglegrinder#>\nPREFIX cfm: <http://example.org/circularfactorymeasure#>\nPREFIX uq: <http://example.org/uncertainty#>\nPREFIX prob: <http://probsparql.org/function#>\n\nSELECT ?product1 ?part1 ?product2 ?part2 ?cc1 ?temp1 ?temp2\n       ?rmsJsd ?rsJsd ?hardnessDist1 ?hardnessDist2\n       ?rmsDist1 ?rmsDist2 ?rsDist1 ?rsDist2\nWHERE {\n  {\n    ?product1 a ag:AngleGrinder ; ag:hasPart ?part1 .\n    ?part1 a ag:BevelGear ; ag:hasHardnessCharacteristic ?hc1 ;\n           ag:hasCarbonContentCharacteristic ?ccChar1 ;\n           ag:hasTemperatureCharacteristic ?tempChar1 .\n    ?hm1 cfm:measuresCharacteristic ?hc1 ;\n         cfm:hasProbabilisticValue/uq:hasDistribution ?hardnessDist1 .\n    ?ccm1 cfm:measuresCharacteristic ?ccChar1 ; cfm:hasValue ?cc1 .\n    ?tm1 cfm:measuresCharacteristic ?tempChar1 ; cfm:hasValue ?temp1 .\n  }\n\n  DIVJOIN(?hardnessDist1, ?hardnessDist2, 0.1, 0.05)\n\n  {\n    ?product2 a ag:AngleGrinder ; ag:hasPart ?part2 .\n    ?part2 a ag:BevelGear ; ag:hasHardnessCharacteristic ?hc2 ;\n           ag:hasCarbonContentCharacteristic ?ccChar2 ;\n           ag:hasTemperatureCharacteristic ?tempChar2 .\n    ?hm2 cfm:measuresCharacteristic ?hc2 ;\n         cfm:hasProbabilisticValue/uq:hasDistribution ?hardnessDist2 .\n    ?ccm2 cfm:measuresCharacteristic ?ccChar2 ; cfm:hasValue ?cc2 .\n    ?tm2 cfm:measuresCharacteristic ?tempChar2 ; cfm:hasValue ?temp2 .\n  }\n  FILTER(STR(?part1) < STR(?part2))\n  FILTER(?cc1 = ?cc2)\n  ?part1 ag:hasBarkhausenRmsCharacteristic ?rc1 ;\n         ag:hasResidualStressCharacteristic ?sc1 .\n  ?rm1 cfm:measuresCharacteristic ?rc1 ;\n       cfm:hasProbabilisticValue/uq:hasDistribution ?rmsDist1 .\n  ?sm1 cfm:measuresCharacteristic ?sc1 ;\n       cfm:hasProbabilisticValue/uq:hasDistribution ?rsDist1 .\n  ?part2 ag:hasBarkhausenRmsCharacteristic ?rc2 ;\n         ag:hasResidualStressCharacteristic ?sc2 .\n  ?rm2 cfm:measuresCharacteristic ?rc2 ;\n       cfm:hasProbabilisticValue/uq:hasDistribution ?rmsDist2 .\n  ?sm2 cfm:measuresCharacteristic ?sc2 ;\n       cfm:hasProbabilisticValue/uq:hasDistribution ?rsDist2 .\n  BIND(prob:jsd(?rmsDist1, ?rmsDist2) AS ?rmsJsd)\n  BIND(prob:jsd(?rsDist1, ?rsDist2) AS ?rsJsd)\n}\nORDER BY DESC(?rsJsd) DESC(?rmsJsd) ?part1 ?part2\n"
       }
     ];
 
@@ -1886,8 +1969,8 @@ LIMIT 60`
       runButton.disabled = true;
       document.getElementById("distributionPane").hidden = true;
       setStatus(statusNode, "Running...");
+      const queryText = queryInput.value;
       try {
-        const queryText = queryInput.value;
         const json = await sparql(queryText);
         queryHistory = [queryText, ...queryHistory.filter(query => query !== queryText)].slice(0, 10);
         saveQueryHistory();
@@ -2076,18 +2159,30 @@ LIMIT ${graphLimit()}`;
 
     function graphFallbackRootQuery() {
       return `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ex: <https://w3id.org/probsparql/examples/real-manufacturing/>
 SELECT ?s (SAMPLE(?type) AS ?nodeType) (COUNT(?o) AS ?relationCount)
 WHERE {
-  ?s ?p ?o .
-  FILTER(isIRI(?s))
-  FILTER NOT EXISTS { ?s rdf:type rdf:Property }
-  FILTER NOT EXISTS { ?s rdf:type <http://www.w3.org/2000/01/rdf-schema#Class> }
-  FILTER NOT EXISTS { ?s <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superClass }
-  FILTER NOT EXISTS { ?parent ?parentPred ?s . FILTER(?parent != ?s) }
+  {
+    ?s a ex:RealMeasurementDataset .
+    BIND(0 AS ?priority)
+  }
+  UNION
+  {
+    ?s ?rootPredicate ?rootObject .
+    FILTER(isIRI(?s))
+    FILTER NOT EXISTS { ?s rdf:type rdf:Property }
+    FILTER NOT EXISTS { ?s rdf:type <http://www.w3.org/2000/01/rdf-schema#Class> }
+    FILTER NOT EXISTS { ?s <http://www.w3.org/2000/01/rdf-schema#subClassOf> ?superClass }
+    FILTER NOT EXISTS { ?parent ?parentPred ?s . FILTER(?parent != ?s) }
+    FILTER NOT EXISTS { ?s a ex:RealMeasurementDataset }
+    FILTER NOT EXISTS { ?s ex:sourceDataset ?dataset . ?dataset a ex:RealMeasurementDataset }
+    BIND(1 AS ?priority)
+  }
   OPTIONAL { ?s a ?type }
+  OPTIONAL { ?s ?p ?o }
 }
 GROUP BY ?s
-ORDER BY ?relationCount
+ORDER BY MIN(?priority) STR(?s)
 LIMIT ${graphLimit()}`;
     }
 
@@ -2111,6 +2206,7 @@ WHERE {
     FILTER(isIRI(?s) || isBlank(?s))
   }
 }
+ORDER BY STR(?s) STR(?p) STR(?o)
 LIMIT ${graphLimit()}`;
     }
 
@@ -3012,5 +3108,6 @@ LIMIT ${graphLimit()}`;
     graphState.transform = { x: 0, y: 0, k: 1 };
     activateTab("query");
   </script>
+  <script src="distribution-guide.js?v=20261009-preview-fix"></script>
 </body>
 </html>

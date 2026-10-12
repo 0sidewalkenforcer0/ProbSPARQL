@@ -245,6 +245,7 @@ All functions use the prefix: `PREFIX prob: <http://probsparql.org/function#>`
 | Function | Description | Example |
 |----------|-------------|---------|
 | `prob:kldivergence(?gmm1, ?gmm2)` | KL divergence between distributions | `prob:kldivergence(?d1, ?d2)` |
+| `prob:divergenceTest(?dist1, ?dist2, ?epsilon, ?alpha)` | Boolean DIVJOIN-compatible decision (score <= epsilon). GMM sequential paths use alpha for both tails; other paths use numerical comparison. Budget exhaustion follows the evaluator fallback; not a uniform significance guarantee. | `prob:divergenceTest(?d1, ?d2, 0.1, 0.05)` |
 | `prob:jsd(?dist1, ?dist2)` | Preferred JSD interface. Returns a numerical Jensen-Shannon divergence for supported distribution types; MC paths use a fixed 10K sample budget | `prob:jsd(?d1, ?d2)` |
 | `prob:jsdivergence(?gmm1, ?gmm2)` | Legacy GMM-only compatibility wrapper for the threshold-aware V1-V5 similarity evaluator | `prob:jsdivergence(?d1, ?d2)` |
 | `prob:histjsd(?hist1, ?hist2)` | Histogram-specific JSD | `prob:histjsd(?h1, ?h2)` |
@@ -337,6 +338,11 @@ ex:sensor1 uq:hasDistribution
 ```
 
 ### Histogram Literals
+
+Histogram literals use `uq:histogramLiteral`
+(`http://example.org/ontology/uncertainty#histogramLiteral`).
+When upgrading from the former histogram datatype URI, update existing data
+and re-import it after rebuilding and restarting Fuseki.
 
 For histogram literals, the preferred lexical form is:
 

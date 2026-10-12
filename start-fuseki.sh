@@ -30,12 +30,11 @@ if ! command -v mvn &> /dev/null; then
     exit 1
 fi
 
-# Build the project if needed
-if [ ! -d "target/classes" ]; then
-    echo "Building project..."
-    mvn clean compile
-    echo ""
-fi
+# Rebuild before every launch: an existing target/classes directory may contain
+# stale classes or IDE-generated classes with unresolved compilation errors.
+echo "Rebuilding project..."
+mvn clean compile
+echo ""
 
 # Default port
 PORT=${1:-3030}

@@ -24,7 +24,7 @@ import java.util.List;
 public class HistogramDatatype extends BaseDatatype {
 
     public static final String URI =
-            "http://example.org/ontology/uncertainty#histLiteral";
+            "http://example.org/ontology/uncertainty#histogramLiteral";
 
     public static final HistogramDatatype INSTANCE = new HistogramDatatype();
 

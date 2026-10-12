@@ -1,0 +1,724 @@
+[
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_2d_diag",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":2,\"dimensions\":2,\"covariance_type\":\"diag\",\"weights\":[0.65,0.35],\"means\":[[0.0,2.0],[2.5,0.5]],\"covariances\":[[1.0,1.3225],[1.44,1.8225]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_2d_diag"
+  },
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_2d_full",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":3,\"dimensions\":2,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[0.0,2.0],[2.5,0.5],[5.0,-1.0]],\"covariances\":[[[1.0,0.2875],[0.2875,1.3225]],[[1.44,0.405],[0.405,1.8225]],[[1.96,0.5425],[0.5425,2.4025]]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_2d_full"
+  },
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_4d_diag",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":2,\"dimensions\":4,\"covariance_type\":\"diag\",\"weights\":[0.65,0.35],\"means\":[[0.0,2.0,4.0,6.0],[2.5,0.5,6.5,4.5]],\"covariances\":[[1.0,1.3225,1.69,2.1025],[1.44,1.8225,2.25,2.7225]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_4d_diag"
+  },
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_4d_full",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":3,\"dimensions\":4,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[0.0,2.0,4.0,6.0],[2.5,0.5,6.5,4.5],[5.0,-1.0,9.0,3.0]],\"covariances\":[[[1.0,0.2875,0.325,0.3625],[0.2875,1.3225,0.37375,0.416875],[0.325,0.37375,1.69,0.47125],[0.3625,0.416875,0.47125,2.1025]],[[1.44,0.405,0.45,0.495],[0.405,1.8225,0.50625,0.556875],[0.45,0.50625,2.25,0.61875],[0.495,0.556875,0.61875,2.7225]],[[1.96,0.5425,0.595,0.6475],[0.5425,2.4025,0.65875,0.716875],[0.595,0.65875,2.89,0.78625],[0.6475,0.716875,0.78625,3.4225]]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_4d_full"
+  },
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_8d_diag",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":2,\"dimensions\":8,\"covariance_type\":\"diag\",\"weights\":[0.65,0.35],\"means\":[[0.0,2.0,4.0,6.0,8.0,10.0,12.0,14.0],[2.5,0.5,6.5,4.5,10.5,8.5,14.5,12.5]],\"covariances\":[[1.0,1.3225,1.69,2.1025,2.56,3.0625,3.61,4.2025],[1.44,1.8225,2.25,2.7225,3.24,3.8025,4.41,5.0625]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_8d_diag"
+  },
+  {
+    "node": "http://example.org/data/synthetic-multidim/rv_8d_full",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":3,\"dimensions\":8,\"covariance_type\":\"full\",\"weights\":[0.5,0.3,0.2],\"means\":[[0.0,2.0,4.0,6.0,8.0,10.0,12.0,14.0],[2.5,0.5,6.5,4.5,10.5,8.5,14.5,12.5],[5.0,-1.0,9.0,3.0,13.0,7.0,17.0,11.0]],\"covariances\":[[[1.0,0.2875,0.325,0.3625,0.4,0.4375,0.475,0.5125],[0.2875,1.3225,0.37375,0.416875,0.46,0.503125,0.54625,0.589375],[0.325,0.37375,1.69,0.47125,0.52,0.56875,0.6175,0.66625],[0.3625,0.416875,0.47125,2.1025,0.58,0.634375,0.68875,0.743125],[0.4,0.46,0.52,0.58,2.56,0.7,0.76,0.82],[0.4375,0.503125,0.56875,0.634375,0.7,3.0625,0.83125,0.896875],[0.475,0.54625,0.6175,0.68875,0.76,0.83125,3.61,0.97375],[0.5125,0.589375,0.66625,0.743125,0.82,0.896875,0.97375,4.2025]],[[1.44,0.405,0.45,0.495,0.54,0.585,0.63,0.675],[0.405,1.8225,0.50625,0.556875,0.6075,0.658125,0.70875,0.759375],[0.45,0.50625,2.25,0.61875,0.675,0.73125,0.7875,0.84375],[0.495,0.556875,0.61875,2.7225,0.7425,0.804375,0.86625,0.928125],[0.54,0.6075,0.675,0.7425,3.24,0.8775,0.945,1.0125],[0.585,0.658125,0.73125,0.804375,0.8775,3.8025,1.02375,1.096875],[0.63,0.70875,0.7875,0.86625,0.945,1.02375,4.41,1.18125],[0.675,0.759375,0.84375,0.928125,1.0125,1.096875,1.18125,5.0625]],[[1.96,0.5425,0.595,0.6475,0.7,0.7525,0.805,0.8575],[0.5425,2.4025,0.65875,0.716875,0.775,0.833125,0.89125,0.949375],[0.595,0.65875,2.89,0.78625,0.85,0.91375,0.9775,1.04125],[0.6475,0.716875,0.78625,3.4225,0.925,0.994375,1.06375,1.133125],[0.7,0.775,0.85,0.925,4.0,1.075,1.15,1.225],[0.7525,0.833125,0.91375,0.994375,1.075,4.6225,1.23625,1.316875],[0.805,0.89125,0.9775,1.06375,1.15,1.23625,5.29,1.40875],[0.8575,0.949375,1.04125,1.133125,1.225,1.316875,1.40875,6.0025]]]}",
+    "source": "examples/data/synthetic/multidimensional-gmm.ttl",
+    "measurement": "http://example.org/data/synthetic-multidim/measurement_8d_full"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_001_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[270.11889]],\"covariances\":[[399.688461]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_001_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_001_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[22.28333]],\"covariances\":[[1138.230377]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_001_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_002_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[225.03361]],\"covariances\":[[447.371146]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_002_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_002_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[26.83333]],\"covariances\":[[335.140757]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_002_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_003_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[238.51833]],\"covariances\":[[809.349015]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_003_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_003_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[32.26667]],\"covariances\":[[142.840504]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_003_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_004_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[280.35778]],\"covariances\":[[679.306554]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_004_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_004_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[30.35]],\"covariances\":[[765.886253]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_004_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_005_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[683.24167]],\"covariances\":[[691.961443]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_005_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_005_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[41.075]],\"covariances\":[[149.238474]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_005_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_006_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[689.50833]],\"covariances\":[[1281.798957]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_006_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_006_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[32.96667]],\"covariances\":[[152.589938]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_006_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_007_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[849.53861]],\"covariances\":[[857.443723]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_007_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_007_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.99167]],\"covariances\":[[68.844524]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_007_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_008_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[859.35333]],\"covariances\":[[1056.827929]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_008_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_008_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.6]],\"covariances\":[[100.694602]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_008_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_009_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[1125.31556]],\"covariances\":[[670.319544]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_009_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_009_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[20.7]],\"covariances\":[[30.398131]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_009_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_010_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[1104.71556]],\"covariances\":[[734.367725]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_010_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_010_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[19.86667]],\"covariances\":[[15.698791]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_010_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_011_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[59.13417]],\"covariances\":[[14.879766]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_011_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_011_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.59167]],\"covariances\":[[627.011616]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_011_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_012_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[58.885]],\"covariances\":[[21.606879]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_012_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_012_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[12.2]],\"covariances\":[[1009.93662]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_012_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_013_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[93.81667]],\"covariances\":[[101.579992]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_013_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_013_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[15.99167]],\"covariances\":[[330.995437]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_013_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_014_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[93.96]],\"covariances\":[[52.428895]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_014_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_014_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[-7.375]],\"covariances\":[[937.098217]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_014_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_015_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[525.88528]],\"covariances\":[[927.536871]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_015_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_015_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[-0.70833]],\"covariances\":[[60.209995]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_015_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_016_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[492.87278]],\"covariances\":[[735.221056]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_016_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_016_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[-9.26667]],\"covariances\":[[171.104189]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_016_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_017_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[685.03556]],\"covariances\":[[693.323141]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_017_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_017_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[3.075]],\"covariances\":[[32.387481]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_017_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_018_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[652.50667]],\"covariances\":[[1421.078888]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_018_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_018_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[3.6]],\"covariances\":[[4.385464]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_018_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_019_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[792.49472]],\"covariances\":[[1812.453517]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_019_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_019_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[25.475]],\"covariances\":[[16.800243]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_019_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_020_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[751.54028]],\"covariances\":[[2947.304207]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_020_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_020_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[13.61667]],\"covariances\":[[21.096016]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_020_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_021_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[66.63528]],\"covariances\":[[5.504983]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_021_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_021_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[-6.1]],\"covariances\":[[570.652788]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_021_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_022_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[61.54444]],\"covariances\":[[77.693118]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_022_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_022_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[0.9]],\"covariances\":[[228.26919]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_022_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_023_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[99.10417]],\"covariances\":[[27.359176]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_023_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_023_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[12.3]],\"covariances\":[[82.569026]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_023_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_024_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[96.16861]],\"covariances\":[[32.341969]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_024_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_024_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[-11.66667]],\"covariances\":[[569.155018]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_024_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_025_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[496.42556]],\"covariances\":[[641.897188]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_025_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_025_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[12.84167]],\"covariances\":[[80.497143]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_025_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_026_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[526.7375]],\"covariances\":[[617.261106]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_026_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_026_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[7.075]],\"covariances\":[[130.298344]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_026_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_027_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[635.89333]],\"covariances\":[[367.253913]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_027_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_027_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[5.85833]],\"covariances\":[[25.095391]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_027_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_028_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[627.52111]],\"covariances\":[[672.095255]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_028_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_028_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[2.75833]],\"covariances\":[[24.904491]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_028_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_029_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[744.915]],\"covariances\":[[953.04519]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_029_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_029_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[26.58333]],\"covariances\":[[7.476068]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_029_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_030_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[738.23694]],\"covariances\":[[2734.168803]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_030_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_030_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[24.76667]],\"covariances\":[[19.744248]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_030_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_031_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[70.34361]],\"covariances\":[[21.957659]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_031_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_031_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[78.79167]],\"covariances\":[[547.062629]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_031_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_032_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[69.62139]],\"covariances\":[[15.405076]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_032_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_032_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[83.78333]],\"covariances\":[[528.801299]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_032_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_033_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[93.86194]],\"covariances\":[[45.122791]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_033_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_033_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[41.09167]],\"covariances\":[[339.966113]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_033_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_034_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[84.95389]],\"covariances\":[[79.976891]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_034_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_034_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[67.64167]],\"covariances\":[[212.477268]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_034_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_035_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[443.97111]],\"covariances\":[[312.641808]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_035_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_035_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[47.00833]],\"covariances\":[[85.135315]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_035_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_036_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[420.17611]],\"covariances\":[[1638.428006]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_036_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_036_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[45.95833]],\"covariances\":[[65.073585]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_036_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_037_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[534.06667]],\"covariances\":[[1005.849471]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_037_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_037_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.6]],\"covariances\":[[40.876331]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_037_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_038_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[523.17944]],\"covariances\":[[863.005191]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_038_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_038_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[6.975]],\"covariances\":[[82.814732]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_038_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_039_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[729.31389]],\"covariances\":[[985.062164]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_039_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_039_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[22.325]],\"covariances\":[[11.120224]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_039_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_040_rmsRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[644.09889]],\"covariances\":[[1147.640966]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_040_rmsMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_040_residualStressRV",
+    "datatype": "gmmLiteral",
+    "value": "{\"n_components\":1,\"dimensions\":1,\"covariance_type\":\"diag\",\"weights\":[1.0],\"means\":[[23.30833]],\"covariances\":[[17.318998]]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#double",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/hardSample_040_residualStressMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/c02_Sa_empiricalRV",
+    "datatype": "histogramLiteral",
+    "value": "{\"bins\":[33.479333,35.325533,37.171733,39.017933,40.864133,42.710333],\"weights\":[0.470588,0.0,0.411765,0.058824,0.058824]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/c02_Sa_empiricalMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/c02_Rq_empiricalRV",
+    "datatype": "histogramLiteral",
+    "value": "{\"bins\":[42.458,45.803956,49.149911,52.495867,55.841822,59.187778],\"weights\":[0.352941,0.411765,0.117647,0.058824,0.058824]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/c02_Rq_empiricalMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/c02_RelativeDensity_empiricalRV",
+    "datatype": "histogramLiteral",
+    "value": "{\"bins\":[0.037333,0.1776,0.317867,0.458133,0.5984,0.738667],\"weights\":[0.588235,0.176471,0.058824,0.117647,0.058824]}",
+    "source": "realusecase/real_measurement_data.ttl",
+    "domain": "http://example.org/ontology/uncertainty#nonNegativeDouble",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/c02_RelativeDensity_empiricalMeasurement"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/syntheticCompositionRV1",
+    "datatype": "dirichletLiteral",
+    "value": "{\"alphas\":[6.0,3.0,1.0]}",
+    "source": "examples/data/synthetic/measurement-data.ttl",
+    "domain": "https://w3id.org/probsparql/examples/real-manufacturing/compositionSimplex",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/syntheticCompositionSample1"
+  },
+  {
+    "node": "https://w3id.org/probsparql/examples/real-manufacturing/syntheticCompositionRV2",
+    "datatype": "dirichletLiteral",
+    "value": "{\"alphas\":[3.0,5.0,2.0]}",
+    "source": "examples/data/synthetic/measurement-data.ttl",
+    "domain": "https://w3id.org/probsparql/examples/real-manufacturing/compositionSimplex",
+    "measurement": "https://w3id.org/probsparql/examples/real-manufacturing/syntheticCompositionSample2"
+  }
+]

@@ -17,7 +17,7 @@ import org.apache.jena.sparql.function.FunctionBase2;
  * of the first argument:</p>
  * <ul>
  *   <li>{@code uq:gmmLiteral}       → weighted sum of Gaussian CDFs</li>
- *   <li>{@code uq:histLiteral}      → linear-interpolated histogram CDF</li>
+ *   <li>{@code uq:histogramLiteral}      → linear-interpolated histogram CDF</li>
  *   <li>{@code uq:dirichletLiteral} → marginal Beta CDF of dimension 0</li>
  * </ul>
  *

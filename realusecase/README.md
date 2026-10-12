@@ -80,5 +80,22 @@ Using the Gaussian encoding above, this query is expected to return 6 measuremen
 
 ## Triple count
 
-The generated Turtle file contains 2386 RDF triples when parsed with RDFLib.
+The generated Turtle file contains 2424 RDF triples when parsed with RDFLib.
 
+
+## Additional distribution demo
+
+The TTL includes three real-data empirical histograms using `uq:histogramLiteral`
+(the datatype name registered by this implementation, matching the paper).
+Existing datasets using the former histogram datatype URI must be updated and
+re-imported after rebuilding and restarting Fuseki.
+Two explicitly synthetic Dirichlet examples use `uq:dirichletLiteral` with
+`{"alphas":[6,3,1]}` and `{"alphas":[3,5,2]}`. Their components represent
+reusable, recyclable, and waste fractions; these parameters are illustrative,
+not estimates from the source spreadsheets. Scalar summaries give the expected
+reusable fraction and use the dimensionless unit `om:one`.
+
+Run `queries/Distribution_types_demo.rq` to retrieve all five random-variable
+nodes and their distributions. `queries/Histogram_real_c02_sa_cdf.rq` evaluates
+the real Sa histogram CDF. Re-upload the updated TTL to make the new examples
+available in the UI.

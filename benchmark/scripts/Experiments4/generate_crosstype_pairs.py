@@ -10,7 +10,7 @@ Creates two TTL files used to evaluate the sample-based cross-type JSD fallback:
        ?rvA cfm:hasDistribution ?gmm        (uq:gmmLiteral,   K=3)
        :e_NNN cfm:hasMeasurementB ?mB .
        ?mB cfm:representedBy ?rvB .
-       ?rvB cfm:hasDistribution ?hist       (uq:histLiteral, dimensions+edges+weights)
+       ?rvB cfm:hasDistribution ?hist       (uq:histogramLiteral, dimensions+edges+weights)
        :e_NNN cfm:refSameTypeJSD ?x    (reference JSD for accuracy reporting)
        The histogram is derived from the same underlying GMM (same source dist),
        so the true GMM↔Hist JSD should be close to zero.
@@ -54,7 +54,7 @@ CFM      = Namespace("http://example.org/ontology/cfm#")
 UQ       = Namespace("http://example.org/ontology/uncertainty#")
 EX       = Namespace("http://example.org/data/")
 GMM_DT   = URIRef("http://example.org/ontology/uncertainty#gmmLiteral")
-HIST_DT  = URIRef("http://example.org/ontology/uncertainty#histLiteral")
+HIST_DT  = URIRef("http://example.org/ontology/uncertainty#histogramLiteral")
 DIR_DT   = URIRef("http://example.org/ontology/uncertainty#dirichletLiteral")
 
 N_PAIRS  = 100

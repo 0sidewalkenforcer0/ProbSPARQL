@@ -1,6 +1,6 @@
 /* Distribution previews use numeric SVG coordinates; dataset text stays textContent. */
 function isDistribution(term) {
-  return term && term.type === 'literal' && /#(gmmLiteral|histLiteral|dirichletLiteral)$/.test(term.datatype || '');
+  return term && term.type === 'literal' && /#(gmmLiteral|histogramLiteral|dirichletLiteral)$/.test(term.datatype || '');
 }
 
 function distributionSeries(term, dimension = 0) {
@@ -32,7 +32,7 @@ function distributionSeries(term, dimension = 0) {
     const points = [...xs].sort((a, b) => a - b).map(x => [x, weights.reduce((sum, w, k) => sum + w * Math.exp(-((x - means[k]) ** 2) / (2 * variances[k])) / Math.sqrt(2 * Math.PI * variances[k]), 0)]);
     return { points, dimensions, label: dimensions > 1 ? `GMM — marginal density, dimension ${dimension + 1}` : 'GMM — probability density', yLabel: 'Density', summary: weights.map((w, k) => `C${k + 1}: weight=${w.toPrecision(4)}, mean=${means[k].toPrecision(5)}, σ=${Math.sqrt(variances[k]).toPrecision(4)}`).join('\n') };
   }
-  if (term.datatype.endsWith('#histLiteral')) {
+  if (term.datatype.endsWith('#histogramLiteral')) {
     if ((data.dimensions || 1) !== 1) throw Error('Histogram preview currently supports one dimension only.');
     const edges = data.bins || (Array.isArray(data.edges?.[0]) ? data.edges[0] : data.edges);
     const weights = normalize(data.weights);
@@ -93,13 +93,13 @@ function drawDistributionSurface(svg, surface) {
     svg.appendChild(node);
     return node;
   };
-  const line = (a, b, stroke = '#64748b') => add('line', {x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke});
-  const text = (p, content) => add('text', {x: p[0], y: p[1], fill: '#cbd5e1', 'font-size': 12, 'text-anchor': 'middle'}, content);
+  const line = (a, b, stroke = 'var(--distribution-axis, #64748b)') => add('line', {x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke});
+  const text = (p, content) => add('text', {x: p[0], y: p[1], fill: 'var(--distribution-heading, #cbd5e1)', 'font-size': 12, 'text-anchor': 'middle'}, content);
   const fmt = v => Number(v.toPrecision(3)).toString();
   for (let i = 0; i <= 4; i++) {
     const t = i / 4;
-    line(project(t, 0, 0), project(t, 1, 0), '#253144');
-    line(project(0, t, 0), project(1, t, 0), '#253144');
+    line(project(t, 0, 0), project(t, 1, 0), 'var(--distribution-grid, #253144)');
+    line(project(0, t, 0), project(1, t, 0), 'var(--distribution-grid, #253144)');
     const px = project(t, 0, 0), py = project(1, t, 0);
     text([px[0], px[1] + 20], fmt(value(0, t)));
     text([py[0] + 24, py[1] + 5], fmt(value(1, t)));
@@ -114,7 +114,7 @@ function drawDistributionSurface(svg, surface) {
       const cell = add('polygon', {
         points: corners.map(([a, b]) => project(a / n, b / n, grid[a][b]).join(',')).join(' '),
         fill: `hsl(${240 - 240 * Math.min(1, z / (top / 1.1))}, 85%, 50%)`,
-        stroke: '#0b1320', 'stroke-opacity': 0.4, 'stroke-width': 0.45
+        stroke: 'var(--distribution-bg, #0b1320)', 'stroke-opacity': 0.4, 'stroke-width': 0.45
       });
       const tooltip = document.createElementNS(svg.namespaceURI, 'title');
       tooltip.textContent = `X₁=${fmt(value(0, (i + 0.5) / n))}; X₂=${fmt(value(1, (j + 0.5) / n))}; density≈${fmt(z)}`;
@@ -167,7 +167,7 @@ function appendDirichletMarginals(svg, alphas) {
     return node;
   };
   svg.setAttribute('viewBox', `0 0 700 ${320 + marginals.length * 190}`);
-  add('text', {x: 65, y: 315, fill: '#cbd5e1', 'font-size': 14}, 'Beta marginal densities — category proportions');
+  add('text', {x: 65, y: 315, fill: 'var(--distribution-heading, #cbd5e1)', 'font-size': 14}, 'Beta marginal densities — category proportions');
   marginals.forEach(({a, b, points}, i) => {
     const base = 350 + i * 190;
     const top = Math.max(...points.map(p => p[1])) * 1.1;
@@ -177,15 +177,15 @@ function appendDirichletMarginals(svg, alphas) {
     add('text', {x: 65, y: base, fill: color, 'font-size': 12}, `Category ${i + 1}: Beta(${a.toPrecision(4)}, ${b.toPrecision(4)})`);
     for (let j = 0; j <= 4; j++) {
       const v = top * j / 4;
-      add('line', {x1: 65, x2: 665, y1: y(v), y2: y(v), stroke: '#253144'});
-      add('text', {x: 57, y: y(v) + 4, 'text-anchor': 'end', fill: '#94a3b8', 'font-size': 10}, Number(v.toPrecision(3)));
-      add('text', {x: x(j / 4), y: base + 138, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 10}, j / 4);
+      add('line', {x1: 65, x2: 665, y1: y(v), y2: y(v), stroke: 'var(--distribution-grid, #253144)'});
+      add('text', {x: 57, y: y(v) + 4, 'text-anchor': 'end', fill: 'var(--distribution-label, #94a3b8)', 'font-size': 10}, Number(v.toPrecision(3)));
+      add('text', {x: x(j / 4), y: base + 138, 'text-anchor': 'middle', fill: 'var(--distribution-label, #94a3b8)', 'font-size': 10}, j / 4);
     }
     const curve = add('polyline', {points: points.map(p => `${x(p[0])},${y(p[1])}`).join(' '), fill: 'none', stroke: color, 'stroke-width': 2});
     const tooltip = document.createElementNS(svg.namespaceURI, 'title');
     tooltip.textContent = `Category ${i + 1}: proportion on x-axis, probability density on y-axis. Each panel has its own density scale.`;
     curve.appendChild(tooltip);
-    add('text', {x: 365, y: base + 157, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 11}, 'Proportion p (0–1)');
+    add('text', {x: 365, y: base + 157, 'text-anchor': 'middle', fill: 'var(--distribution-label, #94a3b8)', 'font-size': 11}, 'Proportion p (0–1)');
   });
 }
 
@@ -245,21 +245,21 @@ function showDistribution(term, label, dimension = null, target = null) {
     const format = v => Number(v.toPrecision(4)).toString();
     for (let i = 0; i <= 4; i++) {
       const v = top * i / 4;
-      add('line', {x1: 65, x2: 665, y1: y(v), y2: y(v), stroke: '#253144'});
-      add('text', {x: 57, y: y(v) + 4, 'text-anchor': 'end', fill: '#94a3b8', 'font-size': 11}, format(v));
+      add('line', {x1: 65, x2: 665, y1: y(v), y2: y(v), stroke: 'var(--distribution-grid, #253144)'});
+      add('text', {x: 57, y: y(v) + 4, 'text-anchor': 'end', fill: 'var(--distribution-label, #94a3b8)', 'font-size': 11}, format(v));
       const tick = lo + (hi - lo) * i / 4;
-      add('text', {x: x(tick), y: 277, 'text-anchor': 'middle', fill: '#94a3b8', 'font-size': 11}, format(tick));
+      add('text', {x: x(tick), y: 277, 'text-anchor': 'middle', fill: 'var(--distribution-label, #94a3b8)', 'font-size': 11}, format(tick));
     }
-    add('text', {x: 65, y: 20, fill: '#94a3b8', 'font-size': 12}, series.yLabel);
+    add('text', {x: 65, y: 20, fill: 'var(--distribution-label, #94a3b8)', 'font-size': 12}, series.yLabel);
     if (series.points) {
-      add('polyline', {points: series.points.map(p => `${x(p[0])},${y(p[1])}`).join(' '), fill: 'none', stroke: '#edb70e', 'stroke-width': 2});
+      add('polyline', {points: series.points.map(p => `${x(p[0])},${y(p[1])}`).join(' '), fill: 'none', stroke: 'var(--distribution-accent, #edb70e)', 'stroke-width': 2});
       series.points.forEach(p => {
         const point = add('circle', {cx: x(p[0]), cy: y(p[1]), r: 4, fill: 'transparent'});
         const title = document.createElementNS(svg.namespaceURI, 'title');
         title.textContent = `x=${format(p[0])}; density=${format(p[1])}`;
         point.appendChild(title);
       });
-    } else series.bars.forEach(b => add('rect', {x: x(b[0]), y: y(b[2]), width: x(b[1]) - x(b[0]), height: 255 - y(b[2]), fill: '#edb70e', opacity: 0.8}));
+    } else series.bars.forEach(b => add('rect', {x: x(b[0]), y: y(b[2]), width: x(b[1]) - x(b[0]), height: 255 - y(b[2]), fill: 'var(--distribution-accent, #edb70e)', opacity: 0.8}));
     if (term.datatype.endsWith('#dirichletLiteral')) {
       appendDirichletMarginals(svg, JSON.parse(term.value).alphas);
       summary.textContent = 'Bars show expected category proportions. Curves show Beta marginal densities for each proportion. Proportions sum to 1 and are dependent. Each panel uses its own density scale; endpoints are omitted.';

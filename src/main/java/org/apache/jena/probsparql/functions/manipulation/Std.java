@@ -18,7 +18,7 @@ import java.util.Locale;
  * <p>Dispatches by RDF datatype:</p>
  * <ul>
  *   <li>{@code uq:gmmLiteral}       → sqrt(Var[X]) via law of total variance</li>
- *   <li>{@code uq:histLiteral}      → sqrt(Σ p_i (c_i - E[X])²)</li>
+ *   <li>{@code uq:histogramLiteral}      → sqrt(Σ p_i (c_i - E[X])²)</li>
  *   <li>{@code uq:dirichletLiteral} → per-dimension Dirichlet variance formula</li>
  * </ul>
  */

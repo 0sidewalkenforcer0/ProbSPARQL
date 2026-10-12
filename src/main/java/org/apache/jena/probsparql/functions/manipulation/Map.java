@@ -18,7 +18,7 @@ import java.util.Locale;
  * <p>Dispatches by RDF datatype:</p>
  * <ul>
  *   <li>{@code uq:gmmLiteral}       → mean of component with maximum weight</li>
- *   <li>{@code uq:histLiteral}      → centre of the bin with the highest probability mass</li>
+ *   <li>{@code uq:histogramLiteral}      → centre of the bin with the highest probability mass</li>
  *   <li>{@code uq:dirichletLiteral} → (αᵢ − 1) / (α₀ − k) if all αᵢ > 1</li>
  * </ul>
  */
