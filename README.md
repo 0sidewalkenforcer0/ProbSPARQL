@@ -483,20 +483,19 @@ mvn exec:java -Dexec.mainClass="org.apache.jena.probsparql.server.ProbSPARQLFuse
 
 ## Citation
 
-If you use this software, please cite the paper. The proceedings entry does not exist yet, so
-the preprint is the citable version for now:
+If you use this software, please cite the paper:
 
 ```bibtex
-@misc{wu2026probsparql,
-  title         = {ProbSPARQL: Querying Knowledge Graphs with Multi-dimensional, Uncertain Numeric Data},
-  author        = {Wu, Jingcheng and Thapa, Ratan Bahadur and Hernandez, Daniel and Zhou, Hongkuan and Staab, Steffen},
-  year          = {2026},
-  eprint        = {2607.18262},
-  archivePrefix = {arXiv},
-  primaryClass  = {cs.AI},
-  doi           = {10.48550/arXiv.2607.18262},
-  url           = {https://arxiv.org/abs/2607.18262},
-  note          = {To appear in the In-Use track of ISWC 2026}
+@inbook{wu2026probsparql,
+  title     = {ProbSPARQL: Querying Knowledge Graphs with Multi-Dimensional, Uncertain Numeric Data},
+  author    = {Wu, Jingcheng and Thapa, Ratan Bahadur and Hern{\'a}ndez, Daniel and Zhou, Hongkuan and Staab, Steffen},
+  booktitle = {The Semantic Web -- ISWC 2026},
+  series    = {Lecture Notes in Computer Science},
+  publisher = {Springer Nature Switzerland},
+  year      = {2026},
+  pages     = {362--381},
+  doi       = {10.1007/978-3-032-42029-9_19},
+  url       = {https://link.springer.com/chapter/10.1007/978-3-032-42029-9_19}
 }
 ```
 
