@@ -6,10 +6,14 @@
 ![SPARQL](https://img.shields.io/badge/SPARQL-1.1-green.svg)
 ![Apache Jena](https://img.shields.io/badge/Apache%20Jena-6.0.0--SNAPSHOT-red.svg)
 ![Status](https://img.shields.io/badge/status-research%20prototype-yellow.svg)
+[![Paper](https://img.shields.io/badge/Paper-Springer-blue.svg)](https://link.springer.com/chapter/10.1007/978-3-032-42029-9_19)
+[![Video](https://img.shields.io/badge/Video-Demo-red.svg)](https://www.ki.uni-stuttgart.de/institute/news/ProbSPARQL-Demo/)
 [![arXiv](https://img.shields.io/badge/arXiv-2607.18262-b31b1b.svg)](https://arxiv.org/abs/2607.18262)
 
 **This repository contains the implementation accompanying the paper of the same title, to appear in the
-In-Use track of the International Semantic Web Conference (ISWC) 2026. A preprint is available at
+In-Use track of the International Semantic Web Conference (ISWC) 2026. The paper is available at
+[Springer](https://link.springer.com/chapter/10.1007/978-3-032-42029-9_19), a demo video at
+[ki.uni-stuttgart.de](https://www.ki.uni-stuttgart.de/institute/news/ProbSPARQL-Demo/), and a preprint at
 [arXiv:2607.18262](https://arxiv.org/abs/2607.18262).**
 
 Probabilistic SPARQL Extension for Apache Jena with GMM, Histogram, and Dirichlet Literals
