@@ -1,0 +1,7 @@
+BACKGROUND = "#0a0f1c"
+INSTANCE = "#edb70e"
+CLASS = "#818cf8"
+LITERAL = "#475569"
+LIKELIHOOD = "#22d3ee"
+MUTED = "#94a3b8"
+TEXT = "#e5e7eb"
