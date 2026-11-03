@@ -2562,12 +2562,13 @@ LIMIT ${graphLimit()}`;
       summary.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px";
       const details = document.createElement("details");
       const caption = document.createElement("summary");
-      const datatypeName = (term.datatype || "").split(/[#/]/).pop();
-      caption.textContent = datatypeName ? `Distribution JSON (${datatypeName})` : "Distribution JSON";
+      caption.textContent = "Distribution JSON";
       const raw = document.createElement("pre");
       raw.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto";
       try { raw.textContent = JSON.stringify(JSON.parse(term.value), null, 2); }
       catch (_) { raw.textContent = term.value; }
+      const datatypeName = (term.datatype || "").split(/[#/]/).pop();
+      if (datatypeName) raw.textContent += `^^${datatypeName}`;
       details.append(caption, raw);
       pane.append(title, selector, svg, summary, details);
       container.appendChild(pane);
