@@ -564,6 +564,7 @@
       -webkit-user-select: none;
     }
 
+    .graph-arrow { fill: rgba(237, 183, 14, 0.85); }
     .graph-link {
       stroke: rgba(237, 183, 14, 0.42);
       stroke-width: 1.5;
@@ -578,13 +579,10 @@
     }
 
     .node-instance { color: var(--primary); fill: var(--primary); }
-    .node-anglegrinder { color: #818cf8; fill: #818cf8; }
-    .node-cfm { color: #f472b6; fill: #f472b6; }
-    .node-uncertainty { color: #fb923c; fill: #fb923c; }
-    .node-om { color: #22d3ee; fill: #22d3ee; }
-    .node-resource { color: #94a3b8; fill: #94a3b8; }
+    .node-class { color: #818cf8; fill: #818cf8; }
     .node-literal { color: #475569; fill: #475569; }
-    .node-science { color: #10b981; fill: #10b981; }
+    .graph-legend { position: absolute; right: 12px; top: 10px; display: flex; gap: 12px; font-size: 11px; color: #94a3b8; pointer-events: none; }
+    .graph-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; }
 
     .graph-node-label {
       font-size: 10px;
@@ -1000,7 +998,11 @@
     [data-theme="light"] :is(.graph-stage, .graph-svg) { background: #edf3fc; box-shadow: none; }
     [data-theme="light"] .graph-detail { background: #f6f9ff; }
     [data-theme="light"] .graph-link { stroke: #8da4bd; }
+    [data-theme="light"] .graph-arrow { fill: #5b7a9c; }
     [data-theme="light"] .graph-node { color: var(--primary); fill: var(--primary); }
+    [data-theme="light"] .graph-node.node-class { color: #6366f1; fill: #6366f1; }
+    [data-theme="light"] .graph-node.node-literal { color: #94a3b8; fill: #94a3b8; }
+    [data-theme="light"] .graph-legend { color: #5b6d89; }
     [data-theme="light"] .graph-node-label { fill: #a67c00; stroke: #edf3fc; }
     [data-theme="light"] .graph-link-label { fill: #5b6d89; stroke: #edf3fc; }
     [data-theme="light"] .graph-node.selected circle { stroke: #273650; filter: none; }
@@ -1250,6 +1252,10 @@
               <input id="graphLiterals" type="checkbox">
               Show Literals
             </label>
+            <label class="check-control" for="graphQueryResults" style="cursor: pointer; font-size: 12px;">
+              <input id="graphQueryResults" type="checkbox">
+              Show Query Results
+            </label>
             <button id="refreshGraph" type="button">
               <svg style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 14"></path></svg>
               Reload Graph
@@ -1264,6 +1270,7 @@
         <div id="graphShell" class="graph-shell">
           <div class="graph-stage">
             <div id="graphStatus" class="status graph-status">Loading top-level nodes…</div>
+            <div class="graph-legend" aria-hidden="true"><span><i style="background:#818cf8"></i>Class</span><span><i style="background:var(--primary)"></i>Instance</span><span><i style="background:#475569"></i>Literal</span></div>
             <svg id="kgGraph" class="graph-svg" role="img" aria-label="Dataset knowledge graph">
               <g id="kgViewport"></g>
             </svg>
@@ -1529,6 +1536,7 @@
     }
     const angleGrinderClassUri = "http://example.org/anglegrinder#AngleGrinder";
     const rdfTypeUri = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
+    const rdfsSubClassOfUri = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 
     const exampleQueries = [
       {
@@ -1626,6 +1634,7 @@ LIMIT 60`
     const resetGraphButton = document.getElementById("resetGraph");
     const graphLimitInput = document.getElementById("graphLimit");
     const graphLiteralsInput = document.getElementById("graphLiterals");
+    const graphQueryResultsInput = document.getElementById("graphQueryResults");
     const graphStatusNode = document.getElementById("graphStatus");
     const kgGraph = document.getElementById("kgGraph");
     const kgViewport = document.getElementById("kgViewport");
@@ -1828,7 +1837,6 @@ LIMIT 60`
       } catch (error) {
         console.error(error);
       } finally {
-        graphNeedsRefresh = true;
         refreshDatasetButton.disabled = false;
       }
     }
@@ -1976,7 +1984,7 @@ LIMIT 60`
         saveQueryHistory();
         if (!historyDropdown.hidden) renderQueryHistory();
         const count = renderTable(resultNode, json);
-        showQueryGraph(json);
+        if (graphQueryResultsInput.checked) showQueryGraph(json);
         setStatus(statusNode, `${count} result row${count === 1 ? "" : "s"}`);
       } catch (error) {
         renderFallback(resultNode, error.message);
@@ -2241,9 +2249,19 @@ LIMIT ${graphLimit()}`;
       return node;
     }
 
+    function nodeRole(node) {
+      if (node.kind === "literal") return "literal";
+      return node.isClass ? "class" : "instance";
+    }
+
     function addGraphLink(sourceTerm, predicateTerm, targetTerm) {
       const source = getGraphNode(sourceTerm);
       const target = getGraphNode(targetTerm);
+      if (predicateTerm.value === rdfTypeUri) target.isClass = true;
+      if (predicateTerm.value === rdfsSubClassOfUri) {
+        source.isClass = true;
+        target.isClass = true;
+      }
       const linkKey = `${source.id}|${predicateTerm.value}|${target.id}`;
       let link = graphState.linkMap.get(linkKey);
       if (!link) {
@@ -2410,10 +2428,14 @@ LIMIT ${graphLimit()}`;
         if (!link.line) {
           return;
         }
+        const dx = link.target.x - link.source.x;
+        const dy = link.target.y - link.source.y;
+        const dist = Math.hypot(dx, dy);
+        const inset = dist > 0 ? (link.target.kind === "literal" ? 9 : 12) / dist : 0;
         link.line.setAttribute("x1", link.source.x);
         link.line.setAttribute("y1", link.source.y);
-        link.line.setAttribute("x2", link.target.x);
-        link.line.setAttribute("y2", link.target.y);
+        link.line.setAttribute("x2", link.target.x - dx * inset);
+        link.line.setAttribute("y2", link.target.y - dy * inset);
         if (link.labelElement) {
           link.labelElement.setAttribute("x", (link.source.x + link.target.x) / 2);
           link.labelElement.setAttribute("y", (link.source.y + link.target.y) / 2);
@@ -2433,13 +2455,14 @@ LIMIT ${graphLimit()}`;
       const marker = svgEl("marker", {
         id: "graphArrow",
         viewBox: "0 0 10 10",
-        refX: "14",
+        refX: "10",
         refY: "5",
-        markerWidth: "4",
-        markerHeight: "4",
-        orient: "auto-start-reverse"
+        markerUnits: "userSpaceOnUse",
+        markerWidth: "11",
+        markerHeight: "11",
+        orient: "auto"
       });
-      marker.appendChild(svgEl("path", { d: "M0 0 L10 5 L0 10 z", fill: "#4b5563" }));
+      marker.appendChild(svgEl("path", { class: "graph-arrow", d: "M0 0 L10 5 L0 10 z" }));
       defs.appendChild(marker);
       kgViewport.appendChild(defs);
 
@@ -2468,7 +2491,7 @@ LIMIT ${graphLimit()}`;
 
       graphState.nodes.forEach((node) => {
         const stateClass = node.loading ? "loading" : node.expanded ? "expanded" : isExpandable(node) ? "expandable" : "not-expandable";
-        const group = svgEl("g", { class: `graph-node node-${node.kind} ${stateClass}` });
+        const group = svgEl("g", { class: `graph-node node-${nodeRole(node)} ${stateClass}` });
         const radius = node.kind === "literal" ? 8 : 11;
         const circle = svgEl("circle", { r: String(radius) });
         const label = svgEl("text", {
@@ -2564,7 +2587,7 @@ LIMIT ${graphLimit()}`;
 
       const rows = [
         ["Label", node.label],
-        ["Kind", node.kind],
+        ["Kind", nodeRole(node)],
         ["State", node.loading ? "loading" : node.expanded ? "expanded" : isExpandable(node) ? "expandable" : "not expandable"],
         ["URI", node.term.value]
       ];
@@ -2801,7 +2824,7 @@ LIMIT ${graphLimit()}`;
         selectNode(node);
         updateGraphPositions();
         startGraphSimulation(0.7);
-        setStatus(graphStatusNode, `${graphState.nodes.length} nodes, ${graphState.links.length} edges visible`);
+        setStatus(graphStatusNode, `${graphState.nodes.length} nodes, ${graphState.links.length} edges visible${bindings.length >= graphLimit() ? `. Showing the first ${bindings.length} edges of ${node.label}; raise Node Limit to see more.` : ""}`);
       } catch (error) {
         node.loading = false;
         syncGraphDOM();
