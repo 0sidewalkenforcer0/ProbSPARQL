@@ -2562,7 +2562,8 @@ LIMIT ${graphLimit()}`;
       summary.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px";
       const details = document.createElement("details");
       const caption = document.createElement("summary");
-      caption.textContent = "Distribution JSON";
+      const datatypeName = (term.datatype || "").split(/[#/]/).pop();
+      caption.textContent = datatypeName ? `Distribution JSON (${datatypeName})` : "Distribution JSON";
       const raw = document.createElement("pre");
       raw.style.cssText = "white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto";
       try { raw.textContent = JSON.stringify(JSON.parse(term.value), null, 2); }
